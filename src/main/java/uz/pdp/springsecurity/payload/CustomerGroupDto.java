@@ -13,10 +13,8 @@ import java.util.UUID;
 public class CustomerGroupDto {
     private UUID id;
     
-    @NotNull(message = "required line")
     private String name;
 
-    @NotNull(message = "required line")
     private Double percent;
 
     private UUID businessId;
