@@ -1,1 +1,0 @@
-java -Dserver.port=7683 $JAVA_OPTS -jar target/spring-security-0.0.1-SNAPSHOT.jar

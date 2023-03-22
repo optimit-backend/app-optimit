@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -16,20 +17,21 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/customerGroup")
+@RequiredArgsConstructor
 public class CustomerGroupController {
-    @Autowired
-    CustomerGroupService customerGroupService;
+
+    private final CustomerGroupService customerGroupService;
 
     @CheckPermission("ADD_CUSTOMER_GROUP")
     @PostMapping
-    public HttpEntity<?> addCustomerGroup(@Valid @RequestBody CustomerGroupDto customerGroupDto) {
+    public HttpEntity<?> addCustomerGroup(@RequestBody CustomerGroupDto customerGroupDto) {
         ApiResponse apiResponse = customerGroupService.addCustomerGroup(customerGroupDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-//    @CheckPermission("VIEW_CUSTOMER_GROUP")
+    //    @CheckPermission("VIEW_CUSTOMER_GROUP")
     @GetMapping("/get")
-    public HttpEntity<?> getAll(){
+    public HttpEntity<?> getAll() {
         ApiResponse apiResponse = customerGroupService.getAll();
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }

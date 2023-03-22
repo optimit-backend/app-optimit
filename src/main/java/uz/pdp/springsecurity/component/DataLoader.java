@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import uz.pdp.springsecurity.entity.*;
@@ -31,6 +32,7 @@ public class DataLoader implements CommandLineRunner {
 
     @Autowired
     RoleRepository roleRepository;
+
 
     @Autowired
     PasswordEncoder passwordEncoder;
