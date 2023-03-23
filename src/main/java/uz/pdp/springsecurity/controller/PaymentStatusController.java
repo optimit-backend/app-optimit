@@ -13,14 +13,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/paystatus")
-public class PayStatusController {
+public class PaymentStatusController {
     @Autowired
     PayStatusService payStatusService;
 
     /**
      * YANGI TO'LANGANLIK STATUSINI QO'SHISH
      *
-     * @param payStatusDto
+     * @RequaestBody payStatusDto
      * @return ApiResponse(success - > true message - > ADDED)
      */
     @CheckPermission("ADD_PAY_STATUS")
@@ -33,8 +33,8 @@ public class PayStatusController {
     /**
      * TO'LANGANLIK STATUSINI TAXRIRLASH
      *
-     * @param id
-     * @param payStatusDto
+     * @PathVariable id
+     * @RequaestBody payStatusDto
      * @return ApiResponse(success - > true message - > EDITED)
      */
     @CheckPermission("EDIT_PAY_STATUS")

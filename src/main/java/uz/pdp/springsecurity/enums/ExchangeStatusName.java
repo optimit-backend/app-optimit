@@ -4,6 +4,4 @@ public enum ExchangeStatusName {
     QABUL_QILINGAN,
     KUTILMOQDA,
     BUYURTMA_QILINGAN
-
-
 }

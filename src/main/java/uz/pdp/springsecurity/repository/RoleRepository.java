@@ -8,12 +8,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface RoleRepository extends JpaRepository<Role, UUID> {
-    boolean existsByName(String name);
+    boolean existsByNameIgnoreCase(String name);
+    boolean existsByNameIgnoreCaseAndBusinessId(String name, UUID businessId);
+    boolean existsByNameIgnoreCaseAndBusinessIdAndIdIsNot(String name, UUID businessId,UUID id);
 
 
     Optional<Role> findByName(String name);
 
-    List<Role> findAllByBusiness_Id(UUID business_id);
+    Optional<Role> findByNameAndBusinessId(String name, UUID businessId);
+
+
+    List<Role> findAllByBusiness_IdAndNameIsNot(UUID business_id, String name);
 
     void deleteAllByBusiness_Id(UUID id);
 }

@@ -1,21 +1,21 @@
 package uz.pdp.springsecurity.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Business;
-import uz.pdp.springsecurity.entity.Supplier;
+import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.StatusName;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.RepaymentDto;
 import uz.pdp.springsecurity.payload.SupplierDto;
-import uz.pdp.springsecurity.repository.BranchRepository;
-import uz.pdp.springsecurity.repository.BusinessRepository;
-import uz.pdp.springsecurity.repository.SupplierRepository;
+import uz.pdp.springsecurity.repository.*;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class SupplierService {
     @Autowired
     SupplierRepository supplierRepository;
@@ -25,6 +25,8 @@ public class SupplierService {
 
     @Autowired
     BusinessRepository businessRepository;
+    private final PurchaseRepository purchaseRepository;
+    private final PaymentStatusRepository paymentStatusRepository;
 
     public ApiResponse add(SupplierDto supplierDto) {
         Optional<Business> optionalBusiness = businessRepository.findById(supplierDto.getBusinessId());
@@ -88,23 +90,45 @@ public class SupplierService {
     }
 
     public ApiResponse storeRepayment(UUID id, RepaymentDto repaymentDto) {
-
-        try {
-            Optional<Supplier> supplierOptional = supplierRepository.findById(id);
-            if (supplierOptional.isEmpty()) return new ApiResponse("Not Found Supplier", false);
-            Supplier supplier = supplierOptional.get();
-
-            if (repaymentDto.getRepayment() != null) {
-                supplier.setDebt(supplier.getDebt() - repaymentDto.getRepayment());
-                supplierRepository.save(supplier);
+        Optional<Supplier> supplierOptional = supplierRepository.findById(id);
+        if (supplierOptional.isEmpty()) return new ApiResponse("Not Found Supplier", false);
+        Supplier supplier = supplierOptional.get();
+        if (repaymentDto.getRepayment() != null) {
+            supplier.setDebt(supplier.getDebt() - repaymentDto.getRepayment());
+            supplierRepository.save(supplier);
+            try {
+                storeRepaymentHelper(repaymentDto.getRepayment(), supplier);
                 return new ApiResponse("Repayment Store !", true);
-
-            } else {
-                return new ApiResponse("Brat Qarz null kelyabdi !", false);
+            } catch (Exception e) {
+                return new ApiResponse("ERROR", false);
             }
-
-        } catch (Exception e) {
-            return new ApiResponse("Exception Xatolik !", false);
+        } else {
+            return new ApiResponse("Repayment Not Found !", false);
         }
+    }
+
+    private void storeRepaymentHelper(Double paidSum, Supplier supplier) {
+        PaymentStatus tolangan = paymentStatusRepository.findByStatus(StatusName.TOLANGAN.name());
+        PaymentStatus qisman_tolangan = paymentStatusRepository.findByStatus(StatusName.QISMAN_TOLANGAN.name());
+        List<Purchase> purchaseList = purchaseRepository.findAllBySupplierId(supplier.getId());
+        for (Purchase purchase : purchaseList) {
+            if (paidSum > purchase.getDebtSum()){
+                paidSum -= purchase.getDebtSum();
+                purchase.setDebtSum(0);
+                purchase.setPaidSum(purchase.getTotalSum());
+                purchase.setPaymentStatus(tolangan);
+            }else if (paidSum == purchase.getDebtSum()){
+                purchase.setDebtSum(0);
+                purchase.setPaidSum(purchase.getTotalSum());
+                purchase.setPaymentStatus(tolangan);
+                break;
+            }else {
+                purchase.setDebtSum(purchase.getDebtSum() - paidSum);
+                purchase.setPaidSum(purchase.getPaidSum() + paidSum);
+                purchase.setPaymentStatus(qisman_tolangan);
+                break;
+            }
+        }
+        purchaseRepository.saveAll(purchaseList);
     }
 }

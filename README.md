@@ -1,2 +1,2 @@
 # evabackDemo
-evaback uchun Demo versiyasi 1.2
+evaback uchun Demo versiyasi 1.2.2

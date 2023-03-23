@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
+import uz.pdp.springsecurity.annotations.CurrentUser;
+import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProfileDto;
 import uz.pdp.springsecurity.payload.UserDto;
@@ -29,7 +31,7 @@ public class UserController {
     @CheckPermission("ADD_USER")
     @PostMapping()
     public HttpEntity<?> add(@Valid @RequestBody UserDto userDto) {
-        ApiResponse apiResponse = userService.add(userDto);
+        ApiResponse apiResponse = userService.add(userDto, false);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -72,23 +74,23 @@ public class UserController {
         ApiResponse apiResponse = userService.delete(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 404).body(apiResponse);
     }
+
     /**
      * OZINI PROFILINI TAXRIRLASH
-     *
-     * @param profileDto
+     * @CurrentUser user
+     * @RequesBody profileDto
      * @return ApiResponse(success - > true, message - > UPDATED)
      */
     @CheckPermission("EDIT_MY_PROFILE")
-    @PutMapping
-    public ResponseEntity<?> editMyProfile(@Valid @RequestBody ProfileDto profileDto) {
-        ApiResponse apiResponse = userService.editMyProfile(profileDto);
+    @PutMapping()
+    public ResponseEntity<?> editMyProfile(@CurrentUser User user, @Valid @RequestBody ProfileDto profileDto) {
+        ApiResponse apiResponse = userService.editMyProfile(user, profileDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? HttpStatus.OK : HttpStatus.CONFLICT).body(apiResponse);
     }
 
     /**
      * ROLE_ID ORQALI USERNI OLIB CHIQISH
-     *
-     * @param role_id
+     * @Id role_id
      * @return ApiResponse(success - > true, message - > FOUND)
      */
 
@@ -98,10 +100,11 @@ public class UserController {
         ApiResponse apiResponse = userService.getByRole(role_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
     /**
      * BUSINESS_ID ORQALI USERLARNI OLIB CHIQISH
      *
-     * @param business_id
+     * @Id business_id
      * @return ApiResponse(success - > true, message - > FOUND)
      */
     @CheckPermission("VIEW_USER_ADMIN")

@@ -80,7 +80,7 @@ public class SupplierController {
     /**
      * BUSINESS ID'SI ORQALI BARCHA TA'MINOTCHILARNI OLIB CHIQISH
      *
-     * @param businessId
+     * @Id businessId
      * @return ApiResponse(success - > true, message - > FOUND)
      */
     @CheckPermission("VIEW_SUPPLIER_ADMIN")
@@ -92,7 +92,6 @@ public class SupplierController {
 
     /**
      * DO'KON QARZINI TO'LASHI
-
      */
     @CheckPermission("ADD_SUPPLIER")
     @PostMapping("/repayment/{id}")

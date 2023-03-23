@@ -10,6 +10,7 @@ import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductBarcodeDto;
 import uz.pdp.springsecurity.payload.ProductDto;
+import uz.pdp.springsecurity.repository.ProductRepository;
 import uz.pdp.springsecurity.service.ProductService;
 
 import javax.validation.Valid;
@@ -23,6 +24,9 @@ public class ProductController {
 
     @Autowired
     ProductService productService;
+
+    @Autowired
+    ProductRepository productRepository;
 
     /**
      * YANGI PRODUCT QO'SHISH
@@ -61,7 +65,7 @@ public class ProductController {
      * @return ApiResponse(success - > true object - > value)
      */
 
-    @CheckPermission("VIEW_PRODUCT_ADMIN")
+    @CheckPermission("VIEW_PRODUCT")
     @GetMapping
     public HttpEntity<?> get(@CurrentUser User user) {
         ApiResponse apiResponse = productService.getAll(user);
@@ -145,8 +149,8 @@ public class ProductController {
      */
     @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/get-by-brand/{brand_id}")
-    public HttpEntity<?> getByBrand(@PathVariable UUID brand_id, @CurrentUser User user)  {
-        ApiResponse apiResponse = productService.getByBrand(brand_id, user);
+    public HttpEntity<?> getByBrand(@PathVariable UUID brand_id)  {
+        ApiResponse apiResponse = productService.getByBrand(brand_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -173,11 +177,25 @@ public class ProductController {
     }
 
     @CheckPermission("VIEW_PRODUCT")
-    @GetMapping("/get-by-business/{business_id}")
-    public HttpEntity<?> getByBusiness(@PathVariable UUID business_id) {
-        ApiResponse apiResponse = productService.getByBusiness(business_id);
+    @GetMapping("/get-by-branch-for-purchase-trade/{branch_id}")
+    public HttpEntity<?> getByBranchForSearch(@PathVariable UUID branch_id) {
+        ApiResponse apiResponse = productService.getByBranchForSearch(branch_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("VIEW_PRODUCT")
+    @GetMapping("/get-by-business/{business_id}")
+    public HttpEntity<?> getByBusiness(@PathVariable UUID business_id,
+                                       @RequestParam(required = false) UUID branch_id,
+                                       @RequestParam(required = false) UUID brand_id) {
+        ApiResponse apiResponse = productService.getByBusiness(business_id,branch_id,brand_id);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 
+    @CheckPermission("VIEW_PRODUCT")
+    @GetMapping("/get-all-by-branch/{branchId}")
+    public HttpEntity<?> getByBranch(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = productService.getByBranchProduct(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }

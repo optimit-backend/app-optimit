@@ -9,13 +9,16 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+import java.sql.Timestamp;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler", "fieldHandler"})
 public class Business extends AbsEntity {
 
     @Column(nullable = false)
@@ -23,5 +26,10 @@ public class Business extends AbsEntity {
 
     private String description;
 
+    // minusga sotish
+    private Boolean saleMinus = false;
 
+    private boolean isActive;
+
+    private boolean delete;
 }

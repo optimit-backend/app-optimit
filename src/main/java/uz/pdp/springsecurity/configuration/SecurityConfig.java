@@ -1,6 +1,5 @@
 package uz.pdp.springsecurity.configuration;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,12 +19,13 @@ import uz.pdp.springsecurity.service.AuthService;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 @Configuration
-@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final AuthService authService;
+    @Autowired
+    AuthService authService;
 
-    private final JwtFilter jwtFilter;
+    @Autowired
+    JwtFilter jwtFilter;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -48,7 +48,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/auth/login",
                         "/swagger-ui/**",
                         "/swagger-resources/**",
-                        "/v2/api-docs").permitAll()
+                        "/v2/api-docs",
+                        "/api/business/create",
+                        "/api/business/checkBusinessName",
+                        "/api/business/checkUsername",
+                        "/api/tariff/getToChooseATariff",
+                        "api/notification/*",
+                        "/api/tariff/getById/*",
+                        "/api/attachment/download/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

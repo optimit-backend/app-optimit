@@ -22,6 +22,9 @@ public class ProductTypeCombo extends AbsEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     private Product contentProduct;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    private ProductTypePrice contentProductTypePrice;
+
     private double amount;
 
     private double buyPrice;

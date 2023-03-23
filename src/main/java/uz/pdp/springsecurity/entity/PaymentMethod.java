@@ -18,7 +18,6 @@ import javax.persistence.ManyToOne;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentMethod extends AbsEntity {
-    @Column(nullable = false,unique = true)
     private String type;
 
     @ManyToOne

@@ -11,14 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BranchDto {
-    @NotNull(message = "required line")
     private String name;
-    @NotNull(message = "required line")
     private UUID addressId;
-    @NotNull(message = "required line")
     private UUID businessId;
-    @NotNull(message = "required line")
-    private double percent;
-    @NotNull(message = "required line")
-    private boolean fifo;
 }

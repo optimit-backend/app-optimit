@@ -14,15 +14,16 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 public class ProductTypePrice extends AbsEntity {
+    @Column(nullable = false)
+    private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Product product;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private ProductTypeValue productTypeValue;
 
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToOne(cascade = CascadeType.ALL)
     private Attachment photo;
 
     private String barcode;
@@ -32,5 +33,4 @@ public class ProductTypePrice extends AbsEntity {
     private double salePrice;
 
     private double profitPercent;
-//    private double amount;
 }

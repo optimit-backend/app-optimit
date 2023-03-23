@@ -21,14 +21,15 @@ public class UserDto {
     private String username;
 
     private String password;
-    @NotNull(message = "required line")
+
     private UUID roleId;
-    @NotNull(message = "required line")
+
     private List<UUID> branchId;
-    @NotNull(message = "required line")
+
     private UUID businessId;
-    @NotNull(message = "required line")
+
     private Boolean enabled;
 
     private UUID photoId;
+
 }

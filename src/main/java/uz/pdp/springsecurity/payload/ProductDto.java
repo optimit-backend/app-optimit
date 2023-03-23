@@ -16,25 +16,28 @@ public class ProductDto {
     @NotNull(message = "required line")
     private String name;
 
-    @NotNull(message = "required line")
-    private Double quantity;
+    private Double minQuantity;
 
-    @NotNull(message = "required line")
     private String barcode;
 
     private UUID brandId;
 
     private UUID categoryId;
 
+    private UUID childCategoryId;
+
     @NotNull(message = "required line")
     private UUID measurementId;
 
-    private List<UUID> photoIds;
+    private UUID photoId;
 
     @NotNull(message = "required line")
     private double buyPrice;
 
     private double salePrice;
+
+
+    private double profitPercent;
 
     private double tax;
 
@@ -45,10 +48,12 @@ public class ProductDto {
 
     private Date dueDate;
 
+    @NotNull(message = "required line")
     private UUID businessId;
 
     // types { SINGLE, MANY, COMBO }
 
+    @NotNull(message = "required line")
     private String type;
 
     //  fields for MANY types

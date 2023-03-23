@@ -10,12 +10,8 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddressDto {
-    @NotNull(message = "required line")
     private String city;
-    @NotNull(message = "required line")
     private String district;
-    @NotNull(message = "required line")
     private String street;
-    @NotNull(message = "required line")
     private String home;
 }

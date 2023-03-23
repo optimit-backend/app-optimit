@@ -1,4 +1,5 @@
 package uz.pdp.springsecurity.entity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +16,7 @@ import javax.persistence.OneToOne;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class ExchangeProduct  extends AbsEntity {
+public class ExchangeProduct extends AbsEntity {
 
     private Double exchangeProductQuantity;
 
@@ -23,5 +24,7 @@ public class ExchangeProduct  extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Product product;
 
-
+    @OneToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private ProductTypePrice productTypePrice;
 }

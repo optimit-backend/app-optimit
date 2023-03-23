@@ -38,7 +38,6 @@ public class Supplier extends AbsEntity {
 
     private double debt;
 
-
     public Supplier( String name, String phoneNumber, String telegram, Business business) {
         this.name = name;
         this.phoneNumber = phoneNumber;

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -13,4 +14,14 @@ public class BusinessDto {
     @NotNull(message = "required line")
     private String name;
     private String description;
+
+    private UUID tariffId;
+
+    private boolean isActive;
+
+    private UserDto userDto;
+
+    private BranchDto branchDto;
+
+    private AddressDto addressDto;
 }

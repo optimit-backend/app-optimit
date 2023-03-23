@@ -14,6 +14,7 @@ import uz.pdp.springsecurity.repository.OutlayRepository;
 import uz.pdp.springsecurity.repository.UserRepository;
 
 import java.sql.Date;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -106,12 +107,15 @@ public class OutlayService {
     public ApiResponse getAllByBranchId(UUID branch_id) {
         List<Outlay> allByBranch_id = outlayRepository.findAllByBranch_Id(branch_id);
         if (allByBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        allByBranch_id.sort(Comparator.comparing(Outlay::getTotalSum).reversed());
         return new ApiResponse("FOUND", true, allByBranch_id);
     }
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Outlay> allByBusinessId = outlayRepository.findAllByBusinessId(businessId);
-        if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        List<Outlay> allByBusinessId = outlayRepository.findAllByBranch_BusinessId(businessId);
+        if (allByBusinessId.isEmpty()){
+            return new ApiResponse("NOT FOUND", false);
+        }
         return new ApiResponse("FOUND", true, allByBusinessId);
     }
 
