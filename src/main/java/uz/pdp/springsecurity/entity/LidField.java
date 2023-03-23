@@ -25,4 +25,5 @@ public class LidField extends AbsEntity {
 
     @ManyToOne
     private Business business;
+
 }
