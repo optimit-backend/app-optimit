@@ -26,6 +26,4 @@ public class Currency extends AbsEntity {
     private Business business;
 
     private boolean active;
-
-
 }
