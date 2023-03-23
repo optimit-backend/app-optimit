@@ -1,6 +1,5 @@
 package uz.pdp.springsecurity.controller;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +16,12 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/customer")
-@RequiredArgsConstructor
 public class CustomerController {
+    @Autowired
+    CustomerRepository customerRepository;
 
-    private final CustomerService customerService;
+    @Autowired
+    CustomerService customerService;
 
     /**
      * YANGI CUSTOMER QO'SHISH MIJOZ YANI
@@ -87,7 +88,6 @@ public class CustomerController {
         ApiResponse apiResponse = customerService.getAllByBusinessId(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
     @CheckPermission("VIEW_CUSTOMER_ADMIN")
     @GetMapping("/get-by-branchId/{branchId}")
     public HttpEntity<?> getAllByBranchId(@PathVariable UUID branchId) {
@@ -96,13 +96,15 @@ public class CustomerController {
     }
 
 
+
     /**
      * QARZNI TO'LASH
+     *
      */
     @CheckPermission("ADD_CUSTOMER")
     @PostMapping("/repayment/{id}")
-    public HttpEntity<?> addRepayment(@PathVariable UUID id, @RequestBody RepaymentDto repaymentDto) {
+    public HttpEntity<?> addRepayment(@PathVariable UUID id, @RequestBody RepaymentDto repaymentDto){
         ApiResponse response = customerService.repayment(id, repaymentDto);
-        return ResponseEntity.status(response.isSuccess() ? 201 : 409).body(response);
+        return ResponseEntity.status(response.isSuccess() ? 201 : 409 ).body(response);
     }
 }

@@ -117,5 +117,11 @@ public class CategoryController {
         ApiResponse response = categoryService.getAllChildcategoryByParentId(id);
         return ResponseEntity.status(response.isSuccess()? 200 : 409).body(response);
     }
+
+    @GetMapping("/get-parent_category_by_business_id/{id}")
+    public HttpEntity<?> getAllParentCategory(@PathVariable UUID id){
+        ApiResponse response = categoryService.getAllParentCategory(id);
+        return ResponseEntity.status(response.isSuccess()? 200 : 409).body(response);
+    }
     
 }

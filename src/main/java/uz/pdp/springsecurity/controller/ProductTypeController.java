@@ -14,14 +14,8 @@ import uz.pdp.springsecurity.repository.ProductRepository;
 import uz.pdp.springsecurity.repository.ProductTypeRepository;
 import uz.pdp.springsecurity.service.ProductTypeService;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -37,25 +31,6 @@ public class ProductTypeController {
     @Autowired
     ProductTypeRepository productTypeRepository;
 
-
-    @CheckPermission("GET_PRODUCT_TYPE")
-    @GetMapping("/export-to-excel")
-    public HttpEntity<?> exportIntoExcelFile(HttpServletResponse response) throws IOException {
-        response.setContentType("application/octet-stream");
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        String currentDateTime = dateFormatter.format(new Date());
-
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=product_type" + currentDateTime + ".xlsx";
-        response.setHeader(headerKey, headerValue);
-
-        List<ProductType> productTypes = productTypeRepository.findAll();
-        ExcelGenerator generator = new ExcelGenerator(productTypes);
-        generator.generateExcelFile(response);
-
-        return ResponseEntity.ok(response);
-    }
-
     @CheckPermission("ADD_PRODUCT_TYPE")
     @PostMapping()
     public HttpEntity<?> add(@Valid @RequestBody ProductTypePostDto postDto) throws ParseException {
@@ -70,14 +45,14 @@ public class ProductTypeController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_PRODUCT_TYPE_PRODUCT_ID")
-    @GetMapping("/product_type/{id}")
-    public HttpEntity<?> getProductTypeByProductId(@Valid @PathVariable UUID id) {
-        ApiResponse apiResponse = service.getProductTypeByProductId(id);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+//    @CheckPermission("GET_PRODUCT_TYPE")
+//    @GetMapping("/product_type/{id}")
+//    public HttpEntity<?> getProductTypeByProductId(@Valid @PathVariable UUID id) {
+//        ApiResponse apiResponse = service.getProductTypeByProductId(id);
+//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+//    }
 
-    @CheckPermission("GET_BY_PRODUCT_TYPE")
+    @CheckPermission("GET_PRODUCT_TYPE")
     @GetMapping("/{id}")
     public HttpEntity<?> getById(@PathVariable UUID id) {
         ApiResponse apiResponse = service.getProductTypeById(id);

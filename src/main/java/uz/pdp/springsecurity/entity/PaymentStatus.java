@@ -23,7 +23,6 @@ public class PaymentStatus extends AbsEntity {
 //    @Enumerated(value = EnumType.STRING)
 //    private StatusName statusName;
 
-    @Column(nullable = false, unique = true)
     private String status;
 
 }

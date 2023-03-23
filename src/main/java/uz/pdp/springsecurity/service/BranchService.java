@@ -38,7 +38,6 @@ public class BranchService {
         Optional<Business> optionalBusiness = businessRepository.findById(branchDto.getBusinessId());
         if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
         branch.setBusiness(optionalBusiness.get());
-        branch.setPercent(branchDto.getPercent());
 
         branchRepository.save(branch);
         return new ApiResponse("ADDED", true);
@@ -57,7 +56,6 @@ public class BranchService {
         Optional<Business> optionalBusiness = businessRepository.findById(branchDto.getBusinessId());
         if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
         branch.setBusiness(optionalBusiness.get());
-        branch.setPercent(branchDto.getPercent());
         branchRepository.save(branch);
         return new ApiResponse("EDITED", true);
     }

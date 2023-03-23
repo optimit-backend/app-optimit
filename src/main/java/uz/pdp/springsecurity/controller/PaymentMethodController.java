@@ -13,14 +13,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/paymethod")
-public class PayMethodController {
+public class PaymentMethodController {
     @Autowired
     PayMethodService payMethodService;
 
     /**
      * YANGI TO'LASH USULINI KIRITISH
      *
-     * @param payMethodDto
+     * @RequesBody  payMethodDto
      * @return ApiResponse(success - > true, message - > ADDED)
      */
     @CheckPermission("ADD_PAY_METHOD")
@@ -33,8 +33,8 @@ public class PayMethodController {
     /**
      * TO'LASH USULINI TAXRIRLASH
      *
-     * @param id
-     * @param payMethodDto
+     * @Id id
+     * @RequesBody  payMethodDto
      * @return ApiResponse(success - > true, message - > EDITED)
      */
     @CheckPermission("EDIT_PAY_METHOD")
@@ -47,7 +47,7 @@ public class PayMethodController {
     /**
      * ID ORQALI BITTA TO'LASH USULINI OLIB CHIQISH
      *
-     * @param id
+     * @Id id
      * @return ApiResponse(success - > true, object - > value)
      */
     @CheckPermission("VIEW_PAY_METHOD")
@@ -60,7 +60,7 @@ public class PayMethodController {
     /**
      * ID ORQALI BITTA TOLOV USULINI DELETE QILISH
      *
-     * @param id
+     * @Id  id
      * @return ApiResponse(success - > true, message - > DELETED)
      */
     @CheckPermission("DELETE_PAY_METHOD")
@@ -72,7 +72,7 @@ public class PayMethodController {
 
     /**
      * BUSINESSGA TEGISHLI BARCHA TO'LASH USULLLARNI OLIB CHIQISH
-     * @param business_id
+     * @Id  business_id
      * @return  ApiResponse(success - > true, object - > value)
      */
     @CheckPermission("VIEW_PAY_METHOD_ADMIN")

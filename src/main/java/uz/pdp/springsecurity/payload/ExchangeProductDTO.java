@@ -15,6 +15,7 @@ public class ExchangeProductDTO {
     @NotNull(message = "required line")
     private Double exchangeProductQuantity;
 
-    @NotNull(message = "required line")
     private UUID productExchangeId;
+
+    private UUID productTypePriceId;
 }

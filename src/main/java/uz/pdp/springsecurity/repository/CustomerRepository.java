@@ -8,7 +8,9 @@ import java.util.UUID;
 
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     List<Customer> findAllByBusiness_Id(UUID business_id);
+    List<Customer> findAllByBusiness_IdAndDebtIsNotOrderByPayDateAsc(UUID business_id, Double debt);
 
     List<Customer> findAllByBranchId(UUID branchId);
+    List<Customer> findAllByBranchIdAndDebtIsNotOrderByPayDateAsc(UUID branchId, Double debt);
 
 }

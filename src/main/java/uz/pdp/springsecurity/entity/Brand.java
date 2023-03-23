@@ -18,7 +18,7 @@ import javax.persistence.ManyToOne;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Brand extends AbsEntity {
-    @Column(nullable = false)
+
     private String name;
 
     @ManyToOne

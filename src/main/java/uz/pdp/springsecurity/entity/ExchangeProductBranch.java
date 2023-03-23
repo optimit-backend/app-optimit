@@ -32,7 +32,7 @@ public class ExchangeProductBranch extends AbsEntity {
     @OneToMany
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn
-    private List<ExchangeProduct> exchangeProduct;
+    private List<ExchangeProduct> exchangeProductList;
 
     @OneToOne
     private ExchangeStatus exchangeStatus;

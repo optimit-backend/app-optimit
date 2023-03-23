@@ -17,6 +17,6 @@ public class ProductTypeValue extends AbsEntity {
 
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private ProductType productType;
 }

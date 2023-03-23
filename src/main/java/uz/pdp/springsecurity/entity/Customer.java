@@ -12,6 +12,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
@@ -42,6 +43,8 @@ public class Customer extends AbsEntity {
     private Branch branch;
 
     private Double debt;
+
+    private Date payDate = new Date(System.currentTimeMillis());
 
     public Customer( String name, String phoneNumber, String telegram, Business business) {
         this.name = name;

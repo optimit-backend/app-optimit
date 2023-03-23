@@ -24,5 +24,6 @@ public class Warehouse extends AbsEntity {
     @ManyToOne
     private Branch branch;
 
+
     private double amount;
 }

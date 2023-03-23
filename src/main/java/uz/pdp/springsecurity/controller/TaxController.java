@@ -52,7 +52,7 @@ public class TaxController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("VIEW_TAX_ADMIN")
+    @CheckPermission("VIEW_TAX")
     @GetMapping("/get-by-business/{businessId}")
     public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId) {
         ApiResponse apiResponse = taxService.getAllByBusinessId(businessId);

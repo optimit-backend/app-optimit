@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 @MappedSuperclass
-public abstract class AbsEntity  {
+public abstract class AbsEntity  implements Serializable{
 
     @Id
     @GeneratedValue

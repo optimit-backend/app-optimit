@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/trade")
-public class TradeControllerIml {
+public class TradeController {
     @Autowired
     TradeService tradeService;
 
@@ -44,22 +44,21 @@ public class TradeControllerIml {
      * @param tradeDTO
      * @return ApiResponse(success - > true, message - > EDITED)
      */
-//    @CheckPermission("EDIT_TRADE")
-//    @PutMapping("/{id}")
-//    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody TradeDTO tradeDTO) {
-//        ApiResponse apiResponse = tradeService.edit(id, tradeDTO);
-//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-//    }
+    @CheckPermission("EDIT_TRADE")
+    @PutMapping("/{trade_id}")
+    public HttpEntity<?> edit(@PathVariable UUID trade_id, @RequestBody TradeDTO tradeDTO) {
+        ApiResponse apiResponse = tradeService.edit(trade_id, tradeDTO);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 
     /**
      * ID ORQALI BITTA SAVDONI OLIB CHIQISH
-     *
-     * @param id
+     * @id id
      * @return ApiResponse(success - > true, object - > value)
      */
     @CheckPermission("VIEW_TRADE")
     @GetMapping("/{id}")
-    public HttpEntity<?> get(@PathVariable UUID id) {
+    public HttpEntity<?> getOne(@PathVariable UUID id) {
         ApiResponse apiResponse = tradeService.getOne(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
@@ -117,21 +116,7 @@ public class TradeControllerIml {
     }
 
     /**
-     * FILIAL ID'SI ORQALI BARCHA SAVDOLARNI OLIB CHIQISH
-     *
-     * @param branch_id
-     * @return ApiResponse(success - > true, message - > FOUND)
-     */
-    @CheckPermission("VIEW_TRADE")
-    @GetMapping("/get-by-branchId/{branch_id}")
-    public HttpEntity<?> getAllByBranch(@PathVariable UUID branch_id) {
-        ApiResponse apiResponse = tradeService.getAllByBranchId(branch_id);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    /**
      * MIJOZ ID'SI ORQALI BARCHA SAVDOLARNI OLIB CHIQISH
-     *
      * @param customer_id
      * @return ApiResponse(success - > true, message - > FOUND)
      */

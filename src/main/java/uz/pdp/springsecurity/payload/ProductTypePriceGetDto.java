@@ -12,6 +12,12 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ProductTypePriceGetDto {
 
+    private UUID productTypePriceId;
+
+    private UUID productTypeValueNameId;
+
+    private UUID photoId;
+
     private String productTypeName;
 
     private String productTypeValueName;
@@ -25,4 +31,6 @@ public class ProductTypePriceGetDto {
     private double salePrice;
 
     private double profitPercent;
+
+    private double quantity;
 }

@@ -15,6 +15,7 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 import uz.pdp.springsecurity.enums.Permissions;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.Set;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler", "fieldHandler"})
 public class User extends AbsEntity implements UserDetails {
 
 
@@ -36,16 +37,28 @@ public class User extends AbsEntity implements UserDetails {
     @Column(nullable = false)
     private String lastName;
 
+    private String email;
     @Column(nullable = false, unique = true)
     private String username;
 
     @Column(nullable = false)
     private String password;
 
+    @ManyToOne
+    private Job job;
+
+    private String phoneNumber;
+
+    private boolean sex;
+
+    private Timestamp birthday;
+
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Role role;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Business business;
 
     @ManyToMany
@@ -54,6 +67,26 @@ public class User extends AbsEntity implements UserDetails {
     @OneToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Attachment photo;
+
+    private boolean active;
+
+    private String address;
+
+    private String description;
+
+    private Timestamp probation;
+
+    private String workingTime;
+
+    private double salary;
+
+    @ManyToMany
+    private List<Bonus> bonuses;
+
+    private Timestamp arrivalTime;
+
+    private Timestamp timeToLeave;
+
 
     //yoqilgan
     private boolean enabled = false;
@@ -65,7 +98,7 @@ public class User extends AbsEntity implements UserDetails {
     private boolean credentialsNonExpired = true;
 
 
-    public User(String firstName, String lastName, String username, String password, Role role, boolean enabled,Business business) {
+    public User(String firstName, String lastName, String username, String password, Role role, boolean enabled, Business business) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -75,7 +108,7 @@ public class User extends AbsEntity implements UserDetails {
         this.business = business;
     }
 
-    public User(String firstName, String lastName, String username, String password, Role role, boolean enabled, Business business, Set<Branch> branches) {
+    public User(String firstName, String lastName, String username, String password, Role role, boolean enabled, Business business, Set<Branch> branches, boolean active) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -84,6 +117,7 @@ public class User extends AbsEntity implements UserDetails {
         this.enabled = enabled;
         this.business = business;
         this.branches = branches;
+        this.isActive();
     }
 
     public User(String firstName, String lastName, String username, String password, Role role, boolean enabled) {
@@ -95,7 +129,7 @@ public class User extends AbsEntity implements UserDetails {
         this.enabled = enabled;
     }
 
-    public User(String firstName, String lastName, String username, String password, Role role,  Business business, Attachment photo, boolean enabled, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired) {
+    public User(String firstName, String lastName, String username, String password, Role role, Business business, Attachment photo, boolean enabled, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;

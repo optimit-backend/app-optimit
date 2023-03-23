@@ -1,6 +1,5 @@
 package uz.pdp.springsecurity.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,16 +10,15 @@ import uz.pdp.springsecurity.repository.RoleRepository;
 import uz.pdp.springsecurity.repository.UserRepository;
 
 @Service
-@RequiredArgsConstructor
 public class  AuthService implements UserDetailsService {
     @Autowired
-   private final UserRepository userRepository;
+    UserRepository userRepository;
 
 //    @Autowired
 //    PasswordEncoder passwordEncoder;
-//
-//    @Autowired
-//    RoleRepository roleRepository;
+
+    @Autowired
+    RoleRepository roleRepository;
 
 
 

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import uz.pdp.springsecurity.entity.CustomerGroup;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -30,4 +31,6 @@ public class CustomerDto {
     private UUID branchId;
 
     private double debt;
+
+    private Date payDate;
 }

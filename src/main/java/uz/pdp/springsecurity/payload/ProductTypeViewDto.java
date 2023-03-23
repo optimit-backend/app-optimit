@@ -17,5 +17,5 @@ public class ProductTypeViewDto {
     private double salePrice;
     private double amount;
     private String barcode;
-    private UUID photoIds;
+    private UUID photoId;
 }

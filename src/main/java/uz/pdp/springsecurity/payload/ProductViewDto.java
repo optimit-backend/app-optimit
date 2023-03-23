@@ -18,9 +18,10 @@ public class ProductViewDto {
     private String productName;
     private List<Branch> branch;
     private double buyPrice;
-    private String measurementId;
     private double salePrice;
+    private String measurementId;
     private String barcode;
+    private UUID photoId;
     private double amount;
     private String brandName;
     private double minQuantity;

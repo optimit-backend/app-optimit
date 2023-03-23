@@ -17,11 +17,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductTypePricePostDto{
+
     private UUID productTypePriceId;
 
     private UUID productTypeValueId;
 
-    @NotNull(message = "required line")
+    private UUID photoId;
+
     private String barcode;
 
     @NotNull(message = "required line")

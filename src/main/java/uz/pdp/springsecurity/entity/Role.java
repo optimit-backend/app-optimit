@@ -4,16 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 import uz.pdp.springsecurity.enums.Permissions;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -24,7 +21,7 @@ import java.util.List;
 @JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
 public class Role extends AbsEntity {
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -38,16 +35,6 @@ public class Role extends AbsEntity {
     private String description;
 
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private Timestamp createdAt;
-
-    @Column(updatable = false)
-    @UpdateTimestamp
-    private Timestamp updateAt;
-
-
-
     public Role(String name, List<Permissions> permissions,Business business) {
         this.name = name;
         this.permissions = permissions;
@@ -57,7 +44,5 @@ public class Role extends AbsEntity {
         this.name = name;
         this.permissions = permissions;
     }
-
-
 
 }

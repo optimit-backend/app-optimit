@@ -25,7 +25,7 @@ public class TradeDTO {
 
     private UUID paymentStatusId;
 
-    private UUID payMethodId;
+    private List<PaymentDto> paymentDtoList;
 
     private Date payDate;
 

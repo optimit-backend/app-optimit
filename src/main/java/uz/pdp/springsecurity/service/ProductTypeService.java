@@ -32,10 +32,6 @@ public class ProductTypeService {
     AttachmentRepository attachmentRepository;
 
 
-
-
-
-
     public ApiResponse addProductType(ProductTypePostDto postDto) {
 
         Optional<Business> optionalBusiness = businessRepository.findById(postDto.getBusinessId());
@@ -71,35 +67,35 @@ public class ProductTypeService {
         return new ApiResponse("successfully_added", true);
     }
 
-    public ApiResponse getProductTypeByProductId(UUID productId){
-        List<ProductTypeViewDto> productTypeViewDtoList=new ArrayList<>();
-        Optional<Product> optionalProduct = productRepository.findById(productId);
-        List<ProductTypePrice> priceList = productTypePriceRepository.findAllByProductId(productId);
-        if (optionalProduct.isEmpty()){
-            return new ApiResponse("NOT FOUND", false);
-        }
-        Product product = optionalProduct.get();
-
-        if (priceList.isEmpty()){
-            return new ApiResponse("PRICE NOT FOUND", false);
-        }
-        for (ProductTypePrice productTypePrice : priceList){
-            ProductTypeViewDto productTypeViewDto=new ProductTypeViewDto();
-            if (productTypePrice.getProduct().getId().equals(productId)){
-                productTypeViewDto.setName(product.getName());
-                productTypeViewDto.setBuyPrice(productTypePrice.getBuyPrice());
-                productTypeViewDto.setSalePrice(productTypePrice.getSalePrice());
-                productTypeViewDto.setBarcode(productTypePrice.getBarcode());
-                Optional<Attachment> optionalAttachment = attachmentRepository.findById(productTypePrice.getId());
-                optionalAttachment.ifPresent(attachment -> productTypeViewDto.setPhotoIds(attachment.getId()));
-            }
-            productTypeViewDtoList.add(productTypeViewDto);
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductId(product.getId());
-            optionalWarehouse.ifPresent(warehouse -> productTypeViewDto.setAmount(warehouse.getAmount()));
-        }
-
-        return new ApiResponse("FOUND", true,productTypeViewDtoList);
-    }
+//    public ApiResponse getProductTypeByProductId(UUID productId){
+//        List<ProductTypeViewDto> productTypeViewDtoList=new ArrayList<>();
+//        Optional<Product> optionalProduct = productRepository.findById(productId);
+//        List<ProductTypePrice> priceList = productTypePriceRepository.findAllByProductId(productId);
+//        if (optionalProduct.isEmpty()){
+//            return new ApiResponse("NOT FOUND", false);
+//        }
+//        Product product = optionalProduct.get();
+//
+//        if (priceList.isEmpty()){
+//            return new ApiResponse("PRICE NOT FOUND", false);
+//        }
+//        for (ProductTypePrice productTypePrice : priceList){
+//            ProductTypeViewDto productTypeViewDto=new ProductTypeViewDto();
+//            if (productTypePrice.getProduct().getId().equals(productId)){
+//                productTypeViewDto.setName(product.getName());
+//                productTypeViewDto.setBuyPrice(productTypePrice.getBuyPrice());
+//                productTypeViewDto.setSalePrice(productTypePrice.getSalePrice());
+//                productTypeViewDto.setBarcode(productTypePrice.getBarcode());
+//                Optional<Attachment> optionalAttachment = attachmentRepository.findById(productTypePrice.getId());
+//                optionalAttachment.ifPresent(attachment -> productTypeViewDto.setPhotoId(attachment.getId()));
+//            }
+//            productTypeViewDtoList.add(productTypeViewDto);
+//            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(product.getId());
+//            optionalWarehouse.ifPresent(warehouse -> productTypeViewDto.setAmount(warehouse.getAmount()));
+//        }
+//
+//        return new ApiResponse("FOUND", true,productTypeViewDtoList);
+//    }
 
 
     public ApiResponse getProductType() {
@@ -126,6 +122,11 @@ public class ProductTypeService {
             getDto.setValues(productTypeValueDto);
             productTypePostDto.add(getDto);
         }
+
+        if (productTypePostDto.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+
         return new ApiResponse(true, productTypePostDto);
     }
 

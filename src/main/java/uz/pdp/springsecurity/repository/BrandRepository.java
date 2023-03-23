@@ -8,4 +8,8 @@ import java.util.UUID;
 
 public interface BrandRepository extends JpaRepository<Brand, UUID> {
     List<Brand> findAllByBusiness_Id(UUID branch_id);
+
+//    List<Brand> findAllByBranchId(UUID id);
+//    List<Brand> findAllBy(UUID id);
+
 }

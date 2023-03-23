@@ -69,7 +69,7 @@ public class PurchaseController {
     @CheckPermission("VIEW_PURCHASE")
     @GetMapping("/{id}")
     public HttpEntity<?> getOne(@PathVariable UUID id) {
-        ApiResponse apiResponse = purchaseService.get(id);
+        ApiResponse apiResponse = purchaseService.getOne(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -131,6 +131,7 @@ public class PurchaseController {
      * @param branch_id
      * @return ApiResponse(success - > true message - > FOUND)
      */
+
     @CheckPermission("VIEW_PURCHASE")
     @GetMapping("get-purchase-by-branch/{branch_id}")
     public HttpEntity<?> getByBranchId(@PathVariable UUID branch_id) {
@@ -163,24 +164,4 @@ public class PurchaseController {
         ApiResponse apiResponse = purchaseService.getPdfFile(id, response);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-    /**
-     * JAMI SUMMA ORQALI BARCHA XARIDLARNI OLIB CHIQISH
-     *
-     * @param totalSum
-     * @return ApiResponse(success - > true message - > FOUND)
-     */
-    /*@CheckPermission("VIEW_PURCHASE")
-    @GetMapping("get-purchase-by-totalSum/{totalSum}")
-    public HttpEntity<?> getByTotalSum(@PathVariable double totalSum) {
-        ApiResponse apiResponse = purchaseService.getByTotalSum(totalSum);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }*/
-
-    /*@CheckPermission("VIEW_PURCHASE_ADMIN")
-    @GetMapping("/get-cost-by-business/{businessId}")
-    public HttpEntity<?> getCostByBusiness(@PathVariable UUID businessId){
-        ApiResponse response = purchaseService.getCostByBusiness(businessId);
-        return ResponseEntity.ok().body(response);
-    }*/
 }
