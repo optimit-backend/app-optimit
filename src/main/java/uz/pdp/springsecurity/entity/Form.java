@@ -22,4 +22,7 @@ public class Form extends AbsEntity {
 
     @ManyToOne
     private Source source;
+
+    @ManyToOne
+    private Business business;
 }

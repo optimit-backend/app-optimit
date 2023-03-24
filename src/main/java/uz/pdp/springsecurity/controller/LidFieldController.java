@@ -17,9 +17,14 @@ public class LidFieldController {
 
     private final LidFieldService lidFieldService;
 
-    @GetMapping("/{businessId}")
+    @GetMapping("/getByBusinessId/{businessId}")
     public HttpEntity<?> getAll(@PathVariable UUID businessId) {
         ApiResponse apiResponse = lidFieldService.getAll(businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+    @GetMapping("/{id}")
+    public HttpEntity<?> getById(@PathVariable UUID id) {
+        ApiResponse apiResponse = lidFieldService.getById(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

@@ -13,6 +13,7 @@ import java.util.List;
 public interface LidFieldMapper {
 
     @Mapping(target = "businessId", source = "business.id")
+    @Mapping(target = "id", source = "id")
     LidFieldDto toDto(LidField lidField);
 
     List<LidFieldDto> toDto(List<LidField> lidFields);
