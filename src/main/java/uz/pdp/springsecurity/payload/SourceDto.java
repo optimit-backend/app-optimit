@@ -9,11 +9,9 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LidFieldDto {
+public class SourceDto {
     private UUID id;
     private String name;
-
-    private String valueType;
-
+    private String icon;
     private UUID businessId;
 }
