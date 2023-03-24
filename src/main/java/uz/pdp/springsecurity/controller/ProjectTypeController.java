@@ -6,52 +6,51 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.TaskStatusDto;
-import uz.pdp.springsecurity.repository.TaskStatusRepository;
-import uz.pdp.springsecurity.service.TaskStatusServise;
+import uz.pdp.springsecurity.payload.ProjectTypeDto;
+import uz.pdp.springsecurity.service.ProjectTypeServise;
 
 import javax.validation.Valid;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/task/status")
-public class TaskStatusController {
+@RequestMapping("/api/project/type")
+public class ProjectTypeController {
 
     @Autowired
-    TaskStatusServise taskStatusServise;
+    ProjectTypeServise projectTypeServise;
 
-    @CheckPermission("ADD_TASK_STATUS")
+    @CheckPermission("ADD_PROJECT_TYPE")
     @PostMapping
-    public HttpEntity<?> add(@Valid @RequestBody TaskStatusDto taskStatusDto) {
-        ApiResponse apiResponse = taskStatusServise.add(taskStatusDto);
+    public HttpEntity<?> add(@Valid @RequestBody ProjectTypeDto projectTypeDto) {
+        ApiResponse apiResponse = projectTypeServise.add(projectTypeDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("EDIT_TASK_STATUS")
+    @CheckPermission("EDIT_PROJECT_TYPE")
     @PutMapping("/{id}")
-    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody TaskStatusDto taskStatusDto) {
-        ApiResponse apiResponse = taskStatusServise.edit(id,taskStatusDto);
+    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody ProjectTypeDto projectTypeDto) {
+        ApiResponse apiResponse = projectTypeServise.edit(id,projectTypeDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_TASK_STATUS")
+    @CheckPermission("GET_PROJECT_TYPE")
     @GetMapping("/{id}")
     public HttpEntity<?> get(@PathVariable UUID id) {
-        ApiResponse apiResponse = taskStatusServise.get(id);
+        ApiResponse apiResponse = projectTypeServise.get(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("DELETE_TASK_STATUS")
+    @CheckPermission("DELETE_PROJECT_TYPE")
     @DeleteMapping("/{id}")
     public HttpEntity<?> delete(@PathVariable UUID id) {
-        ApiResponse apiResponse = taskStatusServise.delete(id);
+        ApiResponse apiResponse = projectTypeServise.delete(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_TASK_STATUS")
+    @CheckPermission("GET_ALL_PROJECT_TYPE")
     @GetMapping("/get-by-business/{businessId}")
     public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId) {
-        ApiResponse apiResponse = taskStatusServise.getAllByBusinessId(businessId);
+        ApiResponse apiResponse = projectTypeServise.getAllByBusinessId(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
