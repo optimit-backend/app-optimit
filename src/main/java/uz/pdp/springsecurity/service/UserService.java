@@ -37,6 +37,7 @@ public class UserService {
 
     private final SubscriptionRepository subscriptionRepository;
     private final RoleRepository roleRepository;
+    private final AgreementService agreementService;
 
     public ApiResponse add(UserDto userDto, boolean isNewUser) {
         UUID businessId = userDto.getBusinessId();
@@ -97,7 +98,8 @@ public class UserService {
         }
 
         userRepository.save(user);
-        return new ApiResponse("ADDED", true);
+        agreementService.add(user);
+        return new ApiResponse("ADDED", true, user.getId());
     }
 
     public ApiResponse edit(UUID id, UserDto userDto) {
