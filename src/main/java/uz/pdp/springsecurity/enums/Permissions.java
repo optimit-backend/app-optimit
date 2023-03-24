@@ -161,6 +161,11 @@ public enum Permissions {
     GET_COURSE,
     DELETE_COURSE,
 
+    CREATE_SALARY,
+    EDIT_SALARY,
+    GET_SALARY,
+    DELETE_SALARY,
+
     CREATE_PRODUCTION,
     GET_PRODUCTION,
 

@@ -2,25 +2,30 @@ package uz.pdp.springsecurity.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 import uz.pdp.springsecurity.enums.SalaryStatus;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Data
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Agreement extends AbsEntity {
-    @ManyToOne
+    @ManyToOne(optional = false)
     private User user;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private SalaryStatus salaryStatus;
 
-    private double price;
+    @Column(nullable = false)
+    private double price = 0;
+
+    private boolean active;
 }
+
+
