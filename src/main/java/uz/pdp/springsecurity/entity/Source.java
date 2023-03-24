@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 
 @Data
 @AllArgsConstructor
@@ -13,4 +14,7 @@ import javax.persistence.Entity;
 @Entity
 public class Source extends AbsEntity {
     private String name;
+    private String icon;
+    @ManyToOne
+    private Business business;
 }

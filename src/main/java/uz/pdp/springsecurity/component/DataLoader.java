@@ -41,6 +41,10 @@ public class DataLoader implements CommandLineRunner {
     private final MeasurementRepository measurementRepository;
     private final AgreementService agreementService;
 
+    private final LidFieldRepository lidFieldRepository;
+
+    private final SourceRepository sourceRepository;
+
     @Value("${spring.sql.init.mode}")
     private String initMode;
 
@@ -48,6 +52,35 @@ public class DataLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
 //------------------------------------------------------------------------------------------//
         if (initMode.equals("always")) {
+
+            LidField lidField = new LidField();
+            lidField.setName("FIO");
+            lidField.setBusiness(null);
+            lidField.setValueType(ValueType.STRING);
+            lidFieldRepository.save(lidField);
+
+            LidField lidField1 = new LidField();
+            lidField1.setName("Address");
+            lidField1.setBusiness(null);
+            lidField1.setValueType(ValueType.STRING);
+
+            lidFieldRepository.save(lidField1);
+
+            Source source = new Source();
+            source.setBusiness(null);
+            source.setName("Telegram");
+            sourceRepository.save(source);
+            Source source1 = new Source();
+            source1.setBusiness(null);
+            source1.setName("Facebook");
+            sourceRepository.save(source1);
+            Source source2 = new Source();
+            source2.setBusiness(null);
+            source2.setName("Instagram");
+            sourceRepository.save(source2);
+
+
+
             List<Tariff> tariffRepositoryAll = tariffRepository.findAll();
             Tariff tariff = null;
             if (tariffRepositoryAll.isEmpty()) {
