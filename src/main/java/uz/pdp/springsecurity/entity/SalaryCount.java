@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import java.sql.Timestamp;
@@ -15,15 +16,13 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Entity
 @EqualsAndHashCode(callSuper = true)
-public class Salary extends AbsEntity {
-    private double totalSumma = 0;
+public class SalaryCount extends AbsEntity {
+    @Column(nullable = false)
+    private double amount;
 
-    private boolean payed;
+    @ManyToOne(optional = false)
+    private Agreement agreement;
 
-    private Timestamp startDate;
-
-    private Timestamp endDate;
-
-    @ManyToOne
-    private User user;
+    @Column(nullable = false)
+    private Timestamp date;
 }

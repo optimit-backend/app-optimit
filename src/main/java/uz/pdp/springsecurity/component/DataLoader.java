@@ -10,6 +10,7 @@ import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.enums.*;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.service.AgreementService;
 import uz.pdp.springsecurity.util.Constants;
 
 import java.sql.Timestamp;
@@ -23,59 +24,22 @@ import static uz.pdp.springsecurity.enums.StatusName.*;
 @Component
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    RoleRepository roleRepository;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    PaymentStatusRepository paymentStatusRepository;
-
-    @Autowired
-    PayMethodRepository payMethodRepository;
-
-    @Autowired
-    CurrencyRepository currencyRepository;
-
-    @Autowired
-    CurrentCourceRepository currentCourceRepository;
-
-    @Autowired
-    ExchangeStatusRepository exchangeStatusRepository;
-
-    @Autowired
-    BusinessRepository businessRepository;
-
-    @Autowired
-    BranchRepository branchRepository;
-
-    @Autowired
-    AddressRepository addressRepository;
-
-    @Autowired
-    AttachmentRepository attachmentRepository;
-
-    @Autowired
-    AttachmentContentRepository attachmentContentRepository;
-
-    @Autowired
-    BrandRepository brandRepository;
-
-    @Autowired
-    CategoryRepository categoryRepository;
-
-    @Autowired
-    TariffRepository tariffRepository;
-
-    @Autowired
-    SubscriptionRepository subscriptionRepository;
-
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final PaymentStatusRepository paymentStatusRepository;
+    private final PayMethodRepository payMethodRepository;
+    private final CurrencyRepository currencyRepository;
+    private final ExchangeStatusRepository exchangeStatusRepository;
+    private final BusinessRepository businessRepository;
+    private final BranchRepository branchRepository;
+    private final AddressRepository addressRepository;
+    private final BrandRepository brandRepository;
+    private final CategoryRepository categoryRepository;
+    private final TariffRepository tariffRepository;
+    private final SubscriptionRepository subscriptionRepository;
     private final MeasurementRepository measurementRepository;
+    private final AgreementService agreementService;
 
     @Value("${spring.sql.init.mode}")
     private String initMode;
@@ -338,7 +302,12 @@ public class DataLoader implements CommandLineRunner {
                                     GET_PRODUCTION,
                                     VIEW_REPORT,
 
-                                    GET_COURSE
+                                    GET_COURSE,
+
+                                    CREATE_SALARY,
+                                    EDIT_SALARY,
+                                    GET_SALARY,
+                                    DELETE_SALARY
                             ),
                             business));
             Role manager = roleRepository.save(new Role(
@@ -565,7 +534,7 @@ public class DataLoader implements CommandLineRunner {
                 }
             }
 
-            userRepository.save(new User(
+            User userAdmin = userRepository.save(new User(
                     "Admin",
                     "Admin",
                     "admin",
@@ -576,8 +545,9 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             ));
+            agreementService.add(userAdmin);
 
-            userRepository.save(new User(
+            User userSuperAdmin = userRepository.save(new User(
                     "SuperAdmin",
                     "Admin of site",
                     "superadmin",
@@ -588,7 +558,9 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             ));
-            userRepository.save(new User(
+            agreementService.add(userSuperAdmin);
+
+            User userManager = userRepository.save(new User(
                     "Manager",
                     "manager",
                     "manager",
@@ -599,8 +571,9 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             ));
+            agreementService.add(userManager);
 
-            userRepository.save(new User(
+            User userEmployee = userRepository.save(new User(
                     "Employee",
                     "employee",
                     "employee",
@@ -611,6 +584,7 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             ));
+            agreementService.add(userEmployee);
 
             List<PaymentStatus> all = paymentStatusRepository.findAll();
             if (all.isEmpty()) {
