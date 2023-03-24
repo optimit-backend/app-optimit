@@ -321,7 +321,7 @@ public class DataLoader implements CommandLineRunner {
                                     DELETE_TASK_TYPE,
                                     GET_TASK_TYPE,
                                     EDIT_TASK_TYPE,
-                                    ADD_TASK_TYPE
+                                    ADD_TASK_TYPE,
 
                                     CREATE_SALARY,
                                     EDIT_SALARY,
