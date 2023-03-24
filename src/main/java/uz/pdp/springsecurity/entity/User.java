@@ -85,7 +85,7 @@ public class User extends AbsEntity implements UserDetails {
 
     private Timestamp arrivalTime;
 
-    private Timestamp timeToLeave;
+    private Timestamp leaveTime;
 
 
     //yoqilgan
