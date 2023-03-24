@@ -191,5 +191,11 @@ public enum Permissions {
     DELETE_TASK_TYPE,
     GET_TASK_TYPE,
     EDIT_TASK_TYPE,
-    ADD_TASK_TYPE
+    ADD_TASK_TYPE,
+
+    ADD_STAGE,
+    EDIT_STAGE,
+    GET_STAGE,
+    DELETE_STAGE,
+    GET_ALL_STAGE
 }

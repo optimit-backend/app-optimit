@@ -321,12 +321,18 @@ public class DataLoader implements CommandLineRunner {
                                     DELETE_TASK_TYPE,
                                     GET_TASK_TYPE,
                                     EDIT_TASK_TYPE,
-                                    ADD_TASK_TYPE
+                                    ADD_TASK_TYPE,
 
                                     CREATE_SALARY,
                                     EDIT_SALARY,
                                     GET_SALARY,
-                                    DELETE_SALARY
+                                    DELETE_SALARY,
+
+                                    ADD_STAGE,
+                                    EDIT_STAGE,
+                                    GET_STAGE,
+                                    DELETE_STAGE,
+                                    GET_ALL_STAGE
 
                             ),
                             business));
@@ -475,7 +481,14 @@ public class DataLoader implements CommandLineRunner {
                             DELETE_TASK_TYPE,
                             GET_TASK_TYPE,
                             EDIT_TASK_TYPE,
-                            ADD_TASK_TYPE),
+                            ADD_TASK_TYPE,
+
+                            ADD_STAGE,
+                            EDIT_STAGE,
+                            GET_STAGE,
+                            DELETE_STAGE,
+                            GET_ALL_STAGE
+                    ),
                     business));
 
             Role employee = roleRepository.save(new Role(
