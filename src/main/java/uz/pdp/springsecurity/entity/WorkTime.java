@@ -25,6 +25,10 @@ public class WorkTime extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Branch branch;
+
     private Timestamp arrivalTime;
 
     private Timestamp leaveTime;
@@ -33,9 +37,11 @@ public class WorkTime extends AbsEntity {
 
     private boolean active;
 
-    public WorkTime(User user, Timestamp arrivalTime, boolean active) {
+    public WorkTime(Branch branch, User user, Timestamp arrivalTime, Timestamp leaveTime, boolean active) {
+        this.branch = branch;
         this.user = user;
         this.arrivalTime = arrivalTime;
+        this.leaveTime = leaveTime;
         this.active = active;
     }
 }
