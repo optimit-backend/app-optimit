@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
@@ -20,13 +22,20 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 public class WorkTime extends AbsEntity {
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    private Timestamp come;
+    private Timestamp arrivalTime;
 
-    private Timestamp go;
+    private Timestamp leaveTime;
 
     private double hour;
 
-    private boolean active = false;
+    private boolean active;
+
+    public WorkTime(User user, Timestamp arrivalTime, boolean active) {
+        this.user = user;
+        this.arrivalTime = arrivalTime;
+        this.active = active;
+    }
 }
