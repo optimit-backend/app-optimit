@@ -14,7 +14,6 @@ import javax.persistence.ManyToOne;
 @Entity
 public class Stage extends AbsEntity {
     private String name;
-
     @ManyToOne
     private Business business;
 }

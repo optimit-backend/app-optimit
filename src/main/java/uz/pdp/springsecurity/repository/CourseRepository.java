@@ -1,4 +1,4 @@
-package uz.pdp.springsecurity.service;
+package uz.pdp.springsecurity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import uz.pdp.springsecurity.entity.Course;

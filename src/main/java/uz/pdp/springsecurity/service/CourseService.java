@@ -7,6 +7,7 @@ import uz.pdp.springsecurity.entity.Course;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.CourseDto;
 import uz.pdp.springsecurity.repository.AttachmentRepository;
+import uz.pdp.springsecurity.repository.CourseRepository;
 
 import java.util.List;
 import java.util.Optional;
