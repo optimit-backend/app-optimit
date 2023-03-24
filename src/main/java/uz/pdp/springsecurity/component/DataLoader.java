@@ -338,7 +338,25 @@ public class DataLoader implements CommandLineRunner {
                                     GET_PRODUCTION,
                                     VIEW_REPORT,
 
-                                    GET_COURSE
+                                    GET_COURSE,
+
+                                    ADD_PROJECT_TYPE,
+                                    EDIT_PROJECT_TYPE,
+                                    GET_PROJECT_TYPE,
+                                    DELETE_PROJECT_TYPE,
+                                    GET_ALL_PROJECT_TYPE,
+
+                                    GET_ALL_TASK_STATUS,
+                                    DELETE_TASK_STATUS,
+                                    GET_TASK_STATUS,
+                                    EDIT_TASK_STATUS,
+                                    ADD_TASK_STATUS,
+
+                                    GET_ALL_TASK_TYPE,
+                                    DELETE_TASK_TYPE,
+                                    GET_TASK_TYPE,
+                                    EDIT_TASK_TYPE,
+                                    ADD_TASK_TYPE
                             ),
                             business));
             Role manager = roleRepository.save(new Role(
@@ -468,7 +486,25 @@ public class DataLoader implements CommandLineRunner {
 
                             CREATE_PRODUCTION,
                             GET_PRODUCTION,
-                            VIEW_REPORT),
+                            VIEW_REPORT,
+
+                            ADD_PROJECT_TYPE,
+                            EDIT_PROJECT_TYPE,
+                            GET_PROJECT_TYPE,
+                            DELETE_PROJECT_TYPE,
+                            GET_ALL_PROJECT_TYPE,
+
+                            GET_ALL_TASK_STATUS,
+                            DELETE_TASK_STATUS,
+                            GET_TASK_STATUS,
+                            EDIT_TASK_STATUS,
+                            ADD_TASK_STATUS,
+
+                            GET_ALL_TASK_TYPE,
+                            DELETE_TASK_TYPE,
+                            GET_TASK_TYPE,
+                            EDIT_TASK_TYPE,
+                            ADD_TASK_TYPE),
                     business));
 
             Role employee = roleRepository.save(new Role(

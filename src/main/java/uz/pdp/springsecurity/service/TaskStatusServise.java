@@ -42,7 +42,7 @@ public class TaskStatusServise {
         }
         TaskStatus taskStatus = taskStatusRepository.getById(id);
         taskStatus.setName(taskStatusDto.getName());
-        taskStatus.setColor(taskStatus.getColor());
+        taskStatus.setColor(taskStatusDto.getColor());
         TaskStatus status = taskStatusRepository.save(taskStatus);
         return new ApiResponse("Edited",true,status);
     }
