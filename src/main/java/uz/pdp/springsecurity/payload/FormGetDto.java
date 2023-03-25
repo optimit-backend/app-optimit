@@ -16,4 +16,6 @@ public class FormGetDto {
     private List<LidFieldDto> lidFieldDtos;
     private SourceDto sourceDto;
 
+    private UUID businessId;
+
 }

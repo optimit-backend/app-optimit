@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,23 +17,15 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class WarehouseService {
-    @Autowired
-    WarehouseRepository warehouseRepository;
-    @Autowired
-    PurchaseProductRepository purchaseProductRepository;
 
+    private final WarehouseRepository warehouseRepository;
     private final ProductRepository productRepository;
-
     private final ProductTypePriceRepository productTypePriceRepository;
-
-    private final ExchangeProductMapper exchangeProductMapper;
-
     private final ExchangeProductRepository exchangeProductRepository;
-    @Autowired
-    private ProductTypeComboRepository productTypeComboRepository;
-    @Autowired
-    private ExchangeProductBranchRepository exchangeProductBranchRepository;
+    private final ProductTypeComboRepository productTypeComboRepository;
+    private final ExchangeProductBranchRepository exchangeProductBranchRepository;
     private final FifoCalculationService fifoCalculationService;
+
 
     public void createOrEditWareHouse(PurchaseProduct purchaseProduct, double quantity) {
         Branch branch = purchaseProduct.getPurchase().getBranch();
@@ -41,12 +34,14 @@ public class WarehouseService {
         createOrEditWareHouseHelper(branch, product, productTypePrice, quantity);
     }
 
+
     public void createOrEditWareHouse(Production production) {
         Branch branch = production.getBranch();
         Product product = production.getProduct();
         ProductTypePrice productTypePrice = production.getProductTypePrice();
         createOrEditWareHouseHelper(branch, product, productTypePrice, production.getQuantity());
     }
+
 
     private void createOrEditWareHouseHelper(Branch branch, Product product, ProductTypePrice productTypePrice, Double quantity) {
         Warehouse warehouse = null;
@@ -88,6 +83,7 @@ public class WarehouseService {
         warehouseRepository.save(warehouse);
     }
 
+
     public Boolean checkBeforeTrade(Branch branch, HashMap<UUID, Double> map) {
         for (Map.Entry<UUID, Double> entry : map.entrySet()) {
             Warehouse warehouse = null;
@@ -111,6 +107,7 @@ public class WarehouseService {
      * @param tradeProductDto
      * @return
      */
+
     public TradeProduct createOrEditTrade(Branch branch, TradeProduct tradeProduct, TradeProductDto tradeProductDto) {
         double amount = tradeProduct.getTradedQuantity() - tradeProductDto.getTradedQuantity();
         if (tradeProductDto.getType().equalsIgnoreCase("single")) {
@@ -144,6 +141,7 @@ public class WarehouseService {
         tradeProduct.setTradedQuantity(tradeProductDto.getTradedQuantity());
         return tradeProduct;
     }
+
 
     public ContentProduct createContentProduct(ContentProduct contentProduct, ContentProductDto contentProductDto) {
         if (contentProductDto.getProductId() != null) {
@@ -280,11 +278,13 @@ public class WarehouseService {
         return new ApiResponse("successfully saved", true);
     }
 
+
     public ApiResponse getLessProduct(UUID businessId, UUID branchId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Warehouse> allWarehouse;
 
         List<GetLessProductDto> getLessProductDtoList = new ArrayList<>();
+        List<Warehouse> warehouses = new ArrayList<>();
 
         if (branchId != null) {
             allWarehouse = warehouseRepository
@@ -295,7 +295,20 @@ public class WarehouseService {
         }
 
         List<Warehouse> warehouseList = allWarehouse.toList();
+
         for (Warehouse warehouse : warehouseList) {
+            if (warehouse.getProduct() != null) {
+                if (warehouse.getProduct().getMinQuantity() >= warehouse.getAmount()) {
+                    warehouses.add(warehouse);
+                }
+            } else {
+                if (warehouse.getProductTypePrice().getProduct().getMinQuantity() >= warehouse.getAmount()) {
+                    warehouses.add(warehouse);
+                }
+            }
+        }
+
+        for (Warehouse warehouse : warehouses) {
             GetLessProductDto getLessProductDto = new GetLessProductDto();
             if (warehouse.getProductTypePrice() != null) {
                 getLessProductDto.setName(warehouse.getProductTypePrice().getName());
@@ -306,11 +319,13 @@ public class WarehouseService {
             getLessProductDtoList.add(getLessProductDto);
         }
 
+        Page<Warehouse> newPage = new PageImpl<>(warehouses);
+
         Map<String, Object> response = new HashMap<>();
         response.put("getLessProduct", getLessProductDtoList);
-        response.put("currentPage", allWarehouse.getNumber());
-        response.put("totalItems", allWarehouse.getTotalElements());
-        response.put("totalPages", allWarehouse.getTotalPages());
+        response.put("currentPage", newPage.getNumber());
+        response.put("totalItems", newPage.getTotalElements());
+        response.put("totalPages", newPage.getTotalPages());
         return new ApiResponse("all", true, response);
     }
 }
