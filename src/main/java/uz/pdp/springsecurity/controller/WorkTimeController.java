@@ -12,7 +12,7 @@ import uz.pdp.springsecurity.service.WorkTimeService;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/work_time")
+@RequestMapping(value = "/api/workTime")
 @RequiredArgsConstructor
 public class WorkTimeController {
     private final WorkTimeService workTimeService;

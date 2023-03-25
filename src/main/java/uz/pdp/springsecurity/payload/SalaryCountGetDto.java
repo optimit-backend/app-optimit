@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.UUID;
@@ -11,16 +12,18 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalaryCountDto {
-    @NotNull(message = "required")
+public class SalaryCountGetDto {
+    private UUID salaryCountId;
+
+    private String firstName;
+
+    private String lastName;
+
     private double count;
 
-    @NotNull(message = "required")
     private double salary;
 
-    @NotNull(message = "required")
-    private UUID agreementId;
+    private String agreementName;
 
-    @NotNull(message = "required")
     private Date date;
 }
