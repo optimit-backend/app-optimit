@@ -75,7 +75,8 @@ public class ProjectService {
     }
 
     public ApiResponse get(UUID id) {
-        return new ApiResponse("Found",true);
+        Optional<Project> optionalProject = projectRepository.findById(id);
+        return optionalProject.map(project -> new ApiResponse("Found", true, project)).orElseGet(() -> new ApiResponse("Project Not Found", false));
     }
 
     public ApiResponse delete(UUID id) {
