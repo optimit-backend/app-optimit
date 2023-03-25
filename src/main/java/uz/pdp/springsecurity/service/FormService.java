@@ -48,6 +48,7 @@ public class FormService {
             formGetDto.setSourceDto(sourceMapper.toDto(form.getSource()));
             formGetDto.setLidFieldDtos(fieldMapper.toDto(form.getLidFields()));
             formGetDto.setId(form.getId());
+            formGetDto.setBusinessId(form.getBusiness().getId());
             formGetDtoList.add(formGetDto);
         }
         return new ApiResponse("found", true, formGetDtoList);
@@ -62,6 +63,7 @@ public class FormService {
         Form form = optionalForm.get();
         FormGetDto formGetDto = new FormGetDto();
         formGetDto.setId(form.getId());
+        formGetDto.setBusinessId(form.getBusiness().getId());
         formGetDto.setLidFieldDtos(fieldMapper.toDto(form.getLidFields()));
         formGetDto.setSourceDto(sourceMapper.toDto(form.getSource()));
 
@@ -91,6 +93,14 @@ public class FormService {
             form.setLidFields(lidFields);
             formList.add(form);
         }
+
+        List<Form> forms = repository.findAll();
+        repository.deleteAll(forms);
+
+        if (formList.isEmpty()) {
+            return new ApiResponse("not save ", false);
+        }
+
         repository.saveAll(formList);
 
         return new ApiResponse("successfully saved", true);

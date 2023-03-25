@@ -22,11 +22,13 @@ public class FormController {
         ApiResponse apiResponse = service.getAll(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
     @GetMapping("/{id}")
     public HttpEntity<?> getById(@PathVariable UUID id) {
         ApiResponse apiResponse = service.getById(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
 
     @PostMapping
     public HttpEntity<?> create(@RequestBody FormDto formDto) {
