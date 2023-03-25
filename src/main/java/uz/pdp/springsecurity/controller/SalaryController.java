@@ -18,17 +18,17 @@ import java.util.UUID;
 public class SalaryController {
     private final SalaryService salaryService;
 
-    @CheckPermission("CREATE_SALARY")
-    @PostMapping
-    public HttpEntity<?> add(@Valid @RequestBody SalaryDto salaryDto) {
-        ApiResponse apiResponse = salaryService.add(salaryDto);
+    @CheckPermission("EDIT_SALARY")
+    @PutMapping("/pay-salary/{salaryId}")
+    public HttpEntity<?> paySalary(@PathVariable UUID salaryId, @Valid @RequestBody SalaryDto salaryDto) {
+        ApiResponse apiResponse = salaryService.paySalary(salaryId, salaryDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @CheckPermission("EDIT_SALARY")
-    @PutMapping("/{salaryId}")
-    public HttpEntity<?> edit(@PathVariable UUID salaryId, @Valid @RequestBody SalaryDto salaryDto) {
-        ApiResponse apiResponse = salaryService.edit(salaryId, salaryDto);
+    @PutMapping("/pay-avans/{salaryId}")
+    public HttpEntity<?> payAvans(@PathVariable UUID salaryId, @Valid @RequestBody SalaryDto salaryDto) {
+        ApiResponse apiResponse = salaryService.payAvans(salaryId, salaryDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -40,16 +40,16 @@ public class SalaryController {
     }
 
     @CheckPermission("GET_SALARY")
-    @GetMapping("/{salaryId}")
-    public HttpEntity<?> getOne(@PathVariable UUID salaryId) {
-        ApiResponse apiResponse = salaryService.getOne(salaryId);
+    @GetMapping("/by-user/{userId}")
+    public HttpEntity<?> getAllByUser(@PathVariable UUID userId, @RequestParam() UUID branchId) {
+        ApiResponse apiResponse = salaryService.getAllByUser(userId, branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("DELETE_SALARY")
-    @DeleteMapping("/{salaryId}")
-    public HttpEntity<?> deleteOne(@PathVariable UUID salaryId) {
-        ApiResponse apiResponse = salaryService.deleteOne(salaryId);
+    @CheckPermission("GET_SALARY")
+    @GetMapping("/{salaryId}")
+    public HttpEntity<?> getOne(@PathVariable UUID salaryId) {
+        ApiResponse apiResponse = salaryService.getOne(salaryId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }

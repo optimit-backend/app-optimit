@@ -42,8 +42,8 @@ public class ExchangeProductBranchController {
 
 //    @CheckPermission("EDIT_EXCHANGE")
 //    @PutMapping("/{id}")
-//    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody ExchangeProductBranchDTO exchangeProductBranchDTO) {
-//        ApiResponse apiResponse = exchangeProductBranchService.edit(id, exchangeProductBranchDTO);
+//    public HttpEntity<?> paySalary(@PathVariable UUID id, @RequestBody ExchangeProductBranchDTO exchangeProductBranchDTO) {
+//        ApiResponse apiResponse = exchangeProductBranchService.paySalary(id, exchangeProductBranchDTO);
 //        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
 //    }
 

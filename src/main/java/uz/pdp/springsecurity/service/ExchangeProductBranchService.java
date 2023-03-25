@@ -84,7 +84,7 @@ public class ExchangeProductBranchService {
         return warehouseService.createOrUpdateExchangeProductBranch(exchangeProductBranchDTO, exchangeProductBranch, false);
     }
 
-    /*public ApiResponse edit(UUID id, ExchangeProductBranchDTO exchangeProductBranchDTO) {
+    /*public ApiResponse paySalary(UUID id, ExchangeProductBranchDTO exchangeProductBranchDTO) {
 
         UUID businessId = exchangeProductBranchDTO.getBusinessId();
         UUID shippedBranchId = exchangeProductBranchDTO.getShippedBranchId();

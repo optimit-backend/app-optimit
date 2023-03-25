@@ -14,4 +14,6 @@ public interface WorkTimeRepository extends JpaRepository<WorkTime, UUID> {
 
     List<WorkTime> findAllByUserIdAndBranchId(UUID userId, UUID branchId);
     List<WorkTime> findAllByBranchIdAndActiveTrue(UUID branchId);
+
+    void deleteAllByUserIdAndBranchIdAndActiveFalse(UUID userId, UUID branchId);
 }

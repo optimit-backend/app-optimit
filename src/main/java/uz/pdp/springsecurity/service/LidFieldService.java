@@ -58,7 +58,7 @@ public class LidFieldService {
         mapper.update(lidFieldDto, lidField);
         repository.save(lidField);
 
-        return new ApiResponse("successfully edit", true);
+        return new ApiResponse("successfully paySalary", true);
     }
 
 
