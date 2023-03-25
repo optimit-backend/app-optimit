@@ -2,6 +2,7 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uz.pdp.springsecurity.entity.Business;
 import uz.pdp.springsecurity.entity.Form;
 import uz.pdp.springsecurity.entity.LidField;
 import uz.pdp.springsecurity.entity.Source;
@@ -10,6 +11,7 @@ import uz.pdp.springsecurity.mapper.SourceMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.FormDto;
 import uz.pdp.springsecurity.payload.FormGetDto;
+import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.repository.FormRepository;
 import uz.pdp.springsecurity.repository.LidFieldRepository;
 import uz.pdp.springsecurity.repository.SourceRepository;
@@ -29,6 +31,8 @@ public class FormService {
     private final LidFieldRepository fieldRepository;
     private final SourceRepository sourceRepository;
 
+    private final BusinessRepository businessRepository;
+
     public ApiResponse getAll(UUID businessId) {
         List<Form> allByBusinessId =
                 repository.findAllByBusiness_Id(businessId);
@@ -43,6 +47,7 @@ public class FormService {
             FormGetDto formGetDto = new FormGetDto();
             formGetDto.setSourceDto(sourceMapper.toDto(form.getSource()));
             formGetDto.setLidFieldDtos(fieldMapper.toDto(form.getLidFields()));
+            formGetDto.setId(form.getId());
             formGetDtoList.add(formGetDto);
         }
         return new ApiResponse("found", true, formGetDtoList);
@@ -56,6 +61,7 @@ public class FormService {
 
         Form form = optionalForm.get();
         FormGetDto formGetDto = new FormGetDto();
+        formGetDto.setId(form.getId());
         formGetDto.setLidFieldDtos(fieldMapper.toDto(form.getLidFields()));
         formGetDto.setSourceDto(sourceMapper.toDto(form.getSource()));
 
@@ -80,6 +86,8 @@ public class FormService {
                     lidFields.add(lidField);
                 }
             }
+            Optional<Business> optionalBusiness = businessRepository.findById(formDto.getBusinessId());
+            optionalBusiness.ifPresent(form::setBusiness);
             form.setLidFields(lidFields);
             formList.add(form);
         }
