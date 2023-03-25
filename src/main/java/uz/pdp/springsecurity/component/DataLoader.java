@@ -365,7 +365,13 @@ public class DataLoader implements CommandLineRunner {
                                     EDIT_STAGE,
                                     GET_STAGE,
                                     DELETE_STAGE,
-                                    GET_ALL_STAGE
+                                    GET_ALL_STAGE,
+
+                                    GET_ALL_PROJECT,
+                                    DELETE_PROJECT,
+                                    GET_PROJECT,
+                                    EDIT_PROJECT,
+                                    ADD_PROJECT
 
                             ),
                             business));
@@ -520,7 +526,13 @@ public class DataLoader implements CommandLineRunner {
                             EDIT_STAGE,
                             GET_STAGE,
                             DELETE_STAGE,
-                            GET_ALL_STAGE
+                            GET_ALL_STAGE,
+
+                            GET_ALL_PROJECT,
+                            DELETE_PROJECT,
+                            GET_PROJECT,
+                            EDIT_PROJECT,
+                            ADD_PROJECT
                     ),
                     business));
 

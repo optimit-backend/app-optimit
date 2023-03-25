@@ -2,10 +2,12 @@ package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uz.pdp.springsecurity.entity.Branch;
 import uz.pdp.springsecurity.entity.Business;
 import uz.pdp.springsecurity.entity.ProjectType;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProjectTypeDto;
+import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.repository.ProjectTypeRepository;
 
@@ -20,16 +22,19 @@ public class ProjectTypeServise {
     ProjectTypeRepository projectTypeRepository;
 
     @Autowired
+    BranchRepository branchRepository;
+
+    @Autowired
     BusinessRepository businessRepository;
 
     public ApiResponse add(ProjectTypeDto projectTypeDto) {
-        Optional<Business> optionalBusiness = businessRepository.findById(projectTypeDto.getBusinessId());
-        if (optionalBusiness.isEmpty()){
-            return new ApiResponse("Business Not Found",false);
+        Optional<Branch> optionalBranch = branchRepository.findById(projectTypeDto.getBranchId());
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch Not Found",false);
         }
         ProjectType projectType=new ProjectType();
         projectType.setName(projectTypeDto.getName());
-        projectType.setBusiness(optionalBusiness.get());
+        projectType.setBranch(optionalBranch.get());
         projectTypeRepository.save(projectType);
         return new ApiResponse("Added",true,projectType);
     }
@@ -59,8 +64,8 @@ public class ProjectTypeServise {
         return new ApiResponse("Deleted",true);
     }
 
-    public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<ProjectType> projectTypeList = projectTypeRepository.findAllByBusinessId(businessId);
+    public ApiResponse getAllByBranch(UUID branchId) {
+        List<ProjectType> projectTypeList = projectTypeRepository.findAllByBranchId(branchId);
         if (projectTypeList.isEmpty()){
             return new ApiResponse("Not Found",false);
         }

@@ -6,10 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -34,8 +31,8 @@ public class Project extends AbsEntity {
     @ManyToMany
     private List<User> users;
 
-    @OneToOne
-    private Attachment attachment;
+    @OneToMany
+    private List<Attachment> attachmentList;
 
     private double budget;
 
@@ -53,5 +50,5 @@ public class Project extends AbsEntity {
 //    private List<ProductionAndAmount> amountList;
 
     @ManyToOne
-    private Business business;
+    private Branch branch;
 }
