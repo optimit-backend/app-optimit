@@ -120,7 +120,7 @@ public class CurrencyService {
         if (byId.isPresent()) {
             Currency currency = byId.get();
             if (currency.getName().equalsIgnoreCase("SO'M")) {
-                return new ApiResponse("Can't edit this currency");
+                return new ApiResponse("Can't paySalary this currency");
             }
             currency.setName(dto.getName());
             currency.setDescription(dto.getDescription());

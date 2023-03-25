@@ -22,5 +22,8 @@ public class SalaryCountDto {
     private UUID agreementId;
 
     @NotNull(message = "required")
+    private UUID branchId;
+
+    @NotNull(message = "required")
     private Date date;
 }

@@ -8,4 +8,6 @@ import java.util.UUID;
 
 public interface SalaryCountRepository extends JpaRepository<SalaryCount, UUID> {
     List<SalaryCount> findAllByAgreement_UserIdOrderByDate(UUID userId);
+
+    void deleteAllByAgreement_UserIdAndBranchId(UUID userID, UUID branchId);
 }

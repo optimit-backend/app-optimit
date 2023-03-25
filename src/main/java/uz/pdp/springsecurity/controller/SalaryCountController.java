@@ -37,8 +37,8 @@ public class SalaryCountController {
 
     @CheckPermission("GET_SALARY")
     @GetMapping("//by-user-last-month/{userId}")
-    public HttpEntity<?> getByUserLastMonth(@PathVariable UUID userId) {
-        ApiResponse apiResponse = salaryCountService.getByUserLastMonth(userId);
+    public HttpEntity<?> getByUserLastMonth(@PathVariable UUID userId, @RequestParam() UUID branchId) {
+        ApiResponse apiResponse = salaryCountService.getByUserLastMonth(userId, branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

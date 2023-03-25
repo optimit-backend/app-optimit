@@ -20,11 +20,16 @@ import java.util.Date;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 public class SalaryCount extends AbsEntity {
-    @Column(nullable = false)
-    private double count;
+
+    @ManyToOne(optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Branch branch;
 
     @Column(nullable = false)
-    private double salary;
+    private double count = 0;
+
+    @Column(nullable = false)
+    private double salary = 0;
 
     @ManyToOne(optional = false)
     private Agreement agreement;
