@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -82,7 +83,7 @@ public class CustomerController {
      * @param businessId
      * @return ApiResponse(success - > true object - > value)
      */
-    @CheckPermission("VIEW_CUSTOMER_ADMIN")
+    @PreAuthorize("hasAnyAuthority()")
     @GetMapping("/get-by-businessId/{businessId}")
     public HttpEntity<?> getAllByBusinessId(@PathVariable UUID businessId) {
         ApiResponse apiResponse = customerService.getAllByBusinessId(businessId);
