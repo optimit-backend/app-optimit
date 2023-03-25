@@ -9,5 +9,5 @@ import java.util.UUID;
 
 public interface ProjectTypeRepository extends JpaRepository<ProjectType, UUID> {
 
-    List<ProjectType> findAllByBusinessId(UUID business_id);
+    List<ProjectType> findAllByBranchId(UUID branchId);
 }

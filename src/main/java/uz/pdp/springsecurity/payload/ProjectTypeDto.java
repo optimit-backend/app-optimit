@@ -14,5 +14,5 @@ public class ProjectTypeDto {
 
     private String name;
 
-    private UUID businessId;
+    private UUID branchId;
 }

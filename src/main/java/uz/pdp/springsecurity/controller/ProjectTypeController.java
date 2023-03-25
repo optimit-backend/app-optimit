@@ -48,9 +48,9 @@ public class ProjectTypeController {
     }
 
     @CheckPermission("GET_ALL_PROJECT_TYPE")
-    @GetMapping("/get-by-business/{businessId}")
-    public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId) {
-        ApiResponse apiResponse = projectTypeServise.getAllByBusinessId(businessId);
+    @GetMapping("/get-by-branch/{branchId}")
+    public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = projectTypeServise.getAllByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
