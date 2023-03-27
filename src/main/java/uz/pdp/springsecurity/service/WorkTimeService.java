@@ -3,16 +3,15 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Branch;
+import uz.pdp.springsecurity.entity.Role;
 import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.entity.WorkTime;
 import uz.pdp.springsecurity.mapper.WorkTimeMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.WorkTimeGetDto;
 import uz.pdp.springsecurity.payload.WorkTimePostDto;
-import uz.pdp.springsecurity.repository.AgreementRepository;
-import uz.pdp.springsecurity.repository.BranchRepository;
-import uz.pdp.springsecurity.repository.UserRepository;
-import uz.pdp.springsecurity.repository.WorkTimeRepository;
+import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.util.Constants;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -24,7 +23,7 @@ public class WorkTimeService {
     private final UserRepository userRepository;
     private final WorkTimeMapper workTimeMapper;
     private final BranchRepository branchRepository;
-    private final AgreementRepository agreementRepository;
+    private final RoleRepository roleRepository;
 
     public ApiResponse arrive(WorkTimePostDto workTimePostDto) {
         Optional<User> optionalUser = userRepository.findById(workTimePostDto.getUserID());
@@ -74,7 +73,9 @@ public class WorkTimeService {
 
     public ApiResponse getOnWork(UUID branchId) {
         if (!branchRepository.existsById(branchId)) return new ApiResponse("BRANCH NOT FOUND", false);
-        List<User> userList = userRepository.findAllByBranchesIdAndActiveIsTrue(branchId);
+        Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
+        if (optionalRole.isEmpty()) return new ApiResponse("ERROR", false);
+        List<User> userList = userRepository.findAllByBranchesIdAndRoleIsNotAndActiveIsTrue(branchId, optionalRole.get());
         if (userList.isEmpty()) return new ApiResponse("USERS NOT FOUND", false);
         List<WorkTimeGetDto> workTimeGetDtoList = new ArrayList<>();
         for (User user : userList) {

@@ -22,16 +22,13 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByUsernameAndIdIsNotLike(String username, UUID id);
 
     List<User> findAllByRole_Id(UUID role_id);
-    List<User> findAllByRole_IdAndBusiness_Delete(UUID role_id, boolean delete);
 
+    List<User> findAllByRole_IdAndBusiness_Delete(UUID role_id, boolean delete);
 
     List<User> findAllByBusiness_Id(UUID business_id);
 
     List<User> findAllByBusiness_IdAndRoleIsNotAndActiveIsTrue(UUID business_id, Role role);
 
-//    List<User> findAllByBranches(Set<Branch> branches);
-
     List<User> findAllByBranchesIdAndRoleIsNotAndActiveIsTrue(UUID branches_id, Role role);
-    List<User> findAllByBranchesIdAndActiveIsTrue(UUID branches_id);
 
 }
