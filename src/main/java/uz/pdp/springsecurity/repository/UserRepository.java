@@ -10,25 +10,15 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsById(UUID userId);
-
     boolean existsByUsernameIgnoreCase(String username);
-
-    Optional<User> findByUsernameAndIdNot(String username, UUID id);
-
     Optional<User> findByUsername(String username);
-
-    boolean existsByUsernameAndIdNot(String userName, UUID id);
-
-    boolean existsByUsernameAndIdIsNotLike(String username, UUID id);
-
     List<User> findAllByRole_Id(UUID role_id);
+
 
     List<User> findAllByRole_IdAndBusiness_Delete(UUID role_id, boolean delete);
 
     List<User> findAllByBusiness_Id(UUID business_id);
-
     List<User> findAllByBusiness_IdAndRoleIsNotAndActiveIsTrue(UUID business_id, Role role);
-
     List<User> findAllByBranchesIdAndRoleIsNotAndActiveIsTrue(UUID branches_id, Role role);
-
+    Optional<User> findByBusinessIdAndRoleName(UUID business_id, String role_name);
 }

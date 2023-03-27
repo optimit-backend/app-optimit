@@ -8,6 +8,7 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LidDto;
 import uz.pdp.springsecurity.service.LidService;
 
+import java.util.Date;
 import java.util.UUID;
 
 @RestController
@@ -37,7 +38,7 @@ public class LidController {
 
     @PutMapping("/edit-status/{id}")
     HttpEntity<?> editStatus(@PathVariable UUID id,
-                             @RequestParam UUID statusId){
+                             @RequestParam UUID statusId) {
         ApiResponse apiResponse = lidService.editStatus(id, statusId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
