@@ -32,9 +32,9 @@ public class WorkTimeController {
     }
 
     @CheckPermission("GET_SALARY")
-    @GetMapping("/by-user-last-month")
-    public HttpEntity<?> getByUserLastMonth(@RequestBody WorkTimePostDto workTimePostDto) {
-        ApiResponse apiResponse = workTimeService.getByUserLastMonth(workTimePostDto);
+    @GetMapping("/by-user-last-month/{userId}")
+    public HttpEntity<?> getByUserLastMonth(@PathVariable UUID userId, @RequestParam() UUID branchId) {
+        ApiResponse apiResponse = workTimeService.getByUserLastMonth(userId, branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

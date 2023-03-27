@@ -12,6 +12,7 @@ public interface AgreementRepository extends JpaRepository<Agreement, UUID> {
     List<Agreement> findAllByUserId(UUID userId);
 
     Optional<Agreement> findByUserIdAndSalaryStatus(UUID userId, SalaryStatus salaryStatus);
+    Optional<Agreement> findByUserIdAndSalaryStatusAndActiveTrue(UUID userId, SalaryStatus salaryStatus);
     Agreement getByUserIdAndSalaryStatus(UUID userId, SalaryStatus salaryStatus);
 
     Integer countAllByUserId(UUID userId);

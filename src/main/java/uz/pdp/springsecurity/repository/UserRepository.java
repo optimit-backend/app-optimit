@@ -32,5 +32,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 //    List<User> findAllByBranches(Set<Branch> branches);
 
     List<User> findAllByBranchesIdAndRoleIsNotAndActiveIsTrue(UUID branches_id, Role role);
+    List<User> findAllByBranchesIdAndActiveIsTrue(UUID branches_id);
 
 }

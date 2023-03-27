@@ -7,15 +7,15 @@ import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.entity.WorkTime;
 import uz.pdp.springsecurity.mapper.WorkTimeMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.WorkTimeGetDto;
 import uz.pdp.springsecurity.payload.WorkTimePostDto;
+import uz.pdp.springsecurity.repository.AgreementRepository;
 import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.UserRepository;
 import uz.pdp.springsecurity.repository.WorkTimeRepository;
 
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +24,7 @@ public class WorkTimeService {
     private final UserRepository userRepository;
     private final WorkTimeMapper workTimeMapper;
     private final BranchRepository branchRepository;
+    private final AgreementRepository agreementRepository;
 
     public ApiResponse arrive(WorkTimePostDto workTimePostDto) {
         Optional<User> optionalUser = userRepository.findById(workTimePostDto.getUserID());
@@ -37,7 +38,7 @@ public class WorkTimeService {
             }
         }
         if (branch == null) return new ApiResponse("BRANCH NOT FOUND", false);
-        if (workTimeRepository.existsByUserIdAndBranchIdAndActiveTrue(workTimePostDto.getUserID(), branch.getId())) return new ApiResponse("USER ON WORK", false);
+        if (workTimeRepository.existsByUserIdAndBranchIdAndActiveTrue(user.getId(), branch.getId())) return new ApiResponse("USER ON WORK", false);
         workTimeRepository.save(
                 new WorkTime(
                         branch,
@@ -63,16 +64,40 @@ public class WorkTimeService {
         return new ApiResponse("SUCCESS", true);
     }
 
-    public ApiResponse getByUserLastMonth(WorkTimePostDto workTimePostDto) {
-        List<WorkTime> workTimeList = workTimeRepository.findAllByUserIdAndBranchId(workTimePostDto.getUserID(), workTimePostDto.getBranchID());
+    public ApiResponse getByUserLastMonth(UUID userId, UUID branchId) {
+        if (!userRepository.existsById(userId)) return new ApiResponse("USER NO FOUND", false);
+        if (!branchRepository.existsById(branchId)) return new ApiResponse("BRANCH NO FOUND", false);
+        List<WorkTime> workTimeList = workTimeRepository.findAllByUserIdAndBranchId(userId, branchId);
         if (workTimeList.isEmpty()) return new ApiResponse("NOT FOUND WORK TIME", false);
         return new ApiResponse(true, workTimeMapper.toDtoList(workTimeList));
     }
 
     public ApiResponse getOnWork(UUID branchId) {
         if (!branchRepository.existsById(branchId)) return new ApiResponse("BRANCH NOT FOUND", false);
-        List<WorkTime> workTimeList = workTimeRepository.findAllByBranchIdAndActiveTrue(branchId);
-        if (workTimeList.isEmpty())return new ApiResponse("USER ON WORK NOT FOUND", false);
-        return new ApiResponse(true, workTimeList);
+        List<User> userList = userRepository.findAllByBranchesIdAndActiveIsTrue(branchId);
+        if (userList.isEmpty()) return new ApiResponse("USERS NOT FOUND", false);
+        List<WorkTimeGetDto> workTimeGetDtoList = new ArrayList<>();
+        for (User user : userList) {
+            Optional<WorkTime> optionalWorkTime = workTimeRepository.findByUserIdAndBranchIdAndActiveTrue(user.getId(), branchId);
+            if (optionalWorkTime.isEmpty()){
+                workTimeGetDtoList.add(new WorkTimeGetDto(
+                        user.getId(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        new Timestamp(System.currentTimeMillis()),
+                        false
+                ));
+            }else {
+                WorkTime workTime = optionalWorkTime.get();
+                workTimeGetDtoList.add(new WorkTimeGetDto(
+                        user.getId(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        workTime.getArrivalTime(),
+                        workTime.isActive()
+                ));
+            }
+        }
+        return new ApiResponse(true, workTimeGetDtoList);
     }
 }
