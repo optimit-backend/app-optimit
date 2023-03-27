@@ -117,7 +117,7 @@ public class User extends AbsEntity implements UserDetails {
         this.enabled = enabled;
         this.business = business;
         this.branches = branches;
-        this.isActive();
+        this.active = active;
     }
 
     public User(String firstName, String lastName, String username, String password, Role role, boolean enabled) {

@@ -10,13 +10,12 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface SalaryCountMapper {
-    @Mapping(target = "agreementId", source = "agreement.id")
-    SalaryCountDto toDto(SalaryCount salaryCount);
 
-    @Mapping(target = "salaryCountId", source = "id")
+    @Mapping(target = "userId", source = "agreement.user.id")
     @Mapping(target = "firstName", source = "agreement.user.firstName")
     @Mapping(target = "lastName", source = "agreement.user.lastName")
     @Mapping(target = "agreementName", source = "agreement.salaryStatus")
+    @Mapping(target = "agreementId", source = "agreement.id")
     SalaryCountGetDto toGetDto(SalaryCount salaryCount);
 
     List<SalaryCountGetDto> toGetDtoList(List<SalaryCount> salaryCountList);
