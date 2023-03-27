@@ -81,6 +81,7 @@ public class DataLoader implements CommandLineRunner {
 
 
 
+
             List<Tariff> tariffRepositoryAll = tariffRepository.findAll();
             Tariff tariff = null;
             if (tariffRepositoryAll.isEmpty()) {

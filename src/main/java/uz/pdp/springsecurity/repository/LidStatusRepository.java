@@ -7,5 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface LidStatusRepository extends JpaRepository<LidStatus, UUID> {
-    List<LidStatus> findAllByBusiness_Id(UUID business_id);
+    List<LidStatus> findAllByBusiness_IdOrderBySortAsc(UUID business_id);
+
+    List<LidStatus> findAllBySortGreaterThanEqual(Integer sort);
 }

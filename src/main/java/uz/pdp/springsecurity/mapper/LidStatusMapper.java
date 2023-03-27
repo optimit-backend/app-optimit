@@ -16,10 +16,10 @@ public interface LidStatusMapper {
 
     List<LidStatusDto> toDto(List<LidStatus> lidStatusList);
 
+    @Mapping(target = "business", ignore = true)
     @Mapping(target = "updateAt", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "business", ignore = true)
     @Mapping(target = "business.id", source = "businessId")
     LidStatus toEntity(LidStatusDto lidStatusDto);
 
