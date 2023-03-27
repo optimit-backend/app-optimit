@@ -21,6 +21,7 @@ public class TaskStatusServise {
 
     @Autowired
     BusinessRepository businessRepository;
+
     public ApiResponse add(TaskStatusDto taskStatusDto) {
         Optional<Business> optionalBusiness = businessRepository.findById(taskStatusDto.getBusinessId());
         if (optionalBusiness.isEmpty()){
@@ -28,7 +29,8 @@ public class TaskStatusServise {
         }
         TaskStatus taskStatus = new TaskStatus();
         taskStatus.setABoolean(taskStatusDto.isABoolean());
-        taskStatus.setOrdinalNumber(taskStatusDto.getOrdinalNumber());
+        long ordinalNumber = taskStatusRepository.count()+1;
+        taskStatus.setOrdinalNumber((int) ordinalNumber);
         taskStatus.setName(taskStatusDto.getName());
         taskStatus.setColor(taskStatusDto.getColor());
         taskStatus.setBusiness(optionalBusiness.get());
@@ -53,12 +55,11 @@ public class TaskStatusServise {
     public final void updateTaskStatusOrdinalNumber(TaskStatus taskStatus, int newOrdinalNumber) {
         int currentOrdinalNumber = taskStatus.getOrdinalNumber();
         if (currentOrdinalNumber == newOrdinalNumber) {
-            return; // No need to update if the ordinal numbers are the same
+            return;
         }
 
         List<TaskStatus> allTaskStatuses = taskStatusRepository.findAllByOrderByOrdinalNumber();
         if (newOrdinalNumber > currentOrdinalNumber) {
-            // Move the task status to a higher ordinal number
             for (TaskStatus ts : allTaskStatuses) {
                 if (ts.getOrdinalNumber() > currentOrdinalNumber && ts.getOrdinalNumber() <= newOrdinalNumber) {
                     ts.setOrdinalNumber(ts.getOrdinalNumber() - 1);
@@ -66,7 +67,6 @@ public class TaskStatusServise {
                 }
             }
         } else {
-            // Move the task status to a lower ordinal number
             for (TaskStatus ts : allTaskStatuses) {
                 if (ts.getOrdinalNumber() >= newOrdinalNumber && ts.getOrdinalNumber() < currentOrdinalNumber) {
                     ts.setOrdinalNumber(ts.getOrdinalNumber() + 1);
