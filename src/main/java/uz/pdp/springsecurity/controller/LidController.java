@@ -18,13 +18,8 @@ public class LidController {
     private final LidService lidService;
 
     @GetMapping("/get-by-businessId/{businessId}")
-    HttpEntity<?> getAll(@PathVariable UUID businessId,
-                         @RequestParam(required = false) String date,
-                         @RequestParam(required = false) Date startDate,
-                         @RequestParam(required = false) Date endDate,
-                         @RequestParam int size,
-                         @RequestParam int page) {
-        ApiResponse apiResponse = lidService.getAll(businessId, date, startDate, endDate, size, page);
+    HttpEntity<?> getAll(@PathVariable UUID businessId) {
+        ApiResponse apiResponse = lidService.getAll(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

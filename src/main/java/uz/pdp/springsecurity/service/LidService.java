@@ -15,7 +15,6 @@ import uz.pdp.springsecurity.repository.LidStatusRepository;
 import uz.pdp.springsecurity.repository.NotificationRepository;
 import uz.pdp.springsecurity.repository.UserRepository;
 
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,16 +27,21 @@ public class LidService {
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
 
-    public ApiResponse getAll(UUID businessId, String date, Date startDate, Date endDate, int size, int page) {
+    public ApiResponse getAll(UUID businessId) {
         List<LidStatus> allLidStatus =
                 lidStatusRepository.findAllByBusiness_IdOrderBySortAsc(businessId);
-        List<Lid> lidList = repository.findAllByLidStatus_BusinessIdOrderByLidStatus_Sort(businessId);
+
 
         return null;
     }
 
     public ApiResponse getById(UUID id) {
-        return null;
+        Lid lid = repository.findById(id).orElse(null);
+        if (lid == null) {
+            return new ApiResponse("not found", false);
+        }
+        LidDto lidDto = mapper.toDto(lid);
+        return new ApiResponse("found", true, lidDto);
     }
 
     public ApiResponse create(LidDto lidDto) {
