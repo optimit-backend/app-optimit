@@ -203,5 +203,10 @@ public enum Permissions {
     DELETE_PROJECT,
     GET_PROJECT,
     EDIT_PROJECT,
-    ADD_PROJECT
+    ADD_PROJECT,
+
+    DELETE_LID_STATUS,
+    PUT_LID_STATUS,
+    POST_LID_STATUS,
+    GET_LID_STATUS
 }
