@@ -98,10 +98,14 @@ public class ProductTypeService {
 //    }
 
 
-    public ApiResponse getProductType() {
+    public ApiResponse getProductType(User user) {
+        UUID uuid = user.getBusiness().getId();
         List<ProductTypeGetDto> productTypePostDto = new ArrayList<>();
 
-        List<ProductType> all = typeRepository.findAll();
+        List<ProductType> all = typeRepository.findAllByBusinessId(uuid);
+        if (all.isEmpty()){
+            return new ApiResponse("Not Found ",false);
+        }
 
         for (ProductType productType : all) {
             ProductTypeGetDto getDto = new ProductTypeGetDto();

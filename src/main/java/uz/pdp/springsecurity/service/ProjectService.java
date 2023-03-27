@@ -7,6 +7,8 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProjectDto;
 import uz.pdp.springsecurity.repository.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,6 +23,9 @@ public class ProjectService {
 
     @Autowired
     BonusRepository bonusRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     BranchRepository branchRepository;
@@ -53,7 +58,14 @@ public class ProjectService {
         optionalProjectType.ifPresent(project::setProjectType);
         project.setCustomer(optionalCustomer.get());
         project.setDescription(projectDto.getDescription());
-        project.setUsers(projectDto.getUserList());
+
+        List<User> userList = new ArrayList<>();
+        for (UUID uuid : projectDto.getUserList()) {
+            Optional<User> optionalUser = userRepository.findById(uuid);
+            optionalUser.ifPresent(userList::add);
+        }
+        project.setUsers(userList);
+        
         if (!projectDto.getAttachmentList().isEmpty()){
             project.setAttachmentList(projectDto.getAttachmentList());
         }
