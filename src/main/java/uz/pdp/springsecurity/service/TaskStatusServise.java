@@ -21,12 +21,16 @@ public class TaskStatusServise {
 
     @Autowired
     BusinessRepository businessRepository;
+
     public ApiResponse add(TaskStatusDto taskStatusDto) {
         Optional<Business> optionalBusiness = businessRepository.findById(taskStatusDto.getBusinessId());
         if (optionalBusiness.isEmpty()){
             return new ApiResponse("Business Not Found",false);
         }
         TaskStatus taskStatus = new TaskStatus();
+        taskStatus.setABoolean(taskStatusDto.isABoolean());
+        long ordinalNumber = taskStatusRepository.count()+1;
+        taskStatus.setOrdinalNumber((int) ordinalNumber);
         taskStatus.setName(taskStatusDto.getName());
         taskStatus.setColor(taskStatusDto.getColor());
         taskStatus.setBusiness(optionalBusiness.get());
@@ -40,10 +44,39 @@ public class TaskStatusServise {
             return new ApiResponse("Not Found",false);
         }
         TaskStatus taskStatus = taskStatusRepository.getById(id);
+        taskStatus.setABoolean(taskStatusDto.isABoolean());
+        updateTaskStatusOrdinalNumber(taskStatus,taskStatusDto.getOrdinalNumber());
         taskStatus.setName(taskStatusDto.getName());
         taskStatus.setColor(taskStatusDto.getColor());
         TaskStatus status = taskStatusRepository.save(taskStatus);
         return new ApiResponse("Edited",true,status);
+    }
+
+    public final void updateTaskStatusOrdinalNumber(TaskStatus taskStatus, int newOrdinalNumber) {
+        int currentOrdinalNumber = taskStatus.getOrdinalNumber();
+        if (currentOrdinalNumber == newOrdinalNumber) {
+            return;
+        }
+
+        List<TaskStatus> allTaskStatuses = taskStatusRepository.findAllByOrderByOrdinalNumber();
+        if (newOrdinalNumber > currentOrdinalNumber) {
+            for (TaskStatus ts : allTaskStatuses) {
+                if (ts.getOrdinalNumber() > currentOrdinalNumber && ts.getOrdinalNumber() <= newOrdinalNumber) {
+                    ts.setOrdinalNumber(ts.getOrdinalNumber() - 1);
+                    taskStatusRepository.save(ts);
+                }
+            }
+        } else {
+            for (TaskStatus ts : allTaskStatuses) {
+                if (ts.getOrdinalNumber() >= newOrdinalNumber && ts.getOrdinalNumber() < currentOrdinalNumber) {
+                    ts.setOrdinalNumber(ts.getOrdinalNumber() + 1);
+                    taskStatusRepository.save(ts);
+                }
+            }
+        }
+        taskStatus.setOrdinalNumber(newOrdinalNumber);
+
+        taskStatusRepository.save(taskStatus);
     }
 
     public ApiResponse get(UUID id) {

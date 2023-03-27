@@ -17,6 +17,8 @@ import javax.persistence.ManyToOne;
 public class LidStatus extends AbsEntity {
     private String name;
     private String color;
+    private Integer sort;
+    private boolean big;
     @ManyToOne
     private Business business;
 }
