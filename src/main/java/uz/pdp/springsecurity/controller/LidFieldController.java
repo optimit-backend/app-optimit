@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/lidField")
+@RequestMapping("/api/lidField")
 public class LidFieldController {
 
     private final LidFieldService lidFieldService;

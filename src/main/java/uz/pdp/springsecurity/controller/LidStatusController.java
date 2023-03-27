@@ -14,7 +14,7 @@ import uz.pdp.springsecurity.service.LidStatusService;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/lid-status")
+@RequestMapping("/api/lid-status")
 @RequiredArgsConstructor
 public class LidStatusController {
     private final LidStatusService service;

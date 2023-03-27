@@ -11,7 +11,7 @@ import uz.pdp.springsecurity.service.FormService;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/form-lid")
+@RequestMapping("/api/form-lid")
 @RequiredArgsConstructor
 public class FormController {
 
