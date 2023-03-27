@@ -12,7 +12,7 @@ import uz.pdp.springsecurity.service.SourceService;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/source")
+@RequestMapping("/api/source")
 @RequiredArgsConstructor
 public class SourceController {
 
