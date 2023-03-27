@@ -4,16 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LidStatusDto {
-    private UUID id;
+public class LidDto {
     private String name;
-    private String color;
-    private Integer sort;
-    private boolean big;
-    private UUID businessId;
 }
