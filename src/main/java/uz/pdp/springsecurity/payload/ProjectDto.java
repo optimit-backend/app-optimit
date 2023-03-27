@@ -23,7 +23,7 @@ public class ProjectDto {
     private UUID projectTypeId;
     private UUID customerId;
     private String description;
-    private List<User> userList;
+    private List<UUID> userList;
     private List<Attachment> attachmentList;
     private double budget;
     private UUID stageId;

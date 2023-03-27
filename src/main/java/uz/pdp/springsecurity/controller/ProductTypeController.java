@@ -6,8 +6,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
+import uz.pdp.springsecurity.annotations.CurrentUser;
 import uz.pdp.springsecurity.configuration.ExcelGenerator;
 import uz.pdp.springsecurity.entity.ProductType;
+import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductTypePostDto;
 import uz.pdp.springsecurity.repository.ProductRepository;
@@ -40,8 +42,8 @@ public class ProductTypeController {
 
     @CheckPermission("GET_PRODUCT_TYPE")
     @GetMapping()
-    public HttpEntity<?> getAll() {
-        ApiResponse apiResponse = service.getProductType();
+    public HttpEntity<?> getAll(@CurrentUser User user) {
+        ApiResponse apiResponse = service.getProductType(user);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
