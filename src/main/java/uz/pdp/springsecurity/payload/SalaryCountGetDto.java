@@ -13,17 +13,21 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SalaryCountGetDto {
-    private UUID salaryCountId;
+    private UUID userId;
 
     private String firstName;
 
     private String lastName;
 
+    private UUID id;
+
     private double count;
 
     private double salary;
 
-    private String agreementName;
-
     private Date date;
+
+    private UUID agreementId;
+
+    private String agreementName;
 }

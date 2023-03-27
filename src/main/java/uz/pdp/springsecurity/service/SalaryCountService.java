@@ -57,13 +57,13 @@ public class SalaryCountService {
     public ApiResponse getByUserLastMonth(UUID userId, UUID branchId) {
         if (!userRepository.existsById(userId)) return new ApiResponse("USER NOT FOUND", false);
         if (!branchRepository.existsById(branchId)) return new ApiResponse("USER NOT BRANCH", false);
-        List<SalaryCount> salaryCountList = salaryCountRepository.findAllByAgreement_UserIdOrderByDate(userId);
+        List<SalaryCount> salaryCountList = salaryCountRepository.findAllByAgreement_UserIdAndBranch_IdOrderByDate(userId, branchId);
         if (salaryCountList.isEmpty())return new ApiResponse("SALARY COUNT NOT FOUND", false);
         return new ApiResponse(true, salaryCountMapper.toGetDtoList(salaryCountList));
     }
 
     public ApiResponse getOne(UUID salaryCountId) {
         Optional<SalaryCount> optionalSalaryCount = salaryCountRepository.findById(salaryCountId);
-        return optionalSalaryCount.map(salaryCount -> new ApiResponse(true, salaryCountMapper.toDto(salaryCount))).orElseGet(() -> new ApiResponse("SALARY COUNT NOT FOUND", false));
+        return optionalSalaryCount.map(salaryCount -> new ApiResponse(true, salaryCountMapper.toGetDto(salaryCount))).orElseGet(() -> new ApiResponse("SALARY COUNT NOT FOUND", false));
     }
 }
