@@ -30,7 +30,7 @@ public class TaskStatusServise {
         TaskStatus taskStatus = new TaskStatus();
         taskStatus.setABoolean(taskStatusDto.isABoolean());
         long ordinalNumber = taskStatusRepository.count()+1;
-        taskStatus.setOrdinalNumber((int) ordinalNumber);
+        taskStatus.setRowNumber(ordinalNumber);
         taskStatus.setName(taskStatusDto.getName());
         taskStatus.setColor(taskStatusDto.getColor());
         taskStatus.setBusiness(optionalBusiness.get());
@@ -45,15 +45,15 @@ public class TaskStatusServise {
         }
         TaskStatus taskStatus = taskStatusRepository.getById(id);
         taskStatus.setABoolean(taskStatusDto.isABoolean());
-        updateTaskStatusOrdinalNumber(taskStatus,taskStatusDto.getOrdinalNumber());
+        updateTaskStatusOrdinalNumber(taskStatus,taskStatusDto.getRowNumber());
         taskStatus.setName(taskStatusDto.getName());
         taskStatus.setColor(taskStatusDto.getColor());
         TaskStatus status = taskStatusRepository.save(taskStatus);
         return new ApiResponse("Edited",true,status);
     }
 
-    public final void updateTaskStatusOrdinalNumber(TaskStatus taskStatus, int newOrdinalNumber) {
-        int currentOrdinalNumber = taskStatus.getOrdinalNumber();
+    public final void updateTaskStatusOrdinalNumber(TaskStatus taskStatus, long newOrdinalNumber) {
+        long currentOrdinalNumber = taskStatus.getRowNumber();
         if (currentOrdinalNumber == newOrdinalNumber) {
             return;
         }
@@ -61,20 +61,20 @@ public class TaskStatusServise {
         List<TaskStatus> allTaskStatuses = taskStatusRepository.findAllByOrderByOrdinalNumber();
         if (newOrdinalNumber > currentOrdinalNumber) {
             for (TaskStatus ts : allTaskStatuses) {
-                if (ts.getOrdinalNumber() > currentOrdinalNumber && ts.getOrdinalNumber() <= newOrdinalNumber) {
-                    ts.setOrdinalNumber(ts.getOrdinalNumber() - 1);
+                if (ts.getRowNumber() > currentOrdinalNumber && ts.getRowNumber() <= newOrdinalNumber) {
+                    ts.setRowNumber(ts.getRowNumber() - 1);
                     taskStatusRepository.save(ts);
                 }
             }
         } else {
             for (TaskStatus ts : allTaskStatuses) {
-                if (ts.getOrdinalNumber() >= newOrdinalNumber && ts.getOrdinalNumber() < currentOrdinalNumber) {
-                    ts.setOrdinalNumber(ts.getOrdinalNumber() + 1);
+                if (ts.getRowNumber() >= newOrdinalNumber && ts.getRowNumber() < currentOrdinalNumber) {
+                    ts.setRowNumber(ts.getRowNumber() + 1);
                     taskStatusRepository.save(ts);
                 }
             }
         }
-        taskStatus.setOrdinalNumber(newOrdinalNumber);
+        taskStatus.setRowNumber(newOrdinalNumber);
 
         taskStatusRepository.save(taskStatus);
     }
