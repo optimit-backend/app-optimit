@@ -58,7 +58,7 @@ public class TaskStatusServise {
             return;
         }
 
-        List<TaskStatus> allTaskStatuses = taskStatusRepository.findAllByOrderByOrdinalNumber();
+        List<TaskStatus> allTaskStatuses = taskStatusRepository.findAllByOrderByRowNumber();
         if (newOrdinalNumber > currentOrdinalNumber) {
             for (TaskStatus ts : allTaskStatuses) {
                 if (ts.getRowNumber() > currentOrdinalNumber && ts.getRowNumber() <= newOrdinalNumber) {

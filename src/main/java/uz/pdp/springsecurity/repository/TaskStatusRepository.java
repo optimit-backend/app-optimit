@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface TaskStatusRepository extends JpaRepository<TaskStatus,UUID> {
     List<TaskStatus> findAllByBusiness_Id(UUID business_id);
 
-    List<TaskStatus> findAllByOrderByOrdinalNumber();
+    List<TaskStatus> findAllByOrderByRowNumber();
 
     long count();
 }
