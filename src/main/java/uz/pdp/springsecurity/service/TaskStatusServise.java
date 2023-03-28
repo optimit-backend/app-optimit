@@ -9,9 +9,7 @@ import uz.pdp.springsecurity.payload.TaskStatusDto;
 import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.repository.TaskStatusRepository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class TaskStatusServise {
@@ -98,6 +96,7 @@ public class TaskStatusServise {
         if (taskStatusList.isEmpty()){
             return new ApiResponse("Not Found",false);
         }
+        taskStatusList.sort(Comparator.comparing(TaskStatus::getRowNumber));
         return new ApiResponse("Found",true,taskStatusList);
     }
 }
