@@ -2,21 +2,15 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Lid;
-import uz.pdp.springsecurity.entity.LidStatus;
-import uz.pdp.springsecurity.entity.Notification;
-import uz.pdp.springsecurity.entity.User;
+import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.NotificationType;
 import uz.pdp.springsecurity.mapper.LidMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LidDto;
-import uz.pdp.springsecurity.repository.LidRepository;
-import uz.pdp.springsecurity.repository.LidStatusRepository;
-import uz.pdp.springsecurity.repository.NotificationRepository;
-import uz.pdp.springsecurity.repository.UserRepository;
+import uz.pdp.springsecurity.payload.LidGetDto;
+import uz.pdp.springsecurity.repository.*;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,13 +20,13 @@ public class LidService {
     private final LidMapper mapper;
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
+    private final LidFieldRepository lidFieldRepository;
+    private final BusinessRepository businessRepository;
 
     public ApiResponse getAll(UUID businessId) {
-        List<LidStatus> allLidStatus =
-                lidStatusRepository.findAllByBusiness_IdOrderBySortAsc(businessId);
-
-
-        return null;
+        List<Lid> all = repository.findAllByLidStatus_BusinessId(businessId);
+        List<LidGetDto> dtoList = getDtoList(all);
+        return new ApiResponse("found", true, dtoList);
     }
 
     public ApiResponse getById(UUID id) {
@@ -40,13 +34,23 @@ public class LidService {
         if (lid == null) {
             return new ApiResponse("not found", false);
         }
-        LidDto lidDto = mapper.toDto(lid);
-        return new ApiResponse("found", true, lidDto);
+        LidGetDto lidGetDto = getDto(lid);
+        return new ApiResponse("found", true, lidGetDto);
     }
 
+
     public ApiResponse create(LidDto lidDto) {
-        User admin = userRepository.findByBusinessIdAndRoleName(lidDto.getLidStatus().getBusiness().getId(), "ADMIN").orElse(null);
-        Lid lid = repository.save(mapper.toEntity(lidDto));
+        User admin = userRepository.findByBusinessIdAndRoleName(lidDto.getBusinessId(), "ADMIN").orElse(null);
+        Map<UUID, String> values = lidDto.getValues();
+
+        Map<LidField, String> value = new HashMap<>();
+        for (Map.Entry<UUID, String> uuidStringEntry : values.entrySet()) {
+            lidFieldRepository.findById(uuidStringEntry.getKey()).ifPresent(lidField -> value.put(lidField, uuidStringEntry.getValue()));
+        }
+
+        Lid lid = mapper.toEntity(lidDto);
+        lid.setValues(value);
+        repository.save(lid);
         if (admin != null) {
             Notification notification = new Notification();
             notification.setRead(false);
@@ -80,7 +84,45 @@ public class LidService {
         if (lid == null) {
             return new ApiResponse("not found", false);
         }
-        repository.save(lid);
+        repository.delete(lid);
         return new ApiResponse("successfully saved", true);
     }
+
+    private LidGetDto getDto(Lid lid) {
+        if (lid == null) {
+            return null;
+        }
+
+        LidGetDto lidGetDto = new LidGetDto();
+        LidStatus lidStatus = lidStatusRepository.findById(lid.getLidStatus().getId()).orElse(null);
+        Business business = businessRepository.findById(lid.getBusiness().getId()).orElse(null);
+
+
+        lidGetDto.setId(lid.getId());
+        lidGetDto.setLidStatusId(lidStatus != null ? lidStatus.getId() : null);
+        lidGetDto.setBusinessId(business != null ? business.getId() : null);
+
+        Map<LidField, String> lidValues = lid.getValues();
+        Map<String, String> values = new HashMap<>();
+        for (Map.Entry<LidField, String> entry : lidValues.entrySet()) {
+            values.put(entry.getKey().getName(), entry.getValue());
+        }
+        lidGetDto.setValues(values);
+
+        return lidGetDto;
+    }
+
+    private List<LidGetDto> getDtoList(List<Lid> lidList) {
+        if (lidList == null) {
+            return null;
+        }
+
+        List<LidGetDto> list = new ArrayList<LidGetDto>(lidList.size());
+        for (Lid lid : lidList) {
+            list.add(getDto(lid));
+        }
+
+        return list;
+    }
+
 }
