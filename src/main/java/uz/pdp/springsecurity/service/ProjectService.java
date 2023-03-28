@@ -37,6 +37,8 @@ public class ProjectService {
     StageRepository stageRepository;
 
     @Autowired
+    AttachmentRepository attachmentRepository;
+    @Autowired
     ProjectTypeRepository projectTypeRepository;
     public ApiResponse add(ProjectDto projectDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(projectDto.getBranchId());
@@ -65,20 +67,22 @@ public class ProjectService {
             optionalUser.ifPresent(userList::add);
         }
         project.setUsers(userList);
-        
-        if (!projectDto.getAttachmentList().isEmpty()){
-            project.setAttachmentList(projectDto.getAttachmentList());
+        List<Attachment> attachmentList=new ArrayList<>();
+        for (UUID uuid : projectDto.getAttachmentList()) {
+            Optional<Attachment> optionalAttachment = attachmentRepository.findAllById(uuid);
+            optionalAttachment.ifPresent(attachmentList::add);
         }
+        project.setAttachmentList(attachmentList);
         project.setBudget(projectDto.getBudget());
         Optional<Stage> optionalStage = stageRepository.findById(projectDto.getStageId());
         optionalStage.ifPresent(project::setStage);
         project.setGoalAmount(projectDto.getGoalAmount());
         project.setProduction(projectDto.isProduction());
-        Optional<Bonus> optionalBonus = bonusRepository.findById(projectDto.getBonus().getId());
+        Optional<Bonus> optionalBonus = bonusRepository.findById(projectDto.getBonus());
         optionalBonus.ifPresent(project::setBonus);
         project.setBranch(optionalBranch.get());
 
-        return new ApiResponse("Added",true);
+        return new ApiResponse("Added",true,project);
     }
 
     public ApiResponse edit(UUID id, ProjectDto projectDto) {
