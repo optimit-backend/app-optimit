@@ -25,6 +25,5 @@ public class ProjectDto {
     private UUID stageId;
     private double goalAmount;
     private boolean isProduction;
-    private UUID bonus;
     private UUID branchId;
 }

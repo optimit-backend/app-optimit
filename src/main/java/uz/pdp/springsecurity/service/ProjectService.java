@@ -78,8 +78,6 @@ public class ProjectService {
         optionalStage.ifPresent(project::setStage);
         project.setGoalAmount(projectDto.getGoalAmount());
         project.setProduction(projectDto.isProduction());
-        Optional<Bonus> optionalBonus = bonusRepository.findById(projectDto.getBonus());
-        optionalBonus.ifPresent(project::setBonus);
         project.setBranch(optionalBranch.get());
 
         return new ApiResponse("Added",true,project);

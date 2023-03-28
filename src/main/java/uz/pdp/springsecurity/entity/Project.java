@@ -44,9 +44,6 @@ public class Project extends AbsEntity {
 
     private boolean isProduction;
 
-    @ManyToOne
-    private Bonus bonus;
-
     //todo aniqlik kiritish kerak
 //    private List<ProductionAndAmount> amountList;
 
