@@ -10,9 +10,9 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LidDto {
+public class LidGetDto {
     private UUID id;
-    private Map<UUID, String> values;
+    private Map<String, String> values;
     private UUID lidStatusId;
     private UUID businessId;
 }

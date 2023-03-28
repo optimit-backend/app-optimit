@@ -23,4 +23,7 @@ public class Lid extends AbsEntity {
 
     @ManyToOne
     private LidStatus lidStatus;
+
+    @ManyToOne
+    private Business business;
 }
