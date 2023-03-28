@@ -17,5 +17,4 @@ public class ProjectUser extends AbsEntity {
 
     @ManyToOne
     Project project;
-
 }
