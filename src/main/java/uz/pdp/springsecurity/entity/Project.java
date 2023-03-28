@@ -8,6 +8,7 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -17,9 +18,9 @@ import java.util.List;
 @Entity
 public class Project extends AbsEntity {
     private String name;
-    private Timestamp startDate;
-    private Timestamp endDate;
-    private Timestamp deadline;
+    private Date startDate;
+    private Date endDate;
+    private Date deadline;
     @ManyToOne
     private ProjectType projectType;
 
@@ -42,9 +43,6 @@ public class Project extends AbsEntity {
     private double goalAmount;
 
     private boolean isProduction;
-
-    @ManyToOne
-    private Bonus bonus;
 
     //todo aniqlik kiritish kerak
 //    private List<ProductionAndAmount> amountList;
