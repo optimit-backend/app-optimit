@@ -2,6 +2,7 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.Branch;
 import uz.pdp.springsecurity.entity.Salary;
 import uz.pdp.springsecurity.entity.User;
@@ -24,15 +25,28 @@ public class SalaryService {
     private final SalaryMapper salaryMapper;
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
-    public ApiResponse add(User user, Branch branch, double salarySum) {
+    public void add(User user, Branch branch, double salarySum) {
         Optional<Salary> optionalSalary = salaryRepository.findByUserIdAndBranch_IdAndActiveTrue(user.getId(), branch.getId());
-        if (optionalSalary.isEmpty()) return new ApiResponse("NOT FOUND SALARY", false);
+        if (optionalSalary.isEmpty()) {
+            Date date = new Date();
+            salaryRepository.save(new Salary(
+                    user,
+                    branch,
+                    0d,
+                    salarySum,
+                    0d,
+                    true,
+                    date,
+                    date
+            ));
+            return;
+        }
         Salary salary = optionalSalary.get();
         salary.setSalary(salary.getSalary() + salarySum);
         salaryRepository.save(salary);
-        return new ApiResponse("SUCCESS", true);
     }
 
+    @Transactional
     public ApiResponse paySalary(UUID salaryId, SalaryDto salaryDto) {
         Optional<Salary> optionalSalary = salaryRepository.findByIdAndActiveTrue(salaryId);
         if (optionalSalary.isEmpty()) return new ApiResponse("SALARY NOT FOUND", false);
@@ -79,7 +93,7 @@ public class SalaryService {
         if (!branchRepository.existsById(branchId))return new ApiResponse("NOT FOUND BRANCH");
         List<Salary> salaryList = salaryRepository.findAllByBranchIdAndActiveTrue(branchId);
         if (salaryList.isEmpty())return new ApiResponse("NOT FOUND SALARY");
-        return new ApiResponse( true, salaryMapper.toAllDtoList(salaryList));
+        return new ApiResponse( true, salaryMapper.toDtoList(salaryList));
     }
 
     public ApiResponse getOne(UUID salaryId) {
