@@ -56,7 +56,7 @@ public class WorkTimeService {
         if (optionalWorkTime.isEmpty()) return new ApiResponse("USER DOES NOT COME", false);
         WorkTime workTime = optionalWorkTime.get();
         workTime.setLeaveTime(new Timestamp(System.currentTimeMillis()));
-        long hour = (workTime.getLeaveTime().getTime() - workTime.getArrivalTime().getTime()) / (1000 * 60 * 60);
+        long hour = (workTime.getLeaveTime().getTime() - workTime.getArrivalTime().getTime()) / (1000 * 60);
         workTime.setHour(hour);
         workTime.setActive(false);
         workTimeRepository.save(workTime);

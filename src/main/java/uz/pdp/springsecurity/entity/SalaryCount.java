@@ -11,7 +11,6 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import java.sql.Timestamp;
 import java.util.Date;
 
 @Data
@@ -32,6 +31,7 @@ public class SalaryCount extends AbsEntity {
     private double salary = 0;
 
     @ManyToOne(optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Agreement agreement;
 
     @Column(nullable = false)
