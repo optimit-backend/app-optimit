@@ -10,10 +10,14 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LidFieldDto {
+
     private UUID id;
+
     private String name;
 
     private String valueType;
 
     private UUID businessId;
+
+    private Boolean tanlangan;
 }

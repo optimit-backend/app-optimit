@@ -56,13 +56,15 @@ public class DataLoader implements CommandLineRunner {
             lidField.setName("FIO");
             lidField.setBusiness(null);
             lidField.setValueType(ValueType.STRING);
+            lidField.setTanlangan(false);
             lidFieldRepository.save(lidField);
+
 
             LidField lidField1 = new LidField();
             lidField1.setName("Address");
             lidField1.setBusiness(null);
             lidField1.setValueType(ValueType.STRING);
-
+            lidField1.setTanlangan(false);
             lidFieldRepository.save(lidField1);
 
             Source source = new Source();
@@ -77,8 +79,6 @@ public class DataLoader implements CommandLineRunner {
             source2.setBusiness(null);
             source2.setName("Instagram");
             sourceRepository.save(source2);
-
-
 
 
             List<Tariff> tariffRepositoryAll = tariffRepository.findAll();

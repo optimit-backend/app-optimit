@@ -45,6 +45,4 @@ public class LidFieldController {
         ApiResponse apiResponse = lidFieldService.delete(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-
 }
