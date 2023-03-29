@@ -62,7 +62,7 @@ public class BonusService {
         return optionalBonus.map(bonus -> new ApiResponse(true, bonusMapper.toDto(bonus))).orElseGet(() -> new ApiResponse("BONUS NOT FOUND", false));
     }
 
-    public ApiResponse deleteOne(UUID bonusId) {
+    public ApiResponse delete(UUID bonusId) {
         Optional<Bonus> optionalBonus = bonusRepository.findByDeleteFalseAndId(bonusId);
         if (optionalBonus.isEmpty())return new ApiResponse("BONUS NOT FOUND", false);
         Bonus bonus = optionalBonus.get();

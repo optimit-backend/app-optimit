@@ -48,8 +48,8 @@ public class BonusController {
 
     @CheckPermission("DELETE_BONUS")
     @DeleteMapping("/{bonusId}")
-    public HttpEntity<?> deleteOne(@PathVariable UUID bonusId) {
-        ApiResponse apiResponse = bonusService.deleteOne(bonusId);
+    public HttpEntity<?> delete(@PathVariable UUID bonusId) {
+        ApiResponse apiResponse = bonusService.delete(bonusId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
