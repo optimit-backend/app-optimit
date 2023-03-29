@@ -15,5 +15,5 @@ import javax.persistence.ManyToOne;
 public class SelectForLid extends AbsEntity {
     private String name;
     @ManyToOne
-    private Lid lid;
+    private LidField lid;
 }

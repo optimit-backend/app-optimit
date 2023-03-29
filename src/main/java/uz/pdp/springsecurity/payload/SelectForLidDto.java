@@ -4,15 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LidDto {
+public class SelectForLidDto {
     private UUID id;
-    private Map<UUID, String> values;
-    private UUID lidStatusId;
-    private UUID businessId;
+    private String name;
+    private UUID lidId;
 }
