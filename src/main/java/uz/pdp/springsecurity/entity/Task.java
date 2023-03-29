@@ -9,6 +9,7 @@ import uz.pdp.springsecurity.enums.Importance;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -25,9 +26,9 @@ public class Task extends AbsEntity {
     @ManyToOne
     private Project project;
 
-    private Timestamp startDate;
+    private Date startDate;
 
-    private Timestamp EndDate;
+    private Date EndDate;
 
     @ManyToMany
     private List<User> users;

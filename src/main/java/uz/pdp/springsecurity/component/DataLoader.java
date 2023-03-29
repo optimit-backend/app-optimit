@@ -384,6 +384,12 @@ public class DataLoader implements CommandLineRunner {
                                     EDIT_BONUS,
                                     ADD_BONUS
 
+
+                                    GET_ALL_TASK,
+                                    DELETE_TASK,
+                                    GET_TASK,
+                                    EDIT_TASK,
+                                    ADD_TASK
                             ),
                             business));
             Role manager = roleRepository.save(new Role(
@@ -550,10 +556,18 @@ public class DataLoader implements CommandLineRunner {
                             POST_LID_STATUS,
                             GET_LID_STATUS,
 
+
+                            GET_ALL_TASK,
+                            DELETE_TASK,
+                            GET_TASK,
+                            EDIT_TASK,
+                            ADD_TASK
+
                             DELETE_BONUS,
                             GET_BONUS,
                             EDIT_BONUS,
                             ADD_BONUS
+
                     ),
                     business));
 

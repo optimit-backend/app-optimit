@@ -208,10 +208,21 @@ public enum Permissions {
     DELETE_LID_STATUS,
     PUT_LID_STATUS,
     POST_LID_STATUS,
+
+
+    GET_LID_STATUS,
+    GET_ALL_TASK,
+    
+    DELETE_TASK,
+    GET_TASK,
+    EDIT_TASK,
+    ADD_TASK
+
     GET_LID_STATUS,
 
     DELETE_BONUS,
     GET_BONUS,
     EDIT_BONUS,
     ADD_BONUS
+
 }
