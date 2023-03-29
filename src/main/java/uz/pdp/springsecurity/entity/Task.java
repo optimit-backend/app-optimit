@@ -55,6 +55,9 @@ public class Task extends AbsEntity {
     private double taskPrice;
 
     private boolean isEach;
+
+    @ManyToOne
+    private Branch branch;
 }
 
 
