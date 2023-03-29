@@ -29,6 +29,12 @@ public class LidController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @GetMapping("/get-by-businessId-pageable/{id}")
+    HttpEntity<?> getByBusinessIdPageable(@PathVariable UUID id) {
+        ApiResponse apiResponse = lidService.getByBusinessIdPageable(id);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
 
     @PostMapping
     HttpEntity<?> create(@RequestBody LidDto lidDto) {

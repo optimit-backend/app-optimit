@@ -1,6 +1,9 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.NotificationType;
@@ -76,7 +79,7 @@ public class LidService {
 
         lid.setLidStatus(lidStatus);
         repository.save(lid);
-        return new ApiResponse("successfully edited", false);
+        return new ApiResponse("successfully edited", true);
     }
 
     public ApiResponse delete(UUID id) {
@@ -112,6 +115,26 @@ public class LidService {
         return lidGetDto;
     }
 
+    public ApiResponse getByBusinessIdPageable(UUID id) {
+        List<LidStatus> allStatus = lidStatusRepository.findAllByBusiness_IdOrderBySortAsc(id);
+        List<Map<String, Object>> responses = new ArrayList<>();
+        Pageable pageable = PageRequest.of(0, 10);
+
+        for (LidStatus status : allStatus) {
+            Page<Lid> allLid = repository.findAllByBusiness_IdAndLidStatusId(id, status.getId(), pageable);
+            List<LidGetDto> lidGetDtoList = getDtoList(allLid.toList());
+            Map<String, Object> response = new HashMap<>();
+            response.put("statusId", status.getId());
+            response.put("getLessProduct", lidGetDtoList);
+            response.put("currentPage", allLid.getNumber());
+            response.put("totalItems", allLid.getTotalElements());
+            response.put("totalPages", allLid.getTotalPages());
+            responses.add(response);
+        }
+
+        return new ApiResponse("found", true, responses);
+    }
+
     private List<LidGetDto> getDtoList(List<Lid> lidList) {
         if (lidList == null) {
             return null;
@@ -124,5 +147,4 @@ public class LidService {
 
         return list;
     }
-
 }
