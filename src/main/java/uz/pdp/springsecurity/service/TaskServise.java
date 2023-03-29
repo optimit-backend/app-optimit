@@ -74,14 +74,10 @@ public class TaskServise {
         Optional<Task> optionalTask = taskRepository.findById(taskDto.getDependTask());
         optionalTask.ifPresent(task::setDependTask);
 
-
-
         task.setProduction(taskDto.isProduction());
-
 
 //        Optional<Production> optionalProduction = productionRepository.findById(taskDto.getProduction());
 //        optionalProduction.ifPresent(task::setProduction);
-
 
         task.setGoalAmount(taskDto.getGoalAmount());
         task.setTaskPrice(taskDto.getTaskPrice());
@@ -93,7 +89,7 @@ public class TaskServise {
         return new ApiResponse("Added",true);
     }
 
-    public ApiResponse edit(UUID id, TaskStatusDto taskStatusDto) {
+    public ApiResponse edit(UUID id, TaskDto taskDto) {
         return null;
     }
 
