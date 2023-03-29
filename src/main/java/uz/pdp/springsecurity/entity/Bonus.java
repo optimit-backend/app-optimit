@@ -30,6 +30,8 @@ public class Bonus extends AbsEntity {
     @Column(nullable = false)
     private double summa = 0;
 
+    private boolean active = true;
+
     private boolean delete = false;
 
     @ManyToOne(optional = false)
