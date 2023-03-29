@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Address;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BranchService {
     @Autowired
     BranchRepository branchRepository;
@@ -25,6 +27,7 @@ public class BranchService {
 
     @Autowired
     BusinessRepository businessRepository;
+    private final InvoiceService invoiceService;
 
     public ApiResponse addBranch(BranchDto branchDto) {
         Branch branch = new Branch();
@@ -40,9 +43,9 @@ public class BranchService {
         branch.setBusiness(optionalBusiness.get());
 
         branchRepository.save(branch);
+        invoiceService.create(branch);
         return new ApiResponse("ADDED", true);
     }
-
 
     public ApiResponse editBranch(UUID id, BranchDto branchDto) {
         if (!branchRepository.existsById(id)) return new ApiResponse("BRANCH NOT FOUND", false);
