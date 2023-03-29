@@ -12,6 +12,7 @@ public interface BonusRepository extends JpaRepository<Bonus, UUID> {
 
     List<Bonus> findAllByBusinessIdAndDeleteFalse(UUID businessId);
 
-    boolean existsByNameIgnoreCaseAndBusinessId(String name, UUID businessId);
-    boolean existsByNameIgnoreCaseAndBusinessIdAndIdIsNot(String name, UUID businessId, UUID id);
+    boolean existsByNameIgnoreCaseAndBusinessIdAndDeleteFalse(String name, UUID businessId);
+
+    boolean existsByNameIgnoreCaseAndBusinessIdAndIdIsNotAndDeleteFalse(String name, UUID businessId, UUID id);
 }

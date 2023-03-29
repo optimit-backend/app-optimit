@@ -19,4 +19,6 @@ public class BonusGetDto {
     private String icon;
 
     private double summa;
+
+    private boolean active;
 }
