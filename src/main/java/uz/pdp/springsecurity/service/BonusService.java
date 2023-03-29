@@ -75,7 +75,7 @@ public class BonusService {
         Optional<Bonus> optionalBonus = bonusRepository.findByDeleteFalseAndId(bonusId);
         if (optionalBonus.isEmpty())return new ApiResponse("BONUS NOT FOUND", false);
         Bonus bonus = optionalBonus.get();
-        bonus.setDelete(bonus.isActive());
+        bonus.setActive(!bonus.isActive());
         bonusRepository.save(bonus);
         return new ApiResponse("SUCCESS", true);
     }

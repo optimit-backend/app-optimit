@@ -9,11 +9,8 @@ import org.hibernate.annotations.OnDeleteAction;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.sql.Timestamp;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
