@@ -78,8 +78,10 @@ public class TaskServise {
 
         task.setProduction(taskDto.isProduction());
 
+
 //        Optional<Production> optionalProduction = productionRepository.findById(taskDto.getProduction());
 //        optionalProduction.ifPresent(task::setProduction);
+
 
         task.setGoalAmount(taskDto.getGoalAmount());
         task.setTaskPrice(taskDto.getTaskPrice());
