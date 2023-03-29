@@ -24,7 +24,7 @@ public class BonusService {
     public ApiResponse add(BonusDto bonusDto) {
         Optional<Business> optionalBusiness = businessRepository.findById(bonusDto.getBusinessId());
         if (optionalBusiness.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
-        if (bonusRepository.existsByNameIgnoreCaseAndBusinessId(bonusDto.getName(), bonusDto.getBusinessId()))
+        if (bonusRepository.existsByNameIgnoreCaseAndBusinessIdAndDeleteFalse(bonusDto.getName(), bonusDto.getBusinessId()))
             return new ApiResponse("BONUS NAME EXIST", false);
         Business business = optionalBusiness.get();
         Bonus bonus = new Bonus();
@@ -35,7 +35,7 @@ public class BonusService {
     public ApiResponse edit(UUID bonusId, BonusDto bonusDto) {
         Optional<Bonus> optionalBonus = bonusRepository.findByDeleteFalseAndId(bonusId);
         if (optionalBonus.isEmpty())return new ApiResponse("BONUS NOT FOUND", false);
-        if (bonusRepository.existsByNameIgnoreCaseAndBusinessIdAndIdIsNot(bonusDto.getName(), bonusDto.getBusinessId(), bonusId))
+        if (bonusRepository.existsByNameIgnoreCaseAndBusinessIdAndIdIsNotAndDeleteFalse(bonusDto.getName(), bonusDto.getBusinessId(), bonusId))
             return new ApiResponse("BONUS NAME EXIST", false);
         Bonus bonus = optionalBonus.get();
         return createEdit(bonus, bonusDto);
@@ -62,11 +62,20 @@ public class BonusService {
         return optionalBonus.map(bonus -> new ApiResponse(true, bonusMapper.toDto(bonus))).orElseGet(() -> new ApiResponse("BONUS NOT FOUND", false));
     }
 
-    public ApiResponse deleteOne(UUID bonusId) {
+    public ApiResponse delete(UUID bonusId) {
         Optional<Bonus> optionalBonus = bonusRepository.findByDeleteFalseAndId(bonusId);
         if (optionalBonus.isEmpty())return new ApiResponse("BONUS NOT FOUND", false);
         Bonus bonus = optionalBonus.get();
         bonus.setDelete(true);
+        bonusRepository.save(bonus);
+        return new ApiResponse("SUCCESS", true);
+    }
+
+    public ApiResponse setActive(UUID bonusId) {
+        Optional<Bonus> optionalBonus = bonusRepository.findByDeleteFalseAndId(bonusId);
+        if (optionalBonus.isEmpty())return new ApiResponse("BONUS NOT FOUND", false);
+        Bonus bonus = optionalBonus.get();
+        bonus.setDelete(bonus.isActive());
         bonusRepository.save(bonus);
         return new ApiResponse("SUCCESS", true);
     }

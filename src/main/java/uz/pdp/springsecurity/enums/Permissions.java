@@ -221,6 +221,7 @@ public enum Permissions {
     DELETE_BONUS,
     GET_BONUS,
     EDIT_BONUS,
-    ADD_BONUS
+    ADD_BONUS,
+    ADD_PRIZE
 
 }
