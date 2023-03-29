@@ -18,7 +18,10 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 @Entity
 public class LidField extends AbsEntity {
+
     private String name;
+
+    private Boolean tanlangan;
 
     @Enumerated(EnumType.STRING)
     private ValueType valueType;
