@@ -1,18 +1,18 @@
 package uz.pdp.springsecurity.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import java.util.Objects;
 
-@Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+@Entity
 public class Attachment extends AbsEntity {
 
     private String fileOriginalName;
@@ -25,11 +25,4 @@ public class Attachment extends AbsEntity {
 
     @ManyToOne
     private Branch branch;
-
-    public Attachment(String fileOriginalName, long size, String contentType) {
-        this.fileOriginalName = fileOriginalName;
-        this.size = size;
-        this.contentType = contentType;
-        
-    }
 }
