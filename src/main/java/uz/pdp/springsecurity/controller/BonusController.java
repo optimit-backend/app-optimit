@@ -32,6 +32,13 @@ public class BonusController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("EDIT_BONUS")
+    @PutMapping("/set-active/{bonusId}")
+    public HttpEntity<?> setActive(@PathVariable UUID bonusId) {
+        ApiResponse apiResponse = bonusService.setActive(bonusId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
     @CheckPermission("GET_BONUS")
     @GetMapping("/by-business/{businessId}")
     public HttpEntity<?> getAll(@PathVariable UUID businessId) {
