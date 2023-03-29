@@ -46,6 +46,8 @@ public class SalaryService {
         salaryRepository.save(salary);
     }
 
+
+
     @Transactional
     public ApiResponse paySalary(UUID salaryId, SalaryDto salaryDto) {
         Optional<Salary> optionalSalary = salaryRepository.findByIdAndActiveTrue(salaryId);
