@@ -25,5 +25,6 @@ public class TaskDto {
     private double goalAmount;
     private double taskPrice;
     private boolean isEach;
+    private UUID branchId;
 
 }

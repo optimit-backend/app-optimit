@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.TaskDto;
 import uz.pdp.springsecurity.payload.TaskStatusDto;
 import uz.pdp.springsecurity.service.TaskServise;
 
@@ -21,15 +22,15 @@ public class TaskController {
 
     @CheckPermission("ADD_TASK")
     @PostMapping
-    public HttpEntity<?> add(@Valid @RequestBody TaskStatusDto taskStatusDto) {
-        ApiResponse apiResponse = taskServise.add(taskStatusDto);
+    public HttpEntity<?> add(@Valid @RequestBody TaskDto taskDto) {
+        ApiResponse apiResponse = taskServise.add(taskDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @CheckPermission("EDIT_TASK")
     @PutMapping("/{id}")
-    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody TaskStatusDto taskStatusDto) {
-        ApiResponse apiResponse = taskServise.edit(id,taskStatusDto);
+    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody TaskDto taskDto) {
+        ApiResponse apiResponse = taskServise.edit(id,taskDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
