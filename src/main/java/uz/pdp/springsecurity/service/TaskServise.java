@@ -74,10 +74,10 @@ public class TaskServise {
         Optional<Task> optionalTask = taskRepository.findById(taskDto.getDependTask());
         optionalTask.ifPresent(task::setDependTask);
 
-        task.setProduction(taskDto.isProduction());
+        task.setProductions(taskDto.isProduction());
 
-//        Optional<Production> optionalProduction = productionRepository.findById(taskDto.getProduction());
-//        optionalProduction.ifPresent(task::setProduction);
+        Optional<Production> optionalProduction = productionRepository.findById(taskDto.getProduction());
+        optionalProduction.ifPresent(task::setProduction);
 
         task.setGoalAmount(taskDto.getGoalAmount());
         task.setTaskPrice(taskDto.getTaskPrice());
