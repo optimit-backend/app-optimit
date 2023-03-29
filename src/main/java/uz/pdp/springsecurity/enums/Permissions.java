@@ -216,9 +216,7 @@ public enum Permissions {
     DELETE_TASK,
     GET_TASK,
     EDIT_TASK,
-    ADD_TASK
-
-    GET_LID_STATUS,
+    ADD_TASK,
 
     DELETE_BONUS,
     GET_BONUS,
