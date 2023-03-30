@@ -27,7 +27,7 @@ public class LidService {
     private final BusinessRepository businessRepository;
 
     public ApiResponse getAll(UUID businessId) {
-        List<Lid> all = repository.findAllByLidStatus_BusinessId(businessId);
+        List<Lid> all = repository.findAllByBusinessId(businessId);
         List<LidGetDto> dtoList = getDtoList(all);
         return new ApiResponse("found", true, dtoList);
     }
@@ -50,6 +50,8 @@ public class LidService {
         for (Map.Entry<UUID, String> uuidStringEntry : values.entrySet()) {
             lidFieldRepository.findById(uuidStringEntry.getKey()).ifPresent(lidField -> value.put(lidField, uuidStringEntry.getValue()));
         }
+        Optional<LidStatus> optional = lidStatusRepository.findByName("New");
+        optional.ifPresent(lidStatus -> lidDto.setLidStatusId(lidStatus.getId()));
 
         Lid lid = mapper.toEntity(lidDto);
         lid.setValues(value);
@@ -116,7 +118,9 @@ public class LidService {
     }
 
     public ApiResponse getByBusinessIdPageable(UUID id) {
+        List<LidStatus> all = lidStatusRepository.findAllByOrderBySortAsc();
         List<LidStatus> allStatus = lidStatusRepository.findAllByBusiness_IdOrderBySortAsc(id);
+        allStatus.addAll(all);
         List<Map<String, Object>> responses = new ArrayList<>();
         Pageable pageable = PageRequest.of(0, 10);
 
