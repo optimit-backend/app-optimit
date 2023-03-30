@@ -40,6 +40,12 @@ public class ProjectService {
     AttachmentRepository attachmentRepository;
     @Autowired
     ProjectTypeRepository projectTypeRepository;
+
+    @Autowired
+    ProjectStatusRepository projectStatusRepository;
+
+    @Autowired
+    FileDateRepository fileDateRepository;
     public ApiResponse add(ProjectDto projectDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(projectDto.getBranchId());
         if (optionalBranch.isEmpty()){
@@ -66,13 +72,17 @@ public class ProjectService {
             Optional<User> optionalUser = userRepository.findById(uuid);
             optionalUser.ifPresent(userList::add);
         }
+
         project.setUsers(userList);
-        List<Attachment> attachmentList=new ArrayList<>();
-        for (UUID uuid : projectDto.getAttachmentList()) {
-            Optional<Attachment> optionalAttachment = attachmentRepository.findAllById(uuid);
-            optionalAttachment.ifPresent(attachmentList::add);
+        List<FileData> fileDataList = new ArrayList<>();
+        for (UUID uuid : projectDto.getFileDateList()) {
+            Optional<FileData> optionalFileData = fileDateRepository.findById(uuid);
+            if (optionalFileData.isPresent()){
+                FileData fileData = optionalFileData.get();
+                fileDataList.add(fileData);
+            }
         }
-        project.setAttachmentList(attachmentList);
+        project.setFileDataList(fileDataList);
         project.setBudget(projectDto.getBudget());
         Optional<Stage> optionalStage = stageRepository.findById(projectDto.getStageId());
         optionalStage.ifPresent(project::setStage);
@@ -111,14 +121,14 @@ public class ProjectService {
         }
         project.setUsers(userList);
 
-        List<Attachment> attachmentList = new ArrayList<>();
-        if (!projectDto.getAttachmentList().isEmpty()) {
-            for (UUID uuid : projectDto.getAttachmentList()) {
-                Optional<Attachment> optionalAttachment = attachmentRepository.findById(uuid);
-                optionalAttachment.ifPresent(attachmentList::add);
+        List<FileData> fileDataList= new ArrayList<>();
+        if (!projectDto.getFileDateList().isEmpty()) {
+            for (UUID uuid : projectDto.getFileDateList()) {
+                Optional<FileData> optionalAttachment = fileDateRepository.findById(uuid);
+                optionalAttachment.ifPresent(fileDataList::add);
             }
         }
-        project.setAttachmentList(attachmentList);
+        project.setFileDataList(fileDataList);
 
         project.setBudget(projectDto.getBudget());
 
@@ -156,4 +166,14 @@ public class ProjectService {
         }
         return new ApiResponse("Found",true,projectList);
     }
+
+    public ApiResponse findByStatusId(UUID statusId) {
+        List<Project> projects = projectRepository.findAllByProjectStatusId(statusId);
+        if (projects.isEmpty()){
+            return new ApiResponse("Projects Not Found",false);
+        }
+        return new ApiResponse("Found",true,projects);
+    }
+
+
 }

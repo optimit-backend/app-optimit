@@ -53,4 +53,11 @@ public class ProjectController {
         ApiResponse apiResponse = projectService.getAllByBusinessId(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("GET_ALL_PROJECT")
+    @GetMapping("/get-by-status/{statusId}")
+    public HttpEntity<?> getAllByStatus(@PathVariable UUID statusId) {
+        ApiResponse apiResponse = projectService.findByStatusId(statusId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }

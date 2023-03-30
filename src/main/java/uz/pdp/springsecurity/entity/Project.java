@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class Project extends AbsEntity {
     private List<User> users;
 
     @OneToMany
-    private List<Attachment> attachmentList;
+    private List<FileData> fileDataList;
 
     private double budget;
 
@@ -49,4 +48,7 @@ public class Project extends AbsEntity {
 
     @ManyToOne
     private Branch branch;
+
+    @ManyToOne
+    ProjectStatus projectStatus;
 }
