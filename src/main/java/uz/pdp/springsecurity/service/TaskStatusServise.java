@@ -83,13 +83,33 @@ public class TaskStatusServise {
     }
 
     public ApiResponse delete(UUID id) {
-        boolean exists = taskStatusRepository.existsById(id);
-        if (!exists){
-            return new ApiResponse("Not Found",false);
+        Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findById(id);
+        if (optionalTaskStatus.isPresent()) {
+            TaskStatus taskStatusToDelete = optionalTaskStatus.get();
+
+            taskStatusRepository.delete(taskStatusToDelete);
+
+
+            List<TaskStatus> allTaskStatuses = taskStatusRepository.findAllByOrderByRowNumber();
+            int index = 1;
+            for (TaskStatus ts : allTaskStatuses) {
+                if (ts.getId() != taskStatusToDelete.getId()) {
+                    ts.setRowNumber(index++);
+                    taskStatusRepository.save(ts);
+                }
+            }
         }
-        taskStatusRepository.deleteById(id);
-        return new ApiResponse("Deleted",true);
+        return new ApiResponse("Deleted",false);
     }
+
+//    public ApiResponse delete(UUID id) {
+//        boolean exists = taskStatusRepository.existsById(id);
+//        if (!exists){
+//            return new ApiResponse("Not Found",false);
+//        }
+//        taskStatusRepository.deleteById(id);
+//        return new ApiResponse("Deleted",true);
+//    }
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
         List<TaskStatus> taskStatusList = taskStatusRepository.findAllByBusiness_Id(businessId);

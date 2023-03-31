@@ -166,8 +166,10 @@ public class ProjectService {
         Pageable pageable = PageRequest.of(page,size);
         Page<Project> projects = projectRepository.findAllByBranch_BusinessId(businessId, pageable);
         if (projects.isEmpty()){
+            assert projects.getTotalElements() <= 0 : "list is empty";
             return new ApiResponse("Project Not Found",false);
         }
+
         return new ApiResponse("Found",true,projects);
     }
 
