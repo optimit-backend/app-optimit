@@ -1,16 +1,19 @@
 package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProjectDto;
 import uz.pdp.springsecurity.repository.*;
 
-import java.util.ArrayList;
+import java.util.UUID;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.ArrayList;
 
 @Service
 public class ProjectService {
@@ -72,8 +75,8 @@ public class ProjectService {
             Optional<User> optionalUser = userRepository.findById(uuid);
             optionalUser.ifPresent(userList::add);
         }
-
         project.setUsers(userList);
+
         List<FileData> fileDataList = new ArrayList<>();
         for (UUID uuid : projectDto.getFileDateList()) {
             Optional<FileData> optionalFileData = fileDateRepository.findById(uuid);
@@ -159,12 +162,13 @@ public class ProjectService {
         return new ApiResponse("Deleted",true);
     }
 
-    public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Project> projectList = projectRepository.findAllByBranch_BusinessId(businessId);
-        if (projectList.isEmpty()){
+    public ApiResponse  getAllByBusinessId(UUID businessId, int page, int size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Project> projects = projectRepository.findAllByBranch_BusinessId(businessId, pageable);
+        if (projects.isEmpty()){
             return new ApiResponse("Project Not Found",false);
         }
-        return new ApiResponse("Found",true,projectList);
+        return new ApiResponse("Found",true,projects);
     }
 
     public ApiResponse findByStatusId(UUID statusId) {

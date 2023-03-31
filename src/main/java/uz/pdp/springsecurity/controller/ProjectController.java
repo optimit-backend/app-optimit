@@ -49,8 +49,10 @@ public class ProjectController {
 
     @CheckPermission("GET_ALL_PROJECT")
     @GetMapping("/get-by-business/{businessId}")
-    public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId) {
-        ApiResponse apiResponse = projectService.getAllByBusinessId(businessId);
+    public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId,
+                                          @RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size) {
+        ApiResponse apiResponse = projectService.getAllByBusinessId(businessId,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

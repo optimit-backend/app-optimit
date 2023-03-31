@@ -31,7 +31,7 @@ public class Project extends AbsEntity {
     @ManyToMany
     private List<User> users;
 
-    @OneToMany
+    @ManyToMany
     private List<FileData> fileDataList;
 
     private double budget;

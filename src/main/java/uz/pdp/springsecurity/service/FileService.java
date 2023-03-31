@@ -1,10 +1,11 @@
 package uz.pdp.springsecurity.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.FileData;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.repository.FileDateRepository;
+
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
