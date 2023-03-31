@@ -11,9 +11,12 @@ import java.util.UUID;
 public interface LidStatusRepository extends JpaRepository<LidStatus, UUID> {
     List<LidStatus> findAllByBusiness_IdOrderBySortAsc(UUID business_id);
 
+    List<LidStatus> findAllByBusinessIsNullOrderBySortAsc();
+
     List<LidStatus> findAllBySortGreaterThanEqual(Integer sort);
 
     List<LidStatus> findAllByOrderBySortAsc();
 
     Optional<LidStatus> findByName(String name);
+    Optional<LidStatus> findBySort(Integer sort);
 }

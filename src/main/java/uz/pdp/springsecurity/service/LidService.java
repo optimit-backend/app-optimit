@@ -37,8 +37,11 @@ public class LidService {
         if (lid == null) {
             return new ApiResponse("not found", false);
         }
-        LidGetDto lidGetDto = getDto(lid);
-        return new ApiResponse("found", true, lidGetDto);
+        LidGetDto dto = getDto(lid);
+        Map<String, String> values = dto.getValues();
+        List<Map<String, String>> valueList = new ArrayList<>();
+        valueList.add(values);
+        return new ApiResponse("found", true, valueList);
     }
 
 
@@ -50,7 +53,7 @@ public class LidService {
         for (Map.Entry<UUID, String> uuidStringEntry : values.entrySet()) {
             lidFieldRepository.findById(uuidStringEntry.getKey()).ifPresent(lidField -> value.put(lidField, uuidStringEntry.getValue()));
         }
-        Optional<LidStatus> optional = lidStatusRepository.findByName("New");
+        Optional<LidStatus> optional = lidStatusRepository.findBySort(1);
         optional.ifPresent(lidStatus -> lidDto.setLidStatusId(lidStatus.getId()));
 
         Lid lid = mapper.toEntity(lidDto);
@@ -118,13 +121,16 @@ public class LidService {
     }
 
     public ApiResponse getByBusinessIdPageable(UUID id) {
-        List<LidStatus> all = lidStatusRepository.findAllByOrderBySortAsc();
+        List<LidStatus> all = lidStatusRepository.findAllByBusinessIsNullOrderBySortAsc();
         List<LidStatus> allStatus = lidStatusRepository.findAllByBusiness_IdOrderBySortAsc(id);
-        allStatus.addAll(all);
+        all.addAll(allStatus);
         List<Map<String, Object>> responses = new ArrayList<>();
         Pageable pageable = PageRequest.of(0, 10);
-
         for (LidStatus status : allStatus) {
+            System.out.println(status);
+        }
+
+        for (LidStatus status : all) {
             Page<Lid> allLid = repository.findAllByBusiness_IdAndLidStatusId(id, status.getId(), pageable);
             List<LidGetDto> lidGetDtoList = getDtoList(allLid.toList());
             Map<String, Object> response = new HashMap<>();
