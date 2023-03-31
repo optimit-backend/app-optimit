@@ -27,7 +27,7 @@ public class CustomerGroupController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-//    @CheckPermission("VIEW_CUSTOMER_GROUP")
+    @CheckPermission("VIEW_CUSTOMER_GROUP")
     @GetMapping("/get/{businessId}")
     public HttpEntity<?> getAll(@PathVariable UUID businessId){
         ApiResponse apiResponse = customerGroupService.getAll(businessId);

@@ -19,14 +19,17 @@ public class LidStatusService {
     private final LidStatusMapper mapper;
 
     public ApiResponse getAll(UUID businessId) {
+
         List<LidStatus> allByBusinessId =
                 repository.findAllByBusiness_IdOrderBySortAsc(businessId);
+        List<LidStatus> all = repository.findAllByBusinessIsNullOrderBySortAsc();
+        all.addAll(allByBusinessId);
 
         if (allByBusinessId.isEmpty()) {
             return new ApiResponse("not found", false);
         }
 
-        return new ApiResponse("found", true, mapper.toDto(allByBusinessId));
+        return new ApiResponse("found", true, mapper.toDto(all));
     }
 
     public ApiResponse getById(UUID id) {

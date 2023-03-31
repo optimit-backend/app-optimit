@@ -83,12 +83,13 @@ public class CustomerController {
      * @param businessId
      * @return ApiResponse(success - > true object - > value)
      */
-    @PreAuthorize("hasAnyAuthority()")
+    @CheckPermission("VIEW_CUSTOMER")
     @GetMapping("/get-by-businessId/{businessId}")
     public HttpEntity<?> getAllByBusinessId(@PathVariable UUID businessId) {
         ApiResponse apiResponse = customerService.getAllByBusinessId(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
     @CheckPermission("VIEW_CUSTOMER_ADMIN")
     @GetMapping("/get-by-branchId/{branchId}")
     public HttpEntity<?> getAllByBranchId(@PathVariable UUID branchId) {
@@ -97,15 +98,13 @@ public class CustomerController {
     }
 
 
-
     /**
      * QARZNI TO'LASH
-     *
      */
     @CheckPermission("ADD_CUSTOMER")
     @PostMapping("/repayment/{id}")
-    public HttpEntity<?> addRepayment(@PathVariable UUID id, @RequestBody RepaymentDto repaymentDto){
+    public HttpEntity<?> addRepayment(@PathVariable UUID id, @RequestBody RepaymentDto repaymentDto) {
         ApiResponse response = customerService.repayment(id, repaymentDto);
-        return ResponseEntity.status(response.isSuccess() ? 201 : 409 ).body(response);
+        return ResponseEntity.status(response.isSuccess() ? 201 : 409).body(response);
     }
 }

@@ -40,9 +40,8 @@ public class DataLoader implements CommandLineRunner {
     private final SubscriptionRepository subscriptionRepository;
     private final MeasurementRepository measurementRepository;
     private final AgreementService agreementService;
-
+    private final LidStatusRepository lidStatusRepository;
     private final LidFieldRepository lidFieldRepository;
-
     private final SourceRepository sourceRepository;
     private final InvoiceService invoiceService;
 
@@ -81,6 +80,28 @@ public class DataLoader implements CommandLineRunner {
             source2.setBusiness(null);
             source2.setName("Instagram");
             sourceRepository.save(source2);
+
+            LidStatus newStatus = new LidStatus();
+            newStatus.setName("New");
+            newStatus.setBig(true);
+            newStatus.setColor("rang");
+            newStatus.setSort(1);
+            lidStatusRepository.save(newStatus);
+
+            LidStatus progressStatus = new LidStatus();
+            progressStatus.setName("Progress");
+            progressStatus.setBig(true);
+            progressStatus.setColor("rang");
+            progressStatus.setSort(2);
+            lidStatusRepository.save(progressStatus);
+
+            LidStatus doneStatus = new LidStatus();
+            doneStatus.setName("Done");
+            doneStatus.setBig(true);
+            doneStatus.setColor("rang");
+            doneStatus.setSort(3);
+            lidStatusRepository.save(doneStatus);
+
 
 
             List<Tariff> tariffRepositoryAll = tariffRepository.findAll();
