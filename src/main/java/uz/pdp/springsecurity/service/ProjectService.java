@@ -1,16 +1,19 @@
 package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProjectDto;
 import uz.pdp.springsecurity.repository.*;
 
-import java.util.ArrayList;
+import java.util.UUID;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.ArrayList;
 
 @Service
 public class ProjectService {
@@ -40,6 +43,12 @@ public class ProjectService {
     AttachmentRepository attachmentRepository;
     @Autowired
     ProjectTypeRepository projectTypeRepository;
+
+    @Autowired
+    ProjectStatusRepository projectStatusRepository;
+
+    @Autowired
+    FileDateRepository fileDateRepository;
     public ApiResponse add(ProjectDto projectDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(projectDto.getBranchId());
         if (optionalBranch.isEmpty()){
@@ -67,12 +76,16 @@ public class ProjectService {
             optionalUser.ifPresent(userList::add);
         }
         project.setUsers(userList);
-        List<Attachment> attachmentList=new ArrayList<>();
-        for (UUID uuid : projectDto.getAttachmentList()) {
-            Optional<Attachment> optionalAttachment = attachmentRepository.findAllById(uuid);
-            optionalAttachment.ifPresent(attachmentList::add);
+
+        List<FileData> fileDataList = new ArrayList<>();
+        for (UUID uuid : projectDto.getFileDateList()) {
+            Optional<FileData> optionalFileData = fileDateRepository.findById(uuid);
+            if (optionalFileData.isPresent()){
+                FileData fileData = optionalFileData.get();
+                fileDataList.add(fileData);
+            }
         }
-        project.setAttachmentList(attachmentList);
+        project.setFileDataList(fileDataList);
         project.setBudget(projectDto.getBudget());
         Optional<Stage> optionalStage = stageRepository.findById(projectDto.getStageId());
         optionalStage.ifPresent(project::setStage);
@@ -111,14 +124,14 @@ public class ProjectService {
         }
         project.setUsers(userList);
 
-        List<Attachment> attachmentList = new ArrayList<>();
-        if (!projectDto.getAttachmentList().isEmpty()) {
-            for (UUID uuid : projectDto.getAttachmentList()) {
-                Optional<Attachment> optionalAttachment = attachmentRepository.findById(uuid);
-                optionalAttachment.ifPresent(attachmentList::add);
+        List<FileData> fileDataList= new ArrayList<>();
+        if (!projectDto.getFileDateList().isEmpty()) {
+            for (UUID uuid : projectDto.getFileDateList()) {
+                Optional<FileData> optionalAttachment = fileDateRepository.findById(uuid);
+                optionalAttachment.ifPresent(fileDataList::add);
             }
         }
-        project.setAttachmentList(attachmentList);
+        project.setFileDataList(fileDataList);
 
         project.setBudget(projectDto.getBudget());
 
@@ -149,11 +162,22 @@ public class ProjectService {
         return new ApiResponse("Deleted",true);
     }
 
-    public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Project> projectList = projectRepository.findAllByBranch_BusinessId(businessId);
-        if (projectList.isEmpty()){
+    public ApiResponse  getAllByBusinessId(UUID businessId, int page, int size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Project> projects = projectRepository.findAllByBranch_BusinessId(businessId, pageable);
+        if (projects.isEmpty()){
             return new ApiResponse("Project Not Found",false);
         }
-        return new ApiResponse("Found",true,projectList);
+        return new ApiResponse("Found",true,projects);
     }
+
+    public ApiResponse findByStatusId(UUID statusId) {
+        List<Project> projects = projectRepository.findAllByProjectStatusId(statusId);
+        if (projects.isEmpty()){
+            return new ApiResponse("Projects Not Found",false);
+        }
+        return new ApiResponse("Found",true,projects);
+    }
+
+
 }

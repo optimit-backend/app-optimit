@@ -20,7 +20,7 @@ public class ProjectDto {
     private UUID customerId;
     private String description;
     private List<UUID> userList;
-    private List<UUID> attachmentList;
+    private List<UUID> fileDateList;
     private double budget;
     private UUID stageId;
     private double goalAmount;
