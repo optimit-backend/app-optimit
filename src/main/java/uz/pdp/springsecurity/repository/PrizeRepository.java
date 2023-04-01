@@ -9,6 +9,6 @@ import java.util.UUID;
 
 public interface PrizeRepository extends JpaRepository<Prize, UUID> {
     List<Prize> findAllByBranchId(UUID branchId);
-    List<Prize> findAllByBranchIdAndUserSetIdOrderByDateDesc(UUID branchId, UUID userId);
-    List<Prize> findAllByBranchIdAndUserSetIdAndDateAfterAndGivenTrue(UUID branchId, UUID userId, Date date);
+    List<Prize> findAllByBranchIdAndUserIdOrderByDateDesc(UUID branchId, UUID userId);
+    List<Prize> findAllByBranchIdAndUserIdAndDateAfterAndGivenTrue(UUID branchId, UUID userId, Date date);
 }

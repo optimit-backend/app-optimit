@@ -23,7 +23,9 @@ public class PrizeGetDto {
     private UUID bonusId;
     private String bonusName;
 
-    private Set<UUID> userIdSet;
+    private UUID userId;
+    private String firstName;
+    private String lastName;
 
     private Date date;
 
@@ -31,22 +33,9 @@ public class PrizeGetDto {
 
     private boolean given;
 
-    private UUID projectId;
-    private String projectName;
-
-    private UUID taskId;
-    private String taskName;
-
+    private boolean task;
+    private boolean lid;
+    private Integer count;
     private Date deadline;
-
-    public PrizeGetDto(UUID id, UUID branchId, String branchName, UUID bonusId, String bonusName, Set<UUID> userIdSet, Date date, String description, boolean given, Date deadline) {
-        this.id = id;
-        this.bonusId = bonusId;
-        this.bonusName = bonusName;
-        this.userIdSet = userIdSet;
-        this.date = date;
-        this.description = description;
-        this.given = given;
-        this.deadline = deadline;
-    }
+    private Integer counter = 0;
 }

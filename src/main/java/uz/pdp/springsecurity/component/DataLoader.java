@@ -404,7 +404,9 @@ public class DataLoader implements CommandLineRunner {
                                     DELETE_BONUS,
                                     GET_BONUS,
                                     EDIT_BONUS,
-                                    ADD_BONUS
+                                    ADD_BONUS,
+                                    ADD_PRIZE,
+                                    VIEW_PRIZE
 
                             ),
                             business));
@@ -575,7 +577,9 @@ public class DataLoader implements CommandLineRunner {
                             DELETE_BONUS,
                             GET_BONUS,
                             EDIT_BONUS,
-                            ADD_BONUS
+                            ADD_BONUS,
+                            ADD_PRIZE,
+                            VIEW_PRIZE
                     ),
                     business));
 
