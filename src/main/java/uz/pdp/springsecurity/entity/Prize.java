@@ -22,27 +22,13 @@ public class Prize extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
-//    @ManyToOne(optional = false)
-//    @OnDelete(action = OnDeleteAction.CASCADE)
-//    private User user;
-
-    @ManyToMany
-    @JoinColumn(nullable = false)
-    private Set<User> userSet;
+    @ManyToOne(optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
 
     @ManyToOne(optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Bonus bonus;
-
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Project project;
-
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Task task;
-
-    private Date deadline = new Date();
 
     @Column(nullable = false)
     private Date date;
@@ -52,32 +38,16 @@ public class Prize extends AbsEntity {
     @Column(nullable = false)
     private boolean given;
 
-    public Prize(Branch branch, Set<User> userSet, Bonus bonus, Date date, String description, boolean given) {
-        this.branch = branch;
-        this.userSet = userSet;
-        this.bonus = bonus;
-        this.date = date;
-        this.description = description;
-        this.given = given;
-    }
+    private boolean task;
+    private boolean lid;
+    private Integer count;
+    private Date deadline = new Date();
+    private Integer counter = 0;
 
-    public Prize(Branch branch, Set<User> userSet, Bonus bonus, Project project, Date deadline, Date date, String description, boolean given) {
+    public Prize(Branch branch, User user, Bonus bonus, Date date, String description, boolean given) {
         this.branch = branch;
-        this.userSet = userSet;
+        this.user = user;
         this.bonus = bonus;
-        this.project = project;
-        this.deadline = deadline;
-        this.date = date;
-        this.description = description;
-        this.given = given;
-    }
-
-    public Prize(Branch branch, Set<User> userSet, Bonus bonus, Task task, Date deadline, Date date, String description, boolean given) {
-        this.branch = branch;
-        this.userSet = userSet;
-        this.bonus = bonus;
-        this.task = task;
-        this.deadline = deadline;
         this.date = date;
         this.description = description;
         this.given = given;

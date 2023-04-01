@@ -78,8 +78,12 @@ public class SupplierService {
 
     public ApiResponse delete(UUID id) {
         if (!supplierRepository.existsById(id)) return new ApiResponse("SUPPLIER NOT FOUND", false);
-        supplierRepository.deleteById(id);
-        return new ApiResponse("DELETED", true);
+        try {
+            supplierRepository.deleteById(id);
+            return new ApiResponse("DELETED", true);
+        } catch (Exception e) {
+            return new ApiResponse("TAMINOTCHI BILAN BOG'LIQ MA'LUMOTLAR MAVJUD", false);
+        }
     }
 
 
