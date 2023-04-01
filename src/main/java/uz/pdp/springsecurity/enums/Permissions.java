@@ -222,7 +222,7 @@ public enum Permissions {
     GET_BONUS,
     EDIT_BONUS,
     ADD_BONUS,
-    ADD_PRIZE
-
-
+    
+    ADD_PRIZE,
+    VIEW_PRIZE
 }

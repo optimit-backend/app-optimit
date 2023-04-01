@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.PrizeDto;
-import uz.pdp.springsecurity.payload.PrizeProjectTaskDto;
 import uz.pdp.springsecurity.service.PrizeService;
 
 import javax.validation.Valid;
@@ -23,20 +22,6 @@ public class PrizeController {
     @PostMapping
     public HttpEntity<?> add(@Valid @RequestBody PrizeDto prizeDto) {
         ApiResponse apiResponse = prizeService.add(prizeDto);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    @CheckPermission("ADD_PRIZE")
-    @PostMapping("/for-project")
-    public HttpEntity<?> addForProject(@Valid @RequestBody PrizeProjectTaskDto prizeProjectTaskDto) {
-        ApiResponse apiResponse = prizeService.addForProject(prizeProjectTaskDto);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    @CheckPermission("ADD_PRIZE")
-    @PostMapping("/for-task")
-    public HttpEntity<?> addForTask(@Valid @RequestBody PrizeProjectTaskDto prizeProjectTaskDto) {
-        ApiResponse apiResponse = prizeService.addForTask(prizeProjectTaskDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
