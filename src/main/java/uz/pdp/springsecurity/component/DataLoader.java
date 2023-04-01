@@ -430,7 +430,7 @@ public class DataLoader implements CommandLineRunner {
                                     GET_TASK,
                                     EDIT_TASK,
                                     ADD_TASK,
-                                    GET_ALL_TASK
+                                    GET_ALL_TASK,
 
                                     ADD_PRIZE,
                                     VIEW_PRIZE
