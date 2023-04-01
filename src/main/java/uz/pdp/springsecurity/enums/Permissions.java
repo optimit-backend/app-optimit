@@ -224,4 +224,5 @@ public enum Permissions {
     ADD_BONUS,
     ADD_PRIZE
 
+
 }

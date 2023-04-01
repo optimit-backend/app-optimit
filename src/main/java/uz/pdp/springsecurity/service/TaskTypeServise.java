@@ -2,12 +2,11 @@ package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Business;
-import uz.pdp.springsecurity.entity.TaskStatus;
-import uz.pdp.springsecurity.entity.TaskType;
+import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TaskStatusDto;
 import uz.pdp.springsecurity.payload.TaskTypeDto;
+import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.repository.TaskTypeRepository;
 
@@ -24,14 +23,17 @@ public class TaskTypeServise {
     @Autowired
     BusinessRepository businessRepository;
 
+    @Autowired
+    BranchRepository branchRepository;
+
     public ApiResponse add(TaskTypeDto taskTypeDto) {
-        Optional<Business> optionalBusiness = businessRepository.findById(taskTypeDto.getBusinessId());
-        if (optionalBusiness.isEmpty()){
-            return new ApiResponse("Business Not Found",false);
+        Optional<Branch> optionalBranch = branchRepository.findById(taskTypeDto.getBranchId());
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch Not Found",false);
         }
         TaskType taskType = new TaskType();
         taskType.setName(taskTypeDto.getName());
-        taskType.setBusiness(optionalBusiness.get());
+        taskType.setBranch(optionalBranch.get());
         taskTypeRepository.save(taskType);
         return new ApiResponse("Added",true,taskType);
     }
@@ -61,8 +63,8 @@ public class TaskTypeServise {
         return new ApiResponse("Deleted",true);
     }
 
-    public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<TaskType> taskTypeList = taskTypeRepository.findAllByBusiness_Id(businessId);
+    public ApiResponse getAllByBranch(UUID branchId) {
+        List<TaskType> taskTypeList = taskTypeRepository.findAllByBranchId(branchId);
         if (taskTypeList.isEmpty()){
             return new ApiResponse("Not Found",false);
         }

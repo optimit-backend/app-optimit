@@ -16,5 +16,5 @@ public class TaskStatusDto {
     private String color;
     private long rowNumber;
     private boolean aBoolean;
-    private UUID businessId;
+    private UUID branchId;
 }

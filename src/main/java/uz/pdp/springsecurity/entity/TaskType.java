@@ -17,5 +17,5 @@ import javax.persistence.ManyToOne;
 public class TaskType extends AbsEntity {
     String name;
     @ManyToOne
-    private Business business;
+    private Branch branch;
 }

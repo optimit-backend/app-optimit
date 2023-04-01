@@ -3,6 +3,8 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -11,12 +13,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProjectDto {
-
+    @NotNull
     private String name;
     private Date startDate;
     private Date endDate;
     private Date deadline;
     private UUID projectTypeId;
+    @NotNull
     private UUID customerId;
     private String description;
     private List<UUID> userList;
@@ -25,5 +28,6 @@ public class ProjectDto {
     private UUID stageId;
     private double goalAmount;
     private boolean isProduction;
+    @NotNull
     private UUID branchId;
 }

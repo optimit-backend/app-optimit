@@ -49,9 +49,9 @@ public class TaskStatusController {
     }
 
     @CheckPermission("GET_ALL_TASK_STATUS")
-    @GetMapping("/get-by-business/{businessId}")
-    public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId) {
-        ApiResponse apiResponse = taskStatusServise.getAllByBusinessId(businessId);
+    @GetMapping("/get-by-branchId/{branchId}")
+    public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = taskStatusServise.getAllByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }

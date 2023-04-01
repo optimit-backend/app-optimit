@@ -2,10 +2,11 @@ package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Business;
+import uz.pdp.springsecurity.entity.Branch;
 import uz.pdp.springsecurity.entity.TaskStatus;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TaskStatusDto;
+import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.repository.TaskStatusRepository;
 
@@ -20,10 +21,13 @@ public class TaskStatusServise {
     @Autowired
     BusinessRepository businessRepository;
 
+    @Autowired
+    BranchRepository branchRepository;
+
     public ApiResponse add(TaskStatusDto taskStatusDto) {
-        Optional<Business> optionalBusiness = businessRepository.findById(taskStatusDto.getBusinessId());
-        if (optionalBusiness.isEmpty()){
-            return new ApiResponse("Business Not Found",false);
+        Optional<Branch> optionalBranch = branchRepository.findById(taskStatusDto.getBranchId());
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch Not Found",false);
         }
         TaskStatus taskStatus = new TaskStatus();
         taskStatus.setABoolean(taskStatusDto.isABoolean());
@@ -31,7 +35,7 @@ public class TaskStatusServise {
         taskStatus.setRowNumber(ordinalNumber);
         taskStatus.setName(taskStatusDto.getName());
         taskStatus.setColor(taskStatusDto.getColor());
-        taskStatus.setBusiness(optionalBusiness.get());
+        taskStatus.setBranch(optionalBranch.get());
         taskStatusRepository.save(taskStatus);
         return new ApiResponse("Added",true,taskStatus);
     }
@@ -99,20 +103,12 @@ public class TaskStatusServise {
                 }
             }
         }
-        return new ApiResponse("Deleted",false);
+        return new ApiResponse("Deleted",true);
     }
 
-//    public ApiResponse delete(UUID id) {
-//        boolean exists = taskStatusRepository.existsById(id);
-//        if (!exists){
-//            return new ApiResponse("Not Found",false);
-//        }
-//        taskStatusRepository.deleteById(id);
-//        return new ApiResponse("Deleted",true);
-//    }
-
-    public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<TaskStatus> taskStatusList = taskStatusRepository.findAllByBusiness_Id(businessId);
+    public ApiResponse getAllByBranch(UUID branchId) {
+        List<String> names = Arrays.asList("Uncompleted","Completed");
+        List<TaskStatus> taskStatusList = taskStatusRepository.findAllByNameInOrBranchId(names,branchId);
         if (taskStatusList.isEmpty()){
             return new ApiResponse("Not Found",false);
         }

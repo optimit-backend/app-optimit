@@ -48,7 +48,4 @@ public class Project extends AbsEntity {
 
     @ManyToOne
     private Branch branch;
-
-    @ManyToOne
-    ProjectStatus projectStatus;
 }
