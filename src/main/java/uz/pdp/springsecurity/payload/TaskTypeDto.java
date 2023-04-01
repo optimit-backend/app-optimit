@@ -11,5 +11,5 @@ import java.util.UUID;
 public class TaskTypeDto {
 
     private String name;
-    private UUID businessId;
+    private UUID branchId;
 }

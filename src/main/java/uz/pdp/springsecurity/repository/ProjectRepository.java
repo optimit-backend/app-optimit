@@ -11,6 +11,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ProjectRepository extends JpaRepository<Project, UUID> {
-    List<Project> findAllByProjectStatusId(UUID projectStatus_id);
+    List<Project> findAllByStageId(UUID projectStatus_id);
     Page<Project> findAllByBranch_BusinessId(UUID businessId, Pageable pageable);
 }

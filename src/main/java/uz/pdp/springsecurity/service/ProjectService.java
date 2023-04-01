@@ -65,8 +65,10 @@ public class ProjectService {
         project.setStartDate(projectDto.getStartDate());
         project.setEndDate(projectDto.getEndDate());
         project.setDeadline(projectDto.getDeadline());
-        Optional<ProjectType> optionalProjectType = projectTypeRepository.findById(projectDto.getProjectTypeId());
-        optionalProjectType.ifPresent(project::setProjectType);
+        if (projectDto.getProjectTypeId()!=null){
+            Optional<ProjectType> optionalProjectType = projectTypeRepository.findById(projectDto.getProjectTypeId());
+            optionalProjectType.ifPresent(project::setProjectType);
+        }
         project.setCustomer(optionalCustomer.get());
         project.setDescription(projectDto.getDescription());
 
@@ -78,13 +80,16 @@ public class ProjectService {
         project.setUsers(userList);
 
         List<FileData> fileDataList = new ArrayList<>();
-        for (UUID uuid : projectDto.getFileDateList()) {
-            Optional<FileData> optionalFileData = fileDateRepository.findById(uuid);
-            if (optionalFileData.isPresent()){
-                FileData fileData = optionalFileData.get();
-                fileDataList.add(fileData);
+        if (projectDto.getFileDateList()!=null){
+            for (UUID uuid : projectDto.getFileDateList()) {
+                Optional<FileData> optionalFileData = fileDateRepository.findById(uuid);
+                if (optionalFileData.isPresent()){
+                    FileData fileData = optionalFileData.get();
+                    fileDataList.add(fileData);
+                }
             }
         }
+
         project.setFileDataList(fileDataList);
         project.setBudget(projectDto.getBudget());
         Optional<Stage> optionalStage = stageRepository.findById(projectDto.getStageId());
@@ -150,7 +155,7 @@ public class ProjectService {
 
     public ApiResponse get(UUID id) {
         Optional<Project> optionalProject = projectRepository.findById(id);
-        return optionalProject.map(project -> new ApiResponse("Found", true, project)).orElseGet(() -> new ApiResponse("Project Not Found", false));
+        return optionalProject.map(project -> new ApiResponse("Found",true,project)).orElseGet(() -> new ApiResponse("Project Not Found", false));
     }
 
     public ApiResponse delete(UUID id) {
@@ -174,7 +179,7 @@ public class ProjectService {
     }
 
     public ApiResponse findByStatusId(UUID statusId) {
-        List<Project> projects = projectRepository.findAllByProjectStatusId(statusId);
+        List<Project> projects = projectRepository.findAllByStageId(statusId);
         if (projects.isEmpty()){
             return new ApiResponse("Projects Not Found",false);
         }

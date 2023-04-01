@@ -20,5 +20,5 @@ public class TaskStatus extends AbsEntity {
     private long rowNumber;
     private boolean aBoolean;
     @ManyToOne
-    private Business business;
+    private Branch branch;
 }
