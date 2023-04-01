@@ -13,6 +13,7 @@ import uz.pdp.springsecurity.payload.LidDto;
 import uz.pdp.springsecurity.payload.LidGetDto;
 import uz.pdp.springsecurity.repository.*;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -26,9 +27,21 @@ public class LidService {
     private final LidFieldRepository lidFieldRepository;
     private final BusinessRepository businessRepository;
 
-    public ApiResponse getAll(UUID businessId) {
-        List<Lid> all = repository.findAllByBusinessId(businessId);
-        List<LidGetDto> dtoList = getDtoList(all);
+    public ApiResponse getAll(UUID businessId, int page, int size, UUID sourceId, UUID statusId, Date startDate, Date endDate) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Timestamp startTimestamp = null;
+        Timestamp endTimestamp = null;
+
+        if (startDate != null && endDate != null) {
+            startTimestamp = new Timestamp(startDate.getTime());
+            endTimestamp = new Timestamp(endDate.getTime());
+            Page<Lid> allPageable = repository.findAllByBusinessIdAndCreatedAtBetween(businessId, startTimestamp, endTimestamp, pageable);
+        }
+
+        Page<Lid> allPageable = repository.findAllByBusinessId(businessId, pageable);
+
+        List<LidGetDto> dtoList = getDtoList(allPageable.toList());
         return new ApiResponse("found", true, dtoList);
     }
 
@@ -120,25 +133,38 @@ public class LidService {
         return lidGetDto;
     }
 
-    public ApiResponse getByBusinessIdPageable(UUID id) {
+    public ApiResponse getByBusinessIdPageable(UUID id, Map<String, String> params) {
+
         List<LidStatus> all = lidStatusRepository.findAllByBusinessIsNullOrderBySortAsc();
         List<LidStatus> allStatus = lidStatusRepository.findAllByBusiness_IdOrderBySortAsc(id);
         all.addAll(allStatus);
-        List<Map<String, Object>> responses = new ArrayList<>();
-        Pageable pageable = PageRequest.of(0, 10);
-        for (LidStatus status : allStatus) {
-            System.out.println(status);
+
+        Map<UUID, Integer> value = new HashMap<>();
+
+        if (params != null) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                value.put(UUID.fromString(entry.getKey()), Integer.valueOf(entry.getValue()));
+            }
         }
 
+        List<Map<String, Object>> responses = new ArrayList<>();
+
         for (LidStatus status : all) {
+            Integer integer = null;
+            integer = value.get(status.getId());
+
+            Pageable pageable = PageRequest.of(0, Objects.requireNonNullElse(integer, 5));
+
             Page<Lid> allLid = repository.findAllByBusiness_IdAndLidStatusId(id, status.getId(), pageable);
             List<LidGetDto> lidGetDtoList = getDtoList(allLid.toList());
+
             Map<String, Object> response = new HashMap<>();
             response.put("statusId", status.getId());
             response.put("getLessProduct", lidGetDtoList);
             response.put("currentPage", allLid.getNumber());
             response.put("totalItems", allLid.getTotalElements());
             response.put("totalPages", allLid.getTotalPages());
+
             responses.add(response);
         }
 
