@@ -16,6 +16,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class TaskStatus extends AbsEntity {
     private String name;
+    private String orginalName;
     private String color;
     private long rowNumber;
     private boolean aBoolean;

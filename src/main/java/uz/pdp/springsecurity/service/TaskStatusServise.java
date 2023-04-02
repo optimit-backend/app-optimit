@@ -31,7 +31,7 @@ public class TaskStatusServise {
         }
         TaskStatus taskStatus = new TaskStatus();
         taskStatus.setABoolean(taskStatusDto.isABoolean());
-        long ordinalNumber = taskStatusRepository.count()+1;
+        long ordinalNumber = taskStatusRepository.countByBranchId(optionalBranch.get().getId())+1;
         taskStatus.setRowNumber(ordinalNumber);
         taskStatus.setName(taskStatusDto.getName());
         taskStatus.setColor(taskStatusDto.getColor());
@@ -40,27 +40,32 @@ public class TaskStatusServise {
         return new ApiResponse("Added",true,taskStatus);
     }
 
-    public ApiResponse edit(UUID id, TaskStatusDto taskStatusDto) {
+    public ApiResponse edit(UUID id, UUID branchId, TaskStatusDto taskStatusDto) {
         boolean exists = taskStatusRepository.existsById(id);
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch Not Found",false);
+        }
+        Branch branch = optionalBranch.get();
         if (!exists){
             return new ApiResponse("Not Found",false);
         }
         TaskStatus taskStatus = taskStatusRepository.getById(id);
         taskStatus.setABoolean(taskStatusDto.isABoolean());
-        updateTaskStatusOrdinalNumber(taskStatus,taskStatusDto.getRowNumber());
+        updateTaskStatusOrdinalNumber(taskStatus,taskStatusDto.getRowNumber(),branch.getId());
         taskStatus.setName(taskStatusDto.getName());
         taskStatus.setColor(taskStatusDto.getColor());
         TaskStatus status = taskStatusRepository.save(taskStatus);
         return new ApiResponse("Edited",true,status);
     }
 
-    public final void updateTaskStatusOrdinalNumber(TaskStatus taskStatus, long newOrdinalNumber) {
+    public final void updateTaskStatusOrdinalNumber(TaskStatus taskStatus, long newOrdinalNumber, UUID branchId) {
         long currentOrdinalNumber = taskStatus.getRowNumber();
         if (currentOrdinalNumber == newOrdinalNumber) {
             return;
         }
 
-        List<TaskStatus> allTaskStatuses = taskStatusRepository.findAllByOrderByRowNumber();
+        List<TaskStatus> allTaskStatuses = taskStatusRepository.findAllByBranchIdOrderByRowNumber(branchId);
         if (newOrdinalNumber > currentOrdinalNumber) {
             for (TaskStatus ts : allTaskStatuses) {
                 if (ts.getRowNumber() > currentOrdinalNumber && ts.getRowNumber() <= newOrdinalNumber) {
@@ -90,11 +95,15 @@ public class TaskStatusServise {
         Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findById(id);
         if (optionalTaskStatus.isPresent()) {
             TaskStatus taskStatusToDelete = optionalTaskStatus.get();
+            if (taskStatusToDelete.getOrginalName().equals("Completed") || taskStatusToDelete.getOrginalName().equals("Uncompleted")){
+                return new ApiResponse("You can not delete this task status!",false);
+            }
+            Branch branch = taskStatusToDelete.getBranch();
 
             taskStatusRepository.delete(taskStatusToDelete);
 
 
-            List<TaskStatus> allTaskStatuses = taskStatusRepository.findAllByOrderByRowNumber();
+            List<TaskStatus> allTaskStatuses = taskStatusRepository.findAllByBranchIdOrderByRowNumber(branch.getId());
             int index = 1;
             for (TaskStatus ts : allTaskStatuses) {
                 if (ts.getId() != taskStatusToDelete.getId()) {
@@ -107,8 +116,7 @@ public class TaskStatusServise {
     }
 
     public ApiResponse getAllByBranch(UUID branchId) {
-        List<String> names = Arrays.asList("Uncompleted","Completed");
-        List<TaskStatus> taskStatusList = taskStatusRepository.findAllByNameInOrBranchId(names,branchId);
+        List<TaskStatus> taskStatusList = taskStatusRepository.findAllByBranchId(branchId);
         if (taskStatusList.isEmpty()){
             return new ApiResponse("Not Found",false);
         }

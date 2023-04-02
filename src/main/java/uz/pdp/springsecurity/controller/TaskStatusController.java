@@ -29,8 +29,10 @@ public class TaskStatusController {
 
     @CheckPermission("EDIT_TASK_STATUS")
     @PutMapping("/{id}")
-    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody TaskStatusDto taskStatusDto) {
-        ApiResponse apiResponse = taskStatusServise.edit(id,taskStatusDto);
+    public HttpEntity<?> edit(@PathVariable UUID id,
+                              @RequestParam(required = false) UUID branchId,
+                              @RequestBody TaskStatusDto taskStatusDto) {
+        ApiResponse apiResponse = taskStatusServise.edit(id,branchId,taskStatusDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
