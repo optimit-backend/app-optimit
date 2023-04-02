@@ -34,9 +34,6 @@ public class Task extends AbsEntity {
     private List<User> users;
 
     @ManyToOne
-    private Stage stage;
-
-    @ManyToOne
     private TaskStatus taskStatus;
 
     @Enumerated(EnumType.STRING)

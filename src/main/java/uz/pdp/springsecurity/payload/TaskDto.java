@@ -19,7 +19,6 @@ public class TaskDto {
     private Date startDate;
     private Date EndDate;
     private List<UUID> users;
-    private UUID stage;
     private UUID taskStatus;
     private String importance;
     private UUID dependTask;
