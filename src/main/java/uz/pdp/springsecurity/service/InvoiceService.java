@@ -8,6 +8,7 @@ import uz.pdp.springsecurity.entity.Invoice;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.InvoiceDto;
 import uz.pdp.springsecurity.repository.AttachmentRepository;
+import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.InvoiceRepository;
 
 import java.util.Optional;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final AttachmentRepository attachmentRepository;
+    private final BranchRepository branchRepository;
 
     public void create(Branch branch) {
         invoiceRepository.save(new Invoice(
@@ -43,7 +45,12 @@ public class InvoiceService {
 
     public ApiResponse getOne(UUID branchId) {
         Optional<Invoice> optionalInvoice = invoiceRepository.findByBranch_Id(branchId);
-        if (optionalInvoice.isEmpty()) return new ApiResponse("INVOICE NOT FOUND", false);
+        if (optionalInvoice.isEmpty()){
+            Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+            if (optionalBranch.isEmpty()) return new ApiResponse("BRANCH NOT FOUND", false);
+            create(optionalBranch.get());
+            return getOne(branchId);
+        }
         Invoice invoice = optionalInvoice.get();
         InvoiceDto invoiceDto = new InvoiceDto();
         invoiceDto.setName(invoice.getName());

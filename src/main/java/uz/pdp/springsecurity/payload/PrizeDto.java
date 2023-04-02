@@ -3,10 +3,9 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -20,10 +19,18 @@ public class PrizeDto {
     private UUID bonusId;
 
     @NotNull(message = "REQUIRED")
-    private Set<UUID> userIdSet;
+    private UUID userId;
 
     @NotNull(message = "REQUIRED")
     private Date date;
 
+    @NotNull(message = "REQUIRED")
+    private boolean given;
+
     private String description;
+
+    private Integer count;
+    private boolean task;
+    private boolean lid;
+    private Date deadline;
 }

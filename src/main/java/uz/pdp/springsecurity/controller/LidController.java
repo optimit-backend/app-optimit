@@ -9,6 +9,7 @@ import uz.pdp.springsecurity.payload.LidDto;
 import uz.pdp.springsecurity.service.LidService;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -18,8 +19,13 @@ public class LidController {
     private final LidService lidService;
 
     @GetMapping("/get-by-businessId/{businessId}")
-    HttpEntity<?> getAll(@PathVariable UUID businessId) {
-        ApiResponse apiResponse = lidService.getAll(businessId);
+    HttpEntity<?> getAll(@PathVariable UUID businessId,
+                         @RequestParam int page, @RequestParam int size,
+                         @RequestParam UUID sourceId,
+                         @RequestParam UUID statusId,
+                         @RequestParam Date startDate,
+                         @RequestParam Date endDate) {
+        ApiResponse apiResponse = lidService.getAll(businessId, page, size, sourceId, statusId, startDate, endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -30,8 +36,9 @@ public class LidController {
     }
 
     @GetMapping("/get-by-businessId-pageable/{id}")
-    HttpEntity<?> getByBusinessIdPageable(@PathVariable UUID id) {
-        ApiResponse apiResponse = lidService.getByBusinessIdPageable(id);
+    HttpEntity<?> getByBusinessIdPageable(@PathVariable UUID id,
+                                          @RequestParam(required = false) Map<String, String> params) {
+        ApiResponse apiResponse = lidService.getByBusinessIdPageable(id, params);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

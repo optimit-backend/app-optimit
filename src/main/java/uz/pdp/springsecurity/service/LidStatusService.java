@@ -8,9 +8,7 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LidStatusDto;
 import uz.pdp.springsecurity.repository.LidStatusRepository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +22,8 @@ public class LidStatusService {
                 repository.findAllByBusiness_IdOrderBySortAsc(businessId);
         List<LidStatus> all = repository.findAllByBusinessIsNullOrderBySortAsc();
         all.addAll(allByBusinessId);
+
+        all.sort(Comparator.comparing(LidStatus::getSort));
 
         if (allByBusinessId.isEmpty()) {
             return new ApiResponse("not found", false);
@@ -94,6 +94,21 @@ public class LidStatusService {
         }
         LidStatus lidStatus = optional.get();
         repository.delete(lidStatus);
+
+        List<LidStatus> allByBusinessId =
+                repository.findAllByBusiness_IdOrderBySortAsc(optional.get().getBusiness().getId());
+        List<LidStatus> all = repository.findAllByBusinessIsNullOrderBySortAsc();
+        all.addAll(allByBusinessId);
+
+        all.sort(Comparator.comparing(LidStatus::getSort));
+
+        int index = 1;
+        for (LidStatus lidStatus1 : all) {
+            if (lidStatus1.getId() != lidStatus.getId()) {
+                lidStatus1.setSort(index++);
+                repository.save(lidStatus1);
+            }
+        }
         return new ApiResponse("successfully deleted", true);
     }
 }
