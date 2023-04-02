@@ -63,10 +63,7 @@ public class TaskServise {
         }
         task.setUsers(userList);
 
-        Optional<Stage> optionalStage = stageRepository.findById(taskDto.getStage());
-        optionalStage.ifPresent(task::setStage);
-
-        Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findByName("Uncompleted");
+        Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findByOrginalName("Uncompleted");
         optionalTaskStatus.ifPresent(task::setTaskStatus);
 
         task.setImportance(Importance.valueOf(taskDto.getImportance()));
@@ -92,7 +89,49 @@ public class TaskServise {
     }
 
     public ApiResponse edit(UUID id, TaskDto taskDto) {
-        return null;
+        Optional<Task> optionalTask = taskRepository.findById(id);
+        if (optionalTask.isEmpty()){
+            return new ApiResponse("Task not found",false);
+        }
+        Task task = optionalTask.get();
+        task.setName(taskDto.getName());
+        if (taskDto.getTaskTypeId() != null){
+            Optional<TaskType> optionalTaskType = taskTypeRepository.findById(taskDto.getTaskTypeId());
+            optionalTaskType.ifPresent(task::setTaskType);
+        }
+        if (taskDto.getProjectId() != null){
+            Optional<Project> optionalProject = projectRepository.findById(taskDto.getProjectId());
+            optionalProject.ifPresent(task::setProject);
+        }
+        task.setStartDate(taskDto.getStartDate());
+        task.setEndDate(taskDto.getEndDate());
+        if (taskDto.getUsers() != null){
+            List<User> userList = new ArrayList<>();
+            for (UUID user : taskDto.getUsers()) {
+                Optional<User> optionalUser = userRepository.findById(user);
+                optionalUser.ifPresent(userList::add);
+            }
+            task.setUsers(userList);
+        }
+        if (taskDto.getTaskStatus() != null){
+            Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findById(taskDto.getTaskStatus());
+            optionalTaskStatus.ifPresent(task::setTaskStatus);
+        }
+        task.setImportance(Importance.valueOf(taskDto.getImportance()));
+        if (taskDto.getDependTask() != null){
+            Optional<Task> taskOptional = taskRepository.findById(taskDto.getDependTask());
+            taskOptional.ifPresent(task::setDependTask);
+        }
+        task.setProductions(taskDto.isProduction());
+        if (taskDto.getProduction() != null){
+            Optional<Production> optionalProduction = productionRepository.findById(taskDto.getProduction());
+            optionalProduction.ifPresent(task::setProduction);
+        }
+        task.setGoalAmount(taskDto.getGoalAmount());
+        task.setTaskPrice(taskDto.getTaskPrice());
+        task.setEach(taskDto.isEach());
+        taskRepository.save(task);
+        return new ApiResponse("Edited",true);
     }
 
     public ApiResponse get(UUID id) {
