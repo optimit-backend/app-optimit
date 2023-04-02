@@ -12,8 +12,8 @@ public interface TaskStatusRepository extends JpaRepository<TaskStatus,UUID> {
     List<TaskStatus> findAllByBranchId(UUID branchId);
     Optional<TaskStatus> findByName(String name);
     List<TaskStatus> findAllByNameInOrBranchId(Collection<String> name, UUID branch_id);
-
+    List<TaskStatus> findAllByBranchIdOrderByRowNumber(UUID branchId);
     List<TaskStatus> findAllByOrderByRowNumber();
 
-    long count();
+    Long countByBranchId(UUID branchId);
 }

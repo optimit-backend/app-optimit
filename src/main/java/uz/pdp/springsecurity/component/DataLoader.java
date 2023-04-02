@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import uz.pdp.springsecurity.annotations.CurrentUser;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.enums.*;
@@ -104,24 +103,6 @@ public class DataLoader implements CommandLineRunner {
             doneStatus.setSort(3);
             lidStatusRepository.save(doneStatus);
 
-            List<TaskStatus> taskStatusList = taskStatusRepository.findAll();
-            if (taskStatusList.isEmpty()){
-                TaskStatus taskStatus = new TaskStatus();
-                taskStatus.setName("Completed");
-                taskStatus.setRowNumber(2);
-                taskStatus.setABoolean(true);
-                taskStatus.setColor("#04d227");
-                taskStatusRepository.save(taskStatus);
-            }
-
-            if (taskStatusList.isEmpty()){
-                TaskStatus taskStatus = new TaskStatus();
-                taskStatus.setName("Uncompleted");
-                taskStatus.setRowNumber(1);
-                taskStatus.setABoolean(true);
-                taskStatus.setColor("#FF0000");
-                taskStatusRepository.save(taskStatus);
-            }
 
             List<Tariff> tariffRepositoryAll = tariffRepository.findAll();
             Tariff tariff = null;
@@ -696,8 +677,34 @@ public class DataLoader implements CommandLineRunner {
                     branchRepository.save(branch);
                     invoiceService.create(branch);
                     branches.add(branch);
+
+                    List<TaskStatus> taskStatusList = taskStatusRepository.findAll();
+                    if (taskStatusList.isEmpty()){
+                        TaskStatus taskStatus = new TaskStatus();
+                        taskStatus.setName("Completed");
+                        taskStatus.setOrginalName("Completed");
+                        taskStatus.setRowNumber(2);
+                        taskStatus.setABoolean(true);
+                        taskStatus.setColor("#04d227");
+                        taskStatus.setBranch(branch);
+                        taskStatusRepository.save(taskStatus);
+                    }
+                    if (taskStatusList.isEmpty()){
+                        TaskStatus taskStatus = new TaskStatus();
+                        taskStatus.setName("Uncompleted");
+                        taskStatus.setOrginalName("Uncompleted");
+                        taskStatus.setRowNumber(1);
+                        taskStatus.setABoolean(true);
+                        taskStatus.setColor("#FF0000");
+                        taskStatus.setBranch(branch);
+                        taskStatusRepository.save(taskStatus);
+                    }
                 }
             }
+
+
+
+
 
             User userAdmin = userRepository.save(new User(
                     "Admin",
