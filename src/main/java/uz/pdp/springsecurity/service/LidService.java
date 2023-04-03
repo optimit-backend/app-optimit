@@ -39,6 +39,7 @@ public class LidService {
             Page<Lid> allPageable = repository.findAllByBusinessIdAndCreatedAtBetween(businessId, startTimestamp, endTimestamp, pageable);
         }
 
+
         Page<Lid> allPageable = repository.findAllByBusinessId(businessId, pageable);
 
         List<LidGetDto> dtoList = getDtoList(allPageable.toList());

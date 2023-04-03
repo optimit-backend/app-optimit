@@ -105,7 +105,7 @@ public class DataLoader implements CommandLineRunner {
             lidStatusRepository.save(doneStatus);
 
             List<TaskStatus> taskStatusList = taskStatusRepository.findAll();
-            if (taskStatusList.isEmpty()){
+            if (taskStatusList.isEmpty()) {
                 TaskStatus taskStatus = new TaskStatus();
                 taskStatus.setName("Completed");
                 taskStatus.setRowNumber(2);
@@ -114,7 +114,7 @@ public class DataLoader implements CommandLineRunner {
                 taskStatusRepository.save(taskStatus);
             }
 
-            if (taskStatusList.isEmpty()){
+            if (taskStatusList.isEmpty()) {
                 TaskStatus taskStatus = new TaskStatus();
                 taskStatus.setName("Uncompleted");
                 taskStatus.setRowNumber(1);
