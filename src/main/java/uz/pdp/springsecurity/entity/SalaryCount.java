@@ -36,4 +36,6 @@ public class SalaryCount extends AbsEntity {
 
     @Column(nullable = false)
     private Date date;
+
+    private String description;
 }
