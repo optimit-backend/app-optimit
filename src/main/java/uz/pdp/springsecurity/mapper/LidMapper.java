@@ -18,11 +18,13 @@ public interface LidMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "values", ignore = true)
+    @Mapping(target = "source", ignore = true)
     Lid toEntity(LidDto lidDto);
 
     @Mapping(target = "lidStatusId", source = "lidStatus.id")
     @Mapping(target = "businessId", source = "business.id")
     @Mapping(target = "values", ignore = true)
+    @Mapping(target = "formId", ignore = true)
     LidDto toDto(Lid lid);
 
     List<LidDto> toDto(List<Lid> lidList);
