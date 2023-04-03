@@ -29,8 +29,6 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler", "fieldHandler"})
 public class User extends AbsEntity implements UserDetails {
-
-
     @Column(nullable = false)
     private String firstName;
 
