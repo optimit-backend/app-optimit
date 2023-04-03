@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TaskDto;
-import uz.pdp.springsecurity.payload.TaskStatusDto;
 import uz.pdp.springsecurity.service.TaskServise;
 
 import javax.validation.Valid;
@@ -34,6 +33,14 @@ public class TaskController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("EDIT_TASK")
+    @PatchMapping("/{id}/{statusId}")
+    public HttpEntity<?> updateTaskStatus(@PathVariable UUID id,
+                                          @PathVariable  UUID statusId) {
+        ApiResponse apiResponse = taskServise.updateTaskStatus(id,statusId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
     @CheckPermission("GET_TASK")
     @GetMapping("/{id}")
     public HttpEntity<?> get(@PathVariable UUID id) {
@@ -49,9 +56,19 @@ public class TaskController {
     }
 
     @CheckPermission("GET_ALL_TASK")
-    @GetMapping("/get-by-business/{businessId}")
-    public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId) {
-        ApiResponse apiResponse = taskServise.getAllByBusinessId(businessId);
+    @GetMapping("/get-by-branch/{branchId}")
+    public HttpEntity<?> getAllByBusiness(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = taskServise.getAllByBranchId(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("GET_ALL_TASK")
+    @GetMapping("/get-by-status/{branchId}/{statusId}")
+    public HttpEntity<?> getAllByStatus(@PathVariable UUID branchId,
+                                        @PathVariable UUID statusId,
+                                        @RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "10") int size) {
+        ApiResponse apiResponse = taskServise.getAllByStatusId(branchId,statusId,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
