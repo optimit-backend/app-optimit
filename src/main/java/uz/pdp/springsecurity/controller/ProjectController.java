@@ -50,8 +50,8 @@ public class ProjectController {
     @CheckPermission("GET_ALL_PROJECT")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBusiness(@PathVariable UUID branchId,
-                                          @RequestParam(defaultValue = "0") int page,
-                                          @RequestParam(defaultValue = "10") int size) {
+                                          @RequestParam int page,
+                                          @RequestParam int size) {
         ApiResponse apiResponse = projectService.getAllByBranchId(branchId,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }

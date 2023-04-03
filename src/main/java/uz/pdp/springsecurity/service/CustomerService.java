@@ -48,12 +48,9 @@ public class CustomerService {
             return new ApiResponse("BRANCH NOT FOUND", false);
         }
 
-        Optional<CustomerGroup> customerGroupOptional = customerGroupRepository.findById(customerDto.getCustomerGroupId());
-        if (customerGroupOptional.isEmpty()) {
-            return new ApiResponse("NOT FOUND", false);
-        }
-
         Customer customer = mapper.toEntity(customerDto);
+        Optional<CustomerGroup> customerGroupOptional = customerGroupRepository.findById(customerDto.getCustomerGroupId());
+        customerGroupOptional.ifPresent(customer::setCustomerGroup);
 
         customerRepository.save(customer);
         return new ApiResponse("ADDED", true);
@@ -95,8 +92,11 @@ public class CustomerService {
             return new ApiResponse("NOT FOUND", true);
         }
         Customer customer = optional.get();
-
-        return new ApiResponse("FOUND", true, mapper.toDto(customer));
+        CustomerDto customerDto = mapper.toDto(customer);
+        if (customer.getCustomerGroup() != null){
+            customerDto.setCustomerGroupId(customer.getCustomerGroup().getId());
+        }
+        return new ApiResponse("FOUND", true,customerDto);
     }
 
     public ApiResponse delete(UUID id) {
