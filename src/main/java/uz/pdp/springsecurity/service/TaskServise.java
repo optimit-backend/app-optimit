@@ -9,6 +9,7 @@ import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.Importance;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TaskDto;
+import uz.pdp.springsecurity.payload.TaskDtos;
 import uz.pdp.springsecurity.repository.*;
 
 import java.util.ArrayList;
@@ -150,7 +151,7 @@ public class TaskServise {
         TaskStatus taskStatus = optionalTaskStatus.get();
         if (task.getDependTask() != null){
             Task depentTask = taskRepository.getById(task.getDependTask().getId());
-            if (depentTask.getTaskStatus().getOrginalName() != null && depentTask.getTaskStatus().getOrginalName().equals("Completed")){
+            if (depentTask.getTaskStatus().getOrginalName() != null && !depentTask.getTaskStatus().getOrginalName().equals("Completed")){
                 return new ApiResponse("You can not change this task, Complete depend task",false);
             }
         }
@@ -160,7 +161,8 @@ public class TaskServise {
     }
 
     public ApiResponse get(UUID id) {
-        return null;
+        Optional<Task> optionalTask = taskRepository.findById(id);
+        return optionalTask.map(task -> new ApiResponse("Found", true, task)).orElseGet(() -> new ApiResponse("Not Found", false));
     }
 
     public ApiResponse delete(UUID id) {
@@ -172,17 +174,28 @@ public class TaskServise {
         return new ApiResponse("Deleted",true);
     }
 
-    public ApiResponse getAllByBranchId(UUID branchId) {
-        return null;
-    }
+//    public ApiResponse getAllByBranchId(UUID branchId) {
+//        return null;
+//    }
 
-    public ApiResponse getAllByStatusId(UUID branchId,UUID statusId,int page, int size) {
+    public ApiResponse getAllByBranchId(UUID branchId,int page, int size) {
         Pageable pageable = PageRequest.of(page,size);
-        Page<Task> all = taskRepository.findAllByBranchIdAndTaskStatusId(branchId, statusId, pageable);
+        Page<Task> all = taskRepository.findAllByBranchId(branchId, pageable);
         if (all.isEmpty()){
             assert all.getTotalElements() <= 0 : "list is empty";
             return new ApiResponse("Project Not Found",false);
         }
+        List<TaskDtos> taskDtosList = new ArrayList<>();
+        for (Task task : all) {
+            TaskDtos taskDtos = new TaskDtos();
+            taskDtos.setName(task.getName());
+            for (User user : task.getUsers()) {
+                List<String> names = new ArrayList<>();
+                names.add(user.getFirstName()+" "+user.getLastName());
+                taskDtos.setUserName(names);
+            }
+        }
+
         return new ApiResponse("Found",true,all);
     }
 }

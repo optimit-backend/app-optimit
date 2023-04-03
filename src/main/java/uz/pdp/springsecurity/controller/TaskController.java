@@ -57,18 +57,10 @@ public class TaskController {
 
     @CheckPermission("GET_ALL_TASK")
     @GetMapping("/get-by-branch/{branchId}")
-    public HttpEntity<?> getAllByBusiness(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = taskServise.getAllByBranchId(branchId);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    @CheckPermission("GET_ALL_TASK")
-    @GetMapping("/get-by-status/{branchId}/{statusId}")
-    public HttpEntity<?> getAllByStatus(@PathVariable UUID branchId,
-                                        @PathVariable UUID statusId,
+    public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
                                         @RequestParam(defaultValue = "0") int page,
                                         @RequestParam(defaultValue = "10") int size) {
-        ApiResponse apiResponse = taskServise.getAllByStatusId(branchId,statusId,page,size);
+        ApiResponse apiResponse = taskServise.getAllByBranchId(branchId,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }

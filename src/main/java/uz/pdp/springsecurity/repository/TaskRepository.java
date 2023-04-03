@@ -9,5 +9,5 @@ import java.util.UUID;
 
 public interface TaskRepository extends JpaRepository<Task, UUID> {
 
-    Page<Task> findAllByBranchIdAndTaskStatusId(UUID branch_id, UUID taskStatus_id, Pageable pageable);
+    Page<Task> findAllByBranchId(UUID branch_id, Pageable pageable);
 }
