@@ -169,7 +169,7 @@ public class ProjectService {
 
     public ApiResponse  getAllByBranchId(UUID branchId, int page, int size) {
         if (page == 0 && size == 0){
-            List<Project> projectList = projectRepository.findAllByBranchId(branchId);
+            List<Project> projectList = projectRepository.findAllByBranch_Id(branchId);
             if (!projectList.isEmpty()){
                 return new ApiResponse("Found",true,projectList);
             }
