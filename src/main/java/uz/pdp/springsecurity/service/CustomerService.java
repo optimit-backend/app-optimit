@@ -49,9 +49,10 @@ public class CustomerService {
         }
 
         Customer customer = mapper.toEntity(customerDto);
-        Optional<CustomerGroup> customerGroupOptional = customerGroupRepository.findById(customerDto.getCustomerGroupId());
-        customerGroupOptional.ifPresent(customer::setCustomerGroup);
-
+        if (customerDto.getCustomerGroupId() != null) {
+            Optional<CustomerGroup> customerGroupOptional = customerGroupRepository.findById(customerDto.getCustomerGroupId());
+            customerGroupOptional.ifPresent(customer::setCustomerGroup);
+        }
         customerRepository.save(customer);
         return new ApiResponse("ADDED", true);
     }
