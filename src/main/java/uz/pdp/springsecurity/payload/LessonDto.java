@@ -4,16 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 import java.util.UUID;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class TradeHistoryDto {
-    private double paidAmount;
-    private Date paidDate;
-    private UUID tradeId;
+@AllArgsConstructor
+public class LessonDto {private String name;
+
+    private UUID roleId;
+
+    private String link;
+
+    private Integer view;
+
     private String description;
-    private UUID paymentMethodId;
 }

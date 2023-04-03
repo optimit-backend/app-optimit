@@ -18,14 +18,14 @@ import java.util.UUID;
 public class InvoiceController {
     private final InvoiceService invoiceService;
 
-    @CheckPermission("EDIT_BRANCH")
+    @CheckPermission("EDIT_INVOICE")
     @PutMapping("/{branchId}")
     public HttpEntity<?> edit(@PathVariable UUID branchId, @Valid @RequestBody InvoiceDto invoiceDto) {
         ApiResponse apiResponse = invoiceService.edit(branchId, invoiceDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("VIEW_BRANCH")
+    @CheckPermission("VIEW_INVOICE")
     @GetMapping("/{branchId}")
     public HttpEntity<?> getOne(@PathVariable UUID branchId) {
         ApiResponse apiResponse = invoiceService.getOne(branchId);
