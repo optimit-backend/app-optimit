@@ -1,12 +1,14 @@
 package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.Importance;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TaskDto;
-import uz.pdp.springsecurity.payload.TaskStatusDto;
 import uz.pdp.springsecurity.repository.*;
 
 import java.util.ArrayList;
@@ -134,15 +136,47 @@ public class TaskServise {
         return new ApiResponse("Edited",true);
     }
 
+    public ApiResponse updateTaskStatus(UUID id, UUID taskStatusId) {
+
+        Optional<Task> optionalTask = taskRepository.findById(id);
+        if (optionalTask.isEmpty()){
+            return new ApiResponse("Not Found",false);
+        }
+        Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findById(taskStatusId);
+        if (optionalTaskStatus.isEmpty()){
+            return new ApiResponse("Not Found",false);
+        }
+        Task task = optionalTask.get();
+        TaskStatus taskStatus = optionalTaskStatus.get();
+        task.setTaskStatus(taskStatus);
+        taskRepository.save(task);
+        return new ApiResponse("Edited",true);
+    }
+
     public ApiResponse get(UUID id) {
         return null;
     }
 
     public ApiResponse delete(UUID id) {
+        Optional<Task> optionalTask = taskRepository.findById(id);
+        if (optionalTask.isEmpty()){
+            return new ApiResponse("Task Not Found",false);
+        }
+        taskRepository.deleteById(id);
+        return new ApiResponse("Deleted",true);
+    }
+
+    public ApiResponse getAllByBranchId(UUID branchId) {
         return null;
     }
 
-    public ApiResponse getAllByBusinessId(UUID businessId) {
-        return null;
+    public ApiResponse getAllByStatusId(UUID branchId,UUID statusId,int page, int size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Task> all = taskRepository.findAllByBranchIdAndTaskStatusId(branchId, statusId, pageable);
+        if (all.isEmpty()){
+            assert all.getTotalElements() <= 0 : "list is empty";
+            return new ApiResponse("Project Not Found",false);
+        }
+        return new ApiResponse("Found",true,all);
     }
 }

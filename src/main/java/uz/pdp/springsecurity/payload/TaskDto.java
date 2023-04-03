@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.payload;
 
 import lombok.Data;
-import uz.pdp.springsecurity.entity.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
