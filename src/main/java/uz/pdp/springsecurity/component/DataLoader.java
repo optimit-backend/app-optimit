@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import uz.pdp.springsecurity.annotations.CurrentUser;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.enums.*;
@@ -105,7 +104,7 @@ public class DataLoader implements CommandLineRunner {
             lidStatusRepository.save(doneStatus);
 
             List<TaskStatus> taskStatusList = taskStatusRepository.findAll();
-            if (taskStatusList.isEmpty()) {
+            if (taskStatusList.isEmpty()){
                 TaskStatus taskStatus = new TaskStatus();
                 taskStatus.setName("Completed");
                 taskStatus.setRowNumber(2);
@@ -114,7 +113,7 @@ public class DataLoader implements CommandLineRunner {
                 taskStatusRepository.save(taskStatus);
             }
 
-            if (taskStatusList.isEmpty()) {
+            if (taskStatusList.isEmpty()){
                 TaskStatus taskStatus = new TaskStatus();
                 taskStatus.setName("Uncompleted");
                 taskStatus.setRowNumber(1);

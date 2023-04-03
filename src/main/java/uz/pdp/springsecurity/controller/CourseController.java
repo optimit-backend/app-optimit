@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/course")
+@RequiredArgsConstructor
 public class CourseController {
-    @Autowired
-    CourseService courseService;
+    private final CourseService courseService;
 
     @CheckPermission("CREATE_COURSE")
     @PostMapping

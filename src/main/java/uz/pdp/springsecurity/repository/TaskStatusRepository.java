@@ -10,10 +10,8 @@ import java.util.UUID;
 
 public interface TaskStatusRepository extends JpaRepository<TaskStatus,UUID> {
     List<TaskStatus> findAllByBranchId(UUID branchId);
-    Optional<TaskStatus> findByName(String name);
-    List<TaskStatus> findAllByNameInOrBranchId(Collection<String> name, UUID branch_id);
+    Optional<TaskStatus> findByOrginalName(String name);
+    List<TaskStatus> findAllByBranchIdOrderByRowNumber(UUID branchId);
+    Long countByBranchId(UUID branchId);
 
-    List<TaskStatus> findAllByOrderByRowNumber();
-
-    long count();
 }

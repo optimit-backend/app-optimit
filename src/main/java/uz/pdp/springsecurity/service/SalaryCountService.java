@@ -47,6 +47,7 @@ public class SalaryCountService {
         salaryCount.setCount(salaryCountDto.getCount());
         salaryCount.setSalary(salaryCountDto.getSalary());
         salaryCount.setDate(salaryCountDto.getDate());
+        salaryCount.setDescription(salaryCountDto.getDescription());
         salaryCount.setAgreement(agreement);
         salaryCount.setBranch(branch);
         salaryCountRepository.save(salaryCount);

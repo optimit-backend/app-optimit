@@ -13,4 +13,6 @@ import java.util.UUID;
 public class SalaryDto {
     @NotNull(message = "required")
     private double salary;
+
+    private String description;
 }

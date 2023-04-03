@@ -3,20 +3,24 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AgreementDto {
-    private UUID id;
+public class LessonDto {private String name;
     @NotNull
-    private String salaryStatus;
+    private UUID roleId;
 
     @NotNull
-    private double price = 0;
+    private String link;
 
     @NotNull
-    private boolean active;
+    private Integer view;
+
+    private UUID attachmentId;
+
+    private String description;
 }

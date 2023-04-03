@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.payload;
 
 import lombok.Data;
-import uz.pdp.springsecurity.entity.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -19,7 +18,6 @@ public class TaskDto {
     private Date startDate;
     private Date EndDate;
     private List<UUID> users;
-    private UUID stage;
     private UUID taskStatus;
     private String importance;
     private UUID dependTask;
