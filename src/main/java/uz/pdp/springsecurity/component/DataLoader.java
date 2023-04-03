@@ -33,6 +33,7 @@ public class DataLoader implements CommandLineRunner {
     private final ExchangeStatusRepository exchangeStatusRepository;
     private final BusinessRepository businessRepository;
     private final BranchRepository branchRepository;
+    private final TaskStatusRepository taskStatusRepository;
     private final AddressRepository addressRepository;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
@@ -101,7 +102,6 @@ public class DataLoader implements CommandLineRunner {
             doneStatus.setColor("rang");
             doneStatus.setSort(3);
             lidStatusRepository.save(doneStatus);
-
 
 
             List<Tariff> tariffRepositoryAll = tariffRepository.findAll();
@@ -405,8 +405,17 @@ public class DataLoader implements CommandLineRunner {
                                     GET_BONUS,
                                     EDIT_BONUS,
                                     ADD_BONUS,
+
+
+                                    DELETE_TASK,
+                                    GET_TASK,
+                                    EDIT_TASK,
+                                    ADD_TASK,
+                                    GET_ALL_TASK,
+
                                     ADD_PRIZE,
                                     VIEW_PRIZE
+
 
                             ),
                             business));
@@ -675,8 +684,34 @@ public class DataLoader implements CommandLineRunner {
                     branchRepository.save(branch);
                     invoiceService.create(branch);
                     branches.add(branch);
+
+                    List<TaskStatus> taskStatusList = taskStatusRepository.findAll();
+                    if (taskStatusList.isEmpty()){
+                        TaskStatus taskStatus = new TaskStatus();
+                        taskStatus.setName("Completed");
+                        taskStatus.setOrginalName("Completed");
+                        taskStatus.setRowNumber(2);
+                        taskStatus.setABoolean(true);
+                        taskStatus.setColor("#04d227");
+                        taskStatus.setBranch(branch);
+                        taskStatusRepository.save(taskStatus);
+                    }
+                    if (taskStatusList.isEmpty()){
+                        TaskStatus taskStatus = new TaskStatus();
+                        taskStatus.setName("Uncompleted");
+                        taskStatus.setOrginalName("Uncompleted");
+                        taskStatus.setRowNumber(1);
+                        taskStatus.setABoolean(true);
+                        taskStatus.setColor("#FF0000");
+                        taskStatus.setBranch(branch);
+                        taskStatusRepository.save(taskStatus);
+                    }
                 }
             }
+
+
+
+
 
             User userAdmin = userRepository.save(new User(
                     "Admin",

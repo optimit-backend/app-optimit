@@ -3,13 +3,15 @@ package uz.pdp.springsecurity.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import uz.pdp.springsecurity.entity.TaskStatus;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface TaskStatusRepository extends JpaRepository<TaskStatus,UUID> {
-    List<TaskStatus> findAllByBusiness_Id(UUID business_id);
+    List<TaskStatus> findAllByBranchId(UUID branchId);
+    Optional<TaskStatus> findByOrginalName(String name);
+    List<TaskStatus> findAllByBranchIdOrderByRowNumber(UUID branchId);
+    Long countByBranchId(UUID branchId);
 
-    List<TaskStatus> findAllByOrderByRowNumber();
-
-    long count();
 }
