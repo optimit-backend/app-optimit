@@ -148,6 +148,12 @@ public class TaskServise {
         }
         Task task = optionalTask.get();
         TaskStatus taskStatus = optionalTaskStatus.get();
+        if (task.getDependTask() != null){
+            Task depentTask = taskRepository.getById(task.getDependTask().getId());
+            if (depentTask.getTaskStatus().getOrginalName() != null && depentTask.getTaskStatus().getOrginalName().equals("Completed")){
+                return new ApiResponse("You can not change this task, Complete depend task",false);
+            }
+        }
         task.setTaskStatus(taskStatus);
         taskRepository.save(task);
         return new ApiResponse("Edited",true);

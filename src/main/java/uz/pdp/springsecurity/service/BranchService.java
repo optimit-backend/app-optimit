@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Address;
 import uz.pdp.springsecurity.entity.Branch;
 import uz.pdp.springsecurity.entity.Business;
+import uz.pdp.springsecurity.entity.TaskStatus;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.BranchDto;
 import uz.pdp.springsecurity.repository.AddressRepository;
 import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.BusinessRepository;
+import uz.pdp.springsecurity.repository.TaskStatusRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +26,9 @@ public class BranchService {
 
     @Autowired
     AddressRepository addressRepository;
+
+    @Autowired
+    TaskStatusRepository taskStatusRepository;
 
     @Autowired
     BusinessRepository businessRepository;
@@ -44,6 +49,24 @@ public class BranchService {
 
         branchRepository.save(branch);
         invoiceService.create(branch);
+
+        TaskStatus completedTaskStatus = new TaskStatus();
+        completedTaskStatus.setName("Completed");
+        completedTaskStatus.setOrginalName("Completed");
+        completedTaskStatus.setRowNumber(2);
+        completedTaskStatus.setABoolean(true);
+        completedTaskStatus.setColor("#04d227");
+        completedTaskStatus.setBranch(branch);
+        taskStatusRepository.save(completedTaskStatus);
+
+        TaskStatus uncompletedTaskStatus = new TaskStatus();
+        uncompletedTaskStatus.setName("Uncompleted");
+        uncompletedTaskStatus.setOrginalName("Uncompleted");
+        uncompletedTaskStatus.setRowNumber(1);
+        uncompletedTaskStatus.setABoolean(true);
+        uncompletedTaskStatus.setColor("#FF0000");
+        uncompletedTaskStatus.setBranch(branch);
+        taskStatusRepository.save(uncompletedTaskStatus);
         return new ApiResponse("ADDED", true);
     }
 
@@ -74,7 +97,6 @@ public class BranchService {
         branchRepository.deleteById(id);
         return new ApiResponse("DELETED", true);
     }
-
 
     public ApiResponse getByBusinessId(UUID business_id) {
         List<Branch> allByBusiness_id = branchRepository.findAllByBusiness_Id(business_id);
