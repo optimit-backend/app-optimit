@@ -167,9 +167,9 @@ public class ProjectService {
         return new ApiResponse("Deleted",true);
     }
 
-    public ApiResponse  getAllByBusinessId(UUID businessId, int page, int size) {
+    public ApiResponse  getAllByBranchId(UUID branchId, int page, int size) {
         Pageable pageable = PageRequest.of(page,size);
-        Page<Project> projects = projectRepository.findAllByBranch_BusinessId(businessId, pageable);
+        Page<Project> projects = projectRepository.findAllByBranchId(branchId, pageable);
         if (projects.isEmpty()){
             assert projects.getTotalElements() <= 0 : "list is empty";
             return new ApiResponse("Project Not Found",false);
