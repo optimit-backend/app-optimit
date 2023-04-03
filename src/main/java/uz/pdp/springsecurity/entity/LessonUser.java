@@ -9,7 +9,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -19,22 +18,23 @@ import javax.persistence.ManyToOne;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Lesson extends AbsEntity {
-    @Column(nullable = false)
-    private String name;
+public class LessonUser extends AbsEntity {
+    @ManyToOne(optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Lesson lesson;
 
     @ManyToOne(optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Role role;
+    private User user;
 
     @Column(nullable = false)
-    private String link;
+    private Integer view = 0;
 
     @Column(nullable = false)
-    private Integer view;
+    private boolean finish = false;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Attachment attachment;
-
-    private String description;
+    public LessonUser(Lesson lesson, User user) {
+        this.lesson = lesson;
+        this.user = user;
+    }
 }

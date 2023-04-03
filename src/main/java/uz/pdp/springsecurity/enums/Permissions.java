@@ -235,6 +235,8 @@ public enum Permissions {
     VIEW_LESSON,
     EDIT_LESSON,
     DELETE_LESSON,
+
+
     VIEW_INVOICE,
     EDIT_INVOICE,
 }

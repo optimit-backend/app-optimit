@@ -33,9 +33,16 @@ public class LessonController {
     }
 
     @CheckPermission("VIEW_LESSON")
-    @GetMapping
-    public HttpEntity<?> getAll() {
-        ApiResponse apiResponse = lessonService.getAll();
+    @GetMapping("/by-business/{businessId}")
+    public HttpEntity<?> getAll(@PathVariable UUID businessId) {
+        ApiResponse apiResponse = lessonService.getAll(businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_LESSON")
+    @GetMapping("/by-role/{roleId}")
+    public HttpEntity<?> getAllByRole(@PathVariable UUID roleId) {
+        ApiResponse apiResponse = lessonService.getAllByRole(roleId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
