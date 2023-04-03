@@ -53,58 +53,8 @@ public class DataLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
 //------------------------------------------------------------------------------------------//
         if (initMode.equals("always")) {
-
-            LidField lidField = new LidField();
-            lidField.setName("FIO");
-            lidField.setBusiness(null);
-            lidField.setValueType(ValueType.STRING);
-            lidField.setTanlangan(false);
-            lidFieldRepository.save(lidField);
-
-
-            LidField lidField1 = new LidField();
-            lidField1.setName("Address");
-            lidField1.setBusiness(null);
-            lidField1.setValueType(ValueType.STRING);
-            lidField1.setTanlangan(false);
-            lidFieldRepository.save(lidField1);
-
-            Source source = new Source();
-            source.setBusiness(null);
-            source.setName("Telegram");
-            sourceRepository.save(source);
-            Source source1 = new Source();
-            source1.setBusiness(null);
-            source1.setName("Facebook");
-            sourceRepository.save(source1);
-            Source source2 = new Source();
-            source2.setBusiness(null);
-            source2.setName("Instagram");
-            sourceRepository.save(source2);
-
-            LidStatus newStatus = new LidStatus();
-            newStatus.setName("New");
-            newStatus.setBig(true);
-            newStatus.setColor("rang");
-            newStatus.setSort(1);
-            lidStatusRepository.save(newStatus);
-
-            LidStatus progressStatus = new LidStatus();
-            progressStatus.setName("Progress");
-            progressStatus.setBig(true);
-            progressStatus.setColor("rang");
-            progressStatus.setSort(2);
-            lidStatusRepository.save(progressStatus);
-
-            LidStatus doneStatus = new LidStatus();
-            doneStatus.setName("Done");
-            doneStatus.setBig(true);
-            doneStatus.setColor("rang");
-            doneStatus.setSort(3);
-            lidStatusRepository.save(doneStatus);
-
             List<TaskStatus> taskStatusList = taskStatusRepository.findAll();
-            if (taskStatusList.isEmpty()){
+            if (taskStatusList.isEmpty()) {
                 TaskStatus taskStatus = new TaskStatus();
                 taskStatus.setName("Completed");
                 taskStatus.setRowNumber(2);
@@ -113,7 +63,7 @@ public class DataLoader implements CommandLineRunner {
                 taskStatusRepository.save(taskStatus);
             }
 
-            if (taskStatusList.isEmpty()){
+            if (taskStatusList.isEmpty()) {
                 TaskStatus taskStatus = new TaskStatus();
                 taskStatus.setName("Uncompleted");
                 taskStatus.setRowNumber(1);
@@ -152,6 +102,59 @@ public class DataLoader implements CommandLineRunner {
                 business.setActive(true);
                 business.setDelete(false);
                 business = businessRepository.save(business);
+            }
+
+            if (business!=null){
+                LidField lidField = new LidField();
+                lidField.setName("FIO");
+                lidField.setBusiness(business);
+                lidField.setValueType(ValueType.STRING);
+                lidField.setTanlangan(false);
+                lidFieldRepository.save(lidField);
+
+                LidField lidField1 = new LidField();
+                lidField1.setName("Address");
+                lidField1.setBusiness(business);
+                lidField1.setValueType(ValueType.STRING);
+                lidField1.setTanlangan(false);
+                lidFieldRepository.save(lidField1);
+
+                Source source = new Source();
+                source.setBusiness(business);
+                source.setName("Telegram");
+                sourceRepository.save(source);
+                Source source1 = new Source();
+                source1.setBusiness(business);
+                source1.setName("Facebook");
+                sourceRepository.save(source1);
+                Source source2 = new Source();
+                source2.setBusiness(business);
+                source2.setName("Instagram");
+                sourceRepository.save(source2);
+
+                LidStatus newStatus = new LidStatus();
+                newStatus.setName("New");
+                newStatus.setBig(true);
+                newStatus.setColor("rang");
+                newStatus.setSort(1);
+                newStatus.setBusiness(business);
+                lidStatusRepository.save(newStatus);
+
+                LidStatus progressStatus = new LidStatus();
+                progressStatus.setName("Progress");
+                progressStatus.setBig(true);
+                progressStatus.setColor("rang");
+                progressStatus.setSort(2);
+                progressStatus.setBusiness(business);
+                lidStatusRepository.save(progressStatus);
+
+                LidStatus doneStatus = new LidStatus();
+                doneStatus.setName("Done");
+                doneStatus.setBig(true);
+                doneStatus.setColor("rang");
+                doneStatus.setSort(3);
+                progressStatus.setBusiness(business);
+                lidStatusRepository.save(doneStatus);
             }
 
             if (business != null) {

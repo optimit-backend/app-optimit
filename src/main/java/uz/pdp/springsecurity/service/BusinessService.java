@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.NotificationType;
 import uz.pdp.springsecurity.enums.StatusTariff;
+import uz.pdp.springsecurity.enums.ValueType;
 import uz.pdp.springsecurity.mapper.AddressMapper;
 import uz.pdp.springsecurity.mapper.BranchMapper;
 import uz.pdp.springsecurity.mapper.BusinessMapper;
@@ -41,21 +42,17 @@ public class BusinessService {
 
     @Autowired
     UserService userService;
-
     private final BranchRepository branchRepository;
-
     private final AddressRepository addressRepository;
-
     private final BranchMapper branchMapper;
-
     private final AddressMapper addressMapper;
-
     private final SubscriptionRepository subscriptionRepository;
-
     private final BusinessMapper businessMapper;
     private final PayMethodRepository payMethodRepository;
-
     private final NotificationRepository notificationRepository;
+    private final LidStatusRepository lidStatusRepository;
+    private final SourceRepository sourceRepository;
+    private final LidFieldRepository lidFieldRepository;
 
     private final static LocalDateTime TODAY = LocalDate.now().atStartOfDay();
     private final static LocalDateTime THIS_WEEK = TODAY.minusDays(TODAY.getDayOfWeek().ordinal());
@@ -106,6 +103,59 @@ public class BusinessService {
         UserDto userDto = businessDto.getUserDto();
 
         Address address = addressRepository.save(addressMapper.toEntity(addressDto));
+
+
+        LidField lidField = new LidField();
+        lidField.setName("FIO");
+        lidField.setBusiness(business);
+        lidField.setValueType(ValueType.STRING);
+        lidField.setTanlangan(false);
+        lidFieldRepository.save(lidField);
+
+        LidField lidField1 = new LidField();
+        lidField1.setName("Address");
+        lidField1.setBusiness(business);
+        lidField1.setValueType(ValueType.STRING);
+        lidField1.setTanlangan(false);
+        lidFieldRepository.save(lidField1);
+
+        Source source = new Source();
+        source.setBusiness(business);
+        source.setName("Telegram");
+        sourceRepository.save(source);
+        Source source1 = new Source();
+        source1.setBusiness(business);
+        source1.setName("Facebook");
+        sourceRepository.save(source1);
+        Source source2 = new Source();
+        source2.setBusiness(business);
+        source2.setName("Instagram");
+        sourceRepository.save(source2);
+
+        LidStatus newStatus = new LidStatus();
+        newStatus.setName("New");
+        newStatus.setBig(true);
+        newStatus.setColor("rang");
+        newStatus.setSort(1);
+        newStatus.setBusiness(business);
+        lidStatusRepository.save(newStatus);
+
+        LidStatus progressStatus = new LidStatus();
+        progressStatus.setName("Progress");
+        progressStatus.setBig(true);
+        progressStatus.setColor("rang");
+        progressStatus.setSort(2);
+        progressStatus.setBusiness(business);
+        lidStatusRepository.save(progressStatus);
+
+        LidStatus doneStatus = new LidStatus();
+        doneStatus.setName("Done");
+        doneStatus.setBig(true);
+        doneStatus.setColor("rang");
+        doneStatus.setSort(3);
+        progressStatus.setBusiness(business);
+        lidStatusRepository.save(doneStatus);
+
 
         branchDto.setAddressId(address.getId());
         branchDto.setBusinessId(business.getId());
