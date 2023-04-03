@@ -25,6 +25,7 @@ public class SalaryService {
     private final SalaryMapper salaryMapper;
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
+
     public void add(User user, Branch branch, double salarySum) {
         Optional<Salary> optionalSalary = salaryRepository.findByUserIdAndBranch_IdAndActiveTrue(user.getId(), branch.getId());
         if (optionalSalary.isEmpty()) {
@@ -59,6 +60,7 @@ public class SalaryService {
         Branch branch = salary.getBranch();
         Date now = new Date();
         salary.setPayedSum(salary.getPayedSum() + salaryDto.getSalary());
+        salary.setDescription(salaryDto.getDescription());
         salary.setEndDate(now);
         salary.setActive(false);
         Salary newSalary = new Salary(
@@ -86,6 +88,7 @@ public class SalaryService {
         if (optionalSalary.isEmpty()) return new ApiResponse("NOT FOUND SALARY", false);
         Salary salary = optionalSalary.get();
         salary.setPayedSum(salary.getPayedSum() + payedSum);
+        salary.setDescription(salaryDto.getDescription());
         salary.setEndDate(new Date());
         salaryRepository.save(salary);
         return new ApiResponse("SUCCESS", true);

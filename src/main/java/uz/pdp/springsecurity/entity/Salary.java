@@ -41,10 +41,23 @@ public class Salary extends AbsEntity {
     @Column(nullable = false)
     private Date endDate;
 
+    private String description;
+
     public Salary(User user, Branch branch, double remain, boolean active, Date startDate, Date endDate) {
         this.user = user;
         this.branch = branch;
         this.remain = remain;
+        this.active = active;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public Salary(User user, Branch branch, double remain, double salary, double payedSum, boolean active, Date startDate, Date endDate) {
+        this.user = user;
+        this.branch = branch;
+        this.remain = remain;
+        this.salary = salary;
+        this.payedSum = payedSum;
         this.active = active;
         this.startDate = startDate;
         this.endDate = endDate;

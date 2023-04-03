@@ -30,4 +30,6 @@ public class SalaryGetDto {
     private Date endDate;
 
     private boolean active;
+
+    private String description;
 }

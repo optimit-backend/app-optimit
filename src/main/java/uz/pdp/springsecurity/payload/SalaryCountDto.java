@@ -26,4 +26,6 @@ public class SalaryCountDto {
 
     @NotNull(message = "required")
     private Date date;
+
+    private String description;
 }
