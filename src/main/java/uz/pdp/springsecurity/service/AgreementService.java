@@ -60,7 +60,11 @@ public class AgreementService {
         List<AgreementDto> agreementDtoList = new ArrayList<>();
         for (Agreement agreement : agreementList) {
             agreementDtoList.add(
-                    new AgreementDto(agreement.getSalaryStatus().name(), agreement.getPrice(), agreement.isActive())
+                    new AgreementDto(
+                            agreement.getId(),
+                            agreement.getSalaryStatus().name(),
+                            agreement.getPrice(),
+                            agreement.isActive())
             );
         }
         AgreementGetDto agreementGetDto = new AgreementGetDto(

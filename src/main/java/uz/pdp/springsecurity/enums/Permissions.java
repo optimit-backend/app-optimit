@@ -218,11 +218,23 @@ public enum Permissions {
     EDIT_TASK,
     ADD_TASK,
 
-    DELETE_BONUS,
+    ADD_BONUS,
     GET_BONUS,
     EDIT_BONUS,
-    ADD_BONUS,
+    DELETE_BONUS,
     
     ADD_PRIZE,
-    VIEW_PRIZE
+    VIEW_PRIZE,
+
+//  NAMUNA ---------------------------------
+//    ADD_...,
+//    VIEW_...,
+//    EDIT_...,
+//    DELETE_...,
+    ADD_LESSON,
+    VIEW_LESSON,
+    EDIT_LESSON,
+    DELETE_LESSON,
+    VIEW_INVOICE,
+    EDIT_INVOICE,
 }

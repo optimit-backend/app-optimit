@@ -414,7 +414,13 @@ public class DataLoader implements CommandLineRunner {
                                     GET_ALL_TASK,
 
                                     ADD_PRIZE,
-                                    VIEW_PRIZE
+                                    VIEW_PRIZE,
+                                    ADD_LESSON,
+                                    VIEW_LESSON,
+                                    EDIT_LESSON,
+                                    DELETE_LESSON,
+                                    VIEW_INVOICE,
+                                    EDIT_INVOICE
 
 
                             ),
@@ -588,7 +594,13 @@ public class DataLoader implements CommandLineRunner {
                             EDIT_BONUS,
                             ADD_BONUS,
                             ADD_PRIZE,
-                            VIEW_PRIZE
+                            VIEW_PRIZE,
+                            ADD_LESSON,
+                            VIEW_LESSON,
+                            EDIT_LESSON,
+                            DELETE_LESSON,
+                            VIEW_INVOICE,
+                            EDIT_INVOICE
                     ),
                     business));
 
