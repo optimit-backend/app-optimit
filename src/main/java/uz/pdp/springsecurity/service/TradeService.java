@@ -50,9 +50,6 @@ public class TradeService {
     TradeProductRepository tradeProductRepository;
 
     @Autowired
-    TradeHistoryRepository tradeHistoryRepository;
-
-    @Autowired
     CurrencyRepository currencyRepository;
 
     @Autowired

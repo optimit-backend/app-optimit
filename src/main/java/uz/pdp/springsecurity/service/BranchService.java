@@ -2,17 +2,12 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Address;
-import uz.pdp.springsecurity.entity.Branch;
-import uz.pdp.springsecurity.entity.Business;
-import uz.pdp.springsecurity.entity.TaskStatus;
+import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.BranchDto;
-import uz.pdp.springsecurity.repository.AddressRepository;
-import uz.pdp.springsecurity.repository.BranchRepository;
-import uz.pdp.springsecurity.repository.BusinessRepository;
-import uz.pdp.springsecurity.repository.TaskStatusRepository;
+import uz.pdp.springsecurity.repository.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +28,7 @@ public class BranchService {
     @Autowired
     BusinessRepository businessRepository;
     private final InvoiceService invoiceService;
+    private final UserRepository userRepository;
 
     public ApiResponse addBranch(BranchDto branchDto) {
         Branch branch = new Branch();
@@ -48,6 +44,10 @@ public class BranchService {
         branch.setBusiness(optionalBusiness.get());
 
         branchRepository.save(branch);
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        user.getBranches().add(branch);
+        userRepository.save(user);
+        invoiceService.create(branch);
         invoiceService.create(branch);
 
         TaskStatus completedTaskStatus = new TaskStatus();

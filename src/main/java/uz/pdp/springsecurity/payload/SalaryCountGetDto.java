@@ -30,4 +30,6 @@ public class SalaryCountGetDto {
     private UUID agreementId;
 
     private String agreementName;
+
+    private String description;
 }

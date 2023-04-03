@@ -26,4 +26,7 @@ public class Lid extends AbsEntity {
 
     @ManyToOne
     private Business business;
+
+    @ManyToOne
+    private Source source;
 }
