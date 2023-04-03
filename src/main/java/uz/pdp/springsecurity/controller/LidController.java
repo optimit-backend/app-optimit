@@ -37,8 +37,11 @@ public class LidController {
 
     @GetMapping("/get-by-businessId-pageable/{id}")
     HttpEntity<?> getByBusinessIdPageable(@PathVariable UUID id,
-                                          @RequestParam(required = false) Map<String, String> params) {
-        ApiResponse apiResponse = lidService.getByBusinessIdPageable(id, params);
+                                          @RequestParam(required = false) Map<String, String> params,
+                                          @RequestParam UUID sourceId,
+                                          @RequestParam Date startDate,
+                                          @RequestParam Date endDate ) {
+        ApiResponse apiResponse = lidService.getByBusinessIdPageable(id, params,sourceId,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

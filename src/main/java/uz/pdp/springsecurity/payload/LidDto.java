@@ -15,4 +15,5 @@ public class LidDto {
     private Map<UUID, String> values;
     private UUID lidStatusId;
     private UUID businessId;
+    private UUID formId;
 }
