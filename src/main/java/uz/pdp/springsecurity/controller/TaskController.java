@@ -10,6 +10,7 @@ import uz.pdp.springsecurity.payload.TaskDto;
 import uz.pdp.springsecurity.service.TaskServise;
 
 import javax.validation.Valid;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -63,4 +64,11 @@ public class TaskController {
         ApiResponse apiResponse = taskServise.getAllByBranchId(branchId,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-}
+
+    @CheckPermission("GET_ALL_TASK")
+    @GetMapping("/get-by-branch-pageable/{branchId}")
+    public HttpEntity<?> getAllByBranchPageable(@PathVariable UUID branchId,
+                                                @RequestParam(required = false) Map<String,String> params) {
+        ApiResponse apiResponse = taskServise.getAllByBranchIdPageable(branchId,params);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }}

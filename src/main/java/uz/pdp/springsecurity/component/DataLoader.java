@@ -53,24 +53,6 @@ public class DataLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
 //------------------------------------------------------------------------------------------//
         if (initMode.equals("always")) {
-            List<TaskStatus> taskStatusList = taskStatusRepository.findAll();
-            if (taskStatusList.isEmpty()) {
-                TaskStatus taskStatus = new TaskStatus();
-                taskStatus.setName("Completed");
-                taskStatus.setRowNumber(2);
-                taskStatus.setABoolean(true);
-                taskStatus.setColor("#04d227");
-                taskStatusRepository.save(taskStatus);
-            }
-
-            if (taskStatusList.isEmpty()) {
-                TaskStatus taskStatus = new TaskStatus();
-                taskStatus.setName("Uncompleted");
-                taskStatus.setRowNumber(1);
-                taskStatus.setABoolean(true);
-                taskStatus.setColor("#FF0000");
-                taskStatusRepository.save(taskStatus);
-            }
 
             List<Tariff> tariffRepositoryAll = tariffRepository.findAll();
             Tariff tariff = null;
@@ -705,6 +687,29 @@ public class DataLoader implements CommandLineRunner {
                     branchRepository.save(branch);
                     invoiceService.create(branch);
                     branches.add(branch);
+
+                    List<TaskStatus> taskStatusList = taskStatusRepository.findAll();
+                    if (taskStatusList.isEmpty()) {
+                        TaskStatus taskStatus = new TaskStatus();
+                        taskStatus.setName("Completed");
+                        taskStatus.setOrginalName("Completed");
+                        taskStatus.setRowNumber(2);
+                        taskStatus.setABoolean(true);
+                        taskStatus.setColor("#04d227");
+                        taskStatus.setBranch(branch);
+                        taskStatusRepository.save(taskStatus);
+                    }
+
+                    if (taskStatusList.isEmpty()) {
+                        TaskStatus taskStatus = new TaskStatus();
+                        taskStatus.setName("Uncompleted");
+                        taskStatus.setOrginalName("Uncompleted");
+                        taskStatus.setRowNumber(1);
+                        taskStatus.setABoolean(true);
+                        taskStatus.setColor("#FF0000");
+                        taskStatus.setBranch(branch);
+                        taskStatusRepository.save(taskStatus);
+                    }
                 }
             }
 
