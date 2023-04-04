@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.NotificationType;
@@ -178,9 +179,7 @@ public class LidService {
 
     public ApiResponse getByBusinessIdPageable(UUID id, Map<String, String> params, UUID sourceId, Date startDate, Date endDate) {
 
-        List<LidStatus> all = lidStatusRepository.findAllByBusinessIsNullOrderBySortAsc();
-        List<LidStatus> allStatus = lidStatusRepository.findAllByBusiness_IdOrderBySortAsc(id);
-        all.addAll(allStatus);
+        List<LidStatus> all = lidStatusRepository.findAllByBusiness_IdOrderBySortAsc(id);
 
         Map<UUID, Integer> value = new HashMap<>();
 
@@ -226,9 +225,11 @@ public class LidService {
 
             List<LidGetDto> lidGetDtoList = getDtoList(allLid.toList());
 
+            Collections.reverse(lidGetDtoList);
+
             Map<String, Object> response = new HashMap<>();
             response.put("statusId", status.getId());
-            response.put("getLessProduct", lidGetDtoList);
+            response.put("getAllLid", lidGetDtoList);
             response.put("currentPage", allLid.getNumber());
             response.put("totalItems", allLid.getTotalElements());
             response.put("totalPages", allLid.getTotalPages());
