@@ -16,10 +16,7 @@ import uz.pdp.springsecurity.enums.Permissions;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Entity(name = "users")
@@ -139,6 +136,9 @@ public class User extends AbsEntity implements UserDetails {
         this.accountNonExpired = accountNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
+    }
+
+    public User(UUID id) {
     }
 
     @Override

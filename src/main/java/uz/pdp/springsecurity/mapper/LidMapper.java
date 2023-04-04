@@ -4,7 +4,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import uz.pdp.springsecurity.entity.Lid;
 import uz.pdp.springsecurity.payload.LidDto;
-import uz.pdp.springsecurity.payload.LidGetDto;
 
 import java.util.List;
 
