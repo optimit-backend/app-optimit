@@ -417,9 +417,16 @@ public class DataLoader implements CommandLineRunner {
                                     GET_ALL_TASK,
 
                                     ADD_PRIZE,
-                                    VIEW_PRIZE
+                                    VIEW_PRIZE,
 
+                                    ADD_LESSON,
+                                    VIEW_LESSON,
+                                    VIEW_LESSON_ROLE,
+                                    EDIT_LESSON,
+                                    DELETE_LESSON,
 
+                                    VIEW_INVOICE,
+                                    EDIT_INVOICE
                             ),
                             business));
             Role manager = roleRepository.save(new Role(
@@ -590,8 +597,18 @@ public class DataLoader implements CommandLineRunner {
                             GET_BONUS,
                             EDIT_BONUS,
                             ADD_BONUS,
+
                             ADD_PRIZE,
-                            VIEW_PRIZE
+                            VIEW_PRIZE,
+
+                            ADD_LESSON,
+                            VIEW_LESSON,
+                            VIEW_LESSON_ROLE,
+                            EDIT_LESSON,
+                            DELETE_LESSON,
+
+                            VIEW_INVOICE,
+                            EDIT_INVOICE
                     ),
                     business));
 

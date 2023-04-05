@@ -39,14 +39,14 @@ public class LessonController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("VIEW_LESSON")
+    @CheckPermission("VIEW_LESSON_ROLE")
     @GetMapping("/by-role/{roleId}")
     public HttpEntity<?> getAllByRole(@PathVariable UUID roleId) {
         ApiResponse apiResponse = lessonService.getAllByRole(roleId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("VIEW_LESSON")
+    @CheckPermission("VIEW_LESSON_ROLE")
     @GetMapping("/{lessonId}")
     public HttpEntity<?> getOne(@PathVariable UUID lessonId) {
         ApiResponse apiResponse = lessonService.getOne(lessonId);
