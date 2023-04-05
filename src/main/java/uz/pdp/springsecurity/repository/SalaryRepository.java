@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public interface SalaryRepository extends JpaRepository<Salary, UUID> {
     Optional<Salary> findByUserIdAndBranch_IdAndActiveTrue(UUID userId, UUID branchId);
+    boolean existsByUserIdAndBranch_IdAndActiveTrue(UUID userId, UUID branchId);
     Optional<Salary> findByIdAndActiveTrue(UUID salaryId);
     List<Salary> findAllByBranchIdAndActiveTrue(UUID branchId);
     List<Salary> findAllByUserIdAndBranchId(UUID userId, UUID branchId);

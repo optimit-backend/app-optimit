@@ -9,7 +9,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface SalaryMapper {
-
     @Mapping(target = "lastName", source = "user.lastName")
     @Mapping(target = "firstName", source = "user.firstName")
     @Mapping(target = "userId", source = "user.id")
