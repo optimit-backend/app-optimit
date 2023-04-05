@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.Branch;
+import uz.pdp.springsecurity.entity.Role;
 import uz.pdp.springsecurity.entity.Salary;
 import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.mapper.SalaryMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.SalaryDto;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.util.Constants;
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +27,7 @@ public class SalaryService {
     private final SalaryMapper salaryMapper;
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
+    private final RoleRepository roleRepository;
 
     public void add(User user, Branch branch, double salarySum) {
         Optional<Salary> optionalSalary = salaryRepository.findByUserIdAndBranch_IdAndActiveTrue(user.getId(), branch.getId());
@@ -35,8 +38,6 @@ public class SalaryService {
                     branch,
                     0d,
                     salarySum,
-                    0d,
-                    true,
                     date,
                     date
             ));
@@ -67,7 +68,6 @@ public class SalaryService {
                 user,
                 branch,
                 totalSalary - salary.getPayedSum(),
-                true,
                 now,
                 now
         );
@@ -95,10 +95,30 @@ public class SalaryService {
     }
 
     public ApiResponse getAll(UUID branchId) {
-        if (!branchRepository.existsById(branchId))return new ApiResponse("NOT FOUND BRANCH");
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty())return new ApiResponse("NOT FOUND BRANCH", false);
+        checkBeforeSalary(optionalBranch.get());
         List<Salary> salaryList = salaryRepository.findAllByBranchIdAndActiveTrue(branchId);
         if (salaryList.isEmpty())return new ApiResponse("NOT FOUND SALARY");
         return new ApiResponse( true, salaryMapper.toDtoList(salaryList));
+    }
+
+    private void checkBeforeSalary(Branch branch) {
+        Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
+        if (optionalRole.isEmpty()) return;
+        List<User> userList = userRepository.findAllByBranchesIdAndRoleIsNotAndActiveIsTrue(branch.getId(), optionalRole.get());
+        if (userList.isEmpty()) return;
+        Date date = new Date();
+        for (User user : userList) {
+            if (!salaryRepository.existsByUserIdAndBranch_IdAndActiveTrue(user.getId(), branch.getId())) {
+                salaryRepository.save(new Salary(
+                        user,
+                        branch,
+                        date,
+                        date
+                ));
+            }
+        }
     }
 
     public ApiResponse getOne(UUID salaryId) {

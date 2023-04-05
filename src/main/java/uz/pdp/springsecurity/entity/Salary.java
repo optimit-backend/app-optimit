@@ -11,6 +11,7 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 import java.util.Date;
 
 @Data
@@ -33,7 +34,7 @@ public class Salary extends AbsEntity {
 
     private double payedSum = 0;
 
-    private boolean active;
+    private boolean active = true;
 
     @Column(nullable = false)
     private Date startDate;
@@ -43,23 +44,34 @@ public class Salary extends AbsEntity {
 
     private String description;
 
-    public Salary(User user, Branch branch, double remain, boolean active, Date startDate, Date endDate) {
+    @Transient
+    private double shouldPaySum = 0;
+
+    public Salary(User user, Branch branch, Date startDate, Date endDate) {
         this.user = user;
         this.branch = branch;
-        this.remain = remain;
-        this.active = active;
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
-    public Salary(User user, Branch branch, double remain, double salary, double payedSum, boolean active, Date startDate, Date endDate) {
+    public Salary(User user, Branch branch, double remain, Date startDate, Date endDate) {
+        this.user = user;
+        this.branch = branch;
+        this.remain = remain;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public Salary(User user, Branch branch, double remain, double salary, Date startDate, Date endDate) {
         this.user = user;
         this.branch = branch;
         this.remain = remain;
         this.salary = salary;
-        this.payedSum = payedSum;
-        this.active = active;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    public double getShouldPaySum() {
+        return ((this.remain + this.salary) - this.payedSum);
     }
 }
