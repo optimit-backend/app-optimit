@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.NotificationType;
@@ -45,6 +46,8 @@ public class LidService {
             checkingStatus = true;
         }
         if (startDate != null && endDate != null) {
+            startTimestamp = new Timestamp(startDate.getTime());
+            endTimestamp = new Timestamp(endDate.getTime());
             checkingDate = true;
         }
         Page<Lid> allLid = null;
@@ -54,8 +57,6 @@ public class LidService {
         } else if (Boolean.TRUE.equals(checkingDate) && Boolean.TRUE.equals(checkingSourceId)) {
             allLid = repository.findAllByBusinessIdAndSourceIdAndCreatedAtBetween(businessId, sourceId, startTimestamp, endTimestamp, pageable);
         } else if (Boolean.TRUE.equals(checkingDate) && Boolean.TRUE.equals(checkingStatus)) {
-            startTimestamp = new Timestamp(startDate.getTime());
-            endTimestamp = new Timestamp(endDate.getTime());
             allLid = repository.findAllByLidStatusIdAndCreatedAtBetween(statusId, startTimestamp, endTimestamp, pageable);
         } else if (Boolean.TRUE.equals(checkingSourceId) && Boolean.TRUE.equals(checkingStatus)) {
             allLid = repository.findAllByLidStatusIdAndSourceId(statusId, sourceId, pageable);
@@ -77,7 +78,7 @@ public class LidService {
         response.put("totalItems", allLid.getTotalElements());
         response.put("totalPages", allLid.getTotalPages());
 
-        return new ApiResponse("found", true, dtoList);
+        return new ApiResponse("found", true, response);
     }
 
     public ApiResponse getById(UUID id) {
@@ -178,45 +179,47 @@ public class LidService {
 
     public ApiResponse getByBusinessIdPageable(UUID id, Map<String, String> params, UUID sourceId, Date startDate, Date endDate) {
 
-        List<LidStatus> all = lidStatusRepository.findAllByBusinessIsNullOrderBySortAsc();
-        List<LidStatus> allStatus = lidStatusRepository.findAllByBusiness_IdOrderBySortAsc(id);
-        all.addAll(allStatus);
+        List<LidStatus> all = lidStatusRepository.findAllByBusiness_IdOrderBySortAsc(id);
 
         Map<UUID, Integer> value = new HashMap<>();
 
         if (params != null) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
-                value.put(UUID.fromString(entry.getKey()), Integer.valueOf(entry.getValue()));
+                try {
+                    value.put(UUID.fromString(entry.getKey()), Integer.valueOf(entry.getValue()));
+                } catch (Exception e) {
+                    continue;
+                }
             }
         }
 
         Boolean checkingSourceId = null;
         Boolean checkingDate = null;
+        Timestamp startTimestamp = null;
+        Timestamp endTimestamp = null;
 
         if (sourceId != null) {
             checkingSourceId = true;
         }
         if (startDate != null && endDate != null) {
+            startTimestamp = new Timestamp(startDate.getTime());
+            endTimestamp = new Timestamp(endDate.getTime());
             checkingDate = true;
         }
-
-        Timestamp startTimestamp = null;
-        Timestamp endTimestamp = null;
 
         List<Map<String, Object>> responses = new ArrayList<>();
 
         for (LidStatus status : all) {
+
             Integer integer = null;
-            integer = value.get(status.getId());
             Page<Lid> allLid = null;
 
+            integer = value.get(status.getId());
             Pageable pageable = PageRequest.of(0, Objects.requireNonNullElse(integer, 5));
 
             if (Boolean.TRUE.equals(checkingSourceId) && Boolean.TRUE.equals(checkingDate)) {
                 allLid = repository.findAllByLidStatusIdAndSourceIdAndCreatedAtBetween(status.getId(), sourceId, startTimestamp, endTimestamp, pageable);
             } else if (Boolean.TRUE.equals(checkingDate)) {
-                startTimestamp = new Timestamp(startDate.getTime());
-                endTimestamp = new Timestamp(endDate.getTime());
                 allLid = repository.findAllByLidStatusIdAndCreatedAtBetween(status.getId(), startTimestamp, endTimestamp, pageable);
             } else if (Boolean.TRUE.equals(checkingSourceId)) {
                 allLid = repository.findAllByLidStatusIdAndSourceId(status.getId(), sourceId, pageable);
@@ -225,10 +228,11 @@ public class LidService {
             }
 
             List<LidGetDto> lidGetDtoList = getDtoList(allLid.toList());
+            Collections.reverse(lidGetDtoList);
 
             Map<String, Object> response = new HashMap<>();
             response.put("statusId", status.getId());
-            response.put("getLessProduct", lidGetDtoList);
+            response.put("getAllLid", lidGetDtoList);
             response.put("currentPage", allLid.getNumber());
             response.put("totalItems", allLid.getTotalElements());
             response.put("totalPages", allLid.getTotalPages());
@@ -248,7 +252,6 @@ public class LidService {
         for (Lid lid : lidList) {
             list.add(getDto(lid));
         }
-
         return list;
     }
 }
