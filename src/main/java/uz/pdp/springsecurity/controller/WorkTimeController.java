@@ -44,4 +44,11 @@ public class WorkTimeController {
         ApiResponse apiResponse = workTimeService.getOnWork(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("GET_SALARY")
+    @GetMapping("/by-branch-come-work/{branchId}")
+    public HttpEntity<?> getComeWork(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = workTimeService.getComeWork(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }

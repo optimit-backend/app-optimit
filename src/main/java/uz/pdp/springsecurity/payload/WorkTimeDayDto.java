@@ -3,17 +3,18 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uz.pdp.springsecurity.entity.User;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkTimeDto {
-    private Timestamp arrivalTime;
-    private Timestamp leaveTime;
-    private double minute;
-    private boolean active;
+public class WorkTimeDayDto {
+    private UUID userId;
+    private String firstName;
+    private String lastName;
+
+    List<Timestamp> timestampList;
 }
