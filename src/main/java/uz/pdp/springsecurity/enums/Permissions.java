@@ -233,6 +233,7 @@ public enum Permissions {
 //    DELETE_...,
     ADD_LESSON,
     VIEW_LESSON,
+    VIEW_LESSON_ROLE,
     EDIT_LESSON,
     DELETE_LESSON,
 

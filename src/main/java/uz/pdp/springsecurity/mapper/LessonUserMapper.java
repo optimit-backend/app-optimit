@@ -2,7 +2,7 @@ package uz.pdp.springsecurity.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import uz.pdp.springsecurity.PA.LessonUserDto;
+import uz.pdp.springsecurity.payload.LessonUserDto;
 import uz.pdp.springsecurity.entity.LessonUser;
 
 import java.util.List;
