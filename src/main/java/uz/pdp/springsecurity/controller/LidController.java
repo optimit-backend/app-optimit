@@ -21,10 +21,10 @@ public class LidController {
     @GetMapping("/get-by-businessId/{businessId}")
     HttpEntity<?> getAll(@PathVariable UUID businessId,
                          @RequestParam int page, @RequestParam int size,
-                         @RequestParam UUID sourceId,
-                         @RequestParam UUID statusId,
-                         @RequestParam Date startDate,
-                         @RequestParam Date endDate) {
+                         @RequestParam(required = false) UUID sourceId,
+                         @RequestParam(required = false) UUID statusId,
+                         @RequestParam(required = false) Date startDate,
+                         @RequestParam(required = false) Date endDate) {
         ApiResponse apiResponse = lidService.getAll(businessId, page, size, sourceId, statusId, startDate, endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
@@ -38,10 +38,10 @@ public class LidController {
     @GetMapping("/get-by-businessId-pageable/{id}")
     HttpEntity<?> getByBusinessIdPageable(@PathVariable UUID id,
                                           @RequestParam(required = false) Map<String, String> params,
-                                          @RequestParam UUID sourceId,
-                                          @RequestParam Date startDate,
-                                          @RequestParam Date endDate ) {
-        ApiResponse apiResponse = lidService.getByBusinessIdPageable(id, params,sourceId,startDate,endDate);
+                                          @RequestParam(required = false) UUID sourceId,
+                                          @RequestParam(required = false) Date startDate,
+                                          @RequestParam(required = false) Date endDate) {
+        ApiResponse apiResponse = lidService.getByBusinessIdPageable(id, params, sourceId, startDate, endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
