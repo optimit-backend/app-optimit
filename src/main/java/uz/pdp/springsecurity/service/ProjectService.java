@@ -170,9 +170,10 @@ public class ProjectService {
     public ApiResponse  getAllByBranchId(UUID branchId, int page, int size) {
         if (page == 0 && size == 0){
             List<Project> projectList = projectRepository.findAllByBranch_Id(branchId);
-            if (!projectList.isEmpty()){
-                return new ApiResponse("Found",true,projectList);
+            if (projectList.isEmpty()){
+                return new ApiResponse("Not Found",false);
             }
+            return new ApiResponse("Found",true,projectList);
         }
         Pageable pageable = PageRequest.of(page,size);
         Page<Project> projects = projectRepository.findAllByBranchId(branchId, pageable);

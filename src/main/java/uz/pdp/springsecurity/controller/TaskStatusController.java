@@ -36,6 +36,7 @@ public class TaskStatusController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+
     @CheckPermission("GET_TASK_STATUS")
     @GetMapping("/{id}")
     public HttpEntity<?> get(@PathVariable UUID id) {
@@ -56,4 +57,6 @@ public class TaskStatusController {
         ApiResponse apiResponse = taskStatusServise.getAllByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+
 }

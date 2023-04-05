@@ -42,6 +42,14 @@ public class TaskController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("EDIT_TASK")
+    @PatchMapping("change/{statusId}")
+    public HttpEntity<?> updateTaskStatus(@PathVariable  UUID statusId,
+                                          @RequestParam boolean isIncrease) {
+        ApiResponse apiResponse = taskServise.updateTaskStatusIncrease(statusId,isIncrease);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
     @CheckPermission("GET_TASK")
     @GetMapping("/{id}")
     public HttpEntity<?> get(@PathVariable UUID id) {
