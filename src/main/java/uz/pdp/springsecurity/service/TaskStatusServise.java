@@ -96,7 +96,7 @@ public class TaskStatusServise {
         if (optionalTaskStatus.isPresent()) {
             TaskStatus taskStatusToDelete = optionalTaskStatus.get();
             if (taskStatusToDelete.getOrginalName() != null){
-                return new ApiResponse("You can not delete this task status !",false);
+                return new ApiResponse("You can not deleteAll this task status !",false);
             }
             Branch branch = taskStatusToDelete.getBranch();
 

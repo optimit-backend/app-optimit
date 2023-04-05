@@ -1,5 +1,7 @@
 package uz.pdp.springsecurity.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import uz.pdp.springsecurity.entity.TaskStatus;
 
@@ -13,5 +15,7 @@ public interface TaskStatusRepository extends JpaRepository<TaskStatus,UUID> {
     Optional<TaskStatus> findByOrginalName(String name);
     List<TaskStatus> findAllByBranchIdOrderByRowNumber(UUID branchId);
     Long countByBranchId(UUID branchId);
+
+    List<TaskStatus> findAllByBranchIdOrderByRowNumberAsc(UUID branch_id);
 
 }

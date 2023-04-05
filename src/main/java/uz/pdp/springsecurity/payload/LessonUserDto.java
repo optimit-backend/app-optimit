@@ -1,4 +1,4 @@
-package uz.pdp.springsecurity.PA;
+package uz.pdp.springsecurity.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

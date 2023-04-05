@@ -32,4 +32,5 @@ public class SalaryGetDto {
     private boolean active;
 
     private String description;
+    private double shouldPaySum;
 }
