@@ -158,6 +158,17 @@ public class TaskServise {
         taskRepository.save(task);
         return new ApiResponse("Edited", true);
     }
+    public ApiResponse updateTaskStatusIncrease(UUID taskStatusId, boolean isIncrease) {
+        Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findById(taskStatusId);
+        if (optionalTaskStatus.isEmpty()) {
+            return new ApiResponse("Not Found", false);
+        }
+        TaskStatus taskStatus = optionalTaskStatus.get();
+        taskStatus.setABoolean(isIncrease);
+        taskStatusRepository.save(taskStatus);
+
+        return new ApiResponse("Edited", true);
+    }
 
     public ApiResponse get(UUID id) {
         Optional<Task> optionalTask = taskRepository.findById(id);
@@ -193,9 +204,6 @@ public class TaskServise {
 
             allTask = taskRepository.findAllByTaskStatusId(status.getId(), pageable);
             List<TaskGetDto> taskGetDtoList = taskMapper.toDto(allTask.toList());
-
-
-
 
             Map<String, Object> response = new HashMap<>();
             response.put("statusId", status.getId());
