@@ -10,6 +10,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface LidStatusMapper {
+    @Mapping(target = "numberOfLids", ignore = true)
     @Mapping(target = "businessId", source = "business.id")
     @Mapping(target = "id", source = "id")
     LidStatusDto toDto(LidStatus lidStatus);

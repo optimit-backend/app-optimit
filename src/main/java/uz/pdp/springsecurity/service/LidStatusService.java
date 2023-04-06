@@ -2,6 +2,7 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uz.pdp.springsecurity.entity.Lid;
 import uz.pdp.springsecurity.entity.LidStatus;
 import uz.pdp.springsecurity.mapper.LidStatusMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -22,19 +23,21 @@ public class LidStatusService {
 
         List<LidStatus> allByBusinessId =
                 repository.findAllByBusiness_IdOrderBySortAsc(businessId);
-        List<LidStatus> all = repository.findAllByBusinessIsNullOrderBySortAsc();
-        all.addAll(allByBusinessId);
-        for (LidStatus lidStatus : all) {
+
+        List<LidStatusDto> list = new ArrayList<>();
+        for (LidStatus lidStatus : allByBusinessId) {
+            LidStatusDto statusDto = mapper.toDto(lidStatus);
             int count = lidRepository.countByLidStatusId(lidStatus.getId());
-            lidStatus.setNumberOfLids(count);
+            statusDto.setNumberOfLids(count);
+            list.add(statusDto);
         }
-        all.sort(Comparator.comparing(LidStatus::getSort));
+        list.sort(Comparator.comparing(LidStatusDto::getSort));
 
         if (allByBusinessId.isEmpty()) {
             return new ApiResponse("not found", false);
         }
 
-        return new ApiResponse("found", true, mapper.toDto(all));
+        return new ApiResponse("found", true, list);
     }
 
     public ApiResponse getById(UUID id) {

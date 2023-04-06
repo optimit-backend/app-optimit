@@ -135,7 +135,7 @@ public class DataLoader implements CommandLineRunner {
                 doneStatus.setBig(true);
                 doneStatus.setColor("rang");
                 doneStatus.setSort(3);
-                progressStatus.setBusiness(business);
+                doneStatus.setBusiness(business);
                 lidStatusRepository.save(doneStatus);
             }
 
