@@ -10,10 +10,13 @@ import uz.pdp.springsecurity.mapper.WorkTimeMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.WorkTimeGetDto;
 import uz.pdp.springsecurity.payload.WorkTimePostDto;
+import uz.pdp.springsecurity.payload.WorkTimeDayDto;
 import uz.pdp.springsecurity.repository.*;
 import uz.pdp.springsecurity.util.Constants;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -24,6 +27,9 @@ public class WorkTimeService {
     private final WorkTimeMapper workTimeMapper;
     private final BranchRepository branchRepository;
     private final RoleRepository roleRepository;
+
+    private final static LocalDateTime START_MONTH = LocalDate.now().atStartOfDay().withDayOfMonth(1);
+    private final static Integer THIS_DAY = LocalDate.now().getDayOfMonth();
 
     public ApiResponse arrive(WorkTimePostDto workTimePostDto) {
         Optional<User> optionalUser = userRepository.findById(workTimePostDto.getUserID());
@@ -56,8 +62,8 @@ public class WorkTimeService {
         if (optionalWorkTime.isEmpty()) return new ApiResponse("USER DOES NOT COME", false);
         WorkTime workTime = optionalWorkTime.get();
         workTime.setLeaveTime(new Timestamp(System.currentTimeMillis()));
-        long hour = (workTime.getLeaveTime().getTime() - workTime.getArrivalTime().getTime()) / (1000 * 60);
-        workTime.setHour(hour);
+        long minute = (workTime.getLeaveTime().getTime() - workTime.getArrivalTime().getTime()) / (1000 * 60);
+        workTime.setMinute(minute);
         workTime.setActive(false);
         workTimeRepository.save(workTime);
         return new ApiResponse("SUCCESS", true);
@@ -100,5 +106,35 @@ public class WorkTimeService {
             }
         }
         return new ApiResponse(true, workTimeGetDtoList);
+    }
+
+    public ApiResponse getComeWork(UUID branchId) {
+        if (!branchRepository.existsById(branchId)) return new ApiResponse("BRANCH NOT FOUND", false);
+        Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
+        if (optionalRole.isEmpty()) return new ApiResponse("ERROR", false);
+        List<User> userList = userRepository.findAllByBranchesIdAndRoleIsNotAndActiveIsTrue(branchId, optionalRole.get());
+        if (userList.isEmpty()) return new ApiResponse("USERS NOT FOUND", false);
+        List<WorkTimeDayDto> workTimeDayDtoList = new ArrayList<>();
+        for (User user : userList) {
+            List<Timestamp> timestampList = new ArrayList<>();
+            LocalDateTime startMonth = START_MONTH;
+            for (int day = 0; day < THIS_DAY; day++) {
+
+                Optional<WorkTime> optionalWorkTime = workTimeRepository.findFirstByUserIdAndBranchIdAndArrivalTimeIsBetween(
+                        user.getId(),
+                        branchId,
+                        Timestamp.valueOf(startMonth.plusDays(day)),
+                        Timestamp.valueOf(startMonth.plusDays(day + 1))
+                );
+                optionalWorkTime.ifPresent(workTime -> timestampList.add(workTime.getArrivalTime()));
+            }
+            workTimeDayDtoList.add(new WorkTimeDayDto(
+                    user.getId(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    timestampList
+            ));
+        }
+        return new ApiResponse(true, workTimeDayDtoList);
     }
 }
