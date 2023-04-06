@@ -13,6 +13,7 @@ public class LessonGetDto {
     private UUID id;
     private UUID roleId;
     private String roleName;
+    private String name;
     private String link;
     private Integer view;
     private UUID attachmentId;

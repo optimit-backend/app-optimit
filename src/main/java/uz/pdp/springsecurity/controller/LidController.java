@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LidDto;
 import uz.pdp.springsecurity.service.LidService;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class LidController {
     private final LidService lidService;
 
+    @CheckPermission("VIEW_LID")
     @GetMapping("/get-by-businessId/{businessId}")
     HttpEntity<?> getAll(@PathVariable UUID businessId,
                          @RequestParam int page, @RequestParam int size,
@@ -29,12 +31,14 @@ public class LidController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("VIEW_LID")
     @GetMapping("/get-by-id/{id}")
     HttpEntity<?> getById(@PathVariable UUID id) {
         ApiResponse apiResponse = lidService.getById(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("VIEW_LID")
     @GetMapping("/get-by-businessId-pageable/{id}")
     HttpEntity<?> getByBusinessIdPageable(@PathVariable UUID id,
                                           @RequestParam(required = false) Map<String, String> params,
@@ -52,6 +56,8 @@ public class LidController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+
+    @CheckPermission("EDIT_LID")
     @PutMapping("/edit-status/{id}")
     HttpEntity<?> editStatus(@PathVariable UUID id,
                              @RequestParam UUID statusId) {
@@ -59,6 +65,7 @@ public class LidController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("DELETE_LID")
     @DeleteMapping("/{id}")
     HttpEntity<?> delete(@PathVariable UUID id) {
         ApiResponse apiResponse = lidService.delete(id);
