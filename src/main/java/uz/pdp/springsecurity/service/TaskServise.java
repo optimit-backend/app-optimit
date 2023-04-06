@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +11,7 @@ import uz.pdp.springsecurity.mapper.TaskMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 
@@ -19,25 +19,16 @@ import java.util.*;
 @RequiredArgsConstructor
 public class TaskServise {
 
-    @Autowired
-    BranchRepository branchRepository;
-    @Autowired
-    ProjectRepository projectRepository;
-    @Autowired
-    TaskTypeRepository taskTypeRepository;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    StageRepository stageRepository;
+    private final BranchRepository branchRepository;
+    private final ProjectRepository projectRepository;
+    private final TaskTypeRepository taskTypeRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    TaskStatusRepository taskStatusRepository;
+    private final TaskStatusRepository taskStatusRepository;
 
-    @Autowired
-    TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
-    @Autowired
-    ProductionRepository productionRepository;
+    private final ProductionRepository productionRepository;
 
     private final TaskMapper taskMapper;
 
@@ -151,7 +142,7 @@ public class TaskServise {
         if (task.getDependTask() != null) {
             Task depentTask = taskRepository.getById(task.getDependTask().getId());
             if (depentTask.getTaskStatus().getOrginalName() != null && !depentTask.getTaskStatus().getOrginalName().equals("Completed")) {
-                return new ApiResponse("You can not change this task, Complete depend task", false);
+                return new ApiResponse("You can not change this task, Complete "+depentTask.getName()+" task", false);
             }
         }
         task.setTaskStatus(taskStatus);
@@ -184,7 +175,24 @@ public class TaskServise {
         return new ApiResponse("Deleted", true);
     }
 
-    public ApiResponse getAllByBranchIdPageable(UUID branchId, Map<String, String> params) {
+    public ApiResponse getAllByBranchIdPageable(UUID branchId, Map<String, String> params,UUID projectId,UUID typeId, Date startDate,Date endDate) {
+
+        Timestamp start = null;
+        Timestamp end = null;
+        boolean checkingDate = false;
+        boolean checkingProject = false;
+        boolean checkingType = false;
+        if (projectId != null){
+            checkingProject = true;
+        }
+        if (typeId != null){
+            checkingType = true;
+        }
+        if (startDate != null && endDate != null){
+            checkingDate = true;
+            start = new Timestamp(startDate.getTime());
+            end = new Timestamp(endDate.getTime());
+        }
 
         List<TaskStatus> taskStatusList = taskStatusRepository.findAllByBranchIdOrderByRowNumber(branchId);
 
@@ -201,8 +209,23 @@ public class TaskServise {
             Page<Task> allTask = null;
 
             Pageable pageable = PageRequest.of(0, Objects.requireNonNullElse(integer, 5));
-
-            allTask = taskRepository.findAllByTaskStatusId(status.getId(), pageable);
+            if (!checkingProject && !checkingDate && !checkingType) {
+                allTask = taskRepository.findAllByTaskStatusId(status.getId(), pageable);
+            } else if (checkingProject && !checkingDate && !checkingType) {
+                allTask = taskRepository.findAllByTaskStatusIdAndProjectId(status.getId(),projectId,pageable);
+            } else if (!checkingProject && checkingDate && !checkingType) {
+                allTask = taskRepository.findAllByTaskStatusIdAndCreatedAtBetween(status.getId(),start,end,pageable);
+            } else if (!checkingProject && !checkingDate && checkingType) {
+                allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeId(status.getId(),typeId,pageable);
+            } else if (!checkingProject && checkingDate && checkingType) {
+                allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeIdAndCreatedAtBetween(status.getId(),typeId,start,end,pageable);
+            } else if (checkingProject && checkingDate && checkingType) {
+                allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeIdAndProjectIdAndCreatedAtBetween(status.getId(),typeId,projectId,start,end,pageable);
+            } else if (checkingProject && !checkingDate && checkingType) {
+                allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeIdAndProjectId(status.getId(),typeId,projectId,pageable);
+            } else if (checkingProject && checkingDate && !checkingType) {
+                allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndCreatedAtBetween(status.getId(),projectId,start,end,pageable);
+            }
             List<TaskGetDto> taskGetDtoList = taskMapper.toDto(allTask.toList());
 
             Map<String, Object> response = new HashMap<>();
@@ -218,22 +241,50 @@ public class TaskServise {
         return new ApiResponse("Found", true, responses);
     }
 
-
-    public ApiResponse getAllByBranchId(UUID branchId, int page, int size) {
-
-        if (page == 0 && size == 0) {
-            List<Task> taskList = taskRepository.findAllByBranch_Id(branchId);
-            if (taskList.isEmpty()) {
-                return new ApiResponse("Not Found", false);
-            }
-            return new ApiResponse("Found", true, taskList);
+    public ApiResponse getAllByProjectId(UUID projectId) {
+        List<Task> taskList = taskRepository.findAllByBranch_Id(projectId);
+        if (taskList.isEmpty()){
+            return new ApiResponse("Not Found",false);
         }
+        return new ApiResponse("Found", true, taskList);
+    }
+
+    public ApiResponse getAllByBranchId(UUID branchId, UUID projectId,UUID statusId, UUID typeId, Date startDate, Date endDate, int page, int size) {
+        Page<Task> tasks = null;
         Pageable pageable = PageRequest.of(page, size);
-        Page<Task> all = taskRepository.findAllByBranchId(branchId, pageable);
-        if (all.isEmpty()) {
-            return new ApiResponse("Project Not Found", false);
-        }
 
-        return new ApiResponse("Found", true, all);
+        Timestamp start = null;
+        Timestamp end = null;
+
+        if (startDate != null && endDate != null){
+            start = new Timestamp(startDate.getTime());
+            end = new Timestamp(endDate.getTime());
+
+        }
+        if (typeId == null && projectId == null && statusId == null && startDate == null && endDate == null) {
+            tasks = taskRepository.findAllByBranchId(branchId, pageable);
+        } else if (projectId != null && statusId == null && startDate == null && endDate == null) {
+            tasks = taskRepository.findAllByProject_Id(projectId,pageable);
+        } else if (projectId == null && statusId != null && startDate == null && endDate == null) {
+            tasks = taskRepository.findAllByTaskStatus_Id(statusId,pageable);
+        } else if (projectId == null && statusId == null && startDate != null && endDate != null) {
+            tasks = taskRepository.findAllByBranchIdAndCreatedAtBetween(branchId,start, end,pageable);
+        } else if (projectId != null && statusId == null && startDate != null && endDate != null) {
+            tasks = taskRepository.findAllByBranchIdAndProject_IdAndCreatedAtBetween(branchId,projectId, start, end,pageable);
+        } else if (projectId != null && statusId != null && startDate != null && endDate != null && typeId != null) {
+            tasks = taskRepository.findAllByBranchIdAndProject_IdAndTaskTypeIdAndTaskStatus_IdAndCreatedAtBetween(branchId,projectId,typeId,statusId, start, end,pageable);
+        } else if (projectId == null && statusId != null && startDate != null && endDate != null && typeId != null) {
+            tasks = taskRepository.findAllByBranchIdAndTaskTypeIdAndTaskStatus_IdAndCreatedAtBetween(branchId,typeId,statusId, start, end,pageable);
+        } else if (projectId != null && statusId != null && startDate == null && endDate == null && typeId == null) {
+            tasks = taskRepository.findAllByBranchIdAndTaskStatus_Id(branchId,statusId,pageable);
+        } else if (projectId != null && statusId != null && startDate != null && endDate != null) {
+            tasks = taskRepository.findAllByBranchIdAndProjectIdAndTaskStatus_IdAndCreatedAtBetween(branchId,projectId,statusId, start, end,pageable);
+        } else if (projectId == null && statusId != null && startDate != null && endDate != null && typeId == null) {
+            tasks = taskRepository.findAllByBranchIdAndTaskStatus_IdAndCreatedAtBetween(branchId,statusId, start, end,pageable);
+        }
+        if (Objects.requireNonNull(tasks).isEmpty()){
+            return new ApiResponse("Not Found",false);
+        }
+        return new ApiResponse("Found",true,tasks);
     }
 }

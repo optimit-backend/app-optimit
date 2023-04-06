@@ -20,6 +20,7 @@ public class Project extends AbsEntity {
     private Date startDate;
     private Date endDate;
     private Date deadline;
+    private int process;
     @ManyToOne
     private ProjectType projectType;
 

@@ -1,6 +1,6 @@
 package uz.pdp.springsecurity.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,15 +10,16 @@ import uz.pdp.springsecurity.payload.TaskDto;
 import uz.pdp.springsecurity.service.TaskServise;
 
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/task")
+@RequiredArgsConstructor
 public class TaskController {
 
-    @Autowired
-    TaskServise taskServise;
+    private final TaskServise taskServise;
 
     @CheckPermission("ADD_TASK")
     @PostMapping
@@ -67,16 +68,32 @@ public class TaskController {
     @CheckPermission("GET_ALL_TASK")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
-                                        @RequestParam(defaultValue = "0") int page,
-                                        @RequestParam(defaultValue = "10") int size) {
-        ApiResponse apiResponse = taskServise.getAllByBranchId(branchId,page,size);
+                                        @RequestParam(required = false) UUID projectId,
+                                        @RequestParam(required = false) UUID statusId,
+                                        @RequestParam(required = false) UUID typeId,
+                                        @RequestParam(required = false) Date startDate,
+                                        @RequestParam(required = false) Date endDate,
+                                        @RequestParam(defaultValue = "0", required = false) int page,
+                                        @RequestParam(defaultValue = "10", required = false) int size) {
+        ApiResponse apiResponse = taskServise.getAllByBranchId(branchId,projectId,statusId,typeId,startDate,endDate,page,size);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("GET_ALL_TASK")
+    @GetMapping("/get-by-project/{projectId}")
+    public HttpEntity<?> getAllByProject(@PathVariable UUID projectId) {
+        ApiResponse apiResponse = taskServise.getAllByProjectId(projectId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @CheckPermission("GET_ALL_TASK")
     @GetMapping("/get-by-branch-pageable/{branchId}")
     public HttpEntity<?> getAllByBranchPageable(@PathVariable UUID branchId,
+                                                @RequestParam(required = false) UUID projectId,
+                                                @RequestParam(required = false) UUID typeId,
+                                                @RequestParam(required = false) Date startDate,
+                                                @RequestParam(required = false) Date endDate,
                                                 @RequestParam(required = false) Map<String,String> params) {
-        ApiResponse apiResponse = taskServise.getAllByBranchIdPageable(branchId,params);
+        ApiResponse apiResponse = taskServise.getAllByBranchIdPageable(branchId,params,projectId,typeId,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }}

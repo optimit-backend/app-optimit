@@ -19,6 +19,7 @@ import javax.persistence.ManyToOne;
 public class TaskStatus extends AbsEntity {
     private String name;
     private String orginalName;
+    private int numberOfTask;
     private String color;
     private long rowNumber;
     private boolean aBoolean;
