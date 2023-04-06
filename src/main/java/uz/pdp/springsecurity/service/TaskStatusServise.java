@@ -3,11 +3,13 @@ package uz.pdp.springsecurity.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Branch;
+import uz.pdp.springsecurity.entity.Task;
 import uz.pdp.springsecurity.entity.TaskStatus;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TaskStatusDto;
 import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.BusinessRepository;
+import uz.pdp.springsecurity.repository.TaskRepository;
 import uz.pdp.springsecurity.repository.TaskStatusRepository;
 
 import java.util.*;
@@ -23,6 +25,9 @@ public class TaskStatusServise {
 
     @Autowired
     BranchRepository branchRepository;
+
+    @Autowired
+    TaskRepository taskRepository;
 
     public ApiResponse add(TaskStatusDto taskStatusDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(taskStatusDto.getBranchId());
@@ -119,6 +124,10 @@ public class TaskStatusServise {
         List<TaskStatus> taskStatusList = taskStatusRepository.findAllByBranchId(branchId);
         if (taskStatusList.isEmpty()){
             return new ApiResponse("Not Found",false);
+        }
+        for (TaskStatus taskStatus : taskStatusList) {
+            int count = taskRepository.countByTaskStatusId(taskStatus.getId());
+            taskStatus.setNumberOfTask(count);
         }
         taskStatusList.sort(Comparator.comparing(TaskStatus::getRowNumber));
         return new ApiResponse("Found",true,taskStatusList);

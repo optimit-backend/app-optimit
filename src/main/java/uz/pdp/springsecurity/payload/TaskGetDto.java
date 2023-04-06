@@ -3,6 +3,8 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uz.pdp.springsecurity.entity.User;
+
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -10,17 +12,17 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskGetDto {
+    private UUID id;
     private String name;
 
     private UUID taskTypeId;
 
-    private UUID projectId;
+    private String projectName;
 
     private Date startDate;
 
     private Date EndDate;
-
-    private List<UUID> usersIds;
+    private List<User> userList;
 
     private UUID taskStatusId;
 

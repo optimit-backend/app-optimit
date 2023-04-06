@@ -48,6 +48,9 @@ public class ProjectService {
     ProjectStatusRepository projectStatusRepository;
 
     @Autowired
+    TaskRepository taskRepository;
+
+    @Autowired
     FileDateRepository fileDateRepository;
     public ApiResponse add(ProjectDto projectDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(projectDto.getBranchId());
@@ -92,14 +95,16 @@ public class ProjectService {
 
         project.setFileDataList(fileDataList);
         project.setBudget(projectDto.getBudget());
-        Optional<Stage> optionalStage = stageRepository.findById(projectDto.getStageId());
-        optionalStage.ifPresent(project::setStage);
+        if (projectDto.getStageId() != null) {
+            Optional<Stage> optionalStage = stageRepository.findById(projectDto.getStageId());
+            optionalStage.ifPresent(project::setStage);
+        }
         project.setGoalAmount(projectDto.getGoalAmount());
         project.setProduction(projectDto.isProduction());
         project.setBranch(optionalBranch.get());
         projectRepository.save(project);
 
-        return new ApiResponse("Added",true,project);
+        return new ApiResponse("Added",true);
     }
 
     public ApiResponse edit(UUID id, ProjectDto projectDto) {
@@ -177,14 +182,22 @@ public class ProjectService {
         }
         Pageable pageable = PageRequest.of(page,size);
         Page<Project> projects = projectRepository.findAllByBranchId(branchId, pageable);
+        for (Project project : projects) {
+            int completed = taskRepository.countByProjectIdAndTaskStatus_OrginalName(project.getId(), "Completed");
+            int all = taskRepository.countByProjectId(project.getId());
+            if (completed > 0) {
+                int process = 0;
+                process = completed * 100 / all;
+                project.setProcess(process);
+            }
+        }
         if (projects.isEmpty()){
             return new ApiResponse("Project Not Found",false);
         }
-
         return new ApiResponse("Found",true,projects);
     }
 
-    public ApiResponse findByStatusId(UUID statusId) {
+    public ApiResponse findByStageId(UUID statusId) {
         List<Project> projects = projectRepository.findAllByStageId(statusId);
         if (projects.isEmpty()){
             return new ApiResponse("Projects Not Found",false);

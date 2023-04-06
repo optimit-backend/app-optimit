@@ -49,7 +49,7 @@ public class ProjectController {
 
     @CheckPermission("GET_ALL_PROJECT")
     @GetMapping("/get-by-branch/{branchId}")
-    public HttpEntity<?> getAllByBusiness(@PathVariable UUID branchId,
+    public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
                                           @RequestParam int page,
                                           @RequestParam int size) {
         ApiResponse apiResponse = projectService.getAllByBranchId(branchId,page,size);
@@ -57,9 +57,9 @@ public class ProjectController {
     }
 
     @CheckPermission("GET_ALL_PROJECT")
-    @GetMapping("/get-by-status/{statusId}")
-    public HttpEntity<?> getAllByStatus(@PathVariable UUID statusId) {
-        ApiResponse apiResponse = projectService.findByStatusId(statusId);
+    @GetMapping("/get-by-stage/{stageId}")
+    public HttpEntity<?> getAllByStatus(@PathVariable UUID stageId) {
+        ApiResponse apiResponse = projectService.findByStageId(stageId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
