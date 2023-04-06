@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.NotificationType;
@@ -13,6 +12,7 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LidDto;
 import uz.pdp.springsecurity.payload.LidGetDto;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.util.Constants;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -95,7 +95,9 @@ public class LidService {
 
 
     public ApiResponse create(LidDto lidDto) {
-        User admin = userRepository.findByBusinessIdAndRoleName(lidDto.getBusinessId(), "ADMIN").orElse(null);
+        User admin = userRepository.findByBusinessIdAndRoleName(lidDto.getBusinessId(), Constants.ADMIN).orElse(null);
+        List<User> users = userRepository.findAllByBusiness_IdAndRoleName(lidDto.getBusinessId(), Constants.OPERATOR);
+        users.add(admin);
         Map<UUID, String> values = lidDto.getValues();
 
         Map<LidField, String> value = new HashMap<>();
@@ -116,16 +118,18 @@ public class LidService {
             }
         }
         repository.save(lid);
-        if (admin != null) {
+
+        for (User user : users) {
             Notification notification = new Notification();
             notification.setRead(false);
             notification.setName("Yangi lid qo'shildi!");
             notification.setMessage("Yangi lid qo'shildi kirib ko'rishingiz statuslarga ob o'tishingiz mumkin!");
-            notification.setUserTo(admin);
             notification.setType(NotificationType.NEW_LID);
             notification.setObjectId(lid.getId());
+            notification.setUserTo(user);
             notificationRepository.save(notification);
         }
+
         return new ApiResponse("successfully saved", true);
     }
 
