@@ -10,7 +10,10 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LessonDto {private String name;
+public class LessonDto {
+    @NotNull
+    private String name;
+
     @NotNull
     private UUID roleId;
 
