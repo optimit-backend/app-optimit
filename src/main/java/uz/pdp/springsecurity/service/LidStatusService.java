@@ -2,10 +2,12 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uz.pdp.springsecurity.entity.Lid;
 import uz.pdp.springsecurity.entity.LidStatus;
 import uz.pdp.springsecurity.mapper.LidStatusMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LidStatusDto;
+import uz.pdp.springsecurity.repository.LidRepository;
 import uz.pdp.springsecurity.repository.LidStatusRepository;
 
 import java.util.*;
@@ -15,21 +17,27 @@ import java.util.*;
 public class LidStatusService {
     private final LidStatusRepository repository;
     private final LidStatusMapper mapper;
+    private final LidRepository lidRepository;
 
     public ApiResponse getAll(UUID businessId) {
 
         List<LidStatus> allByBusinessId =
                 repository.findAllByBusiness_IdOrderBySortAsc(businessId);
-        List<LidStatus> all = repository.findAllByBusinessIsNullOrderBySortAsc();
-        all.addAll(allByBusinessId);
 
-        all.sort(Comparator.comparing(LidStatus::getSort));
+        List<LidStatusDto> list = new ArrayList<>();
+        for (LidStatus lidStatus : allByBusinessId) {
+            LidStatusDto statusDto = mapper.toDto(lidStatus);
+            int count = lidRepository.countByLidStatusId(lidStatus.getId());
+            statusDto.setNumberOfLids(count);
+            list.add(statusDto);
+        }
+        list.sort(Comparator.comparing(LidStatusDto::getSort));
 
         if (allByBusinessId.isEmpty()) {
             return new ApiResponse("not found", false);
         }
 
-        return new ApiResponse("found", true, mapper.toDto(all));
+        return new ApiResponse("found", true, list);
     }
 
     public ApiResponse getById(UUID id) {

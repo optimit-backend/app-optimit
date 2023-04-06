@@ -123,7 +123,7 @@ public class LidService {
             Notification notification = new Notification();
             notification.setRead(false);
             notification.setName("Yangi lid qo'shildi!");
-            notification.setMessage("Yangi lid qo'shildi kirib ko'rishingiz statuslarga ob o'tishingiz mumkin!");
+            notification.setMessage("Yangi lid qo'shildi kirib ko'rishingiz statuslarga olib o'tishingiz mumkin!");
             notification.setType(NotificationType.NEW_LID);
             notification.setObjectId(lid.getId());
             notification.setUserTo(user);

@@ -11,9 +11,8 @@ import java.util.UUID;
 
 public interface LidRepository extends JpaRepository<Lid, UUID> {
     List<Lid> findAllByBusiness_Id(UUID business_id);
-
     Page<Lid> findAllByLidStatusId(UUID lidStatus_id, Pageable pageable);
-
+    int countByLidStatusId(UUID lidStatus_id);
     Page<Lid> findAllByLidStatusIdAndSourceId(UUID lidStatus_id, UUID source_id, Pageable pageable);
 
     Page<Lid> findAllByLidStatusIdAndCreatedAtBetween(UUID lidStatus_id, Timestamp startDate, Timestamp endDate, Pageable pageable);

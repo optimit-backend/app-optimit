@@ -13,6 +13,7 @@ public interface LidStatusRepository extends JpaRepository<LidStatus, UUID> {
 
     List<LidStatus> findAllByBusinessIsNullOrderBySortAsc();
 
+
     List<LidStatus> findAllBySortGreaterThanEqual(Integer sort);
 
     List<LidStatus> findAllByOrderBySortAsc();
