@@ -6,6 +6,7 @@ import uz.pdp.springsecurity.entity.LidStatus;
 import uz.pdp.springsecurity.mapper.LidStatusMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LidStatusDto;
+import uz.pdp.springsecurity.repository.LidRepository;
 import uz.pdp.springsecurity.repository.LidStatusRepository;
 
 import java.util.*;
@@ -15,6 +16,7 @@ import java.util.*;
 public class LidStatusService {
     private final LidStatusRepository repository;
     private final LidStatusMapper mapper;
+    private final LidRepository lidRepository;
 
     public ApiResponse getAll(UUID businessId) {
 
@@ -22,7 +24,10 @@ public class LidStatusService {
                 repository.findAllByBusiness_IdOrderBySortAsc(businessId);
         List<LidStatus> all = repository.findAllByBusinessIsNullOrderBySortAsc();
         all.addAll(allByBusinessId);
-
+        for (LidStatus lidStatus : all) {
+            int count = lidRepository.countByLidStatusId(lidStatus.getId());
+            lidStatus.setNumberOfLids(count);
+        }
         all.sort(Comparator.comparing(LidStatus::getSort));
 
         if (allByBusinessId.isEmpty()) {

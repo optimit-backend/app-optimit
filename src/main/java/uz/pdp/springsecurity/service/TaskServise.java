@@ -246,7 +246,7 @@ public class TaskServise {
     }
 
     public ApiResponse getAllByProjectId(UUID projectId) {
-        List<Task> taskList = taskRepository.findAllByBranch_Id(projectId);
+        List<Task> taskList = taskRepository.findAllByProjectId(projectId);
         if (taskList.isEmpty()){
             return new ApiResponse("Not Found",false);
         }
@@ -254,6 +254,7 @@ public class TaskServise {
     }
 
     public ApiResponse getAllByBranchId(UUID branchId, UUID projectId,UUID statusId, UUID typeId, Date startDate, Date endDate, int page, int size) {
+
         Page<Task> tasks = null;
         Pageable pageable = PageRequest.of(page, size);
 

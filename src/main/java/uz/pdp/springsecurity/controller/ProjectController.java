@@ -10,6 +10,7 @@ import uz.pdp.springsecurity.payload.ProjectDto;
 import uz.pdp.springsecurity.service.ProjectService;
 
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.UUID;
 
 @RestController
@@ -50,9 +51,13 @@ public class ProjectController {
     @CheckPermission("GET_ALL_PROJECT")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
-                                          @RequestParam int page,
-                                          @RequestParam int size) {
-        ApiResponse apiResponse = projectService.getAllByBranchId(branchId,page,size);
+                                        @RequestParam(required = false) UUID typeId,
+                                        @RequestParam(required = false) UUID stageId,
+                                        @RequestParam(required = false) Date startDate,
+                                        @RequestParam(required = false) Date endDate,
+                                        @RequestParam int page,
+                                        @RequestParam int size) {
+        ApiResponse apiResponse = projectService.getAllByBranchId(branchId,page,size,typeId,stageId,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
