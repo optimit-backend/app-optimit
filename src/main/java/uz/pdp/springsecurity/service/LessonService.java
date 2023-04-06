@@ -40,8 +40,10 @@ public class LessonService {
         lesson.setView(lessonDto.getView());
         lesson.setLink(lessonDto.getLink());
         lesson.setDescription(lessonDto.getDescription());
-        Optional<Attachment> optionalAttachment = attachmentRepository.findById(lessonDto.getAttachmentId());
-        optionalAttachment.ifPresent(lesson::setAttachment);
+        if (lessonDto.getAttachmentId() != null){
+            Optional<Attachment> optionalAttachment = attachmentRepository.findById(lessonDto.getAttachmentId());
+            optionalAttachment.ifPresent(lesson::setAttachment);
+        }
         lessonRepository.save(lesson);
         lessonUserService.connectToUser(lesson);
         return new ApiResponse("SUCCESS", false);
