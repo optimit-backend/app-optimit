@@ -5,4 +5,5 @@ public interface Constants {
     String MANAGER = "Manager";
     String EMPLOYEE = "Employee";
     String SUPERADMIN = "Super Admin";
+    String OPERATOR = "Operator";
 }

@@ -205,14 +205,8 @@ public enum Permissions {
     EDIT_PROJECT,
     ADD_PROJECT,
 
-    DELETE_LID_STATUS,
-    PUT_LID_STATUS,
-    POST_LID_STATUS,
-
-
-    GET_LID_STATUS,
     GET_ALL_TASK,
-    
+
     DELETE_TASK,
     GET_TASK,
     EDIT_TASK,
@@ -222,15 +216,16 @@ public enum Permissions {
     GET_BONUS,
     EDIT_BONUS,
     DELETE_BONUS,
-    
+
     ADD_PRIZE,
     VIEW_PRIZE,
 
-//  NAMUNA ---------------------------------
+    //  NAMUNA ---------------------------------
 //    ADD_...,
 //    VIEW_...,
 //    EDIT_...,
 //    DELETE_...,
+
     ADD_LESSON,
     VIEW_LESSON,
     VIEW_LESSON_ROLE,
@@ -240,4 +235,20 @@ public enum Permissions {
 
     VIEW_INVOICE,
     EDIT_INVOICE,
+
+    //lid uchun permissionlar
+    VIEW_LID,
+    EDIT_LID,
+    DELETE_LID,
+
+    VIEW_FORM_LID,
+    ADD_FORM_LID,
+    EDIT_FORM_LID,
+    DELETE_FORM_LID,
+
+    VIEW_LID_STATUS,
+    ADD_LID_STATUS,
+    EDIT_LID_STATUS,
+    DELETE_LID_STATUS
+    //LIDLAR UCHUN PERMISIONLAR
 }

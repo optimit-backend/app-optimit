@@ -20,28 +20,28 @@ public class LidStatusController {
     private final LidStatusService service;
 
 
-    @CheckPermission("GET_LID_STATUS")
+    @CheckPermission("VIEW_LID_STATUS")
     @GetMapping("/getByBusinessId/{businessId}")
     public HttpEntity<?> getAll(@PathVariable UUID businessId) {
         ApiResponse apiResponse = service.getAll(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_LID_STATUS")
+    @CheckPermission("VIEW_LID_STATUS")
     @GetMapping("/{id}")
     public HttpEntity<?> getById(@PathVariable UUID id) {
         ApiResponse apiResponse = service.getById(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("POST_LID_STATUS")
+    @CheckPermission("ADD_LID_STATUS")
     @PostMapping
     public HttpEntity<?> create(@RequestBody LidStatusDto lidStatusDto) {
         ApiResponse apiResponse = service.create(lidStatusDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("PUT_LID_STATUS")
+    @CheckPermission("EDIT_LID_STATUS")
     @PutMapping("/{id}")
     public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody LidStatusDto lidStatusDto) {
         ApiResponse apiResponse = service.edit(id, lidStatusDto);

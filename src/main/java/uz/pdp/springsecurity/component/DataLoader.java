@@ -86,7 +86,7 @@ public class DataLoader implements CommandLineRunner {
                 business = businessRepository.save(business);
             }
 
-            if (business!=null){
+            if (business != null) {
                 LidField lidField = new LidField();
                 lidField.setName("FIO");
                 lidField.setBusiness(business);
@@ -399,11 +399,6 @@ public class DataLoader implements CommandLineRunner {
                                     EDIT_PROJECT,
                                     ADD_PROJECT,
 
-                                    DELETE_LID_STATUS,
-                                    PUT_LID_STATUS,
-                                    POST_LID_STATUS,
-                                    GET_LID_STATUS,
-
                                     DELETE_BONUS,
                                     GET_BONUS,
                                     EDIT_BONUS,
@@ -426,7 +421,21 @@ public class DataLoader implements CommandLineRunner {
                                     DELETE_LESSON,
 
                                     VIEW_INVOICE,
-                                    EDIT_INVOICE
+                                    EDIT_INVOICE,
+
+                                    VIEW_LID,
+                                    EDIT_LID,
+                                    DELETE_LID,
+
+                                    VIEW_FORM_LID,
+                                    ADD_FORM_LID,
+                                    EDIT_FORM_LID,
+                                    DELETE_FORM_LID,
+
+                                    VIEW_LID_STATUS,
+                                    ADD_LID_STATUS,
+                                    EDIT_LID_STATUS,
+                                    DELETE_LID_STATUS
                             ),
                             business));
             Role manager = roleRepository.save(new Role(
@@ -588,11 +597,6 @@ public class DataLoader implements CommandLineRunner {
                             EDIT_PROJECT,
                             ADD_PROJECT,
 
-                            DELETE_LID_STATUS,
-                            PUT_LID_STATUS,
-                            POST_LID_STATUS,
-                            GET_LID_STATUS,
-
                             DELETE_BONUS,
                             GET_BONUS,
                             EDIT_BONUS,
@@ -608,7 +612,21 @@ public class DataLoader implements CommandLineRunner {
                             DELETE_LESSON,
 
                             VIEW_INVOICE,
-                            EDIT_INVOICE
+                            EDIT_INVOICE,
+
+                            VIEW_LID,
+                            EDIT_LID,
+                            DELETE_LID,
+
+                            VIEW_FORM_LID,
+                            ADD_FORM_LID,
+                            EDIT_FORM_LID,
+                            DELETE_FORM_LID,
+
+                            VIEW_LID_STATUS,
+                            ADD_LID_STATUS,
+                            EDIT_LID_STATUS,
+                            DELETE_LID_STATUS
                     ),
                     business));
 
