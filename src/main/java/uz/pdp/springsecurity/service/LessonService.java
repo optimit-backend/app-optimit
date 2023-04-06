@@ -46,7 +46,7 @@ public class LessonService {
         }
         lessonRepository.save(lesson);
         lessonUserService.connectToUser(lesson);
-        return new ApiResponse("SUCCESS", false);
+        return new ApiResponse("SUCCESS", true);
     }
 
     public ApiResponse getAll(UUID businessId) {
