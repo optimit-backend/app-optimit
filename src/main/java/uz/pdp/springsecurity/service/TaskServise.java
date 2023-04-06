@@ -199,7 +199,11 @@ public class TaskServise {
         Map<UUID, Integer> value = new HashMap<>();
         if (params != null) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
-                value.put(UUID.fromString(entry.getKey()), Integer.valueOf(entry.getValue()));
+                try {
+                    value.put(UUID.fromString(entry.getKey()), Integer.valueOf(entry.getValue()));
+                }catch (Exception e){
+                    continue;
+                }
             }
         }
         List<Map<String, Object>> responses = new ArrayList<>();
