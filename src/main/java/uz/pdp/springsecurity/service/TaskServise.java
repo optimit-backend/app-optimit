@@ -139,7 +139,7 @@ public class TaskServise {
         }
         Task task = optionalTask.get();
         TaskStatus taskStatus = optionalTaskStatus.get();
-        if (task.getDependTask() != null) {
+        if (task.getDependTask() != null && !taskStatus.getOrginalName().equals("Completed")) {
             Task depentTask = taskRepository.getById(task.getDependTask().getId());
             if (depentTask.getTaskStatus().getOrginalName() != null && !depentTask.getTaskStatus().getOrginalName().equals("Completed")) {
                 return new ApiResponse("You can not change this task, Complete "+depentTask.getName()+" task", false);
@@ -157,7 +157,6 @@ public class TaskServise {
         TaskStatus taskStatus = optionalTaskStatus.get();
         taskStatus.setABoolean(isIncrease);
         taskStatusRepository.save(taskStatus);
-
         return new ApiResponse("Edited", true);
     }
 
