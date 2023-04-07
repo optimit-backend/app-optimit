@@ -50,7 +50,7 @@ public class LidStatusController {
     }
 
     @CheckPermission("EDIT_LID_STATUS")
-    @PatchMapping("/{id}")
+    @PatchMapping("change-lid-status-big/{id}")
     public HttpEntity<?> edit(@PathVariable UUID id) {
         ApiResponse apiResponse = service.changeBig(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
