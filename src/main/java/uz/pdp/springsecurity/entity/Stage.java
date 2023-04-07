@@ -15,5 +15,5 @@ import javax.persistence.ManyToOne;
 public class Stage extends AbsEntity {
     private String name;
     @ManyToOne
-    private Business business;
+    private Branch branch;
 }

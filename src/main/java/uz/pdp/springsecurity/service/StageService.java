@@ -5,15 +5,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Business;
+import uz.pdp.springsecurity.entity.Branch;
 import uz.pdp.springsecurity.entity.Stage;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.StageDto;
+import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.repository.StageRepository;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,14 +26,17 @@ public class StageService {
     @Autowired
     BusinessRepository businessRepository;
 
+    @Autowired
+    BranchRepository branchRepository;
+
     public ApiResponse add(StageDto stageDto) {
-        Optional<Business> optionalBusiness = businessRepository.findById(stageDto.getBusinessId());
-        if (optionalBusiness.isEmpty()){
-            return new ApiResponse("Business Not Found",false);
+        Optional<Branch> optionalBranch = branchRepository.findById(stageDto.getBranchId());
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch Not Found",false);
         }
         Stage stage= new Stage();
         stage.setName(stageDto.getName());
-        stage.setBusiness(optionalBusiness.get());
+        stage.setBranch(optionalBranch.get());
         stageRepository.save(stage);
         return new ApiResponse("Added",true,stage);
     }
@@ -63,17 +66,17 @@ public class StageService {
         return new ApiResponse("Deleted",true);
     }
 
-    public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Stage> stageList = stageRepository.findAllByBusinessId(businessId);
+    public ApiResponse getAllByBranch(UUID businessId) {
+        List<Stage> stageList = stageRepository.findAllByBranchId(businessId);
         if (stageList.isEmpty()){
             return new ApiResponse("Not Found",false);
         }
         return new ApiResponse("Found",true,stageList);
     }
 
-    public ApiResponse getAllByBusinessPageable(UUID branchId, int page, int size) {
+    public ApiResponse getAllByBranchPageable(UUID branchId, int page, int size) {
         Pageable pageable = PageRequest.of(page,size);
-        Page<Stage> stageList = stageRepository.findAllByBusiness_Id(branchId,pageable);
+        Page<Stage> stageList = stageRepository.findAllByBranch_Id(branchId,pageable);
         if (stageList.isEmpty()){
             return new ApiResponse("Not Found",false);
         }

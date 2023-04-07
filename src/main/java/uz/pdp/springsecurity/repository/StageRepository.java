@@ -10,6 +10,6 @@ import java.util.UUID;
 
 public interface StageRepository extends JpaRepository<Stage, UUID> {
 
-    List<Stage> findAllByBusinessId(UUID business_id);
-    Page<Stage> findAllByBusiness_Id(UUID BusinessId, Pageable pageable);
+    List<Stage> findAllByBranchId(UUID branch_id);
+    Page<Stage> findAllByBranch_Id(UUID branchId, Pageable pageable);
 }
