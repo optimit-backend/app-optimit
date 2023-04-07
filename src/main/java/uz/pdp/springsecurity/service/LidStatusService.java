@@ -57,7 +57,7 @@ public class LidStatusService {
         } else {
             newLidStatus.setSort(1);
         }
-        newLidStatus.setBig(true);
+        newLidStatus.setIncrease(true);
         repository.save(newLidStatus);
         return new ApiResponse("successfully saved", true);
     }
@@ -91,7 +91,7 @@ public class LidStatusService {
 
         mapper.update(lidStatusPostDto, lidStatus);
         lidStatus.setSort(newSort);
-        lidStatus.setBig(lidStatus.isBig());
+        lidStatus.setIncrease(lidStatus.isIncrease());
         repository.save(lidStatus);
         return new ApiResponse("successfully edited", true);
     }
@@ -127,7 +127,7 @@ public class LidStatusService {
             return new ApiResponse("not found lid status by id", false);
         }
         LidStatus lidStatus = optionalLidStatus.get();
-        lidStatus.setBig(!lidStatus.isBig());
+        lidStatus.setIncrease(!lidStatus.isIncrease());
         repository.save(lidStatus);
         return new ApiResponse("successfully saved", true);
     }
