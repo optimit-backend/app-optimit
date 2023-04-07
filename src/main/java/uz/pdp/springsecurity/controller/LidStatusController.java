@@ -9,6 +9,7 @@ import uz.pdp.springsecurity.entity.LidStatus;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LidFieldDto;
 import uz.pdp.springsecurity.payload.LidStatusDto;
+import uz.pdp.springsecurity.payload.LidStatusPostDto;
 import uz.pdp.springsecurity.service.LidStatusService;
 
 import java.util.UUID;
@@ -36,15 +37,15 @@ public class LidStatusController {
 
     @CheckPermission("ADD_LID_STATUS")
     @PostMapping
-    public HttpEntity<?> create(@RequestBody LidStatusDto lidStatusDto) {
-        ApiResponse apiResponse = service.create(lidStatusDto);
+    public HttpEntity<?> create(@RequestBody LidStatusPostDto lidStatusPostDto) {
+        ApiResponse apiResponse = service.create(lidStatusPostDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @CheckPermission("EDIT_LID_STATUS")
     @PutMapping("/{id}")
-    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody LidStatusDto lidStatusDto) {
-        ApiResponse apiResponse = service.edit(id, lidStatusDto);
+    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody LidStatusPostDto lidStatusPostDto) {
+        ApiResponse apiResponse = service.edit(id, lidStatusPostDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
