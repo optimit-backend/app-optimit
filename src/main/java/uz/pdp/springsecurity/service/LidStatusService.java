@@ -7,6 +7,7 @@ import uz.pdp.springsecurity.entity.LidStatus;
 import uz.pdp.springsecurity.mapper.LidStatusMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LidStatusDto;
+import uz.pdp.springsecurity.payload.LidStatusPostDto;
 import uz.pdp.springsecurity.repository.LidRepository;
 import uz.pdp.springsecurity.repository.LidStatusRepository;
 
@@ -46,9 +47,9 @@ public class LidStatusService {
                 new ApiResponse("found", true, mapper.toDto(lidStatus))).orElseGet(() -> new ApiResponse("not found", false));
     }
 
-    public ApiResponse create(LidStatusDto lidStatusDto) {
-        List<LidStatus> allByOrderBySortDesc = repository.findAllByBusiness_IdOrderBySortAsc(lidStatusDto.getBusinessId());
-        LidStatus newLidStatus = mapper.toEntity(lidStatusDto);
+    public ApiResponse create(LidStatusPostDto lidStatusPostDto) {
+        List<LidStatus> allByOrderBySortDesc = repository.findAllByBusiness_IdOrderBySortAsc(lidStatusPostDto.getBusinessId());
+        LidStatus newLidStatus = mapper.toEntity(lidStatusPostDto);
         if (allByOrderBySortDesc.size() != 0) {
             LidStatus lidStatus = allByOrderBySortDesc.get(allByOrderBySortDesc.size() - 1);
             Integer sort = lidStatus.getSort();
@@ -61,16 +62,16 @@ public class LidStatusService {
         return new ApiResponse("successfully saved", true);
     }
 
-    public ApiResponse edit(UUID id, LidStatusDto lidStatusDto) {
+    public ApiResponse edit(UUID id, LidStatusPostDto lidStatusPostDto) {
         LidStatus lidStatus = repository.findById(id).orElse(null);
         if (lidStatus == null) {
             return new ApiResponse("not found", false);
         }
         List<LidStatus> all = repository.
-                findAllByBusiness_IdOrderBySortAsc(lidStatusDto.getBusinessId());
+                findAllByBusiness_IdOrderBySortAsc(lidStatusPostDto.getBusinessId());
 
         Integer currentSort = lidStatus.getSort();
-        Integer newSort = lidStatusDto.getSort();
+        Integer newSort = lidStatusPostDto.getSort();
 
         if (currentSort < newSort) {
             for (LidStatus status : all) {
@@ -88,7 +89,7 @@ public class LidStatusService {
             }
         }
 
-        mapper.update(lidStatusDto, lidStatus);
+        mapper.update(lidStatusPostDto, lidStatus);
         lidStatus.setSort(newSort);
         lidStatus.setBig(lidStatus.isBig());
         repository.save(lidStatus);
