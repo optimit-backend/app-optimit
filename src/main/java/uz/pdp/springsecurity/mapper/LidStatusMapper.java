@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import uz.pdp.springsecurity.entity.LidStatus;
 import uz.pdp.springsecurity.payload.LidStatusDto;
+import uz.pdp.springsecurity.payload.LidStatusPostDto;
 
 import java.util.List;
 
@@ -22,14 +23,14 @@ public interface LidStatusMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "business.id", source = "businessId")
-    LidStatus toEntity(LidStatusDto lidStatusDto);
+    LidStatus toEntity(LidStatusPostDto lidStatusPostDto);
 
     @Mapping(target = "updateAt", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "business", ignore = true)
     @Mapping(target = "business.id", source = "businessId")
-    void update(LidStatusDto lidStatusDto, @MappingTarget LidStatus lidStatus);
+    void update(LidStatusPostDto lidStatusPostDto, @MappingTarget LidStatus lidStatus);
 
 
 }

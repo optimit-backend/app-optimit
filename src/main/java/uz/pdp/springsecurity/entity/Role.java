@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -13,12 +14,13 @@ import uz.pdp.springsecurity.enums.Permissions;
 import javax.persistence.*;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer", "handler", "fieldHandler"})
 public class Role extends AbsEntity {
 
     @Column(nullable = false)
@@ -32,14 +34,25 @@ public class Role extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Business business;
 
+    @ManyToOne
+    private Role parentRole;
+
     private String description;
 
 
-    public Role(String name, List<Permissions> permissions,Business business) {
+    public Role(String name, List<Permissions> permissions, Business business) {
         this.name = name;
         this.permissions = permissions;
         this.business = business;
     }
+
+    public Role(String name, List<Permissions> permissions, Business business, Role parentRole) {
+        this.name = name;
+        this.permissions = permissions;
+        this.business = business;
+        this.parentRole = parentRole;
+    }
+
     public Role(String name, List<Permissions> permissions) {
         this.name = name;
         this.permissions = permissions;
