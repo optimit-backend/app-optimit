@@ -1,6 +1,9 @@
 package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Business;
 import uz.pdp.springsecurity.entity.Stage;
@@ -10,6 +13,7 @@ import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.repository.StageRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -61,6 +65,15 @@ public class StageService {
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
         List<Stage> stageList = stageRepository.findAllByBusinessId(businessId);
+        if (stageList.isEmpty()){
+            return new ApiResponse("Not Found",false);
+        }
+        return new ApiResponse("Found",true,stageList);
+    }
+
+    public ApiResponse getAllByBusinessPageable(UUID branchId, int page, int size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Stage> stageList = stageRepository.findAllByBusiness_Id(branchId,pageable);
         if (stageList.isEmpty()){
             return new ApiResponse("Not Found",false);
         }

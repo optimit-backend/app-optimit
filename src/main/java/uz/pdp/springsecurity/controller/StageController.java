@@ -55,4 +55,13 @@ public class StageController {
         ApiResponse apiResponse = stageService.getAllByBusinessId(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("GET_ALL_STAGE")
+    @GetMapping("/get-by-businessPageable/{businessId}")
+    public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId,
+                                          @RequestParam(defaultValue = "0", required = false) int page,
+                                          @RequestParam(defaultValue = "10", required = false) int size) {
+        ApiResponse apiResponse = stageService.getAllByBusinessPageable(businessId,page,size);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }

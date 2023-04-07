@@ -188,8 +188,8 @@ public class ProjectService {
         return new ApiResponse("Deleted", true);
     }
 
-    public ApiResponse getAllByBranchId(UUID branchId, int page, int size, UUID typeId, UUID stageId, Date startDate, Date endDate) {
-        Pageable pageable = PageRequest.of(page, size);
+    public ApiResponse  getAllByBranchId(UUID branchId,UUID typeId, UUID stageId,UUID customerId, Date startDate,Date endDate,int page,int size) {
+        Pageable pageable = PageRequest.of(page,size);
         Page<Project> projectList = null;
         Timestamp start = null;
         Timestamp end = null;
@@ -200,33 +200,41 @@ public class ProjectService {
             checkingDate = true;
         }
 
-        boolean checkingType = false;
-        if (typeId != null) {
-            checkingType = true;
-        }
 
-        boolean checkingStage = false;
-        if (stageId != null) {
-            checkingStage = true;
-        }
-        if (page == 0 && size == 0 && !checkingStage && !checkingDate && !checkingType) {
+        boolean checkingType = typeId != null;
+        boolean checkingCustomer = customerId != null;
+        boolean checkingStage = stageId != null;
+
+        if (page == 0 && size == 0 && !checkingStage && !checkingDate && !checkingType && !checkingCustomer){
             List<Project> projects = projectRepository.findAllByBranch_Id(branchId);
             if (projects.isEmpty()) {
                 return new ApiResponse("Not Found", false);
             }
-            return new ApiResponse("Found", true, projects);
-        } else if (!checkingStage && !checkingDate && !checkingType) {
-            projectList = projectRepository.findAllByBranchId(branchId, pageable);
-        } else if (checkingStage && !checkingDate && !checkingType) {
-            projectList = projectRepository.findAllByBranchIdAndStageId(branchId, stageId, pageable);
-        } else if (checkingStage && checkingDate && !checkingType) {
-            projectList = projectRepository.findAllByBranchIdAndStageIdAndCreatedAtBetween(branchId, stageId, start, end, pageable);
-        } else if (checkingStage && checkingDate && checkingDate) {
-            projectList = projectRepository.findAllByBranchIdAndStageIdAndProjectTypeIdAndCreatedAtBetween(branchId, stageId, typeId, start, end, pageable);
-        } else if (checkingStage && checkingType && !checkingDate) {
-            projectList = projectRepository.findAllByBranchIdAndStageIdAndProjectTypeId(branchId, stageId, typeId, pageable);
-        } else if (checkingDate) {
-            projectList = projectRepository.findAllByBranchIdAndCreatedAtBetween(branchId, start, end, pageable);
+            return new ApiResponse("Found",true,projects);
+        } else if (checkingType && checkingCustomer && checkingStage && checkingDate) {
+            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndStageIdAndCustomerIdAndCreatedAtBetween(branchId,typeId,stageId,customerId,start,end,pageable);
+        } else if (checkingType && checkingCustomer && checkingStage) {
+            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndStageIdAndCustomerId(branchId,typeId,stageId,customerId,pageable);
+        } else if (checkingType && checkingCustomer && checkingDate) {
+            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndCustomerIdAndCreatedAtBetween(branchId, typeId, customerId, start, end, pageable);
+        } else if (checkingType && checkingStage && checkingDate) {
+            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndStageIdAndCreatedAtBetween(branchId, typeId, stageId, start, end,pageable);
+        } else if (checkingCustomer && checkingStage && checkingDate) {
+            projectList = projectRepository.findAllByBranchIdAndStageIdAndCustomerIdAndCreatedAtBetween(branchId, stageId, customerId, start, end,pageable);
+        } else if (checkingType && checkingCustomer) {
+            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndCustomerId(branchId, typeId, customerId,pageable);
+        } else if (checkingType && checkingStage) {
+            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndStageId(branchId, typeId, stageId,pageable);
+        } else if (checkingType && checkingDate) {
+            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndCreatedAtBetween(branchId, typeId, start, end,pageable);
+        } else if (checkingCustomer && checkingStage) {
+            projectList = projectRepository.findAllByBranchIdAndStageIdAndCustomerId(branchId, stageId, customerId,pageable);
+        } else if (checkingCustomer && checkingDate) {
+            projectList = projectRepository.findAllByBranchIdAndCustomerIdAndCreatedAtBetween(branchId, customerId, start, end,pageable);
+        } else if (checkingStage && checkingDate) {
+            projectList = projectRepository.findAllByBranchIdAndStageIdAndCreatedAtBetween(branchId, stageId, start, end,pageable);
+        } else {
+            projectList = projectRepository.findAllByBranchId(branchId,pageable)
         }
         assert projectList != null;
         if (projectList.isEmpty()) {

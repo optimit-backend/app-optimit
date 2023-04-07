@@ -1,6 +1,9 @@
 package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -70,4 +73,15 @@ public class TaskTypeServise {
         }
         return new ApiResponse("Found",true,taskTypeList);
     }
+
+    public ApiResponse getAllBranchPageable(UUID branchId, int page, int size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<TaskType> taskTypes = taskTypeRepository.findAllByBranch_Id(branchId,pageable);
+        if (taskTypes.isEmpty()){
+            return new ApiResponse("Not Found",false);
+        }
+        return new ApiResponse("Found",true,taskTypes);
+    }
+
+
 }
