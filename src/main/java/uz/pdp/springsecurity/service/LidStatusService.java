@@ -82,7 +82,7 @@ public class LidStatusService {
             }
         } else {
             for (LidStatus status : all) {
-                if (status.getSort() <= currentSort && status.getSort() > newSort) {
+                if (status.getSort() < currentSort && status.getSort() >= newSort) {
                     status.setSort(status.getSort() + 1);
                     repository.save(status);
                 }
@@ -91,7 +91,7 @@ public class LidStatusService {
 
         mapper.update(lidStatusPostDto, lidStatus);
         lidStatus.setSort(newSort);
-        lidStatus.setIncrease(lidStatus.isIncrease());
+        lidStatus.setIncrease(true);
         repository.save(lidStatus);
         return new ApiResponse("successfully edited", true);
     }
