@@ -14,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoleDto {
+    private UUID id;
     @NotBlank
     private String name;
 
@@ -23,4 +24,6 @@ public class RoleDto {
     private String description;
 
     private UUID businessId;
+
+    private UUID parentRole;
 }
