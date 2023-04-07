@@ -14,7 +14,7 @@ public class LidStatusDto {
     private String name;
     private String color;
     private Integer sort;
-    private boolean big;
+    private boolean increase;
     private int numberOfLids;
     private UUID businessId;
 }
