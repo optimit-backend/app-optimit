@@ -134,7 +134,7 @@ public class BusinessService {
 
         LidStatus newStatus = new LidStatus();
         newStatus.setName("New");
-        newStatus.setBig(true);
+        newStatus.setIncrease(true);
         newStatus.setColor("rang");
         newStatus.setSort(1);
         newStatus.setBusiness(business);
@@ -142,7 +142,7 @@ public class BusinessService {
 
         LidStatus progressStatus = new LidStatus();
         progressStatus.setName("Progress");
-        progressStatus.setBig(true);
+        progressStatus.setIncrease(true);
         progressStatus.setColor("rang");
         progressStatus.setSort(2);
         progressStatus.setBusiness(business);
@@ -150,7 +150,7 @@ public class BusinessService {
 
         LidStatus doneStatus = new LidStatus();
         doneStatus.setName("Done");
-        doneStatus.setBig(true);
+        doneStatus.setIncrease(true);
         doneStatus.setColor("rang");
         doneStatus.setSort(3);
         progressStatus.setBusiness(business);
