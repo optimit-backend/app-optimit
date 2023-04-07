@@ -49,6 +49,13 @@ public class LidStatusController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("EDIT_LID_STATUS")
+    @PatchMapping("/{id}")
+    public HttpEntity<?> edit(@PathVariable UUID id) {
+        ApiResponse apiResponse = service.changeBig(id);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
     @CheckPermission("DELETE_LID_STATUS")
     @DeleteMapping("/{id}")
     public HttpEntity<?> delete(@PathVariable UUID id) {

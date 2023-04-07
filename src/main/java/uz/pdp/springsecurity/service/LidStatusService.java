@@ -120,4 +120,15 @@ public class LidStatusService {
         }
         return new ApiResponse("successfully deleted", true);
     }
+
+    public ApiResponse changeBig(UUID id) {
+        Optional<LidStatus> optionalLidStatus = repository.findById(id);
+        if (optionalLidStatus.isEmpty()) {
+            return new ApiResponse("not found lid status by id", false);
+        }
+        LidStatus lidStatus = optionalLidStatus.get();
+        lidStatus.setBig(!lidStatus.isBig());
+        repository.save(lidStatus);
+        return new ApiResponse("successfully saved", true);
+    }
 }
