@@ -53,11 +53,12 @@ public class ProjectController {
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
                                         @RequestParam(required = false) UUID typeId,
                                         @RequestParam(required = false) UUID stageId,
+                                        @RequestParam(required = false) UUID customerId,
                                         @RequestParam(required = false) Date startDate,
                                         @RequestParam(required = false) Date endDate,
                                         @RequestParam int page,
                                         @RequestParam int size) {
-        ApiResponse apiResponse = projectService.getAllByBranchId(branchId,page,size,typeId,stageId,startDate,endDate);
+        ApiResponse apiResponse = projectService.getAllByBranchId(branchId,typeId,stageId,customerId,startDate,endDate,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

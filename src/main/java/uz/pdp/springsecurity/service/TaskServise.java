@@ -223,22 +223,23 @@ public class TaskServise {
             Page<Task> allTask = null;
 
             Pageable pageable = PageRequest.of(0, Objects.requireNonNullElse(integer, 5));
-            if (!checkingProject && !checkingDate && !checkingType) {
-                allTask = taskRepository.findAllByTaskStatusId(status.getId(), pageable);
-            } else if (checkingProject && !checkingDate && !checkingType) {
-                allTask = taskRepository.findAllByTaskStatusIdAndProjectId(status.getId(), projectId, pageable);
-            } else if (!checkingProject && checkingDate && !checkingType) {
-                allTask = taskRepository.findAllByTaskStatusIdAndCreatedAtBetween(status.getId(), start, end, pageable);
-            } else if (!checkingProject && !checkingDate && checkingType) {
-                allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeId(status.getId(), typeId, pageable);
-            } else if (!checkingProject && checkingDate && checkingType) {
-                allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeIdAndCreatedAtBetween(status.getId(), typeId, start, end, pageable);
-            } else if (checkingProject && checkingDate && checkingType) {
-                allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeIdAndProjectIdAndCreatedAtBetween(status.getId(), typeId, projectId, start, end, pageable);
-            } else if (checkingProject && !checkingDate && checkingType) {
-                allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeIdAndProjectId(status.getId(), typeId, projectId, pageable);
-            } else if (checkingProject && checkingDate && !checkingType) {
-                allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndCreatedAtBetween(status.getId(), projectId, start, end, pageable);
+
+            if (checkingProject && checkingType && checkingDate) {
+                allTask = taskRepository.findAllByBranchIdAndProjectIdAndTaskTypeIdAndCreatedAtBetween(branchId,projectId,typeId,start,end,pageable);
+            } else if (checkingProject && checkingType) {
+                allTask = taskRepository.findAllByBranchIdAndProjectIdAndTaskTypeId(branchId, projectId, typeId,pageable);
+            } else if (checkingProject && checkingDate) {
+                allTask = taskRepository.findAllByBranchIdAndProjectIdAndCreatedAtBetween(branchId, projectId, start, end,pageable);
+            } else if (checkingProject) {
+                allTask = taskRepository.findAllByBranchIdAndProjectId(branchId, projectId,pageable);
+            } else if (checkingType && checkingDate) {
+                allTask = taskRepository.findAllByBranchIdAndTaskTypeIdAndCreatedAtBetween(branchId, typeId, start, end,pageable);
+            } else if (checkingType) {
+                allTask = taskRepository.findAllByBranchIdAndTaskTypeId(branchId, typeId,pageable);
+            } else if (checkingDate) {
+                allTask = taskRepository.findAllByBranchIdAndCreatedAtBetween(branchId, start, end,pageable);
+            } else {
+                allTask = taskRepository.findAllByBranchId(branchId,pageable);
             }
             List<TaskGetDto> taskGetDtoList = taskMapper.toDto(allTask.toList());
 
