@@ -36,5 +36,8 @@ public class Lesson extends AbsEntity {
     @ManyToOne(cascade = CascadeType.ALL)
     private Attachment attachment;
 
+    @Column(nullable = false)
+    private boolean hasTest = false;
+
     private String description;
 }

@@ -53,6 +53,8 @@ public class TestService {
                     }
                 }
             }
+            lesson.setHasTest(true);
+            lessonRepository.save(lesson);
             testRepository.saveAll(testList);
             return new ApiResponse("success", true, testList.size());
         } catch (IOException e) {
@@ -93,10 +95,14 @@ public class TestService {
     }
 
     public ApiResponse deleteAll(UUID lessonId) {
-        if (!lessonRepository.existsById(lessonId)) return new ApiResponse("LESSON NOT FOUND", false);
+        Optional<Lesson> optionalLesson = lessonRepository.findById(lessonId);
+        if (optionalLesson.isEmpty()) return new ApiResponse("LESSON NOT FOUND", false);
         if (!testRepository.existsAllByLessonId(lessonId)) return new ApiResponse("TEST NOT FOUND", false);
         try {
             testRepository.deleteAllByLessonId(lessonId);
+            Lesson lesson = optionalLesson.get();
+            lesson.setHasTest(false);
+            lessonRepository.save(lesson);
             return new ApiResponse("SUCCESS", true);
         } catch (Exception e) {
             return new ApiResponse("ERROR", false);
