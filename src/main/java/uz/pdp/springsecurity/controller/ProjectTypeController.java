@@ -53,4 +53,13 @@ public class ProjectTypeController {
         ApiResponse apiResponse = projectTypeServise.getAllByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("GET_ALL_PROJECT_TYPE")
+    @GetMapping("/get-by-branchPageable/{branchId}")
+    public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
+                                        @RequestParam(defaultValue = "0", required = false) int page,
+                                        @RequestParam(defaultValue = "10", required = false) int size) {
+        ApiResponse apiResponse = projectTypeServise.getAllByBranchPageable(branchId,page,size);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }

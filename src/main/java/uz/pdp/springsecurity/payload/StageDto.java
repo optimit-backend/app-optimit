@@ -14,5 +14,5 @@ public class StageDto {
 
     private String name;
 
-    private UUID businessId;
+    private UUID branchId;
 }

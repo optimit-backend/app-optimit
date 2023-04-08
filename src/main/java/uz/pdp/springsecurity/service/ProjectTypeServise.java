@@ -1,14 +1,19 @@
 package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Branch;
 import uz.pdp.springsecurity.entity.Business;
 import uz.pdp.springsecurity.entity.ProjectType;
+import uz.pdp.springsecurity.entity.Stage;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProjectTypeDto;
 import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.BusinessRepository;
+import uz.pdp.springsecurity.repository.ProjectRepository;
 import uz.pdp.springsecurity.repository.ProjectTypeRepository;
 
 import java.util.List;
@@ -26,6 +31,9 @@ public class ProjectTypeServise {
 
     @Autowired
     BusinessRepository businessRepository;
+
+    @Autowired
+    ProjectRepository projectRepository;
 
     public ApiResponse add(ProjectTypeDto projectTypeDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(projectTypeDto.getBranchId());
@@ -60,6 +68,10 @@ public class ProjectTypeServise {
         if (!exists){
             return new ApiResponse("Not Found",false);
         }
+        boolean existsType = projectRepository.existsByProjectTypeId(id);
+        if (existsType){
+            return new ApiResponse("This project type is connected to another project !",false);
+        }
         projectTypeRepository.deleteById(id);
         return new ApiResponse("Deleted",true);
     }
@@ -70,5 +82,14 @@ public class ProjectTypeServise {
             return new ApiResponse("Not Found",false);
         }
         return new ApiResponse("Found",true,projectTypeList);
+    }
+
+    public ApiResponse getAllByBranchPageable(UUID branchId, int page, int size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<ProjectType> projectTypes = projectTypeRepository.findAllByBranch_Id(branchId,pageable);
+        if (projectTypes.isEmpty()){
+            return new ApiResponse("Not Found",false);
+        }
+        return new ApiResponse("Found",true,projectTypes);
     }
 }

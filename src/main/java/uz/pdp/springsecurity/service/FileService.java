@@ -16,14 +16,21 @@ public class FileService {
     FileDateRepository fileDateRepository;
 
     public ApiResponse saveFileToDatabase(String fileName, byte[] fileData) {
+
+        int maxSizeInBytes = 1024 * 1024; // 1MB
+        if (fileData.length > maxSizeInBytes){
+            return new ApiResponse("File too large !",false);
+        }
+
         FileData fileDataEntity = new FileData();
         fileDataEntity.setFileName(fileName);
         fileDataEntity.setFileData(fileData);
         fileDateRepository.save(fileDataEntity);
-        return new ApiResponse("Saved",true);
+        return new ApiResponse("Found",true,fileDataEntity.getId());
     }
 
-    public FileData getFileFromDatabase(UUID fileId) {
-        return fileDateRepository.findById(fileId).orElse(null);
+    public ApiResponse getFileFromDatabase(UUID fileId) {
+        FileData fileData = fileDateRepository.findById(fileId).orElse(null);
+        return new ApiResponse("Found",true,fileData);
     }
 }

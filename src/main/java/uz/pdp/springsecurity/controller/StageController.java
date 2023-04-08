@@ -50,18 +50,18 @@ public class StageController {
     }
 
     @CheckPermission("GET_ALL_STAGE")
-    @GetMapping("/get-by-business/{businessId}")
-    public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId) {
-        ApiResponse apiResponse = stageService.getAllByBusinessId(businessId);
+    @GetMapping("/get-by-branch/{branchId}")
+    public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = stageService.getAllByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @CheckPermission("GET_ALL_STAGE")
-    @GetMapping("/get-by-businessPageable/{businessId}")
-    public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId,
+    @GetMapping("/get-by-branchPageable/{branchId}")
+    public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
                                           @RequestParam(defaultValue = "0", required = false) int page,
                                           @RequestParam(defaultValue = "10", required = false) int size) {
-        ApiResponse apiResponse = stageService.getAllByBusinessPageable(businessId,page,size);
+        ApiResponse apiResponse = stageService.getAllByBranchPageable(branchId,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
