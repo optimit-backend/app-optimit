@@ -22,6 +22,7 @@ public class TaskGetDto {
     private Date startDate;
 
     private Date EndDate;
+
     private List<User> userList;
 
     private UUID taskStatusId;

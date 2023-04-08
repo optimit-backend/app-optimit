@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -13,23 +14,49 @@ import java.util.UUID;
 @NoArgsConstructor
 public class UserDto {
 
-    @NotNull(message = "required line")
     private String firstName;
-    @NotNull(message = "required line")
+
     private String lastName;
-    @NotNull(message = "required line")
+
+    private String email;
+
     private String username;
 
     private String password;
 
-    private UUID roleId;
+    private UUID jobId;
 
-    private List<UUID> branchId;
+    private String phoneNumber;
+
+    private boolean sex;
+
+    private Timestamp birthday;
+
+    private UUID roleId;
 
     private UUID businessId;
 
-    private Boolean enabled;
+    private Set<UUID> branchesId;
 
     private UUID photoId;
 
+    private boolean active;
+
+    private String address;
+
+    private String description;
+
+    private Timestamp probation;
+
+    private String workingTime;
+
+    private double salary;
+
+    private List<UUID> bonusesId;
+
+    private Timestamp arrivalTime;
+
+    private Timestamp leaveTime;
+
+    private boolean enabled;
 }
