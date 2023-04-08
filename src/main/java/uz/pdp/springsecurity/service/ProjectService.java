@@ -234,7 +234,7 @@ public class ProjectService {
         } else if (checkingStage && checkingDate) {
             projectList = projectRepository.findAllByBranchIdAndStageIdAndCreatedAtBetween(branchId, stageId, start, end,pageable);
         } else {
-            projectList = projectRepository.findAllByBranchId(branchId,pageable)
+            projectList = projectRepository.findAllByBranchId(branchId,pageable);
         }
         assert projectList != null;
         if (projectList.isEmpty()) {
