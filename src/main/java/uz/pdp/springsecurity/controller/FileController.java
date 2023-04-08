@@ -29,17 +29,17 @@ public class FileController {
             ApiResponse apiResponse = fileService.saveFileToDatabase(fileName, fileData);
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.REQUEST_HEADER_FIELDS_TOO_LARGE).build();
         }
     }
 
     @GetMapping("/files/{fileId}")
     public ResponseEntity<byte[]> getFile(@PathVariable UUID fileId) {
-        FileData fileData = fileService.getFileFromDatabase(fileId);
-        if (fileData != null) {
+        ApiResponse fileFromDatabase = fileService.getFileFromDatabase(fileId);
+        if (fileFromDatabase != null) {
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileData.getFileName() + "\"")
-                    .body(fileData.getFileData());
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + "a" + "\"")
+                    .body((byte[]) fileFromDatabase.getObject());
         } else {
             return ResponseEntity.notFound().build();
         }

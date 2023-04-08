@@ -15,6 +15,7 @@ import java.util.UUID;
 
 public interface ProjectRepository extends JpaRepository<Project, UUID> {
     List<Project> findAllByStageId(UUID projectStatus_id);
+    boolean existsByProjectTypeId(UUID projectType_id);
     Page<Project> findAllByBranchId(UUID branchId, Pageable pageable);
     Page<Project> findAllByBranchIdAndStageIdAndCreatedAtBetween(UUID branch_id, UUID stage_id, Timestamp createdAt, Timestamp createdAt2, Pageable pageable);
     List<Project> findAllByBranch_Id(UUID branch_id);

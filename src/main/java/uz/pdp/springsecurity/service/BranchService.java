@@ -48,7 +48,6 @@ public class BranchService {
         user.getBranches().add(branch);
         userRepository.save(user);
         invoiceService.create(branch);
-        invoiceService.create(branch);
 
         TaskStatus completedTaskStatus = new TaskStatus();
         completedTaskStatus.setName("Completed");
