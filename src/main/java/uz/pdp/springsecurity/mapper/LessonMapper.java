@@ -8,7 +8,8 @@ import uz.pdp.springsecurity.payload.LessonGetDto;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface LessonMapper {
+public interface LessonMapper {//ss
+
     @Mapping(target = "roleId", source = "role.id")
     @Mapping(target = "roleName", source = "role.name")
     @Mapping(target = "attachmentId", source = "attachment.id")

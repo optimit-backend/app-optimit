@@ -18,4 +18,5 @@ public class LessonGetDto {
     private Integer view;
     private UUID attachmentId;
     private String description;
+    private boolean hasTest;
 }

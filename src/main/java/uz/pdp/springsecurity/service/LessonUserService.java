@@ -70,7 +70,7 @@ public class LessonUserService {
 
     public ApiResponse getAllByRole(UUID userId) {
         if (!userRepository.existsById(userId))return new ApiResponse("USER NOT FOUND", false);
-        List<LessonUser> lessonUserList = lessonUserRepository.findAllByLessonId(userId);
+        List<LessonUser> lessonUserList = lessonUserRepository.findAllByUserId(userId);
         if (lessonUserList.isEmpty())return new ApiResponse("LESSONS WITH USER NOT FOUND", false);
         return new ApiResponse(true, lessonUserMapper.toDtoList(lessonUserList));
     }
