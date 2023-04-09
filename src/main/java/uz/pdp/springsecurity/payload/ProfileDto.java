@@ -18,6 +18,8 @@ public class ProfileDto {
     @NotNull(message = "required line")
     private String username;
     @NotNull(message = "required line")
+    private String email;
+    @NotNull(message = "required line")
     private String password;
     @NotNull(message = "required line")
     private String prePassword;
