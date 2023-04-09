@@ -67,6 +67,4 @@ public class ExcelController {
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse).getBody();
 
         }
-        return new ApiResponse("XLSX FORMAT REQUIRED", false);
-    }
 }
