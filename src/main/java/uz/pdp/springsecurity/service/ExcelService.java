@@ -85,13 +85,13 @@ public class ExcelService {
         }
 
         if (optionalBranch.isEmpty()){
-            return new ApiResponse("NOT FOUND BRANCH");
+            return new ApiResponse("NOT FOUND BRANCH", false);
         }
         UUID businessId = optionalBranch.get().getBusiness().getId();
 
 
         if (optionalMeasurement.isEmpty()){
-            return new ApiResponse("NOT FOUND MEASUREMENT");
+            return new ApiResponse("NOT FOUND MEASUREMENT", false);
         }
 
         try {

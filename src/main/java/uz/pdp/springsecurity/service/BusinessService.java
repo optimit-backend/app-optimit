@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.enums.NotificationType;
 import uz.pdp.springsecurity.enums.StatusTariff;
 import uz.pdp.springsecurity.enums.ValueType;
@@ -17,10 +18,7 @@ import uz.pdp.springsecurity.util.Constants;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -160,9 +158,9 @@ public class BusinessService {
         branchDto.setAddressId(address.getId());
         branchDto.setBusinessId(business.getId());
         Branch branch = branchRepository.save(branchMapper.toEntity(branchDto));
-        List<UUID> branchIds = new ArrayList<>();
+        Set<UUID> branchIds = new HashSet<>();
         branchIds.add(branch.getId());
-        userDto.setBranchId(branchIds);
+        userDto.setBranchesId(branchIds);
 
         Optional<Role> optionalRole = roleRepository.findByName("Admin");
         if (optionalRole.isPresent()) {

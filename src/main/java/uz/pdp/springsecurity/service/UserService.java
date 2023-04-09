@@ -1,10 +1,10 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.mapper.UserMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProfileDto;
 import uz.pdp.springsecurity.payload.UserDto;
@@ -17,27 +17,16 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    RoleService roleService;
-
-    @Autowired
-    BranchRepository branchRepository;
-
-    @Autowired
-    BusinessRepository businessRepository;
-
-    @Autowired
-    AttachmentRepository attachmentRepository;
-
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
+    private final BranchRepository branchRepository;
+    private final BusinessRepository businessRepository;
+    private final AttachmentRepository attachmentRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final RoleRepository roleRepository;
     private final AgreementService agreementService;
+    private final UserMapper userMapper;
 
     public ApiResponse add(UserDto userDto, boolean isNewUser) {
         UUID businessId = userDto.getBusinessId();
@@ -70,17 +59,8 @@ public class UserService {
         if (!response.isSuccess())
             return response;
 
-        User user = new User();
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setUsername(userDto.getUsername());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRole((Role) response.getObject());
-        user.setActive(true);
-
         HashSet<Branch> branches = new HashSet<>();
-        for (Iterator<UUID> iterator = userDto.getBranchId().iterator(); iterator.hasNext(); ) {
-            UUID branchId = iterator.next();
+        for (UUID branchId : userDto.getBranchesId()) {
             Optional<Branch> optionalBranch = branchRepository.findById(branchId);
             if (optionalBranch.isPresent()) {
                 branches.add(optionalBranch.get());
@@ -89,10 +69,9 @@ public class UserService {
             }
         }
 
+        User user = userMapper.toEntity(userDto);
+        user.setActive(true);
         user.setBranches(branches);
-        user.setBusiness(business);
-        user.setEnabled(userDto.getEnabled());
-
         if (userDto.getPhotoId() != null) {
             user.setPhoto(attachmentRepository.findById(userDto.getPhotoId()).orElseThrow());
         }
@@ -101,6 +80,7 @@ public class UserService {
         agreementService.add(user);
         return new ApiResponse("ADDED", true, user.getId());
     }
+
 
     public ApiResponse edit(UUID id, UserDto userDto) {
         Optional<User> optionalUser = userRepository.findById(id);
@@ -118,18 +98,14 @@ public class UserService {
             return response;
 
         User user = optionalUser.get();
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setUsername(userDto.getUsername());
-        if (userDto.getPassword() != null & userDto.getPassword().length() > 2) {
+        userMapper.update(userDto, user);
+        assert userDto.getPassword() != null;
+        if (userDto.getPassword().length() > 2) {
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         }
 
-//        Optional<Branch> optionalBranch = branchRepository.findById(userDto.getBranchId());
-//        if (optionalBranch.isEmpty()) return new ApiResponse("BRANCH NOT FOUND", false);
-//        user.setBranch(optionalBranch.get());
         Set<Branch> branches = new HashSet<>();
-        for (UUID branchId : userDto.getBranchId()) {
+        for (UUID branchId : userDto.getBranchesId()) {
             Optional<Branch> byId = branchRepository.findById(branchId);
             if (byId.isPresent()) {
                 branches.add(byId.get());
@@ -145,28 +121,23 @@ public class UserService {
             return new ApiResponse("BUSINESS NOT FOUND", false);
         }
 
-
-        user.setBusiness(businessRepository.findById(userDto.getBusinessId()).get());
-
-        user.setRole((Role) response.getObject());
-        user.setEnabled(userDto.getEnabled());
-
         UUID photoId = userDto.getPhotoId();
         if (photoId != null) {
             Optional<Attachment> optionalPhoto = attachmentRepository.findById(photoId);
             if (optionalPhoto.isEmpty()) return new ApiResponse("PHOTO NOT FOUND", false);
-
             user.setPhoto(optionalPhoto.get());
         }
+
         userRepository.save(user);
         return new ApiResponse("EDITED", true);
     }
 
     public ApiResponse get(UUID id) {
-        boolean exists = userRepository.existsById(id);
-        if (!exists) return new ApiResponse("NOT FOUND", false);
-
-        return new ApiResponse("FOUND", true, userRepository.findById(id).get());
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return new ApiResponse("not found", false);
+        }
+        return new ApiResponse("FOUND", true, userMapper.toDto(user));
     }
 
     public ApiResponse delete(UUID id) {
@@ -200,6 +171,7 @@ public class UserService {
         user.setFirstName(profileDto.getFirstName());
         user.setLastName(profileDto.getLastName());
         user.setUsername(profileDto.getUsername());
+        user.setEmail(profileDto.getEmail());
 
         if (profileDto.getPassword() != null && !profileDto.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(profileDto.getPassword()));
@@ -215,10 +187,11 @@ public class UserService {
     }
 
     public ApiResponse getByRole(UUID role_id) {
-        List<User> allByRole_id = userRepository.findAllByRole_Id(role_id);
-        if (allByRole_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-
-        return new ApiResponse("FOUND", true, allByRole_id);
+        List<User> allByRoleId = userRepository.findAllByRole_Id(role_id);
+        if (allByRoleId.isEmpty()) {
+            return new ApiResponse("NOT FOUND", false);
+        }
+        return new ApiResponse("FOUND", true, userMapper.toDto(allByRoleId));
     }
 
     public ApiResponse getAllByBusinessId(UUID business_id) {
@@ -227,7 +200,7 @@ public class UserService {
         Role superAdmin = optionalRole.get();
         List<User> allByBusiness_id = userRepository.findAllByBusiness_IdAndRoleIsNotAndActiveIsTrue(business_id, superAdmin);
         if (allByBusiness_id.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
-        return new ApiResponse("FOUND", true, allByBusiness_id);
+        return new ApiResponse("FOUND", true, userMapper.toDto(allByBusiness_id));
     }
 
 
@@ -238,7 +211,7 @@ public class UserService {
             if (optionalRole.isEmpty()) return new ApiResponse("ERROR", false);
             Role superAdmin = optionalRole.get();
             List<User> allByBranch_id = userRepository.findAllByBranchesIdAndRoleIsNotAndActiveIsTrue(branch_id, superAdmin);
-            return new ApiResponse("FOUND", true, allByBranch_id);
+            return new ApiResponse("FOUND", true, userMapper.toDto(allByBranch_id));
         }
         return new ApiResponse("NOT FOUND", false);
     }
