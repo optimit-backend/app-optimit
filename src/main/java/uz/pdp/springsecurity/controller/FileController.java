@@ -26,7 +26,8 @@ public class FileController {
         try {
             byte[] fileData = file.getBytes();
             String fileName = file.getOriginalFilename();
-            ApiResponse apiResponse = fileService.saveFileToDatabase(fileName, fileData);
+            long size = file.getSize();
+            ApiResponse apiResponse = fileService.saveFileToDatabase(fileName, fileData, size);
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.REQUEST_HEADER_FIELDS_TOO_LARGE).build();
@@ -35,14 +36,20 @@ public class FileController {
 
     @GetMapping("/files/{fileId}")
     public ResponseEntity<byte[]> getFile(@PathVariable UUID fileId) {
-        ApiResponse fileFromDatabase = fileService.getFileFromDatabase(fileId);
-        if (fileFromDatabase != null) {
+        FileData fileData = fileService.getFileFromDatabase(fileId);
+        if (fileData != null) {
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + "a" + "\"")
-                    .body((byte[]) fileFromDatabase.getObject());
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileData.getFileName() + "\"")
+                    .body(fileData.getFileData());
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @DeleteMapping("/files/{fileId}")
+    public HttpEntity<?> deleteFile(@PathVariable UUID fileId) {
+        ApiResponse apiResponse = fileService.deleteById(fileId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
 

@@ -15,9 +15,9 @@ public class FileService {
     @Autowired
     FileDateRepository fileDateRepository;
 
-    public ApiResponse saveFileToDatabase(String fileName, byte[] fileData) {
+    public ApiResponse saveFileToDatabase(String fileName, byte[] fileData,long size) {
 
-        int maxSizeInBytes = 1024 * 1024; // 1MB
+        long maxSizeInBytes = 10000L * 1024 * 1024; // 5MB
         if (fileData.length > maxSizeInBytes){
             return new ApiResponse("File too large !",false);
         }
@@ -25,12 +25,21 @@ public class FileService {
         FileData fileDataEntity = new FileData();
         fileDataEntity.setFileName(fileName);
         fileDataEntity.setFileData(fileData);
+        fileDataEntity.setSize(size);
         fileDateRepository.save(fileDataEntity);
         return new ApiResponse("Found",true,fileDataEntity.getId());
     }
 
-    public ApiResponse getFileFromDatabase(UUID fileId) {
-        FileData fileData = fileDateRepository.findById(fileId).orElse(null);
-        return new ApiResponse("Found",true,fileData);
+    public FileData getFileFromDatabase(UUID fileId) {
+        return fileDateRepository.findById(fileId).orElse(null);
+    }
+
+    public ApiResponse deleteById(UUID fileId) {
+        boolean exists = fileDateRepository.existsById(fileId);
+        if (!exists){
+            return new ApiResponse("Not found",false);
+        }
+        fileDateRepository.deleteById(fileId);
+        return new ApiResponse("Deleted",true);
     }
 }
