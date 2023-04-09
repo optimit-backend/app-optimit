@@ -18,6 +18,8 @@ public class FileData extends AbsEntity {
 
     private byte[] fileData;
 
+    private long size;
+
     @ManyToOne
     Project project;
 }

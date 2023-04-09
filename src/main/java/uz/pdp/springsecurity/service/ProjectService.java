@@ -188,6 +188,18 @@ public class ProjectService {
         return new ApiResponse("Deleted", true);
     }
 
+    public ApiResponse getAllByBranch(UUID branchId){
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch not found",false);
+        }
+        List<Project> projectList = projectRepository.findAllByBranch_Id(branchId);
+        if (projectList.isEmpty()){
+            return new ApiResponse("Project not found",false);
+        }
+        return new ApiResponse("Found",true,projectList);
+    }
+
     public ApiResponse  getAllByBranchId(UUID branchId,UUID typeId, UUID stageId,UUID customerId, Date startDate,Date endDate,int page,int size) {
         Pageable pageable = PageRequest.of(page,size);
         Page<Project> projectList = null;
@@ -233,8 +245,16 @@ public class ProjectService {
             projectList = projectRepository.findAllByBranchIdAndCustomerIdAndCreatedAtBetween(branchId, customerId, start, end,pageable);
         } else if (checkingStage && checkingDate) {
             projectList = projectRepository.findAllByBranchIdAndStageIdAndCreatedAtBetween(branchId, stageId, start, end,pageable);
+        }else if (checkingCustomer) {
+            projectList = projectRepository.findAllByBranchIdAndCustomerId(branchId,customerId,pageable);
+        }else if (checkingStage) {
+            projectList = projectRepository.findAllByBranchIdAndStageId(branchId,stageId,pageable);
+        }else if (checkingType) {
+            projectList = projectRepository.findAllByBranchIdAndProjectTypeId(branchId,typeId,pageable);
+        }else if (checkingDate) {
+            projectList = projectRepository.findAllByBranchIdAndCreatedAtBetween(branchId,start,end,pageable);
         } else {
-            projectList = projectRepository.findAllByBranchId(branchId,pageable)
+            projectList = projectRepository.findAllByBranchId(branchId,pageable);
         }
         assert projectList != null;
         if (projectList.isEmpty()) {

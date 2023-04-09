@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProjectDto;
@@ -12,7 +11,6 @@ import uz.pdp.springsecurity.service.ProjectService;
 
 import javax.validation.Valid;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -61,6 +59,13 @@ public class ProjectController {
                                         @RequestParam int page,
                                         @RequestParam int size) {
         ApiResponse apiResponse = projectService.getAllByBranchId(branchId,typeId,stageId,customerId,startDate,endDate,page,size);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("GET_ALL_PROJECT")
+    @GetMapping("/get-by-branchId/{branchId}")
+    public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = projectService.getAllByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
