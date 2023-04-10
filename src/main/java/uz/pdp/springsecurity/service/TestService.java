@@ -36,8 +36,7 @@ public class TestService {
         try (XWPFDocument document = new XWPFDocument(file.getInputStream())){
             List<Test> testList = new ArrayList<>();
             for (IBodyElement bodyElement : document.getBodyElements()) {
-                if (bodyElement instanceof XWPFTable) {
-                    XWPFTable table = (XWPFTable) bodyElement.getBody();
+                if (bodyElement instanceof XWPFTable table) {
                     if (table.getRows().size() < 2)return new ApiResponse( "0 TEST UPLOADED", false);
 
                     for (XWPFTableRow row : table.getRows()) {
