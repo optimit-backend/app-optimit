@@ -150,6 +150,7 @@ public class BusinessService {
         doneStatus.setName("Done");
         doneStatus.setIncrease(true);
         doneStatus.setColor("rang");
+        doneStatus.setSaleStatus(true);
         doneStatus.setSort(3);
         progressStatus.setBusiness(business);
         lidStatusRepository.save(doneStatus);
