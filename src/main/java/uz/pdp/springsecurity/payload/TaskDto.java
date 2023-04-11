@@ -17,10 +17,12 @@ public class TaskDto {
     private UUID taskTypeId;
     private Date startDate;
     private Date EndDate;
+    private Date deadLine;
     private List<UUID> users;
     private UUID taskStatus;
     private String importance;
     private UUID dependTask;
+    private UUID contentId;
     private boolean isProduction;
     private UUID production;
     private double goalAmount;

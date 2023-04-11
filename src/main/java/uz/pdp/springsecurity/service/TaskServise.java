@@ -46,6 +46,7 @@ public class TaskServise {
         }
         task.setStartDate(taskDto.getStartDate());
         task.setEndDate(taskDto.getEndDate());
+        task.setDeadLine(taskDto.getDeadLine());
 
         List<User> userList = new ArrayList<>();
         for (UUID userId : taskDto.getUsers()) {
@@ -108,6 +109,7 @@ public class TaskServise {
         }
         task.setStartDate(taskDto.getStartDate());
         task.setEndDate(taskDto.getEndDate());
+        task.setDeadLine(taskDto.getDeadLine());
         if (taskDto.getUsers() != null) {
             List<User> userList = new ArrayList<>();
             for (UUID user : taskDto.getUsers()) {
@@ -149,13 +151,12 @@ public class TaskServise {
         }
         Task task = optionalTask.get();
         TaskStatus taskStatus = optionalTaskStatus.get();
-        if (task.getDependTask() != null && !taskStatus.getOrginalName().equals("Completed")) {
+        if (task.getDependTask() != null && taskStatus.getOrginalName().equals("Completed")) {
             Task depentTask = taskRepository.getById(task.getDependTask().getId());
             if (depentTask.getTaskStatus().getOrginalName() != null && !depentTask.getTaskStatus().getOrginalName().equals("Completed")) {
                 return new ApiResponse("You can not change this task, Complete " + depentTask.getName() + " task", false);
             }
         }
-
         task.setTaskStatus(taskStatus);
         taskRepository.save(task);
         return new ApiResponse("Edited", true);

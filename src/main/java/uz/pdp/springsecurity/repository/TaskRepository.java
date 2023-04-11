@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import uz.pdp.springsecurity.entity.Task;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     int countByProjectIdAndTaskStatus_OrginalName(UUID project_id, String taskStatus_orginalName);
     int countByProjectId(UUID project_id);
     Page<Task> findAllByBranchId(UUID branch_id, Pageable pageable);
+    List<Task> findAllByDeadLineBefore(Date currentDate);
     List<Task> findAllByProjectId(UUID project_id);
     List<Task> findAllByBranch_Id(UUID branch_id);
     Page<Task> findAllByProject_Id(UUID project_id, Pageable pageable);
