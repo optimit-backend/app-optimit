@@ -13,7 +13,8 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 @Entity
 public class SelectForLid extends AbsEntity {
-    private String name;
+
+    private String name; //russia
     @ManyToOne
-    private LidField lid;
+    private LidField lid; //davlat
 }

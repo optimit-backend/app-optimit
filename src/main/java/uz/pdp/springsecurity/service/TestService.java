@@ -27,6 +27,8 @@ public class TestService {
     private final TestMapper testMapper;
 
     public ApiResponse add(MultipartFile file, UUID lessonId) {
+
+        //todo filedan bo'sh qatorlar kesa bo'sh object yasavorebdi
         Optional<Lesson> optionalLesson = lessonRepository.findById(lessonId);
         if (optionalLesson.isEmpty()) return new ApiResponse("LESSON NOT FOUND", false);
         if (file.isEmpty() || file.getContentType() == null) return new ApiResponse("FILE NOT FOUND", false);

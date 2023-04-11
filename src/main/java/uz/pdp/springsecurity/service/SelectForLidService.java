@@ -6,6 +6,7 @@ import uz.pdp.springsecurity.entity.SelectForLid;
 import uz.pdp.springsecurity.mapper.SelectForLidMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.SelectForLidDto;
+import uz.pdp.springsecurity.payload.SelectForLidPostDto;
 import uz.pdp.springsecurity.repository.SelectForLidRepository;
 
 import java.util.List;
@@ -28,15 +29,18 @@ public class SelectForLidService {
     }
 
     public ApiResponse getById(UUID id) {
-        SelectForLid selectForLid = repository.findById(id).orElse(null);
-        if (selectForLid == null) {
+        List<SelectForLid> all = repository.findAllByLidId(id);
+        if (all == null) {
             return new ApiResponse("not found", false);
         }
-        return new ApiResponse("found", true, mapper.toDto(selectForLid));
+        return new ApiResponse("found", true, mapper.toDto(all));
     }
 
-    public ApiResponse create(SelectForLidDto dto) {
-        repository.save(mapper.toEntity(dto));
+    public ApiResponse create(SelectForLidPostDto lidPostDto) {
+        List<String> names = lidPostDto.getNames();
+        for (String name : names) {
+            repository.save(mapper.toEntity(new SelectForLidDto(name, lidPostDto.getLidId())));
+        }
         return new ApiResponse("successfully saved", true);
     }
 

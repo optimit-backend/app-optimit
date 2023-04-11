@@ -4,18 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SelectForLidDto {
-    private UUID id;
-    private String name;
+public class SelectForLidPostDto {
+    private List<String> names;
     private UUID lidId;
-
-    public SelectForLidDto(String name, UUID lidId) {
-        this.name = name;
-        this.lidId = lidId;
-    }
 }

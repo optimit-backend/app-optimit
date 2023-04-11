@@ -8,8 +8,10 @@ import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LidFieldDto;
 import uz.pdp.springsecurity.payload.SelectForLidDto;
+import uz.pdp.springsecurity.payload.SelectForLidPostDto;
 import uz.pdp.springsecurity.service.SelectForLidService;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,7 +28,7 @@ public class SelectForLidController {
     }
 
     @CheckPermission("VIEW_FORM_LID")
-    @GetMapping("/{id}")
+    @GetMapping("/getByLidId/{id}")
     public HttpEntity<?> getById(@PathVariable UUID id) {
         ApiResponse apiResponse = service.getById(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
@@ -34,8 +36,8 @@ public class SelectForLidController {
 
     @CheckPermission("ADD_FORM_LID")
     @PostMapping
-    public HttpEntity<?> create(@RequestBody SelectForLidDto dto) {
-        ApiResponse apiResponse = service.create(dto);
+    public HttpEntity<?> create(@RequestBody SelectForLidPostDto names) {
+        ApiResponse apiResponse = service.create(names);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

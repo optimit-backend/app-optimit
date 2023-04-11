@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface SelectForLidRepository extends JpaRepository<SelectForLid, UUID> {
     List<SelectForLid> findAllByLid_BusinessId(UUID lid_business_id);
+    List<SelectForLid> findAllByLidId(UUID lid_id);
 }

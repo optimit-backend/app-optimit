@@ -54,7 +54,7 @@ public class TaskServise {
         }
         task.setUsers(userList);
 
-        Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findByOrginalName("Uncompleted");
+        Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findByBranchIdAndOrginalName(taskDto.getBranchId(), "Uncompleted");
         optionalTaskStatus.ifPresent(task::setTaskStatus);
 
         task.setImportance(Importance.valueOf(taskDto.getImportance()));
@@ -155,6 +155,7 @@ public class TaskServise {
                 return new ApiResponse("You can not change this task, Complete " + depentTask.getName() + " task", false);
             }
         }
+
         task.setTaskStatus(taskStatus);
         taskRepository.save(task);
         return new ApiResponse("Edited", true);
@@ -225,21 +226,21 @@ public class TaskServise {
             Pageable pageable = PageRequest.of(0, Objects.requireNonNullElse(integer, 5));
 
             if (checkingProject && checkingType && checkingDate) {
-                allTask = taskRepository.findAllByBranchIdAndProjectIdAndTaskTypeIdAndCreatedAtBetween(branchId,projectId,typeId,start,end,pageable);
+                allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndTaskTypeIdAndCreatedAtBetween(status.getId(), projectId, typeId, start, end, pageable);
             } else if (checkingProject && checkingType) {
-                allTask = taskRepository.findAllByBranchIdAndProjectIdAndTaskTypeId(branchId, projectId, typeId,pageable);
+                allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndTaskTypeId(status.getId(), projectId, typeId, pageable);
             } else if (checkingProject && checkingDate) {
-                allTask = taskRepository.findAllByBranchIdAndProjectIdAndCreatedAtBetween(branchId, projectId, start, end,pageable);
+                allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndCreatedAtBetween(status.getId(), projectId, start, end, pageable);
             } else if (checkingProject) {
-                allTask = taskRepository.findAllByBranchIdAndProjectId(branchId, projectId,pageable);
+                allTask = taskRepository.findAllByTaskStatusIdAndProjectId(status.getId(), projectId, pageable);
             } else if (checkingType && checkingDate) {
-                allTask = taskRepository.findAllByBranchIdAndTaskTypeIdAndCreatedAtBetween(branchId, typeId, start, end,pageable);
+                allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeIdAndCreatedAtBetween(status.getId(), typeId, start, end, pageable);
             } else if (checkingType) {
-                allTask = taskRepository.findAllByBranchIdAndTaskTypeId(branchId, typeId,pageable);
+                allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeId(status.getId(), typeId, pageable);
             } else if (checkingDate) {
-                allTask = taskRepository.findAllByBranchIdAndCreatedAtBetween(branchId, start, end,pageable);
+                allTask = taskRepository.findAllByTaskStatusIdAndCreatedAtBetween(status.getId(), start, end, pageable);
             } else {
-                allTask = taskRepository.findAllByBranchId(branchId,pageable);
+                allTask = taskRepository.findAllByTaskStatus_Id(status.getId(), pageable);
             }
             List<TaskGetDto> taskGetDtoList = taskMapper.toDto(allTask.toList());
 
