@@ -47,6 +47,9 @@ public class Task extends AbsEntity {
     @ManyToOne
     private Production production;
 
+    @ManyToOne
+    private Content content;
+
     private double goalAmount;
 
     private double taskPrice;
