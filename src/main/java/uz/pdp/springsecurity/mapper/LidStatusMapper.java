@@ -29,6 +29,7 @@ public interface LidStatusMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "business", ignore = true)
+    @Mapping(target = "saleStatus", ignore = true)
     @Mapping(target = "business.id", source = "businessId")
     void update(LidStatusPostDto lidStatusPostDto, @MappingTarget LidStatus lidStatus);
 

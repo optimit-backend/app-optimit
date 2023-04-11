@@ -15,5 +15,6 @@ public class LidStatusPostDto {
     private String color;
     private Integer sort;
     private boolean increase;
+    private boolean saleStatus;
     private UUID businessId;
 }

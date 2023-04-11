@@ -58,6 +58,7 @@ public class LidStatusService {
             newLidStatus.setSort(1);
         }
         newLidStatus.setIncrease(true);
+        newLidStatus.setSaleStatus(false);
         repository.save(newLidStatus);
         return new ApiResponse("successfully saved", true);
     }
@@ -90,9 +91,18 @@ public class LidStatusService {
         }
 
         mapper.update(lidStatusPostDto, lidStatus);
+
+        if (lidStatusPostDto.isSaleStatus()) {
+            if (repository.existsBySaleStatusIsTrue()) {
+                return new ApiResponse("failed edited is Sale Status already exist", false);
+            }
+            lidStatus.setSaleStatus(lidStatusPostDto.isSaleStatus());
+        }
+
         lidStatus.setSort(newSort);
         lidStatus.setIncrease(true);
         repository.save(lidStatus);
+
         return new ApiResponse("successfully edited", true);
     }
 
@@ -102,6 +112,9 @@ public class LidStatusService {
             return new ApiResponse("not found", false);
         }
         LidStatus lidStatus = optional.get();
+        if (lidStatus.isSaleStatus()) {
+            return new ApiResponse("not deleted", false);
+        }
         repository.delete(lidStatus);
 
         List<LidStatus> allByBusinessId =
