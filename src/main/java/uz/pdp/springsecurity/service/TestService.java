@@ -6,14 +6,18 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.springsecurity.entity.Lesson;
+import uz.pdp.springsecurity.entity.LessonUser;
 import uz.pdp.springsecurity.entity.Test;
 import uz.pdp.springsecurity.mapper.TestMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.repository.LessonRepository;
+import uz.pdp.springsecurity.repository.LessonUserRepository;
 import uz.pdp.springsecurity.repository.TestRepository;
+import uz.pdp.springsecurity.repository.UserRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -25,10 +29,11 @@ public class TestService {
     private final LessonRepository lessonRepository;
     private final TestRepository testRepository;
     private final TestMapper testMapper;
+    private final LessonUserRepository lessonUserRepository;
+    private final UserRepository userRepository;
 
     public ApiResponse add(MultipartFile file, UUID lessonId) {
 
-        //todo filedan bo'sh qatorlar kesa bo'sh object yasavorebdi
         Optional<Lesson> optionalLesson = lessonRepository.findById(lessonId);
         if (optionalLesson.isEmpty()) return new ApiResponse("LESSON NOT FOUND", false);
         if (file.isEmpty() || file.getContentType() == null) return new ApiResponse("FILE NOT FOUND", false);
@@ -40,8 +45,13 @@ public class TestService {
             for (IBodyElement bodyElement : document.getBodyElements()) {
                 if (bodyElement instanceof XWPFTable table) {
                     if (table.getRows().size() < 2)return new ApiResponse( "0 TEST UPLOADED", false);
-
-                    for (XWPFTableRow row : table.getRows()) {
+                    List<XWPFTableRow> rowList = table.getRows().subList(1, table.getRows().size());
+                    for (XWPFTableRow row : rowList) {
+                        if (row.getCell(1).getText().trim().equals(""))continue;
+                        if (row.getCell(2).getText().trim().equals(""))continue;
+                        if (row.getCell(3).getText().trim().equals(""))continue;
+                        if (row.getCell(4).getText().trim().equals(""))continue;
+                        if (row.getCell(5).getText().trim().equals(""))continue;
                         Test test = new Test(
                                 lesson,
                                 row.getCell(1).getText().trim(),
@@ -70,8 +80,15 @@ public class TestService {
         return new ApiResponse( true, testMapper.toDtoList(testList));
     }
 
-    public ApiResponse getTest(UUID lessonId) {
+    public ApiResponse generate(UUID lessonId, UUID userId) {
         if (!lessonRepository.existsById(lessonId)) return new ApiResponse("LESSON NOT FOUND", false);
+        if (!userRepository.existsById(userId)) return new ApiResponse("USER NOT FOUND", false);
+        Optional<LessonUser> optionalLessonUser = lessonUserRepository.findByUserIdAndLessonId(lessonId, userId);
+        if (optionalLessonUser.isEmpty())
+            return new ApiResponse("LESSON_USER NOT FOUND", false);
+        LessonUser lessonUser = optionalLessonUser.get();
+        if (lessonUser.isSolveTest())
+            new ApiResponse("YOU SOLVE THE TEST", false);
         List<Test> testList = testRepository.findAllByLessonId(lessonId);
         if (testList.isEmpty()) return new ApiResponse("TEST NOT FOUND", false);
         if (testList.size() < 30) return new ApiResponse("TESTS NOT ENOUGH", false);
@@ -95,6 +112,7 @@ public class TestService {
         return new ApiResponse("ERROR", false);
     }
 
+    @Transactional
     public ApiResponse deleteAll(UUID lessonId) {
         Optional<Lesson> optionalLesson = lessonRepository.findById(lessonId);
         if (optionalLesson.isEmpty()) return new ApiResponse("LESSON NOT FOUND", false);

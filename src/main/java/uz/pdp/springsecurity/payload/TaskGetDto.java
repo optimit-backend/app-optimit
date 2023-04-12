@@ -18,6 +18,7 @@ public class TaskGetDto {
     private UUID taskTypeId;
 
     private String projectName;
+    private UUID contentId;
 
     private Date startDate;
 

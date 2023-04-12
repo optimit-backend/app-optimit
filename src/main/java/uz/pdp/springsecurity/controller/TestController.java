@@ -35,8 +35,8 @@ public class TestController {
 
     @CheckPermission("VIEW_LESSON_ROLE")
     @GetMapping("/generate/{lessonId}")
-    public HttpEntity<?> getTest(@PathVariable UUID lessonId) {
-        ApiResponse apiResponse = testService.getTest(lessonId);
+    public HttpEntity<?> generate(@PathVariable UUID lessonId, @RequestParam UUID userId) {
+        ApiResponse apiResponse = testService.generate(lessonId, userId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

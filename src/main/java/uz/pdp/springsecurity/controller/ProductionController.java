@@ -1,27 +1,34 @@
 package uz.pdp.springsecurity.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductionDto;
+import uz.pdp.springsecurity.payload.ProductionTaskDto;
 import uz.pdp.springsecurity.service.ProductionService;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/production")
+@RequiredArgsConstructor
 public class ProductionController {
-    @Autowired
-    ProductionService productionService;
+    private final ProductionService productionService;
     @CheckPermission("CREATE_PRODUCTION")
     @PostMapping
     public HttpEntity<?> add(@Valid @RequestBody ProductionDto productionDto) {
         ApiResponse apiResponse = productionService.add(productionDto);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("CREATE_PRODUCTION")
+    @PostMapping("/task-production")
+    public HttpEntity<?> addForTask(@Valid @RequestBody ProductionTaskDto productionTaskDto) {
+        ApiResponse apiResponse = productionService.addForTask(productionTaskDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

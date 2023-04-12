@@ -29,6 +29,7 @@ public class TaskServise {
     private final ProductionRepository productionRepository;
     private final TaskMapper taskMapper;
     private final NotificationRepository notificationRepository;
+    private final ContentRepository contentRepository;
 
     public ApiResponse add(TaskDto taskDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(taskDto.getBranchId());
@@ -46,6 +47,16 @@ public class TaskServise {
         }
         task.setStartDate(taskDto.getStartDate());
         task.setEndDate(taskDto.getEndDate());
+        if (taskDto.getDeadLine() != null){
+            task.setDeadLine(taskDto.getDeadLine());
+        }
+        if (taskDto.getContentId()!=null){
+            Optional<Content> optionalContent = contentRepository.findById(taskDto.getContentId());
+            if (optionalContent.isPresent()){
+                Content content = optionalContent.get();
+                task.setContent(content);
+            }
+        }
 
         List<User> userList = new ArrayList<>();
         for (UUID userId : taskDto.getUsers()) {
@@ -63,25 +74,43 @@ public class TaskServise {
             optionalTask.ifPresent(task::setDependTask);
         }
 
-        task.setProductions(taskDto.isProduction());
+        task.setProductions(taskDto.isProductions());
 
-        if (taskDto.getProduction() != null) {
-            Optional<Production> optionalProduction = productionRepository.findById(taskDto.getProduction());
-            optionalProduction.ifPresent(task::setProduction);
-        }
         task.setGoalAmount(taskDto.getGoalAmount());
         task.setTaskPrice(taskDto.getTaskPrice());
         task.setEach(taskDto.isEach());
 
         task.setBranch(optionalBranch.get());
+        Project project = null;
+        if (taskDto.getProjectId() != null){
+            Optional<Project> optionalProject = projectRepository.findById(taskDto.getProjectId());
+            if (optionalProject.isPresent()){
+                project = optionalProject.get();
+            }
+            double budget = project.getBudget();
+            double taskPrice = task.getTaskPrice();
+            int size = userList.size();
+            if (taskDto.isEach()){
+                budget =  budget-(taskPrice*size);
+                project.setBudget(budget);
+                projectRepository.save(project);
+            }else {
+                budget = budget - (taskPrice);
+                project.setBudget(budget);
+                projectRepository.save(project);
+            }
+        }
+
         taskRepository.save(task);
+
+
 
         List<User> users = task.getUsers();
         for (User user : users) {
             Notification notification = new Notification();
             notification.setRead(false);
-            notification.setName("Sizga yangi vafiza belgilandi!");
-            notification.setMessage("Sizning vazifangiz ushbu linkda!");
+            notification.setName("You have been given a new task!");
+            notification.setMessage("Your assignment is at this link!");
             notification.setType(NotificationType.NEW_TASK);
             notification.setObjectId(task.getId());
             notification.setUserTo(user);
@@ -108,6 +137,7 @@ public class TaskServise {
         }
         task.setStartDate(taskDto.getStartDate());
         task.setEndDate(taskDto.getEndDate());
+        task.setDeadLine(taskDto.getDeadLine());
         if (taskDto.getUsers() != null) {
             List<User> userList = new ArrayList<>();
             for (UUID user : taskDto.getUsers()) {
@@ -125,11 +155,7 @@ public class TaskServise {
             Optional<Task> taskOptional = taskRepository.findById(taskDto.getDependTask());
             taskOptional.ifPresent(task::setDependTask);
         }
-        task.setProductions(taskDto.isProduction());
-        if (taskDto.getProduction() != null) {
-            Optional<Production> optionalProduction = productionRepository.findById(taskDto.getProduction());
-            optionalProduction.ifPresent(task::setProduction);
-        }
+        task.setProductions(taskDto.isProductions());
         task.setGoalAmount(taskDto.getGoalAmount());
         task.setTaskPrice(taskDto.getTaskPrice());
         task.setEach(taskDto.isEach());
@@ -145,17 +171,23 @@ public class TaskServise {
         }
         Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findById(taskStatusId);
         if (optionalTaskStatus.isEmpty()) {
+            TaskStatus taskStatus = optionalTaskStatus.get();
             return new ApiResponse("Not Found", false);
         }
         Task task = optionalTask.get();
         TaskStatus taskStatus = optionalTaskStatus.get();
-        if (task.getDependTask() != null && !taskStatus.getOrginalName().equals("Completed")) {
+        if (task.getDependTask() != null && taskStatus.getOrginalName().equals("Completed")) {
             Task depentTask = taskRepository.getById(task.getDependTask().getId());
             if (depentTask.getTaskStatus().getOrginalName() != null && !depentTask.getTaskStatus().getOrginalName().equals("Completed")) {
                 return new ApiResponse("You can not change this task, Complete " + depentTask.getName() + " task", false);
             }
         }
-
+        if (task.getTaskStatus().getName().equals("Completed")){
+            return new ApiResponse("You can not change this task !", false);
+        }
+        if (taskStatus.getOrginalName() != null && taskStatus.getOrginalName().equals("Completed")){
+            task.setEndDate(new Date());
+        }
         task.setTaskStatus(taskStatus);
         taskRepository.save(task);
         return new ApiResponse("Edited", true);

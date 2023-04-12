@@ -8,7 +8,6 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 import uz.pdp.springsecurity.enums.Importance;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +28,7 @@ public class Task extends AbsEntity {
     private Date startDate;
 
     private Date EndDate;
+    private Date deadLine;
 
     @ManyToMany
     private List<User> users;
@@ -42,6 +42,7 @@ public class Task extends AbsEntity {
     @ManyToOne
     private Task dependTask;
 
+    @Column(nullable = false)
     private boolean isProductions;
 
     @ManyToOne
