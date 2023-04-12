@@ -13,6 +13,7 @@ import java.util.List;
 public interface LidStatusMapper {
     @Mapping(target = "numberOfLids", ignore = true)
     @Mapping(target = "businessId", source = "business.id")
+    @Mapping(target = "orginalName", source = "orginalName")
     @Mapping(target = "id", source = "id")
     LidStatusDto toDto(LidStatus lidStatus);
 

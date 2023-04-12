@@ -117,6 +117,7 @@ public class DataLoader implements CommandLineRunner {
                 LidStatus newStatus = new LidStatus();
                 newStatus.setName("New");
                 newStatus.setIncrease(true);
+                newStatus.setOrginalName("New");
                 newStatus.setColor("rang");
                 newStatus.setSort(1);
                 newStatus.setBusiness(business);
@@ -125,6 +126,7 @@ public class DataLoader implements CommandLineRunner {
                 LidStatus progressStatus = new LidStatus();
                 progressStatus.setName("Progress");
                 progressStatus.setIncrease(true);
+                progressStatus.setOrginalName("Progress");
                 progressStatus.setColor("rang");
                 progressStatus.setSort(2);
                 progressStatus.setBusiness(business);
@@ -133,6 +135,7 @@ public class DataLoader implements CommandLineRunner {
                 LidStatus doneStatus = new LidStatus();
                 doneStatus.setName("Done");
                 doneStatus.setIncrease(true);
+                doneStatus.setOrginalName("Done");
                 doneStatus.setColor("rang");
                 doneStatus.setSaleStatus(true);
                 doneStatus.setSort(3);
