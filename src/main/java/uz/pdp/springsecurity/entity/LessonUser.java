@@ -28,13 +28,23 @@ public class LessonUser extends AbsEntity {
     private User user;
 
     @Column(nullable = false)
+    private Integer lessonView;
+
+    @Column(nullable = false)
     private Integer view = 0;
 
     @Column(nullable = false)
     private boolean finish = false;
 
-    public LessonUser(Lesson lesson, User user) {
+    @Column(nullable = false)
+    private boolean solveTest = false;
+
+    @Column(nullable = false)
+    private Integer testResult = 0;
+
+    public LessonUser(Lesson lesson, User user, Integer lessonView) {
         this.lesson = lesson;
         this.user = user;
+        this.lessonView = lessonView;
     }
 }

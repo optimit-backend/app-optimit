@@ -1,26 +1,22 @@
 package uz.pdp.springsecurity.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
-import uz.pdp.springsecurity.annotations.CurrentUser;
-import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ContentDto;
 import uz.pdp.springsecurity.service.ContentService;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/content")
+@RequiredArgsConstructor
 public class ContentController {
-    @Autowired
-    ContentService contentService;
+    private final ContentService contentService;
 
     @CheckPermission("CREATE_CONTENT")
     @PostMapping

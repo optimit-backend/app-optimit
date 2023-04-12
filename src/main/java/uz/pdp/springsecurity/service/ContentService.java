@@ -35,8 +35,7 @@ public class ContentService {
 
     public ApiResponse edit(UUID contentId, ContentDto contentDto) {
         Optional<Content> optionalContent = contentRepository.findById(contentId);
-        if (optionalContent.isEmpty()) return new ApiResponse("NOT FOUND CONTENT", false);
-        return createOrEdit(optionalContent.get(), contentDto);
+        return optionalContent.map(content -> createOrEdit(content, contentDto)).orElseGet(() -> new ApiResponse("NOT FOUND CONTENT", false));
     }
 
     private ApiResponse createOrEdit(Content content, ContentDto contentDto) {
@@ -48,7 +47,7 @@ public class ContentService {
             Optional<ProductTypePrice> optional = productTypePriceRepository.findById(contentDto.getProductTypePriceId());
             if (optional.isEmpty()) return new ApiResponse("NOT FOUND PRODUCT TYPE PRICE", false);
             content.setProductTypePrice(optional.get());
-        }
+        } else return new ApiResponse("NOT FOUND PRODUCT", false);
 
         content.setQuantity(contentDto.getQuantity());
         content.setCostEachOne(contentDto.isCostEachOne());

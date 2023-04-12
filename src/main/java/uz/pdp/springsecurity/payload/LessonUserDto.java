@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import java.util.UUID;
 
 @Data
@@ -18,7 +19,10 @@ public class LessonUserDto {
     private String firstName;
     private String lastName;
 
+    private Integer lessonView;
     private Integer view;
-
     private boolean finish;
+
+    private boolean solveTest;
+    private Integer testResult;
 }

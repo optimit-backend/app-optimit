@@ -42,6 +42,7 @@ public class Task extends AbsEntity {
     @ManyToOne
     private Task dependTask;
 
+    @Column(nullable = false)
     private boolean isProductions;
 
     @ManyToOne
