@@ -6,6 +6,7 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.springsecurity.entity.Lesson;
@@ -40,8 +41,13 @@ public class TestService {
             for (IBodyElement bodyElement : document.getBodyElements()) {
                 if (bodyElement instanceof XWPFTable table) {
                     if (table.getRows().size() < 2)return new ApiResponse( "0 TEST UPLOADED", false);
-
-                    for (XWPFTableRow row : table.getRows()) {
+                    List<XWPFTableRow> rowList = table.getRows().subList(1, table.getRows().size());
+                    for (XWPFTableRow row : rowList) {
+                        if (row.getCell(1).getText().trim().equals(""))continue;
+                        if (row.getCell(2).getText().trim().equals(""))continue;
+                        if (row.getCell(3).getText().trim().equals(""))continue;
+                        if (row.getCell(4).getText().trim().equals(""))continue;
+                        if (row.getCell(5).getText().trim().equals(""))continue;
                         Test test = new Test(
                                 lesson,
                                 row.getCell(1).getText().trim(),
@@ -95,6 +101,7 @@ public class TestService {
         return new ApiResponse("ERROR", false);
     }
 
+    @Transactional
     public ApiResponse deleteAll(UUID lessonId) {
         Optional<Lesson> optionalLesson = lessonRepository.findById(lessonId);
         if (optionalLesson.isEmpty()) return new ApiResponse("LESSON NOT FOUND", false);
