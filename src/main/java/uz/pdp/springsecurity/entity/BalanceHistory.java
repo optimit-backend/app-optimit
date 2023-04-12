@@ -13,14 +13,18 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 @Entity
 public class BalanceHistory extends AbsEntity {
+    //qancha summa otqazmoqchi yoki olmoqchi
     private double summa;
 
+    //otqazdimi yoki oldimi ?
     private boolean plus;
 
+    //hozirda balanceda mavjud summa
     private double accountSumma;
 
+    //otqazilgan yoki olingan summadan keyingi balancedagi holat
     private double totalSumma;
 
     @ManyToOne
-    private Business business;
+    private Branch branch;
 }
