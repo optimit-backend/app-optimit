@@ -27,6 +27,7 @@ public interface UserMapper {
     @Mapping(source = "businessId", target = "business.id")
     User toEntity(UserDto userDto);
 
+    @Mapping(source = "role.name", target = "roleName")
     @Mapping(target = "photoId", ignore = true)
     @Mapping(target = "branchesId", ignore = true)
     @Mapping(target = "bonusesId", ignore = true)

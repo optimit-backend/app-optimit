@@ -35,6 +35,8 @@ public class UserDto {
 
     private UUID roleId;
 
+    private String roleName;
+
     private UUID businessId;
 
     private Set<UUID> branchesId;
