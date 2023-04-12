@@ -7,6 +7,7 @@ import uz.pdp.springsecurity.entity.LessonUser;
 import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.mapper.LessonUserMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.TestResulDto;
 import uz.pdp.springsecurity.repository.LessonRepository;
 import uz.pdp.springsecurity.repository.LessonUserRepository;
 import uz.pdp.springsecurity.repository.UserRepository;
@@ -27,7 +28,8 @@ public class LessonUserService {
         for (User user : userList) {
             lessonUserList.add(new LessonUser(
                     lesson,
-                    user
+                    user,
+                    lesson.getView()
             ));
         }
         if (!lessonUserList.isEmpty()) lessonUserRepository.saveAll(lessonUserList);
@@ -38,7 +40,7 @@ public class LessonUserService {
         if (optionalLessonUser.isPresent()) {
             LessonUser lessonUser = optionalLessonUser.get();
             lessonUser.setView(lessonUser.getView() + 1);
-            if (!lessonUser.isFinish() && Objects.equals(lessonUser.getView(), lessonUser.getLesson().getView())){
+            if (!lessonUser.isFinish() && Objects.equals(lessonUser.getView(), lessonUser.getLessonView())){
                 lessonUser.setFinish(true);
             }
             lessonUserRepository.save(lessonUser);
@@ -54,7 +56,8 @@ public class LessonUserService {
             lessonUserRepository.save(
                     new LessonUser(
                             lesson,
-                            user
+                            user,
+                            lesson.getView()
                     ));
             return edit(lessonId, userId);
         }
@@ -68,10 +71,59 @@ public class LessonUserService {
         return new ApiResponse(true, lessonUserMapper.toDtoList(lessonUserList));
     }
 
-    public ApiResponse getAllByRole(UUID userId) {
+    public ApiResponse getAllByUser(UUID userId) {
         if (!userRepository.existsById(userId))return new ApiResponse("USER NOT FOUND", false);
         List<LessonUser> lessonUserList = lessonUserRepository.findAllByUserId(userId);
         if (lessonUserList.isEmpty())return new ApiResponse("LESSONS WITH USER NOT FOUND", false);
         return new ApiResponse(true, lessonUserMapper.toDtoList(lessonUserList));
+    }
+
+    public ApiResponse getOne(UUID lessonId, UUID userId) {
+        Optional<LessonUser> optionalLessonUser = lessonUserRepository.findByUserIdAndLessonId(userId, lessonId);
+        if (optionalLessonUser.isPresent())
+            return new ApiResponse("SUCCESS", true, lessonUserMapper.toDto(optionalLessonUser.get()));
+        Optional<Lesson> optionalLesson = lessonRepository.findById(lessonId);
+        if (optionalLesson.isEmpty()) return new ApiResponse("LESSON NOT FOUND", false);
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) return new ApiResponse("USER NOT FOUND", false);
+        User user = optionalUser.get();
+        Lesson lesson = optionalLesson.get();
+        if (user.getRole().equals(lesson.getRole())) {
+            lessonUserRepository.save(
+                    new LessonUser(
+                            lesson,
+                            user,
+                            lesson.getView()
+                    ));
+            return getOne(lessonId, userId);
+        }
+        return new ApiResponse("USER ROLE DOES NOT MATCH", false);
+    }
+
+    public ApiResponse testResult(TestResulDto testResulDto) {
+        Optional<LessonUser> optionalLessonUser = lessonUserRepository.findByUserIdAndLessonId(testResulDto.getUserId(), testResulDto.getLessonId());
+        if (optionalLessonUser.isPresent()) {
+            LessonUser lessonUser = optionalLessonUser.get();
+            lessonUser.setSolveTest(true);
+            lessonUser.setTestResult(testResulDto.getTestResult());
+            lessonUserRepository.save(lessonUser);
+            return new ApiResponse("SUCCESS", true);
+        }
+        Optional<Lesson> optionalLesson = lessonRepository.findById(testResulDto.getLessonId());
+        if (optionalLesson.isEmpty()) return new ApiResponse("LESSON NOT FOUND", false);
+        Optional<User> optionalUser = userRepository.findById(testResulDto.getUserId());
+        if (optionalUser.isEmpty()) return new ApiResponse("USER NOT FOUND", false);
+        User user = optionalUser.get();
+        Lesson lesson = optionalLesson.get();
+        if (user.getRole().equals(lesson.getRole())) {
+            lessonUserRepository.save(
+                    new LessonUser(
+                            lesson,
+                            user,
+                            lesson.getView()
+                    ));
+            return testResult(testResulDto);
+        }
+        return new ApiResponse("USER ROLE DOES NOT MATCH", false);
     }
 }
