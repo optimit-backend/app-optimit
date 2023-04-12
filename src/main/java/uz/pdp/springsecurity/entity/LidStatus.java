@@ -18,6 +18,7 @@ public class LidStatus extends AbsEntity {
     private String name;
     private String color;
     private Integer sort;
+    private String orginalName;
     private boolean increase;
     private boolean saleStatus = false;
     @ManyToOne

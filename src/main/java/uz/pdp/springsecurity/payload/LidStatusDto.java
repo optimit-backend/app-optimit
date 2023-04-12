@@ -13,6 +13,7 @@ public class LidStatusDto {
     private UUID id;
     private String name;
     private String color;
+    private String orginalName;
     private Integer sort;
     private boolean increase;
     private int numberOfLids;

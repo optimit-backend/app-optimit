@@ -157,6 +157,9 @@ public class TaskServise {
                 return new ApiResponse("You can not change this task, Complete " + depentTask.getName() + " task", false);
             }
         }
+        if (task.getTaskStatus().getName().equals("Completed")){
+            return new ApiResponse("You can not change this task !", false);
+        }
         task.setTaskStatus(taskStatus);
         taskRepository.save(task);
         return new ApiResponse("Edited", true);
