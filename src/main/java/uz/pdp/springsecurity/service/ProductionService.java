@@ -165,6 +165,9 @@ public class ProductionService {
             if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
         }
 
+        double taskPrice = task.getTaskPrice();
+        if (task.isEach())taskPrice *= task.getUsers().size();
+
         Production production = new Production();
         production.setBranch(branch);
         production.setTotalQuantity(productionTaskDto.getTotalQuantity());
@@ -172,10 +175,9 @@ public class ProductionService {
         production.setInvalid(productionTaskDto.getInvalid());
         production.setDate(productionTaskDto.getDate());
         production.setCostEachOne(false);
-        production.setCost(productionTaskDto.getCost());
+        production.setCost(taskPrice);
         production.setContentPrice(productionTaskDto.getContentPrice());
-        production.setTotalPrice(productionTaskDto.getTotalPrice());
-
+        production.setTotalPrice(productionTaskDto.getContentPrice());
         productionRepository.save(production);
         List<ContentProduct>contentProductList = new ArrayList<>();
 

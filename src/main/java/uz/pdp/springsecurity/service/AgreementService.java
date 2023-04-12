@@ -36,19 +36,19 @@ public class AgreementService {
         List<Agreement> agreementList = new ArrayList<>();
         for (AgreementDto agreementDto : agreementGetDto.getAgreementDtoList()) {
             Optional<Agreement> optionalAgreement = agreementRepository.findByUserIdAndSalaryStatus(userId, SalaryStatus.valueOf(agreementDto.getSalaryStatus()));
-            Agreement agreement = editHelper(optionalAgreement, agreementDto);
-            if (agreement == null) return new ApiResponse("AGREEMENT NOT FOUND", false);
+            if (optionalAgreement.isEmpty()) return new ApiResponse("AGREEMENT NOT FOUND", false);
+            Agreement agreement = editHelper(optionalAgreement.get(), agreementDto, agreementGetDto.getStartDate(), agreementGetDto.getEndDate());
             agreementList.add(agreement);
         }
         agreementRepository.saveAll(agreementList);
         return new ApiResponse("SUCCESS", true);
     }
 
-    private Agreement editHelper(Optional<Agreement> optionalAgreement, AgreementDto agreementDto) {
-        if (optionalAgreement.isEmpty()) return null;
-        Agreement agreement = optionalAgreement.get();
+    private Agreement editHelper(Agreement agreement, AgreementDto agreementDto, Date startDate, Date endDate) {
         agreement.setActive(agreementDto.isActive());
         agreement.setPrice(agreementDto.getPrice());
+        agreement.setStartDate(startDate);
+        agreement.setEndDate(endDate);
         return agreement;
     }
 
@@ -67,6 +67,8 @@ public class AgreementService {
             );
         }
         AgreementGetDto agreementGetDto = new AgreementGetDto(
+                agreementList.get(0).getStartDate(),
+                agreementList.get(0).getEndDate(),
                 agreementDtoList
         );
         return new ApiResponse( true, agreementGetDto);

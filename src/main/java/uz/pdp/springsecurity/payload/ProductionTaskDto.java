@@ -32,12 +32,6 @@ public class ProductionTaskDto {
     private double contentPrice;
 
     @NotNull
-    private double cost;
-
-    @NotNull
-    private double totalPrice;
-
-    @NotNull
     @NotEmpty
     List<ContentProductDto> contentProductDtoList;
 }

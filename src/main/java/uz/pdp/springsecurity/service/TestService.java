@@ -83,12 +83,12 @@ public class TestService {
     public ApiResponse generate(UUID lessonId, UUID userId) {
         if (!lessonRepository.existsById(lessonId)) return new ApiResponse("LESSON NOT FOUND", false);
         if (!userRepository.existsById(userId)) return new ApiResponse("USER NOT FOUND", false);
-        Optional<LessonUser> optionalLessonUser = lessonUserRepository.findByUserIdAndLessonId(lessonId, userId);
+        Optional<LessonUser> optionalLessonUser = lessonUserRepository.findByUserIdAndLessonId(userId, lessonId);
         if (optionalLessonUser.isEmpty())
             return new ApiResponse("LESSON_USER NOT FOUND", false);
         LessonUser lessonUser = optionalLessonUser.get();
         if (lessonUser.isSolveTest())
-            new ApiResponse("YOU SOLVE THE TEST", false);
+            new ApiResponse("YOU SOLVED THE TEST", false);
         List<Test> testList = testRepository.findAllByLessonId(lessonId);
         if (testList.isEmpty()) return new ApiResponse("TEST NOT FOUND", false);
         if (testList.size() < 30) return new ApiResponse("TESTS NOT ENOUGH", false);
