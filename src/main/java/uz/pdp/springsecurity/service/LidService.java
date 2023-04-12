@@ -166,7 +166,6 @@ public class LidService {
         LidStatus lidStatus = lidStatusRepository.findById(lid.getLidStatus().getId()).orElse(null);
         Business business = businessRepository.findById(lid.getBusiness().getId()).orElse(null);
 
-
         lidGetDto.setId(lid.getId());
         lidGetDto.setLidStatusId(lidStatus != null ? lidStatus.getId() : null);
         lidGetDto.setBusinessId(business != null ? business.getId() : null);
