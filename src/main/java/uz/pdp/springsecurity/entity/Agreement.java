@@ -10,6 +10,7 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 import uz.pdp.springsecurity.enums.SalaryStatus;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -29,6 +30,19 @@ public class Agreement extends AbsEntity {
     private double price = 0;
 
     private boolean active;
+
+    @Column(nullable = false)
+    private Date startDate = new Date();
+
+    @Column(nullable = false)
+    private Date endDate = new Date();
+
+    public Agreement(User user, SalaryStatus salaryStatus, double price, boolean active) {
+        this.user = user;
+        this.salaryStatus = salaryStatus;
+        this.price = price;
+        this.active = active;
+    }
 }
 
 
