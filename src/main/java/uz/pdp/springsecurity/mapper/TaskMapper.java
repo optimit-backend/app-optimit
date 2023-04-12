@@ -16,6 +16,7 @@ public interface TaskMapper {
 
     TaskMapper INSTANCE = Mappers.getMapper(TaskMapper.class);
 
+    @Mapping(target = "contentId", source = "content.id")
     @Mapping(target = "projectName", source = "project.name")
     @Mapping(target = "userList", source = "users")
     @Mapping(target = "taskTypeId", source = "taskType.id")
