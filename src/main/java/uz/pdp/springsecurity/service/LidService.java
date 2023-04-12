@@ -177,7 +177,6 @@ public class LidService {
             values.put(entry.getKey().getName(), entry.getValue());
         }
         lidGetDto.setValues(values);
-
         return lidGetDto;
     }
 

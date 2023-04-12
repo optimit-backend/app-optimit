@@ -74,7 +74,11 @@ public class BalanceService {
         }
 
         Balance balance = optionalBalance.get();
+
         BalanceDto balanceDto = new BalanceDto();
-        return null;
+        balanceDto.setBalanceSumma(balance.getAccountSumma());
+        balanceDto.setBranchName(balance.getBranch().getName());
+
+        return new ApiResponse("found", true, balanceDto);
     }
 }
