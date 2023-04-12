@@ -29,6 +29,7 @@ public class TaskServise {
     private final ProductionRepository productionRepository;
     private final TaskMapper taskMapper;
     private final NotificationRepository notificationRepository;
+    private final ContentRepository contentRepository;
 
     public ApiResponse add(TaskDto taskDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(taskDto.getBranchId());
@@ -46,7 +47,16 @@ public class TaskServise {
         }
         task.setStartDate(taskDto.getStartDate());
         task.setEndDate(taskDto.getEndDate());
-        task.setDeadLine(taskDto.getDeadLine());
+        if (taskDto.getDeadLine() != null){
+            task.setDeadLine(taskDto.getDeadLine());
+        }
+        if (taskDto.getContentId()!=null){
+            Optional<Content> optionalContent = contentRepository.findById(taskDto.getContentId());
+            if (optionalContent.isPresent()){
+                Content content = optionalContent.get();
+                task.setContent(content);
+            }
+        }
 
         List<User> userList = new ArrayList<>();
         for (UUID userId : taskDto.getUsers()) {
@@ -64,7 +74,7 @@ public class TaskServise {
             optionalTask.ifPresent(task::setDependTask);
         }
 
-        task.setProductions(taskDto.isProduction());
+        task.setProductions(taskDto.isProductions());
 
         task.setGoalAmount(taskDto.getGoalAmount());
         task.setTaskPrice(taskDto.getTaskPrice());
@@ -123,11 +133,7 @@ public class TaskServise {
             Optional<Task> taskOptional = taskRepository.findById(taskDto.getDependTask());
             taskOptional.ifPresent(task::setDependTask);
         }
-        task.setProductions(taskDto.isProduction());
-        if (taskDto.getProduction() != null) {
-            Optional<Production> optionalProduction = productionRepository.findById(taskDto.getProduction());
-            optionalProduction.ifPresent(task::setProduction);
-        }
+        task.setProductions(taskDto.isProductions());
         task.setGoalAmount(taskDto.getGoalAmount());
         task.setTaskPrice(taskDto.getTaskPrice());
         task.setEach(taskDto.isEach());

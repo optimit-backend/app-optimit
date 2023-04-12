@@ -23,8 +23,7 @@ public class TaskDto {
     private String importance;
     private UUID dependTask;
     private UUID contentId;
-    private boolean isProduction;
-    private UUID production;
+    private boolean isProductions;
     private double goalAmount;
     private double taskPrice;
     private boolean isEach;
