@@ -24,9 +24,9 @@ public class Customer extends AbsEntity {
 
     @Column(nullable = false)
     private String name;
-    @Column(nullable = false)
+
     private String phoneNumber;
-    @Column(nullable = false)
+
     private String telegram;
 
     @ManyToOne
