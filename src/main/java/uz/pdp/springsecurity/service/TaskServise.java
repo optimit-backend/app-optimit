@@ -171,7 +171,6 @@ public class TaskServise {
         }
         Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findById(taskStatusId);
         if (optionalTaskStatus.isEmpty()) {
-            TaskStatus taskStatus = optionalTaskStatus.get();
             return new ApiResponse("Not Found", false);
         }
         Task task = optionalTask.get();
