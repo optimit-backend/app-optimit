@@ -81,7 +81,29 @@ public class TaskServise {
         task.setEach(taskDto.isEach());
 
         task.setBranch(optionalBranch.get());
+        Project project = null;
+        if (taskDto.getProjectId() != null){
+            Optional<Project> optionalProject = projectRepository.findById(taskDto.getProjectId());
+            if (optionalProject.isPresent()){
+                project = optionalProject.get();
+            }
+            double budget = project.getBudget();
+            double taskPrice = task.getTaskPrice();
+            int size = userList.size();
+            if (taskDto.isEach()){
+                budget =  budget-(taskPrice*size);
+                project.setBudget(budget);
+                projectRepository.save(project);
+            }else {
+                budget = budget - (taskPrice);
+                project.setBudget(budget);
+                projectRepository.save(project);
+            }
+        }
+
         taskRepository.save(task);
+
+
 
         List<User> users = task.getUsers();
         for (User user : users) {
@@ -149,6 +171,7 @@ public class TaskServise {
         }
         Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findById(taskStatusId);
         if (optionalTaskStatus.isEmpty()) {
+            TaskStatus taskStatus = optionalTaskStatus.get();
             return new ApiResponse("Not Found", false);
         }
         Task task = optionalTask.get();
@@ -161,6 +184,9 @@ public class TaskServise {
         }
         if (task.getTaskStatus().getName().equals("Completed")){
             return new ApiResponse("You can not change this task !", false);
+        }
+        if (taskStatus.getOrginalName() != null && taskStatus.getOrginalName().equals("Completed")){
+            task.setEndDate(new Date());
         }
         task.setTaskStatus(taskStatus);
         taskRepository.save(task);
