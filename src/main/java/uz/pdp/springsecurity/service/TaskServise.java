@@ -66,10 +66,6 @@ public class TaskServise {
 
         task.setProductions(taskDto.isProduction());
 
-        if (taskDto.getProduction() != null) {
-            Optional<Production> optionalProduction = productionRepository.findById(taskDto.getProduction());
-            optionalProduction.ifPresent(task::setProduction);
-        }
         task.setGoalAmount(taskDto.getGoalAmount());
         task.setTaskPrice(taskDto.getTaskPrice());
         task.setEach(taskDto.isEach());
@@ -81,8 +77,8 @@ public class TaskServise {
         for (User user : users) {
             Notification notification = new Notification();
             notification.setRead(false);
-            notification.setName("Sizga yangi vafiza belgilandi!");
-            notification.setMessage("Sizning vazifangiz ushbu linkda!");
+            notification.setName("You have been given a new task!");
+            notification.setMessage("Your assignment is at this link!");
             notification.setType(NotificationType.NEW_TASK);
             notification.setObjectId(task.getId());
             notification.setUserTo(user);
