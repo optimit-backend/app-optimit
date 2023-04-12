@@ -10,7 +10,7 @@
     </parent>
     <groupId>uz.pdp</groupId>
     <artifactId>spring-security</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+
     <name>spring-security</name>
     <description>Demo project for Spring Boot</description>
 
@@ -20,7 +20,7 @@
 
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
