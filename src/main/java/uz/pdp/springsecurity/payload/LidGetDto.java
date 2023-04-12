@@ -14,5 +14,6 @@ public class LidGetDto {
     private UUID id;
     private Map<String, String> values;
     private UUID lidStatusId;
+    private String lidStatusName;
     private UUID businessId;
 }

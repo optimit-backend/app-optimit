@@ -16,5 +16,5 @@ public class Balance extends AbsEntity {
     private double accountSumma;
 
     @ManyToOne
-    private Business business;
+    private Branch branch;
 }

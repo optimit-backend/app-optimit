@@ -168,6 +168,7 @@ public class LidService {
 
         lidGetDto.setId(lid.getId());
         lidGetDto.setLidStatusId(lidStatus != null ? lidStatus.getId() : null);
+        lidGetDto.setLidStatusName(lidStatus != null ? lidStatus.getName() : null);
         lidGetDto.setBusinessId(business != null ? business.getId() : null);
 
         Map<LidField, String> lidValues = lid.getValues();
