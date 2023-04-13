@@ -24,6 +24,8 @@ import static uz.pdp.springsecurity.enums.StatusName.*;
 @Component
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
+
+    private final ProjectStatusRepository projectStatusRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -726,6 +728,29 @@ public class DataLoader implements CommandLineRunner {
                     branchRepository.save(branch);
                     invoiceService.create(branch);
                     branches.add(branch);
+
+                    List<ProjectStatus> projectStatusList = projectStatusRepository.findAll();
+                    if (projectStatusList.isEmpty()){
+                        ProjectStatus projectStatus = new ProjectStatus();
+                        projectStatus.setName("Uncompleted");
+                        projectStatus.setBranch(branch);
+                        projectStatusRepository.save(projectStatus);
+                    }
+                    if (projectStatusList.isEmpty()){
+                        ProjectStatus projectStatus = new ProjectStatus();
+                        projectStatus.setName("Process");
+                        projectStatus.setBranch(branch);
+                        projectStatusRepository.save(projectStatus);
+                    }
+                    if (projectStatusList.isEmpty()){
+                        ProjectStatus projectStatus = new ProjectStatus();
+                        projectStatus.setName("Completed");
+                        projectStatus.setBranch(branch);
+                        projectStatusRepository.save(projectStatus);
+                    }
+
+
+
 
                     List<TaskStatus> taskStatusList = taskStatusRepository.findAll();
                     if (taskStatusList.isEmpty()) {

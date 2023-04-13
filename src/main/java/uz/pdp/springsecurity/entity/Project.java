@@ -36,13 +36,16 @@ public class Project extends AbsEntity {
     private List<FileData> fileDataList;
 
     private double budget;
-
     @ManyToOne
-    private Stage stage;
+    private ProjectStatus projectStatus;
+
+    @ManyToMany
+    private List<Stage> stageList;
 
     private double goalAmount;
 
     private boolean isProduction;
+    private boolean expired;
 
     @ManyToOne
     private Branch branch;

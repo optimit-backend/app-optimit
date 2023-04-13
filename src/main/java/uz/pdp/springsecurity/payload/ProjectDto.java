@@ -22,10 +22,10 @@ public class ProjectDto {
     @NotNull
     private UUID customerId;
     private String description;
+    private List<String> stages;
     private List<UUID> userList;
     private List<UUID> fileDateList;
     private double budget;
-    private UUID stageId;
     private double goalAmount;
     private boolean isProduction;
     @NotNull

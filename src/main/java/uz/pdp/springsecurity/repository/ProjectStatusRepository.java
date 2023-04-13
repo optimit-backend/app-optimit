@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface ProjectStatusRepository extends JpaRepository<ProjectStatus, UUID> {
 
     List<ProjectStatus> findAllByBranchId(UUID branch_id);
+    ProjectStatus findByName(String name);
 }

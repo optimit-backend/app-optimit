@@ -5,8 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor

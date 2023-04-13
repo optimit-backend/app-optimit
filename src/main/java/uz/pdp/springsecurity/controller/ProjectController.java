@@ -10,7 +10,6 @@ import uz.pdp.springsecurity.payload.ProjectDto;
 import uz.pdp.springsecurity.service.ProjectService;
 
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.UUID;
 
 @RestController
@@ -24,6 +23,14 @@ public class ProjectController {
     @PostMapping
     public HttpEntity<?> add(@Valid @RequestBody ProjectDto projectDto) {
         ApiResponse apiResponse = projectService.add(projectDto);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("EDIT_PROJECT")
+    @PatchMapping("/{projectId}/{statusId}")
+    public HttpEntity<?> updateProjectStatus(@PathVariable  UUID projectId,
+                                             @PathVariable  UUID statusId) {
+        ApiResponse apiResponse = projectService.updateProjectStatus(projectId,statusId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -48,19 +55,18 @@ public class ProjectController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_PROJECT")
-    @GetMapping("/get-by-branch/{branchId}")
-    public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
-                                        @RequestParam(required = false) UUID typeId,
-                                        @RequestParam(required = false) UUID stageId,
-                                        @RequestParam(required = false) UUID customerId,
-                                        @RequestParam(required = false) Date startDate,
-                                        @RequestParam(required = false) Date endDate,
-                                        @RequestParam int page,
-                                        @RequestParam int size) {
-        ApiResponse apiResponse = projectService.getAllByBranchId(branchId,typeId,stageId,customerId,startDate,endDate,page,size);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+//    @CheckPermission("GET_ALL_PROJECT")
+//    @GetMapping("/get-by-branch/{branchId}")
+//    public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
+//                                        @RequestParam(required = false) UUID typeId,
+//                                        @RequestParam(required = false) UUID customerId,
+//                                        @RequestParam(required = false) Date startDate,
+//                                        @RequestParam(required = false) Date endDate,
+//                                        @RequestParam int page,
+//                                        @RequestParam int size) {
+//        ApiResponse apiResponse = projectService.getAllByBranchId(branchId,typeId,stageId,customerId,startDate,endDate,page,size);
+//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+//    }
 
     @CheckPermission("GET_ALL_PROJECT")
     @GetMapping("/get-by-branchId/{branchId}")
@@ -69,10 +75,10 @@ public class ProjectController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_PROJECT")
-    @GetMapping("/get-by-stage/{stageId}")
-    public HttpEntity<?> getAllByStatus(@PathVariable UUID stageId) {
-        ApiResponse apiResponse = projectService.findByStageId(stageId);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+//    @CheckPermission("GET_ALL_PROJECT")
+//    @GetMapping("/get-by-stage/{stageId}")
+//    public HttpEntity<?> getAllByStatus(@PathVariable UUID stageId) {
+//        ApiResponse apiResponse = projectService.findByStageId(stageId);
+//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+//    }
 }

@@ -1,9 +1,9 @@
 package uz.pdp.springsecurity.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -12,7 +12,9 @@ import uz.pdp.springsecurity.service.ProjectStatusServise;
 
 import javax.validation.Valid;
 import java.util.UUID;
-@Service
+@RestController
+@RequestMapping("/api/project/status")
+@RequiredArgsConstructor
 public class ProjectStatusController {
 
     @Autowired
