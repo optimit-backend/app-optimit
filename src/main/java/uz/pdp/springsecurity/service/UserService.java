@@ -8,6 +8,7 @@ import uz.pdp.springsecurity.mapper.UserMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProfileDto;
 import uz.pdp.springsecurity.payload.UserDto;
+import uz.pdp.springsecurity.payload.UserDtoForPatron;
 import uz.pdp.springsecurity.repository.*;
 import uz.pdp.springsecurity.util.Constants;
 
@@ -216,4 +217,8 @@ public class UserService {
         return new ApiResponse("NOT FOUND", false);
     }
 
+    public ApiResponse getByPatron(UUID userId) {
+        UserDtoForPatron userDtoForPatron = new UserDtoForPatron();
+        return null;
+    }
 }

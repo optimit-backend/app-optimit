@@ -28,6 +28,7 @@ public class Task extends AbsEntity {
     private Date startDate;
 
     private Date EndDate;
+
     private Date deadLine;
 
     @ManyToMany

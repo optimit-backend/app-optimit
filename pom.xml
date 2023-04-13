@@ -159,16 +159,6 @@
             <artifactId>java-jwt</artifactId>
             <version>3.17.0</version>
         </dependency>
-
-
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.maven.plugins</groupId>-->
-<!--            <artifactId>maven-compiler-plugin</artifactId>-->
-<!--            <version>3.11.0</version>-->
-<!--        </dependency>-->
-
-
     </dependencies>
 
     <build>
