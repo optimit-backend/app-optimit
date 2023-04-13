@@ -192,7 +192,6 @@ public class TaskServise {
                 task.setExpired(true);
             }else {
                 task.setExpired(false);
-
             }
             task.setEndDate(endDate);
         }
