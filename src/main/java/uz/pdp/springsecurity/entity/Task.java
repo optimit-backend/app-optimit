@@ -29,7 +29,7 @@ public class Task extends AbsEntity {
 
     private Date EndDate;
 
-    private boolean isExpired;
+    private boolean expired;
 
     private Date deadLine;
 
