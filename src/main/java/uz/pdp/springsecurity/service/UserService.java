@@ -5,9 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.mapper.UserMapper;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.ProfileDto;
-import uz.pdp.springsecurity.payload.UserDto;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 import uz.pdp.springsecurity.util.Constants;
 
@@ -27,6 +25,10 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final AgreementService agreementService;
     private final UserMapper userMapper;
+    private final ProjectRepository projectRepository;
+    private final TaskRepository taskRepository;
+    private final TradeRepository tradeRepository;
+
 
     public ApiResponse add(UserDto userDto, boolean isNewUser) {
         UUID businessId = userDto.getBusinessId();
@@ -216,4 +218,75 @@ public class UserService {
         return new ApiResponse("NOT FOUND", false);
     }
 
+    public ApiResponse getByPatron(UUID userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return new ApiResponse("not found User", false);
+        }
+        UserDtoForPatron userDtoForPatron = new UserDtoForPatron();
+        userDtoForPatron.setFio(user.getFirstName() + " " + user.getLastName());
+        if (user.getPhoto() != null) {
+            userDtoForPatron.setPhotosId(user.getPhoto().getId());
+        }
+        userDtoForPatron.setRole(user.getRole().getName());
+
+        List<Project> allProject = projectRepository.findAllByUsersId(userId);
+        List<ProjectDto> allProjectDto = new ArrayList<>();
+
+        for (Project project : allProject) {
+            ProjectDto projectDto = new ProjectDto();
+            projectDto.setId(project.getId());
+            projectDto.setBudget(project.getBudget());
+            projectDto.setDescription(project.getDescription());
+            projectDto.setDeadline(project.getDeadline());
+            projectDto.setEndDate(project.getEndDate());
+            projectDto.setName(project.getName());
+            projectDto.setProduction(project.isProduction());
+            projectDto.setGoalAmount(project.getGoalAmount());
+            projectDto.setBranchId(project.getBranch().getId());
+            projectDto.setCustomerId(project.getCustomer().getId());
+            projectDto.setStageId(project.getStage().getId());
+            projectDto.setStartDate(project.getStartDate());
+            allProjectDto.add(projectDto);
+        }
+        userDtoForPatron.setProjectDtoList(allProjectDto);
+
+        int taskAmount = taskRepository.countAllByUsersId(userId);
+        int completed = taskRepository.countAllByUsersIdAndTaskStatus_OrginalName(userId, "Completed");
+        int expiredIsTrue = taskRepository.countAllByUsersIdAndExpiredIsTrue(userId);
+        TaskInfoGetDto taskInfoGetDto = new TaskInfoGetDto();
+        taskInfoGetDto.setTaskAmount(taskAmount);
+        taskInfoGetDto.setDoneTaskAmount(completed);
+        taskInfoGetDto.setNotDoneDeadlineAmount(expiredIsTrue);
+
+        userDtoForPatron.setTaskInfoGetDto(taskInfoGetDto);
+
+        List<Bonus> bonusList = user.getBonuses();
+        List<BonusGetMetDto> bonusGetMetDto = new ArrayList<>();
+        for (Bonus bonus : bonusList) {
+            BonusGetMetDto bonusDto = new BonusGetMetDto();
+            bonusDto.setName(bonus.getName());
+            bonusDto.setIcon(bonus.getIcon());
+            bonusGetMetDto.add(bonusDto);
+        }
+        userDtoForPatron.setBonusGetMetDtoList(bonusGetMetDto);
+
+        List<Trade> allTrade = tradeRepository.findAllByTrader_Id(userId);
+
+        if (!allTrade.isEmpty()) {
+
+            double totalSumma = 0;
+            for (Trade trade : allTrade) {
+                totalSumma += trade.getTotalSum();
+            }
+
+            TradeResultDto tradeResultDto = new TradeResultDto();
+            tradeResultDto.setTotalTrade(allTrade.size());
+            tradeResultDto.setTotalTradeSumma(totalSumma);
+
+            userDtoForPatron.setTradeResultDto(tradeResultDto);
+        }
+
+        return new ApiResponse("found", true, userDtoForPatron);
+    }
 }

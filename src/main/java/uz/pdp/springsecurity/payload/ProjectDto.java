@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProjectDto {
+    private UUID id;
     @NotNull
     private String name;
     private Date startDate;
