@@ -181,11 +181,20 @@ public class TaskServise {
                 return new ApiResponse("You can not change this task, Complete " + depentTask.getName() + " task", false);
             }
         }
-        if (task.getTaskStatus().getName().equals("Completed")){
+        if (task.getTaskStatus().getOrginalName() != null && task.getTaskStatus().getOrginalName().equals("Completed")){
             return new ApiResponse("You can not change this task !", false);
         }
         if (taskStatus.getOrginalName() != null && taskStatus.getOrginalName().equals("Completed")){
-            task.setEndDate(new Date());
+            Date startDate = task.getStartDate();
+            Date deadline = task.getDeadLine();
+            Date endDate = new Date();
+            if (deadline.before(startDate) || deadline.after(endDate)) {
+                task.setExpired(true);
+            }else {
+                task.setExpired(false);
+
+            }
+            task.setEndDate(endDate);
         }
         task.setTaskStatus(taskStatus);
         taskRepository.save(task);
