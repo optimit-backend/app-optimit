@@ -251,9 +251,9 @@ public class UserService {
         }
         userDtoForPatron.setProjectDtoList(allProjectDto);
 
-        int taskAmount = taskRepository.countByUsersId(userId);
-        int completed = taskRepository.countByUsersIdAndTaskStatusOrginalName(userId, "Completed");
-        int expiredIsTrue = taskRepository.countByUsersIdAndExpiredIsTrue(userId);
+        int taskAmount = taskRepository.countAllByUsersId(userId);
+        int completed = taskRepository.countAllByUsersIdAndTaskStatus_OrginalName(userId, "Completed");
+        int expiredIsTrue = taskRepository.countAllByUsersIdAndExpiredIsTrue(userId);
         TaskInfoGetDto taskInfoGetDto = new TaskInfoGetDto();
         taskInfoGetDto.setTaskAmount(taskAmount);
         taskInfoGetDto.setDoneTaskAmount(completed);
