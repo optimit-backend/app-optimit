@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class UserDtoForPatron {
     private String fio;
-    private List<UUID> photos;
+    private UUID photosId;
     private String role;
     private List<ProjectDto> projectDtoList;
     private TaskInfoGetDto taskInfoGetDto;

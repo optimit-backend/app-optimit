@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskInfoGetDto {
-    private int taskAmount;
-    private int doneTaskAmount;
-    private int notDoneDeadlineAmount;
+    private Integer taskAmount;
+    private Integer doneTaskAmount;
+    private Integer notDoneDeadlineAmount;
 }
