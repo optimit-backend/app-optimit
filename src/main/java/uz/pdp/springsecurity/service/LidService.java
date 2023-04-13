@@ -140,12 +140,16 @@ public class LidService {
         }
         LidStatus lidStatus = lidStatusRepository.findById(statusId).orElse(null);
         if (lidStatus == null) {
-            return new ApiResponse("not found lid status", false);
+            return new ApiResponse("Not found lid status", false);
+        }
+
+        if (lid.getLidStatus().getOrginalName().equals("Done")) {
+            return new ApiResponse("You can't change this lid", false);
         }
 
         lid.setLidStatus(lidStatus);
         repository.save(lid);
-        return new ApiResponse("successfully edited", true);
+        return new ApiResponse("Successfully edited", true);
     }
 
     public ApiResponse delete(UUID id) {
