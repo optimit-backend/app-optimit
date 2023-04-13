@@ -12,6 +12,12 @@ import java.util.UUID;
 
 public interface TaskRepository extends JpaRepository<Task, UUID> {
 
+    int countAllByUsersId(UUID users_id);
+    int countAllByUsersIdAndTaskStatus_OrginalName(UUID users_id, String taskStatus_orginalName);
+    int countAllByUsersIdAndExpiredIsTrue(UUID users_id);
+
+
+
     int countByTaskStatusId(UUID taskStatus_id);
     int countByProjectIdAndTaskStatus_OrginalName(UUID project_id, String taskStatus_orginalName);
     int countByProjectId(UUID project_id);
