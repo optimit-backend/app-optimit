@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
-    boolean existsById(UUID userId);
+    boolean existsById(UUID id);
     boolean existsByUsernameIgnoreCase(String username);
     Optional<User> findByUsername(String username);
     List<User> findAllByRole_Id(UUID role_id);
