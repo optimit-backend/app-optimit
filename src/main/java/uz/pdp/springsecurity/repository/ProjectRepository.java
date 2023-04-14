@@ -41,7 +41,6 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
     Page<Project> findAllByBranchIdAndCreatedAtBetween(UUID branch_id, Timestamp createdAt, Timestamp createdAt2, Pageable pageable);
 
-    List<Project> findAllByBranch_Id(UUID branch_id);
 
     Page<Project> findAllByBranchIdAndProjectTypeIdAndStageIdAndCustomerIdAndCreatedAtBetween(UUID branchId, UUID typeId, UUID stageId, UUID customerId, Timestamp start, Timestamp end, Pageable pageable);
 

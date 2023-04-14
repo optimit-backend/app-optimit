@@ -245,7 +245,7 @@ public class UserService {
             projectDto.setGoalAmount(project.getGoalAmount());
             projectDto.setBranchId(project.getBranch().getId());
             projectDto.setCustomerId(project.getCustomer().getId());
-            projectDto.setStageId(project.getStage().getId());
+//            projectDto.setStageId(project.getStage().getId());
             projectDto.setStartDate(project.getStartDate());
             allProjectDto.add(projectDto);
         }
