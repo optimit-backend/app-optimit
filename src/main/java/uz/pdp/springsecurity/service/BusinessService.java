@@ -111,9 +111,9 @@ public class BusinessService {
         lidFieldRepository.save(lidField);
 
         LidField lidField1 = new LidField();
-        lidField1.setName("Address");
+        lidField1.setName("Phone number");
         lidField1.setBusiness(business);
-        lidField1.setValueType(ValueType.STRING);
+        lidField1.setValueType(ValueType.INTEGER);
         lidField1.setTanlangan(false);
         lidFieldRepository.save(lidField1);
 

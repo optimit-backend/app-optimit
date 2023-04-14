@@ -2,11 +2,12 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uz.pdp.springsecurity.entity.Form;
 import uz.pdp.springsecurity.entity.LidField;
-import uz.pdp.springsecurity.enums.ValueType;
 import uz.pdp.springsecurity.mapper.LidFieldMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LidFieldDto;
+import uz.pdp.springsecurity.repository.FormRepository;
 import uz.pdp.springsecurity.repository.LidFieldRepository;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class LidFieldService {
     private final LidFieldRepository repository;
 
     private final LidFieldMapper mapper;
+    private final FormRepository formRepository;
 
 
     public ApiResponse getAll(UUID businessId) {
@@ -71,8 +73,12 @@ public class LidFieldService {
 
         LidField lidField = optional.get();
 
-        repository.delete(lidField);
+        List<Form> byLidFieldsId = formRepository.findAllByLidFieldsId(id);
+        if (!byLidFieldsId.isEmpty()) {
+            return new ApiResponse("Ushbu lid fieldni o'chirib bo'lmaydi formaga bog'langan", false);
+        }
 
+        repository.delete(lidField);
         return new ApiResponse("successfully deleted", true);
     }
 
