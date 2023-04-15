@@ -57,7 +57,7 @@ public class WorkTimeService {
             Agreement agreement = optionalAgreement.get();
             LocalDateTime todayStart = LocalDate.now().atStartOfDay();
             int count = workTimeRepository.countAllByUserIdAndBranchIdAndArrivalTimeIsBetween(user.getId(), branch.getId(), Timestamp.valueOf(todayStart), Timestamp.valueOf(todayStart.plusDays(1)));
-            if (count == 1){
+            if (count == 1 && agreement.getPrice() > 0){
                 salaryCountService.add(new SalaryCountDto(
                         1,
                         agreement.getPrice(),
@@ -86,14 +86,16 @@ public class WorkTimeService {
             Agreement agreement = optionalAgreement.get();
             int min = (int) workTime.getMinute();
             double hour = (double) (min / 6) / 10;
-            salaryCountService.add(new SalaryCountDto(
-                    hour,
-                    hour * agreement.getPrice(),
-                    agreement.getId(),
-                    workTimePostDto.getBranchID(),
-                    new Date(),
-                    workTime.getArrivalTime() + " kuni " + min / 60 + " soat va " + min % 60 + " minut"
-            ));
+            if (hour > 0 && agreement.getPrice() > 0) {
+                salaryCountService.add(new SalaryCountDto(
+                        hour,
+                        hour * agreement.getPrice(),
+                        agreement.getId(),
+                        workTimePostDto.getBranchID(),
+                        new Date(),
+                        workTime.getArrivalTime() + " kuni " + min / 60 + " soat va " + min % 60 + " minut"
+                ));
+            }
         }
         return new ApiResponse("SUCCESS", true);
     }
@@ -179,18 +181,20 @@ public class WorkTimeService {
             LocalDateTime startDateLocal = LocalDateTime.ofInstant(agreement.getStartDate().toInstant(), ZoneId.systemDefault());
             int days = endDateLocal.getDayOfYear() - startDateLocal.getDayOfYear();
             double salary = agreement.getPrice() * days / 30;
-            ApiResponse apiResponse = salaryCountService.add(new SalaryCountDto(
-                    1,
-                    days >= 28 ? agreement.getPrice() : salary,
-                    agreement.getId(),
-                    branch.getId(),
-                    new Date(),
-                    days >= 28 ? "1 month " + new Date() : days + " kun " + new Date()
-            ));
-            if (apiResponse.isSuccess()) {
-                agreement.setStartDate(endDate);
-                agreement.setEndDate(Timestamp.valueOf(endDateLocal.plusMonths(1)));
-                agreementRepository.save(agreement);
+            if (agreement.getPrice() > 0) {
+                ApiResponse apiResponse = salaryCountService.add(new SalaryCountDto(
+                        1,
+                        days >= 28 ? agreement.getPrice() : salary,
+                        agreement.getId(),
+                        branch.getId(),
+                        new Date(),
+                        days >= 28 ? "1 month " + new Date() : days + " kun " + new Date()
+                ));
+                if (apiResponse.isSuccess()) {
+                    agreement.setStartDate(endDate);
+                    agreement.setEndDate(Timestamp.valueOf(endDateLocal.plusMonths(1)));
+                    agreementRepository.save(agreement);
+                }
             }
         }
     }

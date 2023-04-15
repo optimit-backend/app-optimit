@@ -43,7 +43,7 @@ public class PrizeService {
             Optional<Prize> optionalPrize = prizeRepository.findByUserIdAndBranchIdAndTaskTrueAndGivenFalse(prizeDto.getUserId(), prizeDto.getBranchId());
             if (optionalPrize.isPresent()) {
                 Prize oldPrize = optionalPrize.get();
-                if (oldPrize.getDeadline().before(new Date()))
+                if (oldPrize.getDeadline().after(new Date()))
                     return new ApiResponse("HODIMDA TUGALLANMAGAN BONUS BOR", false);
                 else {
                     boolean delete = delete(oldPrize);
@@ -57,7 +57,7 @@ public class PrizeService {
             Optional<Prize> optionalPrize = prizeRepository.findByUserIdAndBranchIdAndLidTrueAndGivenFalse(prizeDto.getUserId(), prizeDto.getBranchId());
             if (optionalPrize.isPresent()) {
                 Prize oldPrize = optionalPrize.get();
-                if (oldPrize.getDeadline().before(new Date()))
+                if (oldPrize.getDeadline().after(new Date()))
                     return new ApiResponse("HODIMDA TUGALLANMAGAN BONUS BOR", false);
                 else {
                     boolean delete = delete(oldPrize);
@@ -119,8 +119,10 @@ public class PrizeService {
             Optional<Prize> optionalPrize = prizeRepository.findByUserIdAndBranchIdAndTaskTrueAndGivenFalse(user.getId(), task.getBranch().getId());
             if (optionalPrize.isEmpty()) return;
             Prize prize = optionalPrize.get();
-            if (prize.getDeadline().after(new Date()))
+            if (prize.getDeadline().before(new Date())) {
                 delete(prize);
+                return;
+            }
             prize.setCounter(prize.getCounter() + 1);
             if (prize.getCount() <= prize.getCounter()) {
                 prize.setGiven(true);
@@ -141,8 +143,10 @@ public class PrizeService {
         Optional<Prize> optionalPrize = prizeRepository.findByUserIdAndBranchIdAndLidTrueAndGivenFalse(user.getId(), branch.getId());
         if (optionalPrize.isEmpty()) return;
         Prize prize = optionalPrize.get();
-        if (prize.getDeadline().after(new Date()))
+        if (prize.getDeadline().before(new Date())) {
             delete(prize);
+            return;
+        }
         prize.setCounter(prize.getCounter() + 1);
         if (prize.getCount() <= prize.getCounter()) {
             prize.setGiven(true);
