@@ -1879,7 +1879,7 @@ public class ReportsService {
 
         lidReportDto.setStatusReportDtos(statusList);
         lidReportDto.setSourceReportDtos(sourceList);
-        lidReportDto.setTotalLid(done.size());
+        lidReportDto.setTotalSale(done.size());
 
         return new ApiResponse("all", true, lidReportDto);
     }

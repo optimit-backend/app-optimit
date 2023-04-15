@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface LidRepository extends JpaRepository<Lid, UUID> {
     List<Lid> findAllByBusiness_Id(UUID business_id);
-    Page<Lid> findAllByLidStatusId(UUID lidStatus_id, Pageable pageable);
+    Page<Lid> findAllByLidStatus_Id(UUID lidStatus_id, Pageable pageable);
     List<Lid> findAllByLidStatusId(UUID lidStatus_id);
     List<Lid> findAllBySourceId(UUID source_id);
     List<Lid> findAllByLidStatus_OrginalName(String lidStatus_orginalName);
