@@ -149,6 +149,7 @@ public class BusinessService {
         LidStatus doneStatus = new LidStatus();
         doneStatus.setName("Done");
         doneStatus.setIncrease(true);
+        doneStatus.setOrginalName("Done");
         doneStatus.setColor("rang");
         doneStatus.setSaleStatus(true);
         doneStatus.setSort(3);

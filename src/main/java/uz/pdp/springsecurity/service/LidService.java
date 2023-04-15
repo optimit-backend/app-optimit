@@ -62,7 +62,7 @@ public class LidService {
         } else if (Boolean.TRUE.equals(checkingSourceId) && Boolean.TRUE.equals(checkingStatus)) {
             allLid = repository.findAllByLidStatusIdAndSourceId(statusId, sourceId, pageable);
         } else if (Boolean.TRUE.equals(checkingStatus)) {
-            allLid = repository.findAllByLidStatusId(statusId, pageable);
+            allLid = repository.findAllByLidStatus_Id(statusId, pageable);
         } else if (Boolean.TRUE.equals(checkingSourceId)) {
             allLid = repository.findAllByBusinessIdAndSourceId(businessId, sourceId, pageable);
         } else if (Boolean.TRUE.equals(checkingDate)) {
@@ -236,7 +236,7 @@ public class LidService {
             } else if (Boolean.TRUE.equals(checkingSourceId)) {
                 allLid = repository.findAllByLidStatusIdAndSourceId(status.getId(), sourceId, pageable);
             } else {
-                allLid = repository.findAllByLidStatusId(status.getId(), pageable);
+                allLid = repository.findAllByLidStatus_Id(status.getId(), pageable);
             }
 
             List<LidGetDto> lidGetDtoList = getDtoList(allLid.toList());
