@@ -2,21 +2,17 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Branch;
-import uz.pdp.springsecurity.entity.Role;
-import uz.pdp.springsecurity.entity.User;
-import uz.pdp.springsecurity.entity.WorkTime;
+import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.SalaryStatus;
 import uz.pdp.springsecurity.mapper.WorkTimeMapper;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.WorkTimeGetDto;
-import uz.pdp.springsecurity.payload.WorkTimePostDto;
-import uz.pdp.springsecurity.payload.WorkTimeDayDto;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 import uz.pdp.springsecurity.util.Constants;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -27,9 +23,11 @@ public class WorkTimeService {
     private final WorkTimeMapper workTimeMapper;
     private final BranchRepository branchRepository;
     private final RoleRepository roleRepository;
+    private final AgreementRepository agreementRepository;
 
     private final static LocalDateTime START_MONTH = LocalDate.now().atStartOfDay().withDayOfMonth(1);
     private final static Integer THIS_DAY = LocalDate.now().getDayOfMonth();
+    private final SalaryCountService salaryCountService;
 
     public ApiResponse arrive(WorkTimePostDto workTimePostDto) {
         Optional<User> optionalUser = userRepository.findById(workTimePostDto.getUserID());
@@ -44,7 +42,7 @@ public class WorkTimeService {
         }
         if (branch == null) return new ApiResponse("BRANCH NOT FOUND", false);
         if (workTimeRepository.existsByUserIdAndBranchIdAndActiveTrue(user.getId(), branch.getId())) return new ApiResponse("USER ON WORK", false);
-        workTimeRepository.save(
+        WorkTime workTime = workTimeRepository.save(
                 new WorkTime(
                         branch,
                         user,
@@ -53,6 +51,23 @@ public class WorkTimeService {
                         true
                 )
         );
+
+        Optional<Agreement> optionalAgreement = agreementRepository.findByUserIdAndSalaryStatusAndActiveTrue(workTimePostDto.getUserID(), SalaryStatus.DAY);
+        if (optionalAgreement.isPresent()){
+            Agreement agreement = optionalAgreement.get();
+            LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+            int count = workTimeRepository.countAllByUserIdAndBranchIdAndArrivalTimeIsBetween(user.getId(), branch.getId(), Timestamp.valueOf(todayStart), Timestamp.valueOf(todayStart.plusDays(1)));
+            if (count == 1){
+                salaryCountService.add(new SalaryCountDto(
+                        1,
+                        agreement.getPrice(),
+                        agreement.getId(),
+                        workTimePostDto.getBranchID(),
+                        new Date(),
+                        workTime.getArrivalTime() + " kuni"
+                ));
+            }
+        }
         return new ApiResponse("SUCCESS", true);
     }
 
@@ -66,6 +81,20 @@ public class WorkTimeService {
         workTime.setMinute(minute);
         workTime.setActive(false);
         workTimeRepository.save(workTime);
+        Optional<Agreement> optionalAgreement = agreementRepository.findByUserIdAndSalaryStatusAndActiveTrue(workTimePostDto.getUserID(), SalaryStatus.HOUR);
+        if (optionalAgreement.isPresent()){
+            Agreement agreement = optionalAgreement.get();
+            int min = (int) workTime.getMinute();
+            double hour = (double) (min / 6) / 10;
+            salaryCountService.add(new SalaryCountDto(
+                    hour,
+                    hour * agreement.getPrice(),
+                    agreement.getId(),
+                    workTimePostDto.getBranchID(),
+                    new Date(),
+                    workTime.getArrivalTime() + " kuni " + min / 60 + " soat va " + min % 60 + " minut"
+            ));
+        }
         return new ApiResponse("SUCCESS", true);
     }
 
@@ -78,7 +107,8 @@ public class WorkTimeService {
     }
 
     public ApiResponse getOnWork(UUID branchId) {
-        if (!branchRepository.existsById(branchId)) return new ApiResponse("BRANCH NOT FOUND", false);
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()) return new ApiResponse("BRANCH NOT FOUND", false);
         Optional<Role> optionalRole = roleRepository.findByName(Constants.SUPERADMIN);
         if (optionalRole.isEmpty()) return new ApiResponse("ERROR", false);
         List<User> userList = userRepository.findAllByBranchesIdAndRoleIsNotAndActiveIsTrue(branchId, optionalRole.get());
@@ -105,6 +135,8 @@ public class WorkTimeService {
                 ));
             }
         }
+
+        addSalaryMonth(optionalBranch.get());
         return new ApiResponse(true, workTimeGetDtoList);
     }
 
@@ -136,5 +168,30 @@ public class WorkTimeService {
             ));
         }
         return new ApiResponse(true, workTimeDayDtoList);
+    }
+
+    private void addSalaryMonth(Branch branch) {
+        LocalDateTime todayEnd = LocalDate.now().atStartOfDay().plusDays(1);
+        List<Agreement> agreementList = agreementRepository.findAllByUser_BusinessIdAndSalaryStatusAndEndDateBeforeAndActiveTrue(branch.getBusiness().getId(), SalaryStatus.MONTH, Timestamp.valueOf(todayEnd));
+        for (Agreement agreement : agreementList) {
+            Date endDate = agreement.getEndDate();
+            LocalDateTime endDateLocal = LocalDateTime.ofInstant(endDate.toInstant(), ZoneId.systemDefault());
+            LocalDateTime startDateLocal = LocalDateTime.ofInstant(agreement.getStartDate().toInstant(), ZoneId.systemDefault());
+            int days = endDateLocal.getDayOfYear() - startDateLocal.getDayOfYear();
+            double salary = agreement.getPrice() * days / 30;
+            ApiResponse apiResponse = salaryCountService.add(new SalaryCountDto(
+                    1,
+                    days >= 28 ? agreement.getPrice() : salary,
+                    agreement.getId(),
+                    branch.getId(),
+                    new Date(),
+                    days >= 28 ? "1 month " + new Date() : days + " kun " + new Date()
+            ));
+            if (apiResponse.isSuccess()) {
+                agreement.setStartDate(endDate);
+                agreement.setEndDate(Timestamp.valueOf(endDateLocal.plusMonths(1)));
+                agreementRepository.save(agreement);
+            }
+        }
     }
 }

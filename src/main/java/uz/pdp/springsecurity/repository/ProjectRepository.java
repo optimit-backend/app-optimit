@@ -12,6 +12,7 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
     boolean existsByProjectTypeId(UUID projectType_id);
     Page<Project> findAllByBranchId(UUID branchId, Pageable pageable);
+
     List<Project> findAllByBranch_Id(UUID branch_id);
     List<Project> findAllByUsersId(UUID users_id);
     Page<Project> findAllByProjectTypeIdAndCustomerIdAndProjectStatusIdAndExpiredTrue(UUID projectType_id, UUID customer_id, UUID projectStatus_id, Pageable pageable);
@@ -39,6 +40,7 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     Page<Project> findAllByCustomerId(UUID branchId, UUID customerId, Pageable pageable);
 
     Page<Project> findAllByProjectStatusIdAndExpiredTrue(UUID branchId, UUID projectStatusId, Pageable pageable);
+
 
     Page<Project> findAllByProjectStatusId(UUID branchId, UUID projectStatusId, Pageable pageable);
 

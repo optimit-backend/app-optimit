@@ -14,9 +14,10 @@ public interface WorkTimeRepository extends JpaRepository<WorkTime, UUID> {
     Optional<WorkTime> findByUserIdAndBranchIdAndActiveTrue(UUID userID, UUID branchId);
 
     List<WorkTime> findAllByUserIdAndBranchId(UUID userId, UUID branchId);
-    Optional<WorkTime> findByUserIdAndBranchIdAndArrivalTimeIsBetween(UUID user_id, UUID branch_id, Timestamp from, Timestamp to);
+
     Optional<WorkTime> findFirstByUserIdAndBranchIdAndArrivalTimeIsBetween(UUID user_id, UUID branch_id, Timestamp from, Timestamp to);
-    boolean existsByUserIdAndBranchIdAndArrivalTimeIsBetween(UUID user_id, UUID branch_id, Timestamp from, Timestamp to);
+
+    int countAllByUserIdAndBranchIdAndArrivalTimeIsBetween(UUID user_id, UUID branch_id, Timestamp from, Timestamp to);
 
     void deleteAllByUserIdAndBranchIdAndActiveFalse(UUID userId, UUID branchId);
 }

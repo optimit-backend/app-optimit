@@ -24,7 +24,7 @@ public class AgreementService {
                         new Agreement(user, HOUR, 0d, false),
                         new Agreement(user, DAY, 0d, false),
                         new Agreement(user, MONTH, 0d, false),
-                        new Agreement(user, KPI, 6d, true)
+                        new Agreement(user, KPI, 0d, true)
                 );
         agreementRepository.saveAll(agreementList);
     }

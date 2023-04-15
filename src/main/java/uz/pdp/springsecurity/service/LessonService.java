@@ -24,15 +24,15 @@ public class LessonService {
     private final LessonUserService lessonUserService;
 
     public ApiResponse add(LessonDto lessonDto) {
-        return addEdit(new Lesson(), lessonDto);
+        return addEdit(new Lesson(), lessonDto, false);
     }
 
     public ApiResponse edit(UUID lessonId, LessonDto lessonDto) {
         Optional<Lesson> optionalLesson = lessonRepository.findById(lessonId);
-        return optionalLesson.map(lesson -> addEdit(lesson, lessonDto)).orElseGet(() -> new ApiResponse("LESSON NOT FOUND", false));
+        return optionalLesson.map(lesson -> addEdit(lesson, lessonDto, true)).orElseGet(() -> new ApiResponse("LESSON NOT FOUND", false));
     }
 
-    private ApiResponse addEdit(Lesson lesson, LessonDto lessonDto) {
+    private ApiResponse addEdit(Lesson lesson, LessonDto lessonDto, boolean edit) {
         Optional<Role> optionalRole = roleRepository.findById(lessonDto.getRoleId());
         if (optionalRole.isEmpty()) return new ApiResponse("ROLE NOT FOUND", false);
         lesson.setRole(optionalRole.get());
@@ -45,7 +45,8 @@ public class LessonService {
             optionalAttachment.ifPresent(lesson::setAttachment);
         }
         lessonRepository.save(lesson);
-        lessonUserService.connectToUser(lesson);
+        if (!edit)lessonUserService.connectToUser(lesson);
+        else lessonUserService.connectToUserEdit(lesson);
         return new ApiResponse("SUCCESS", true);
     }
 
