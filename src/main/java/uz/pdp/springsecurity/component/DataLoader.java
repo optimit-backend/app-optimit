@@ -733,17 +733,20 @@ public class DataLoader implements CommandLineRunner {
                     if (projectStatusList.isEmpty()){
                         ProjectStatus projectStatus = new ProjectStatus();
                         projectStatus.setName("Uncompleted");
+                        projectStatus.setColor("red");
                         projectStatus.setBranch(branch);
                         projectStatusRepository.save(projectStatus);
                     }
                     if (projectStatusList.isEmpty()){
                         ProjectStatus projectStatus = new ProjectStatus();
+                        projectStatus.setColor("yellow");
                         projectStatus.setName("Process");
                         projectStatus.setBranch(branch);
                         projectStatusRepository.save(projectStatus);
                     }
                     if (projectStatusList.isEmpty()){
                         ProjectStatus projectStatus = new ProjectStatus();
+                        projectStatus.setColor("green");
                         projectStatus.setName("Completed");
                         projectStatus.setBranch(branch);
                         projectStatusRepository.save(projectStatus);

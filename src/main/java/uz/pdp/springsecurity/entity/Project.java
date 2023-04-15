@@ -17,36 +17,26 @@ import java.util.List;
 @Entity
 public class Project extends AbsEntity {
     private String name;
+    private String description;
+    private boolean expired;
+    private boolean isProduction;
+    private double budget;
+    private int process;
     private Date startDate;
     private Date endDate;
     private Date deadline;
-    private int process;
     @ManyToOne
     private ProjectType projectType;
-
     @ManyToOne
     private Customer customer;
-
-    private String description;
-
     @ManyToMany
     private List<User> users;
-
     @ManyToMany
     private List<FileData> fileDataList;
-
-    private double budget;
     @ManyToOne
     private ProjectStatus projectStatus;
-
     @ManyToMany
     private List<Stage> stageList;
-
-    private double goalAmount;
-
-    private boolean isProduction;
-    private boolean expired;
-
     @ManyToOne
     private Branch branch;
 }

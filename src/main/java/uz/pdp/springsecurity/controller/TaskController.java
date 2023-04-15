@@ -57,6 +57,12 @@ public class TaskController {
         ApiResponse apiResponse = taskServise.get(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+    @CheckPermission("GET_ALL_TASK")
+    @GetMapping("/branch/{branchId}")
+    public HttpEntity<?> getAll(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = taskServise.getAll(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 
     @CheckPermission("DELETE_TASK")
     @DeleteMapping("/{id}")
@@ -71,11 +77,10 @@ public class TaskController {
                                         @RequestParam(required = false) UUID projectId,
                                         @RequestParam(required = false) UUID statusId,
                                         @RequestParam(required = false) UUID typeId,
-                                        @RequestParam(required = false) Date startDate,
-                                        @RequestParam(required = false) Date endDate,
+                                        @RequestParam(required = false) Date expired,
                                         @RequestParam(defaultValue = "0", required = false) int page,
                                         @RequestParam(defaultValue = "10", required = false) int size) {
-        ApiResponse apiResponse = taskServise.getAllByBranchId(branchId,projectId,statusId,typeId,startDate,endDate,page,size);
+        ApiResponse apiResponse = taskServise.getAllByBranchId(branchId,projectId,statusId,typeId,expired,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -91,9 +96,9 @@ public class TaskController {
     public HttpEntity<?> getAllByBranchPageable(@PathVariable UUID branchId,
                                                 @RequestParam(required = false) UUID projectId,
                                                 @RequestParam(required = false) UUID typeId,
-                                                @RequestParam(required = false) Date startDate,
-                                                @RequestParam(required = false) Date endDate,
+                                                @RequestParam(required = false) Date expired,
                                                 @RequestParam(required = false) Map<String,String> params) {
-        ApiResponse apiResponse = taskServise.getAllByBranchIdPageable(branchId,params,projectId,typeId,startDate,endDate);
+        ApiResponse apiResponse = taskServise.getAllByBranchIdPageable(branchId,params,projectId,typeId,expired);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }}
+    }
+}
