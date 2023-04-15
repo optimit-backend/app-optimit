@@ -3,13 +3,7 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import uz.pdp.springsecurity.entity.*;
-
-import javax.persistence.ManyToOne;
 import java.util.Date;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -37,5 +31,5 @@ public class PrizeGetDto {
     private boolean lid;
     private Integer count;
     private Date deadline;
-    private Integer counter = 0;
+    private Integer counter;
 }

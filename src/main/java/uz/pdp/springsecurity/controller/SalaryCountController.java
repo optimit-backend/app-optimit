@@ -28,12 +28,12 @@ public class SalaryCountController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("EDIT_SALARY")
+    /*@CheckPermission("EDIT_SALARY")
     @PutMapping("/{salaryCountId}")
     public HttpEntity<?> edit(@PathVariable UUID salaryCountId, @Valid @RequestBody SalaryCountDto salaryCountDto) {
         ApiResponse apiResponse = salaryCountService.edit(salaryCountId, salaryCountDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+    }*/
 
     @CheckPermission("GET_SALARY")
     @GetMapping("//by-user-last-month/{userId}")

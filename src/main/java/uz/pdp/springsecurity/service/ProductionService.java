@@ -20,6 +20,8 @@ public class ProductionService {
     private final FifoCalculationService fifoCalculationService;
     private final TaskRepository taskRepository;
     private final TaskStatusRepository taskStatusRepository;
+    private final SalaryCountService salaryCountService;
+    private final PrizeService prizeService;
 
     public ApiResponse add(ProductionDto productionDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(productionDto.getBranchId());
@@ -133,15 +135,16 @@ public class ProductionService {
         }
         Task task = optionalTask.get();
         TaskStatus taskStatus = optionalTaskStatus.get();
-        if (task.getTaskStatus().getName().equalsIgnoreCase("Completed") || task.getProduction() != null){
+        if (task.getTaskStatus().getOrginalName() != null && task.getTaskStatus().getOrginalName().equals("Completed")){
             return new ApiResponse("You can not change this task !", false);
         }
-        if (task.getDependTask() != null) {
+        if (task.getDependTask() != null && taskStatus.getOrginalName().equals("Completed")) {
             Task depentTask = task.getDependTask();
             if (depentTask.getTaskStatus().getOrginalName() != null && !depentTask.getTaskStatus().getOrginalName().equals("Completed")) {
                 return new ApiResponse("You can not change this task, Complete " + depentTask.getName() + " task", false);
             }
         }
+
         Branch branch = task.getBranch();
 
         List<ContentProductDto> contentProductDtoList = productionTaskDto.getContentProductDtoList();
@@ -216,6 +219,8 @@ public class ProductionService {
         task.setTaskStatus(taskStatus);
         task.setProduction(production);
         taskRepository.save(task);
+        salaryCountService.addForTask(task);
+        prizeService.addForTask(task);
         return new ApiResponse("SUCCESS", true);
     }
 }

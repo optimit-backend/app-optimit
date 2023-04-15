@@ -26,6 +26,8 @@ public class CustomerDto {
 
     private UUID customerGroupId;
 
+    private String customerGroupName;
+
     private UUID businessId;
 
     private UUID branchId;

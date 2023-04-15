@@ -29,6 +29,7 @@ public class LidService {
     private final BusinessRepository businessRepository;
     private final FormRepository formRepository;
     private final SourceRepository sourceRepository;
+    private final PrizeService prizeService;
 
     public ApiResponse getAll(UUID businessId, int page, int size, UUID sourceId, UUID statusId, Date startDate, Date endDate) {
         Pageable pageable = PageRequest.of(page, size);
@@ -145,6 +146,10 @@ public class LidService {
 
         if (lid.getLidStatus().getOrginalName().equals("Done")) {
             return new ApiResponse("You can't change this lid", false);
+        }
+
+        if (lidStatus.getOrginalName() != null && lidStatus.getOrginalName().equalsIgnoreCase("Done")){
+            prizeService.addPrizeForLid();
         }
 
         lid.setLidStatus(lidStatus);
