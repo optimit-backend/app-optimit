@@ -12,5 +12,5 @@ import java.util.UUID;
 @NoArgsConstructor
 public class SelectForLidPostDto {
     private List<String> names;
-    private UUID lidId;
+    private UUID lidFieldId;
 }

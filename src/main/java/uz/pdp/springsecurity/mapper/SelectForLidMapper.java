@@ -11,23 +11,22 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface SelectForLidMapper {
+    @Mapping(target = "lidField", ignore = true)
+    @Mapping(source = "lidFieldId", target = "lidField.id")
     @Mapping(target = "updateAt", ignore = true)
-    @Mapping(target = "lid", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "lid.id", source = "lidId")
     SelectForLid toEntity(SelectForLidDto selectForLidDto);
 
     List<SelectForLid> toEntity(List<SelectForLidDto> selectForLids);
 
-    @Mapping(target = "lidId", source = "lid.id")
+    @Mapping(source = "lidField.id", target = "lidFieldId")
     SelectForLidDto toDto(SelectForLid selectForLid);
 
     List<SelectForLidDto> toDto(List<SelectForLid> selectForLids);
 
     @InheritInverseConfiguration
     @Mapping(target = "updateAt", ignore = true)
-    @Mapping(target = "lid", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "lid.id", source = "lidId")
+    @Mapping(source = "lidFieldId", target = "lidField.id")
     void update(SelectForLidDto selectForLidDto, @MappingTarget SelectForLid selectForLid);
 }
