@@ -25,6 +25,9 @@ public class Task extends AbsEntity {
     @ManyToOne
     private Project project;
 
+    @ManyToOne
+    private Stage stage;
+
     private Date startDate;
 
     private Date EndDate;

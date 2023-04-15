@@ -8,11 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.NotificationType;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.ProjectDto;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
-import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -54,7 +52,6 @@ public class ProjectService {
     @Autowired
     FileDateRepository fileDateRepository;
     private final NotificationRepository notificationRepository;
-
 
     public ApiResponse add(ProjectDto projectDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(projectDto.getBranchId());
@@ -113,7 +110,6 @@ public class ProjectService {
         }
         List<Stage> list = stageRepository.saveAll(stageList);
         project.setStageList(list);
-        project.setGoalAmount(projectDto.getGoalAmount());
         project.setProduction(projectDto.isProduction());
         project.setBranch(optionalBranch.get());
         projectRepository.save(project);
@@ -123,7 +119,7 @@ public class ProjectService {
             Notification notification = new Notification();
             notification.setRead(false);
             notification.setName("A new project has been assigned to you!");
-            notification.setMessage("You can see Project!");
+            notification.setMessage("You can see Project !");
             notification.setType(NotificationType.NEW_PROJECT);
             notification.setObjectId(project.getId());
             notification.setUserTo(user);
@@ -171,7 +167,6 @@ public class ProjectService {
 
         project.setBudget(projectDto.getBudget());
 
-        project.setGoalAmount(projectDto.getGoalAmount());
         project.setProduction(projectDto.isProduction());
 
         Optional<Branch> optionalBranch = branchRepository.findById(projectDto.getBranchId());
@@ -184,6 +179,88 @@ public class ProjectService {
     public ApiResponse get(UUID id) {
         Optional<Project> optionalProject = projectRepository.findById(id);
         return optionalProject.map(project -> new ApiResponse("Found", true, project)).orElseGet(() -> new ApiResponse("Project Not Found", false));
+    }
+    public ApiResponse getOne(UUID id) {
+        Optional<Project> optionalProject = projectRepository.findById(id);
+        if (optionalProject.isEmpty()){
+            return new ApiResponse("Not found",false);
+        }
+        int totalTask = taskRepository.countAllByProjectId(id);
+        int completed = taskRepository.countAllByTaskStatus_OrginalNameAndProjectId("Completed",id);
+        int expired = taskRepository.countAllByProjectIdAndExpiredTrue(id);
+        List<Task> tasks = taskRepository.findAllByProjectId(id);
+        double sum = 0;
+        for (Task task : tasks) {
+            int size = task.getUsers().size();
+            if (task.isEach()){
+                sum += task.getTaskPrice() * size;
+            }else {
+                sum += task.getTaskPrice();
+            }
+        }
+
+        int process = 0;
+        if (completed > 0) {
+            process = completed * 100 / totalTask;
+        }
+
+
+        ProjectGetOne projectGetOne=new ProjectGetOne();
+        Project project = optionalProject.get();
+        projectGetOne.setProjectName(project.getName());
+        projectGetOne.setProjectTypeName(project.getProjectType().getName());
+        projectGetOne.setProjectBudget(project.getBudget());
+        projectGetOne.setTotalTask(totalTask);
+        projectGetOne.setCompletedTask(completed);
+        projectGetOne.setExpiredTask(expired);
+        projectGetOne.setTotalTaskSum(sum);
+        projectGetOne.setCustomerName(project.getCustomer().getName());
+        projectGetOne.setProjectPercent(process);
+        projectGetOne.setStartDate(project.getStartDate());
+        projectGetOne.setEndDate(project.getEndDate());
+        projectGetOne.setDeadline(project.getDeadline());
+
+        List<Stage> stageList = project.getStageList();
+        List<StageProject> stageProjectList=new ArrayList<>();
+        for (Stage stage : stageList) {
+            int stageAmount = taskRepository.countAllByStageId(stage.getId());
+            int completedTasks = taskRepository.countAllByStageIdAndTaskStatus_OrginalName(stage.getId(), "Completed");
+            int percent = (100*completedTasks) / stageAmount;
+            StageProject stageProject=new StageProject();
+            stageProject.setStageName(stage.getName());
+            stageProject.setStageTasks(stageAmount);
+            stageProject.setStagePercent(percent);
+            stageProjectList.add(stageProject);
+        }
+        projectGetOne.setStageProjectList(stageProjectList);
+
+        List<User> userList = project.getUsers();
+        List<UserProject> userProjectList=new ArrayList<>();
+        for (User user : userList) {
+            UserProject userProject=new UserProject();
+            userProject.setUserId(user.getId());
+            if (user.getPhoto() != null){
+                userProject.setPhotoId(user.getPhoto().getId());
+            }
+            userProject.setFirstname(user.getFirstName());
+            userProject.setLastname(user.getLastName());
+            userProjectList.add(userProject);
+        }
+        projectGetOne.setUserProjectList(userProjectList);
+
+        List<ContentProject> contentProjectList=new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.isProductions()) {
+                ContentProject contentProject = new ContentProject();
+                contentProject.setContentName(task.getContent().getProduct().getName());
+                contentProject.setMeasurement(task.getContent().getProduct().getMeasurement().getName());
+                contentProject.setGoalAmount(task.getGoalAmount());
+                contentProjectList.add(contentProject);
+            }
+        }
+        projectGetOne.setContentProjectList(contentProjectList);
+
+        return new ApiResponse("Found",true,projectGetOne);
     }
 
     public ApiResponse delete(UUID id) {
@@ -221,8 +298,14 @@ public class ProjectService {
             return new ApiResponse("Not found",false);
         }
         ProjectStatus projectStatus = optionalProjectStatus.get();
-
-
+        Date startDate = project.getStartDate();
+        Date endDate = new Date();
+        Date deadline = project.getDeadline();
+        if (deadline.before(startDate) || deadline.after(endDate)) {
+            project.setExpired(true);
+        }else {
+            project.setExpired(false);
+        }
         if (projectStatus.getName().equals("Completed")){
             Date today = new Date();
             project.setEndDate(today);
@@ -233,81 +316,75 @@ public class ProjectService {
         return new ApiResponse("Edited",true);
     }
 
-//    public ApiResponse  getAllByBranchId(UUID branchId,UUID typeId,UUID customerId,Date today, int page,int size) /*{
-//        Pageable pageable = PageRequest.of(page,size);
-//        Page<Project> projectList = null;
-//        Timestamp start = null;
-//        Timestamp end = null;
-//        if (startDate != null && endDate != null) {
-//            start = new Timestamp(startDate.getTime());
-//            end = new Timestamp(endDate.getTime());
-//        }
-//
-//        boolean checkingType = typeId != null;
-//        boolean checkingCustomer = customerId != null;
-//
-//        if (page == 0 && size == 0 && !checkingDate && !checkingType && !checkingCustomer){
-//            List<Project> projects = projectRepository.findAllByBranch_Id(branchId);
-//            if (projects.isEmpty()) {
-//                return new ApiResponse("Not Found", false);
-//            }
-//            return new ApiResponse("Found",true,projects);
-//        } else if (checkingType && checkingCustomer&& checkingDate) {
-//            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndCustomerIdAndCreatedAtBetween(branchId,typeId,customerId,start,end,pageable);
-//        } else if (checkingType && checkingCustomer) {
-//            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndCustomerId(branchId,typeId,customerId,pageable);
-//        } else if (checkingType && checkingCustomer && checkingDate) {
-//            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndCustomerIdAndCreatedAtBetween(branchId, typeId, customerId, start, end, pageable);
-//        } else if (checkingType&& checkingDate) {
-//            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndCreatedAtBetween(branchId, typeId, start, end,pageable);
-//        } else if (checkingCustomer && checkingDate) {
-//            projectList = projectRepository.findAllByBranchIdAndCustomerIdAndCreatedAtBetween(branchId, customerId, start, end,pageable);
-//        } else if (checkingType && checkingCustomer) {
-//            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndCustomerId(branchId, typeId, customerId,pageable);
-//        } else if (checkingType) {
-//            projectList = projectRepository.findAllByBranchIdAndProjectTypeId(branchId, typeId,pageable);
-//        } else if (checkingType && checkingDate) {
-//            projectList = projectRepository.findAllByBranchIdAndProjectTypeIdAndCreatedAtBetween(branchId, typeId, start, end,pageable);
-//        } else if (checkingCustomer) {
-//            projectList = projectRepository.findAllByBranchIdAndCustomerId(branchId, customerId,pageable);
-//        } else if (checkingCustomer && checkingDate) {
-//            projectList = projectRepository.findAllByBranchIdAndCustomerIdAndCreatedAtBetween(branchId, customerId, start, end,pageable);
-//        } else if (checkingDate) {
-//            projectList = projectRepository.findAllByBranchIdAndCreatedAtBetween(branchId, start, end,pageable);
-//        }else if (checkingCustomer) {
-//            projectList = projectRepository.findAllByBranchIdAndCustomerId(branchId,customerId,pageable);
-//        }else if (checkingType) {
-//            projectList = projectRepository.findAllByBranchIdAndProjectTypeId(branchId,typeId,pageable);
-//        }else if (checkingDate) {
-//            projectList = projectRepository.findAllByBranchIdAndCreatedAtBetween(branchId,start,end,pageable);
-//        } else {
-//            projectList = projectRepository.findAllByBranchId(branchId,pageable);
-//        }
-//        assert projectList != null;
-//        if (projectList.isEmpty()) {
-//            return new ApiResponse("Project Not Found", false);
-//        }
-//
-//
-//        for (Project project : projectList) {
-//            int completed = taskRepository.countByProjectIdAndTaskStatus_OrginalName(project.getId(), "Completed");
-//            int all = taskRepository.countByProjectId(project.getId());
-//            if (completed > 0) {
-//                int process = 0;
-//                process = completed * 100 / all;
-//                project.setProcess(process);
-//            }
-//        }
-//        return new ApiResponse("Found", true, projectList);
-//    }*/
+    public ApiResponse getAllByBranchId(UUID branchId, UUID typeId, UUID customerId,UUID projectStatusId, Date expired, int page, int size) {
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Project> projectList = null;
 
-//    public ApiResponse findByStageId(UUID statusId) {
-//        List<Project> projects = projectRepository.findAllByStageId(statusId);
-//        if (projects.isEmpty()) {
-//            return new ApiResponse("Projects Not Found", false);
-//        }
-//        return new ApiResponse("Found", true, projects);
-//    }
+        boolean checkingType = typeId != null;
+        boolean checkingCustomer = customerId != null;
+        boolean checkingProjectStatus = projectStatusId != null;
+        boolean checkingExpired = expired != null;
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch not found",false);
+        }
 
+        if (checkingType && checkingCustomer) {
+            if (checkingProjectStatus && checkingExpired) {
+                projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndProjectStatusIdAndExpiredTrue(typeId,customerId,projectStatusId,pageable);
+            } else if (checkingProjectStatus) {
+                projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndProjectStatusId(branchId, typeId, customerId, projectStatusId, pageable);
+            } else if (checkingExpired) {
+                projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndExpiredTrue(branchId, typeId, customerId, pageable);
+            } else {
+                projectList = projectRepository.findAllByProjectTypeIdAndCustomerId(branchId, typeId, customerId, pageable);
+            }
+        } else if (checkingType) {
+            if (checkingProjectStatus && checkingExpired) {
+                projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndExpiredTrue(branchId, typeId, projectStatusId, pageable);
+            } else if (checkingProjectStatus) {
+                projectList = projectRepository.findAllByProjectTypeIdAndProjectStatusId(branchId, typeId, projectStatusId, pageable);
+            } else if (checkingExpired) {
+                projectList = projectRepository.findAllByProjectTypeIdAndExpiredTrue(branchId, typeId, pageable);
+            } else {
+                projectList = projectRepository.findAllByProjectTypeId(branchId, typeId, pageable);
+            }
+        } else if (checkingCustomer) {
+            if (checkingProjectStatus && checkingExpired) {
+                projectList = projectRepository.findAllByCustomerIdAndProjectStatusIdAndExpiredTrue(branchId, customerId, projectStatusId, pageable);
+            } else if (checkingProjectStatus) {
+                projectList = projectRepository.findAllByCustomerIdAndProjectStatusId(branchId, customerId, projectStatusId, pageable);
+            } else if (checkingExpired) {
+                projectList = projectRepository.findAllByCustomerIdAndExpiredTrue(branchId, customerId, pageable);
+            } else {
+                projectList = projectRepository.findAllByCustomerId(branchId, customerId, pageable);
+            }
+        } else if (checkingProjectStatus && checkingExpired) {
+            projectList = projectRepository.findAllByProjectStatusIdAndExpiredTrue(branchId, projectStatusId, pageable);
+        } else if (checkingProjectStatus) {
+            projectList = projectRepository.findAllByProjectStatusId(branchId, projectStatusId, pageable);
+        } else if (checkingExpired) {
+            projectList = projectRepository.findAllByExpiredTrue(branchId, pageable);
+        } else {
+            projectList = projectRepository.findAllByBranchId(branchId, pageable);
+        }
+
+        assert projectList != null;
+        if (projectList.isEmpty()) {
+            return new ApiResponse("Project Not Found", false);
+        }
+
+        for (Project project : projectList) {
+            int completed = taskRepository.countByProjectIdAndTaskStatus_OrginalName(project.getId(), "Completed");
+            int all = taskRepository.countByProjectId(project.getId());
+            if (completed > 0) {
+                int process = 0;
+                process = completed * 100 / all;
+                project.setProcess(process);
+            }
+        }
+
+        return new ApiResponse("Found", true, projectList);
+    }
 
 }

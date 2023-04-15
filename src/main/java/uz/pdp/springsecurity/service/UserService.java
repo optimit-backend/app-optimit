@@ -242,9 +242,9 @@ public class UserService {
             projectDto.setEndDate(project.getEndDate());
             projectDto.setName(project.getName());
             projectDto.setProduction(project.isProduction());
-            projectDto.setGoalAmount(project.getGoalAmount());
             projectDto.setBranchId(project.getBranch().getId());
             projectDto.setCustomerId(project.getCustomer().getId());
+
 //            projectDto.setStageId(project.getStage().getId());
             projectDto.setStartDate(project.getStartDate());
             allProjectDto.add(projectDto);

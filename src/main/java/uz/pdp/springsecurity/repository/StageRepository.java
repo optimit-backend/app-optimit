@@ -12,4 +12,6 @@ public interface StageRepository extends JpaRepository<Stage, UUID> {
 
     List<Stage> findAllByBranchId(UUID branch_id);
     Page<Stage> findAllByBranch_Id(UUID branchId, Pageable pageable);
+
+
 }

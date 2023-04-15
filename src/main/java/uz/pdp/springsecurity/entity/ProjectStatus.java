@@ -20,7 +20,7 @@ public class ProjectStatus{
     @GeneratedValue
     UUID id;
     private String name;
-
+    private String color;
     @ManyToOne
     private Branch branch;
 }
