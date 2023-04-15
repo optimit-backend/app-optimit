@@ -12,10 +12,10 @@ import java.util.UUID;
 public class SelectForLidDto {
     private UUID id;
     private String name;
-    private UUID lidId;
+    private UUID lidFieldId;
 
-    public SelectForLidDto(String name, UUID lidId) {
+    public SelectForLidDto(String name, UUID lidFieldId) {
         this.name = name;
-        this.lidId = lidId;
+        this.lidFieldId = lidFieldId;
     }
 }
