@@ -35,6 +35,15 @@ public class LessonUserService {
         if (!lessonUserList.isEmpty()) lessonUserRepository.saveAll(lessonUserList);
     }
 
+    public void connectToUserEdit(Lesson lesson) {
+        List<LessonUser> lessonUserList = lessonUserRepository.findAllByLessonId(lesson.getId());
+        for (LessonUser lessonUser : lessonUserList) {
+            lessonUser.setLessonView(lesson.getView());
+            if (lessonUser.getView() < lesson.getView())lessonUser.setFinish(false);
+        }
+        if (!lessonUserList.isEmpty()) lessonUserRepository.saveAll(lessonUserList);
+    }
+
     public ApiResponse edit(UUID lessonId, UUID userId) {
         Optional<LessonUser> optionalLessonUser = lessonUserRepository.findByUserIdAndLessonId(userId, lessonId);
         if (optionalLessonUser.isPresent()) {

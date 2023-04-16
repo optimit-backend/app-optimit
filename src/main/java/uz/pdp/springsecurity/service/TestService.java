@@ -91,9 +91,9 @@ public class TestService {
             new ApiResponse("YOU SOLVED THE TEST", false);
         List<Test> testList = testRepository.findAllByLessonId(lessonId);
         if (testList.isEmpty()) return new ApiResponse("TEST NOT FOUND", false);
-        if (testList.size() < 30) return new ApiResponse("TESTS NOT ENOUGH", false);
+        if (testList.size() < 10) return new ApiResponse("TESTS NOT ENOUGH", false);
         Collections.shuffle(testList);
-        return new ApiResponse( true, testMapper.toDtoList(testList.subList(0, 30)));
+        return new ApiResponse( true, testMapper.toDtoList(testList.subList(0, 10)));
     }
 
     public ApiResponse getSample(HttpServletResponse response) {

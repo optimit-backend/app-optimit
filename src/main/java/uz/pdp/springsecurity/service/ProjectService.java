@@ -163,6 +163,42 @@ public class ProjectService {
                 optionalAttachment.ifPresent(fileDataList::add);
             }
         }
+
+        List<String> stageNames = projectDto.getStages();
+        List<Stage> stages = project.getStageList();
+        for (int i = 0; i < stageNames.size(); i++) {
+            if (i < stages.size()) {
+                Stage stage = stages.get(i);
+                if (stageNames.get(i) != null) {
+                    stage.setName(stageNames.get(i));
+                    stageRepository.save(stage);
+                }
+            } else {
+                if (stageNames.get(i) != null) {
+                    Stage stage = new Stage();
+                    stage.setName(stageNames.get(i));
+                    stage.setBranch(project.getBranch());
+                    stages.add(stage);
+                    stageRepository.save(stage);
+                }
+            }
+        }
+
+        List<Stage> stagesToDelete = new ArrayList<>();
+        for (int i = stageNames.size(); i < stages.size(); i++) {
+            stagesToDelete.add(stages.get(i));
+        }
+        stages.removeAll(stagesToDelete);
+        try {
+            stageRepository.deleteAll(stagesToDelete);
+        } catch (Exception e) {
+            return  new ApiResponse("Unable to update or delete the stage record due to a foreign key constraint violation in the task table !",false);
+        }
+
+
+        project.setStageList(stages);
+
+
         project.setFileDataList(fileDataList);
 
         project.setBudget(projectDto.getBudget());
@@ -225,10 +261,13 @@ public class ProjectService {
         for (Stage stage : stageList) {
             int stageAmount = taskRepository.countAllByStageId(stage.getId());
             int completedTasks = taskRepository.countAllByStageIdAndTaskStatus_OrginalName(stage.getId(), "Completed");
-            int percent = (100*completedTasks) / stageAmount;
             StageProject stageProject=new StageProject();
             stageProject.setStageName(stage.getName());
             stageProject.setStageTasks(stageAmount);
+            int percent = 0;
+            if (completedTasks > 0){
+                percent = (100*completedTasks) / stageAmount;
+            }
             stageProject.setStagePercent(percent);
             stageProjectList.add(stageProject);
         }
@@ -277,7 +316,7 @@ public class ProjectService {
         if (optionalBranch.isEmpty()){
             return new ApiResponse("Branch not found",false);
         }
-        List<Project> projectList = projectRepository.findAllByBranch_Id(branchId);
+        List<Project> projectList = projectRepository.findAllByBranchId(branchId);
         if (projectList.isEmpty()){
             return new ApiResponse("Project not found",false);
         }
@@ -298,17 +337,11 @@ public class ProjectService {
             return new ApiResponse("Not found",false);
         }
         ProjectStatus projectStatus = optionalProjectStatus.get();
-        Date startDate = project.getStartDate();
-        Date endDate = new Date();
-        Date deadline = project.getDeadline();
-        if (deadline.before(startDate) || deadline.after(endDate)) {
-            project.setExpired(true);
-        }else {
-            project.setExpired(false);
-        }
         if (projectStatus.getName().equals("Completed")){
-            Date today = new Date();
-            project.setEndDate(today);
+            Date deadline = project.getDeadline();
+            Date endDate = new Date();
+            project.setExpired(!deadline.after(endDate));
+            project.setEndDate(endDate);
         }
         project.setProjectStatus(projectStatus);
         projectRepository.save(project);
@@ -329,44 +362,36 @@ public class ProjectService {
             return new ApiResponse("Branch not found",false);
         }
 
-        if (checkingType && checkingCustomer) {
-            if (checkingProjectStatus && checkingExpired) {
-                projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndProjectStatusIdAndExpiredTrue(typeId,customerId,projectStatusId,pageable);
-            } else if (checkingProjectStatus) {
-                projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndProjectStatusId(branchId, typeId, customerId, projectStatusId, pageable);
-            } else if (checkingExpired) {
-                projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndExpiredTrue(branchId, typeId, customerId, pageable);
-            } else {
-                projectList = projectRepository.findAllByProjectTypeIdAndCustomerId(branchId, typeId, customerId, pageable);
-            }
-        } else if (checkingType) {
-            if (checkingProjectStatus && checkingExpired) {
-                projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndExpiredTrue(branchId, typeId, projectStatusId, pageable);
-            } else if (checkingProjectStatus) {
-                projectList = projectRepository.findAllByProjectTypeIdAndProjectStatusId(branchId, typeId, projectStatusId, pageable);
-            } else if (checkingExpired) {
-                projectList = projectRepository.findAllByProjectTypeIdAndExpiredTrue(branchId, typeId, pageable);
-            } else {
-                projectList = projectRepository.findAllByProjectTypeId(branchId, typeId, pageable);
-            }
-        } else if (checkingCustomer) {
-            if (checkingProjectStatus && checkingExpired) {
-                projectList = projectRepository.findAllByCustomerIdAndProjectStatusIdAndExpiredTrue(branchId, customerId, projectStatusId, pageable);
-            } else if (checkingProjectStatus) {
-                projectList = projectRepository.findAllByCustomerIdAndProjectStatusId(branchId, customerId, projectStatusId, pageable);
-            } else if (checkingExpired) {
-                projectList = projectRepository.findAllByCustomerIdAndExpiredTrue(branchId, customerId, pageable);
-            } else {
-                projectList = projectRepository.findAllByCustomerId(branchId, customerId, pageable);
-            }
+        if (checkingType && checkingCustomer && checkingProjectStatus && checkingExpired) {
+            projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndProjectStatusIdAndExpiredTrue(typeId, customerId, projectStatusId, pageable);
+        } else if (checkingType && checkingCustomer && checkingProjectStatus) {
+            projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndProjectStatusId(typeId,customerId,projectStatusId,pageable);
+        } else if (checkingType && checkingCustomer && checkingExpired) {
+            projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndExpiredTrue(typeId,customerId,pageable);
+        } else if (checkingType && checkingProjectStatus && checkingExpired) {
+            projectList = projectRepository.findAllByProjectTypeIdAndProjectStatusIdAndExpiredTrue(typeId,projectStatusId,pageable);
+        } else if (checkingCustomer && checkingProjectStatus && checkingExpired) {
+            projectList = projectRepository.findAllByCustomerIdAndProjectStatusIdAndExpiredTrue(customerId,projectStatusId,pageable);
+        } else if (checkingType && checkingCustomer) {
+            projectList = projectRepository.findAllByProjectTypeIdAndCustomerId(typeId,customerId,pageable);
+        } else if (checkingCustomer && checkingExpired) {
+            projectList = projectRepository.findAllByCustomerIdAndExpiredTrue(customerId,pageable);
+        } else if (checkingType && checkingExpired) {
+            projectList = projectRepository.findAllByProjectTypeAndExpiredTrue(typeId,pageable);
         } else if (checkingProjectStatus && checkingExpired) {
-            projectList = projectRepository.findAllByProjectStatusIdAndExpiredTrue(branchId, projectStatusId, pageable);
+            projectList = projectRepository.findAllByProjectStatusIdAndExpiredTrue(projectStatusId,pageable);
+        } else if (checkingCustomer && checkingProjectStatus) {
+            projectList = projectRepository.findAllByCustomerIdAndProjectStatusId(customerId,projectStatusId,pageable);
+        } else if (checkingType) {
+            projectList = projectRepository.findAllByProjectTypeId(typeId,pageable);
+        } else if (checkingCustomer) {
+            projectList = projectRepository.findAllByCustomerId(customerId,pageable);
         } else if (checkingProjectStatus) {
-            projectList = projectRepository.findAllByProjectStatusId(branchId, projectStatusId, pageable);
+            projectList = projectRepository.findAllByProjectStatusId(projectStatusId,pageable);
         } else if (checkingExpired) {
-            projectList = projectRepository.findAllByExpiredTrue(branchId, pageable);
-        } else {
-            projectList = projectRepository.findAllByBranchId(branchId, pageable);
+            projectList = projectRepository.findAllByBranch_IdAndExpiredTrue(branchId,pageable);
+        }else {
+            projectList = projectRepository.findAllByBranch_Id(branchId,pageable);
         }
 
         assert projectList != null;

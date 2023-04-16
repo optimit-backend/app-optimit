@@ -16,5 +16,5 @@ public class SelectForLid extends AbsEntity {
 
     private String name; //russia
     @ManyToOne
-    private LidField lid; //davlat
+    private LidField lidField; //davlat
 }

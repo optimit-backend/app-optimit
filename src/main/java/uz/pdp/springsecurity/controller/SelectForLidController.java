@@ -43,8 +43,8 @@ public class SelectForLidController {
 
     @CheckPermission("EDIT_FORM_LID")
     @PutMapping("/{id}")
-    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody SelectForLidDto dto) {
-        ApiResponse apiResponse = service.edit(id, dto);
+    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody SelectForLidPostDto names) {
+        ApiResponse apiResponse = service.edit(id, names);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

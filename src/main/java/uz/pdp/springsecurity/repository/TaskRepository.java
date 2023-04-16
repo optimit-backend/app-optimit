@@ -21,11 +21,11 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     int countAllByProjectIdAndExpiredTrue(UUID project_id);
     int countAllByStageId(UUID stage_id);
     int countAllByStageIdAndTaskStatus_OrginalName(UUID stage_id, String taskStatus_orginalName);
-    Page<Task> findAllByBranchId(UUID branch_id, Pageable pageable);
+    Page<Task> findAllByBranch_Id(UUID branch_id, Pageable pageable);
     Page<Task> findAllByProjectIdAndTaskStatusIdAndTaskTypeIdAndExpiredTrue(UUID project_id, UUID taskStatus_id, UUID taskType_id, Pageable pageable);
     List<Task> findAllByProjectId(UUID project_id);
     Page<Task> findAllByProject_Id(UUID project_id,Pageable pageable);
-    List<Task> findAllByBranch_Id(UUID branch_id);
+    List<Task> findAllByBranchId(UUID branch_id);
     Page<Task> findAllByTaskStatus_Id(UUID project_id, Pageable pageable);
     Page<Task> findAllByTaskStatusIdAndProjectIdAndTaskTypeIdAndExpiredTrue(UUID taskStatus_id, UUID project_id, UUID taskType_id, Pageable pageable);
     Page<Task> findAllByTaskStatusIdAndProjectIdAndTaskTypeId(UUID id, UUID projectId, UUID typeId, Pageable pageable);
@@ -36,10 +36,6 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     Page<Task> findAllByTaskStatusIdAndTaskTypeIdAndExpiredTrue(UUID id, UUID typeId, Pageable pageable);
 
     Page<Task> findAllByProjectIdAndTaskTypeIdAndExpiredTrue(UUID projectId, UUID typeId, Pageable pageable);
-
-    Page<Task> findAllByProjectIdAndTaskStatusIdAndExpiredTrue(UUID projectId, UUID statusId, Pageable pageable);
-
-    Page<Task> findAllByProject_IdAndTaskStatusIdAndTaskTypeId(UUID project_id, UUID taskStatus_id, UUID taskType_id, Pageable pageable);
 
     Page<Task> findAllByTaskTypeId(UUID taskType_id, Pageable pageable);
 
