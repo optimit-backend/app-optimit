@@ -29,6 +29,7 @@ public class LidService {
     private final BusinessRepository businessRepository;
     private final FormRepository formRepository;
     private final SourceRepository sourceRepository;
+    private final PrizeService prizeService;
 
     public ApiResponse getAll(UUID businessId, int page, int size, UUID sourceId, UUID statusId, Date startDate, Date endDate) {
         Pageable pageable = PageRequest.of(page, size);
@@ -61,7 +62,7 @@ public class LidService {
         } else if (Boolean.TRUE.equals(checkingSourceId) && Boolean.TRUE.equals(checkingStatus)) {
             allLid = repository.findAllByLidStatusIdAndSourceId(statusId, sourceId, pageable);
         } else if (Boolean.TRUE.equals(checkingStatus)) {
-            allLid = repository.findAllByLidStatusId(statusId, pageable);
+            allLid = repository.findAllByLidStatus_Id(statusId, pageable);
         } else if (Boolean.TRUE.equals(checkingSourceId)) {
             allLid = repository.findAllByBusinessIdAndSourceId(businessId, sourceId, pageable);
         } else if (Boolean.TRUE.equals(checkingDate)) {
@@ -145,6 +146,10 @@ public class LidService {
 
         if (lid.getLidStatus().getOrginalName().equals("Done")) {
             return new ApiResponse("You can't change this lid", false);
+        }
+
+        if (lidStatus.getOrginalName() != null && lidStatus.getOrginalName().equalsIgnoreCase("Done")){
+            prizeService.addPrizeForLid();
         }
 
         lid.setLidStatus(lidStatus);
@@ -231,7 +236,7 @@ public class LidService {
             } else if (Boolean.TRUE.equals(checkingSourceId)) {
                 allLid = repository.findAllByLidStatusIdAndSourceId(status.getId(), sourceId, pageable);
             } else {
-                allLid = repository.findAllByLidStatusId(status.getId(), pageable);
+                allLid = repository.findAllByLidStatus_Id(status.getId(), pageable);
             }
 
             List<LidGetDto> lidGetDtoList = getDtoList(allLid.toList());

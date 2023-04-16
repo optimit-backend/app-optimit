@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Customer;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.SalaryStatus;
 import uz.pdp.springsecurity.mapper.PaymentMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
@@ -71,6 +72,8 @@ public class TradeService {
     private final SubscriptionRepository subscriptionRepository;
     private final ProductTypeComboRepository productTypeComboRepository;
     private final PaymentRepository paymentRepository;
+    private final SalaryCountService salaryCountService;
+    private final AgreementRepository agreementRepository;
 
     @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
@@ -95,7 +98,7 @@ public class TradeService {
 
         if (subscription.getTariff().getTradeAmount() >= size || subscription.getTariff().getTradeAmount() == 0) {
             Trade trade = new Trade();
-            return createOrEditTrade(trade, tradeDTO);
+            return createOrEditTrade(trade, tradeDTO, false);
         }
         return new ApiResponse("You have opened a sufficient branch according to the trade", false);
     }
@@ -114,10 +117,10 @@ public class TradeService {
             trade.setEditable(false);
             return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
         }
-        return createOrEditTrade(trade, tradeDTO);
+        return createOrEditTrade(trade, tradeDTO, true);
     }
 
-    public ApiResponse createOrEditTrade(Trade trade, TradeDTO tradeDTO) {
+    public ApiResponse createOrEditTrade(Trade trade, TradeDTO tradeDTO, boolean edit) {
 
         Optional<User> optionalUser = userRepository.findById(tradeDTO.getUserId());
         if (optionalUser.isEmpty()) {
@@ -137,6 +140,11 @@ public class TradeService {
             return new ApiResponse("PAYMENTSTATUS NOT FOUND", false);
         }
         trade.setPaymentStatus(optionalPaymentStatus.get());
+
+        Optional<Agreement> optionalAgreementKpi = agreementRepository.findByUserIdAndSalaryStatus(trade.getTrader().getId(), SalaryStatus.KPI);
+        if (optionalAgreementKpi.isEmpty()) {
+            return new ApiResponse("AGREEMENT NOT FOUND", false);
+        }
 
         if (tradeDTO.getPaymentDtoList().isEmpty()) {
             return new ApiResponse("PAYMENT METHOD NOT FOUND", false);
@@ -283,6 +291,20 @@ public class TradeService {
         trade.setTotalProfit(profit);
         tradeRepository.save(trade);
         tradeProductRepository.saveAll(tradeProductList);
+        if (!edit) {
+            Agreement agreementKpi = optionalAgreementKpi.get();
+            if (agreementKpi.getPrice() >= 0) {
+                double salarySum = trade.getTotalSum() * agreementKpi.getPrice() / 100;
+                salaryCountService.add(new SalaryCountDto(
+                        1,
+                        salarySum,
+                        agreementKpi.getId(),
+                        branch.getId(),
+                        new Date(),
+                        "Savdo ulushi"
+                ));
+            }
+        }
         return new ApiResponse("SAVED!", true);
     }
 
@@ -293,7 +315,7 @@ public class TradeService {
         List<TradeProduct> allByTradeId = tradeProductRepository.findAllByTradeId(trade.getId());
         if (allByTradeId.isEmpty()) return new ApiResponse("NOT FOUND", false);
         for (TradeProduct tradeProduct : allByTradeId) {
-            Optional<Warehouse> optionalWarehouse = null;
+            Optional<Warehouse> optionalWarehouse;
             if (tradeProduct.getProduct() != null)
                 optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(trade.getBranch().getId(), tradeProduct.getProduct().getId());
             else
@@ -343,7 +365,7 @@ public class TradeService {
         return new ApiResponse("FOUND", true, allByCustomer_id);
     }
 
-    public ApiResponse getByPayDate(Timestamp payDate) throws ParseException {
+    public ApiResponse getByPayDate(Timestamp payDate){
         List<Trade> allByPayDate = tradeRepository.findTradeByOneDate(payDate);
         if (allByPayDate.isEmpty()) return new ApiResponse("NOT FOUND", false);
 

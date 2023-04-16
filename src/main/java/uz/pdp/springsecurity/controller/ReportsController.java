@@ -159,5 +159,11 @@ public class ReportsController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("VIEW_REPORT")
+    @GetMapping("/lid-report/{businessId}")
+    public HttpEntity<?> lidReport(@PathVariable UUID businessId) {
+        ApiResponse apiResponse = reportsService.lidReport(businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 
 }

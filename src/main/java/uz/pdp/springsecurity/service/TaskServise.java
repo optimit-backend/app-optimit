@@ -30,6 +30,8 @@ public class TaskServise {
     private final NotificationRepository notificationRepository;
     private final ContentRepository contentRepository;
     private final StageRepository stageRepository;
+    private final SalaryCountService salaryCountService;
+    private final PrizeService prizeService;
 
     public ApiResponse add(TaskDto taskDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(taskDto.getBranchId());
@@ -200,6 +202,8 @@ public class TaskServise {
             Date endDate = new Date();
             task.setExpired(!deadline.after(endDate));
             task.setEndDate(endDate);
+            salaryCountService.addForTask(task);
+            prizeService.addForTask(task);
         }
         task.setTaskStatus(taskStatus);
         taskRepository.save(task);

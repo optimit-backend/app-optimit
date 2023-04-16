@@ -11,8 +11,8 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface CustomerMapper {
-
-    @Mapping(target = "customerGroupId", ignore = true)
+    @Mapping(target = "customerGroupId", source = "customerGroup.id")
+    @Mapping(target = "customerGroupName", source = "customerGroup.name")
     @Mapping(target = "businessId", source = "business.id")
     @Mapping(target = "branchId", source = "branch.id")
     CustomerDto toDto(Customer customer);
