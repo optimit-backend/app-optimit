@@ -334,7 +334,7 @@ public class TaskServise {
         }else if (statusId != null) {
             tasks = taskRepository.findAllByTaskStatusId(statusId,pageable);
         } else {
-            tasks = taskRepository.findAllByBranchId(branchId,pageable);
+            tasks = taskRepository.findAllByBranch_Id(branchId,pageable);
         }
         if (Objects.requireNonNull(tasks).isEmpty()) {
             return new ApiResponse("Not Found", false);
@@ -347,7 +347,7 @@ public class TaskServise {
         if (optionalBranch.isEmpty()){
             return new ApiResponse("Branch not found",false);
         }
-        List<Task> taskList = taskRepository.findAllByBranch_Id(branchId);
+        List<Task> taskList = taskRepository.findAllByBranchId(branchId);
         if (taskList.isEmpty()){
             return new ApiResponse("Tasks not found",false);
         }

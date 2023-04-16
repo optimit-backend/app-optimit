@@ -244,7 +244,7 @@ public class UserService {
             projectDto.setProduction(project.isProduction());
             projectDto.setBranchId(project.getBranch().getId());
             projectDto.setCustomerId(project.getCustomer().getId());
-
+            //todo bir korib qoyishiz kere
 //            projectDto.setStageId(project.getStage().getId());
             projectDto.setStartDate(project.getStartDate());
             allProjectDto.add(projectDto);

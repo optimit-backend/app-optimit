@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.*;
@@ -36,6 +38,7 @@ public class Project extends AbsEntity {
     @ManyToOne
     private ProjectStatus projectStatus;
     @ManyToMany
+//    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Stage> stageList;
     @ManyToOne
     private Branch branch;
