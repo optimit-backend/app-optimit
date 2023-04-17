@@ -14,7 +14,6 @@ import uz.pdp.springsecurity.repository.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.util.*;
 
 @Service
@@ -241,9 +240,6 @@ public class TradeService {
         paymentRepository.saveAll(paymentList);
         trade.setPayMethod(paymentList.get(0).getPayMethod());
 
-        /**
-         * SOTILGAN PRODUCT SAQLANDI YANI TRADERPRODUCT
-         */
         List<TradeProduct> tradeProductList = new ArrayList<>();
 
         double profit = 0;

@@ -3,6 +3,8 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.Column;
 import java.util.Date;
 import java.util.UUID;
 
@@ -16,6 +18,9 @@ public class PrizeGetDto {
 
     private UUID bonusId;
     private String bonusName;
+    private String bonusColor;
+    private String bonusIcon;
+    private double bonusSumma;
 
     private UUID userId;
     private String firstName;

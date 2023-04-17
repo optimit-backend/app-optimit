@@ -32,28 +32,28 @@ public class PrizeController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }*/
 
-    @CheckPermission("ADD_PRIZE")
+    @CheckPermission("VIEW_PRIZE")
     @GetMapping("/by-branch/{branchId}")
     public HttpEntity<?> getAll(@PathVariable UUID branchId) {
         ApiResponse apiResponse = prizeService.getAll(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("ADD_PRIZE")
+    @CheckPermission("VIEW_PRIZE")
     @GetMapping("/{prizeId}")
     public HttpEntity<?> getOne(@PathVariable UUID prizeId) {
         ApiResponse apiResponse = prizeService.getOne(prizeId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("ADD_PRIZE")
+    @CheckPermission("VIEW_PRIZE")
     @GetMapping("/by-user-all/{userId}")
     public HttpEntity<?> getByUserAll(@PathVariable UUID userId, @RequestParam UUID branchId) {
         ApiResponse apiResponse = prizeService.getByUserAll(userId, branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("ADD_PRIZE")
+    @CheckPermission("VIEW_PRIZE")
     @GetMapping("/by-user-last-month/{userId}")
     public HttpEntity<?> getByUserMonth(@PathVariable UUID userId, @RequestParam UUID branchId) {
         ApiResponse apiResponse = prizeService.getByUserMonth(userId, branchId);
