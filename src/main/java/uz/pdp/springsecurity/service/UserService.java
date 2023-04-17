@@ -244,8 +244,11 @@ public class UserService {
             projectDto.setProduction(project.isProduction());
             projectDto.setBranchId(project.getBranch().getId());
             projectDto.setCustomerId(project.getCustomer().getId());
-
-//            projectDto.setStageId(project.getStage().getId());
+            List<String> stringList=new ArrayList<>();
+            for (Stage stage : project.getStageList()) {
+                stringList.add(stage.getName());
+            }
+            projectDto.setStages(stringList);
             projectDto.setStartDate(project.getStartDate());
             allProjectDto.add(projectDto);
         }
