@@ -81,11 +81,4 @@ public class ProjectController {
         ApiResponse apiResponse = projectService.getAllByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-//    @CheckPermission("GET_ALL_PROJECT")
-//    @GetMapping("/get-by-stage/{stageId}")
-//    public HttpEntity<?> getAllByStatus(@PathVariable UUID stageId) {
-//        ApiResponse apiResponse = projectService.findByStageId(stageId);
-//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-//    }
 }

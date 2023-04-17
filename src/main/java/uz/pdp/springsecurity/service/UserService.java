@@ -230,29 +230,17 @@ public class UserService {
         }
         userDtoForPatron.setRole(user.getRole().getName());
 
-        List<Project> allProject = projectRepository.findAllByUsersId(userId);
-        List<ProjectDto> allProjectDto = new ArrayList<>();
 
-        for (Project project : allProject) {
-            ProjectDto projectDto = new ProjectDto();
-            projectDto.setId(project.getId());
-            projectDto.setBudget(project.getBudget());
-            projectDto.setDescription(project.getDescription());
-            projectDto.setDeadline(project.getDeadline());
-            projectDto.setEndDate(project.getEndDate());
-            projectDto.setName(project.getName());
-            projectDto.setProduction(project.isProduction());
-            projectDto.setBranchId(project.getBranch().getId());
-            projectDto.setCustomerId(project.getCustomer().getId());
-            List<String> stringList=new ArrayList<>();
-            for (Stage stage : project.getStageList()) {
-                stringList.add(stage.getName());
-            }
-            projectDto.setStages(stringList);
-            projectDto.setStartDate(project.getStartDate());
-            allProjectDto.add(projectDto);
-        }
-        userDtoForPatron.setProjectDtoList(allProjectDto);
+        int total = projectRepository.countAllByUsersId(userId);
+        int completed1 = projectRepository.countAllByProjectStatus_NameAndUsersId("Completed", userId);
+        int expired = projectRepository.countAllByExpiredTrue();
+        int process = projectRepository.countAllByProjectStatus_NameAndUsersId("Process",userId);
+        ProjectInfoDto projectInfoDto=new ProjectInfoDto();
+        projectInfoDto.setTotal(total);
+        projectInfoDto.setCompleted(completed1);
+        projectInfoDto.setProcess(process);
+        projectInfoDto.setExpired(expired);
+        userDtoForPatron.setProjectInfoDto(projectInfoDto);
 
         int taskAmount = taskRepository.countAllByUsersId(userId);
         int completed = taskRepository.countAllByUsersIdAndTaskStatus_OrginalName(userId, "Completed");
@@ -286,7 +274,6 @@ public class UserService {
             TradeResultDto tradeResultDto = new TradeResultDto();
             tradeResultDto.setTotalTrade(allTrade.size());
             tradeResultDto.setTotalTradeSumma(totalSumma);
-
             userDtoForPatron.setTradeResultDto(tradeResultDto);
         }
 
