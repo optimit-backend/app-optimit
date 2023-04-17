@@ -13,6 +13,9 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     boolean existsByProjectTypeId(UUID projectType_id);
     List<Project> findAllByBranchId(UUID branch_id);
     List<Project> findAllByUsersId(UUID users_id);
+    int countAllByUsersId(UUID users_id);
+    int countAllByExpiredTrue();
+    int countAllByProjectStatus_NameAndUsersId(String projectStatus_name, UUID users_id);
     Page<Project> findAllByCustomerIdAndExpiredTrue(UUID customerId,Pageable pageable);
     Page<Project> findAllByCustomerIdAndProjectStatusId(UUID customerId, UUID projectStatusId, Pageable pageable);
     Page<Project> findAllByProjectTypeIdAndCustomerIdAndProjectStatusIdAndExpiredTrue(UUID typeId, UUID customerId, UUID projectStatusId, Pageable pageable);

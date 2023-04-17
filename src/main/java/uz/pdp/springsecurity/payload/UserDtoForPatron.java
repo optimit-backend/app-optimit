@@ -14,7 +14,7 @@ public class UserDtoForPatron {
     private String fio;
     private UUID photosId;
     private String role;
-    private List<ProjectDto> projectDtoList;
+    private ProjectInfoDto projectInfoDto;
     private TaskInfoGetDto taskInfoGetDto;
     private List<BonusGetMetDto> bonusGetMetDtoList;
     private TradeResultDto tradeResultDto;
