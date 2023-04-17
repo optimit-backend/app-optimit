@@ -230,6 +230,7 @@ public class UserService {
         }
         userDtoForPatron.setRole(user.getRole().getName());
 
+
         int total = projectRepository.countAllByUsersId(userId);
         int completed1 = projectRepository.countAllByProjectStatus_NameAndUsersId("Completed", userId);
         int expired = projectRepository.countAllByExpiredTrue();
@@ -240,7 +241,6 @@ public class UserService {
         projectInfoDto.setProcess(process);
         projectInfoDto.setExpired(expired);
         userDtoForPatron.setProjectInfoDto(projectInfoDto);
-
 
         int taskAmount = taskRepository.countAllByUsersId(userId);
         int completed = taskRepository.countAllByUsersIdAndTaskStatus_OrginalName(userId, "Completed");
