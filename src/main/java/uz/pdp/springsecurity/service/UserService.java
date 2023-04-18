@@ -83,7 +83,6 @@ public class UserService {
         return new ApiResponse("ADDED", true, user.getId());
     }
 
-
     public ApiResponse edit(UUID id, UserDto userDto) {
         Optional<User> optionalUser = userRepository.findById(id);
 
