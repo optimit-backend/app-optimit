@@ -62,14 +62,14 @@ public class UserService {
             return response;
 
         HashSet<Branch> branches = new HashSet<>();
-        for (UUID branchId : userDto.getBranchesId()) {
-            Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-            if (optionalBranch.isPresent()) {
-                branches.add(optionalBranch.get());
-            } else {
-                return new ApiResponse("BRANCH NOT FOUND", false);
+            for (UUID branchId : userDto.getBranchId()) {
+                Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+                if (optionalBranch.isPresent()) {
+                    branches.add(optionalBranch.get());
+                } else {
+                    return new ApiResponse("BRANCH NOT FOUND", false);
+                }
             }
-        }
 
         User user = userMapper.toEntity(userDto);
         user.setActive(true);
@@ -107,7 +107,7 @@ public class UserService {
         }
 
         Set<Branch> branches = new HashSet<>();
-        for (UUID branchId : userDto.getBranchesId()) {
+        for (UUID branchId : userDto.getBranchId()) {
             Optional<Branch> byId = branchRepository.findById(branchId);
             if (byId.isPresent()) {
                 branches.add(byId.get());
