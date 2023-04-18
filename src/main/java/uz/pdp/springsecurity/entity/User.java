@@ -46,7 +46,7 @@ public class User extends AbsEntity implements UserDetails {
 
     private boolean sex;
 
-    private Timestamp birthday;
+    private Date birthday;
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -69,7 +69,7 @@ public class User extends AbsEntity implements UserDetails {
 
     private String description;
 
-    private Timestamp probation;
+    private Date probation;
 
     private String workingTime;
 
@@ -78,9 +78,9 @@ public class User extends AbsEntity implements UserDetails {
     @ManyToMany
     private List<Bonus> bonuses;
 
-    private Timestamp arrivalTime;
+    private Date arrivalTime;
 
-    private Timestamp leaveTime;
+    private Date leaveTime;
 
 
     //yoqilgan
