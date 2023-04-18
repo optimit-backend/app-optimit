@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -31,7 +32,7 @@ public class UserDto {
 
     private boolean sex;
 
-    private Timestamp birthday;
+    private Date birthday;
 
     private UUID roleId;
 
@@ -39,7 +40,7 @@ public class UserDto {
 
     private UUID businessId;
 
-    private Set<UUID> branchesId;
+    private Set<UUID> branchId;
 
     private UUID photoId;
 
@@ -49,7 +50,7 @@ public class UserDto {
 
     private String description;
 
-    private Timestamp probation;
+    private Date probation;
 
     private String workingTime;
 
@@ -57,9 +58,9 @@ public class UserDto {
 
     private List<UUID> bonusesId;
 
-    private Timestamp arrivalTime;
+    private Date arrivalTime;
 
-    private Timestamp leaveTime;
+    private Date leaveTime;
 
     private boolean enabled;
 }
