@@ -1,15 +1,12 @@
 package uz.pdp.springsecurity.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.ContentDto;
 import uz.pdp.springsecurity.payload.SalaryCountDto;
-import uz.pdp.springsecurity.service.ContentService;
 import uz.pdp.springsecurity.service.SalaryCountService;
 
 import javax.validation.Valid;
@@ -36,7 +33,7 @@ public class SalaryCountController {
     }*/
 
     @CheckPermission("GET_SALARY")
-    @GetMapping("//by-user-last-month/{userId}")
+    @GetMapping("/by-user-last-month/{userId}")
     public HttpEntity<?> getByUserLastMonth(@PathVariable UUID userId, @RequestParam() UUID branchId) {
         ApiResponse apiResponse = salaryCountService.getByUserLastMonth(userId, branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);

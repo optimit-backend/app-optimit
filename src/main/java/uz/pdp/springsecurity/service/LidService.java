@@ -143,12 +143,13 @@ public class LidService {
         if (lidStatus == null) {
             return new ApiResponse("Not found lid status", false);
         }
-
-        if (lid.getLidStatus().getOrginalName().equals("Done")) {
-            return new ApiResponse("You can't change this lid", false);
+        if (lid.getLidStatus().getOrginalName() != null) {
+            if (lid.getLidStatus().getOrginalName().equals("Done")) {
+                return new ApiResponse("You can't change this lid", false);
+            }
         }
 
-        if (lidStatus.getOrginalName() != null && lidStatus.getOrginalName().equalsIgnoreCase("Done")){
+        if (lidStatus.getOrginalName() != null && lidStatus.getOrginalName().equalsIgnoreCase("Done")) {
             prizeService.addPrizeForLid();
         }
 

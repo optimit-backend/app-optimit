@@ -162,7 +162,7 @@ public class BusinessService {
         Branch branch = branchRepository.save(branchMapper.toEntity(branchDto));
         Set<UUID> branchIds = new HashSet<>();
         branchIds.add(branch.getId());
-        userDto.setBranchesId(branchIds);
+        userDto.setBranchId(branchIds);
 
         Optional<Role> optionalRole = roleRepository.findByName("Admin");
         if (optionalRole.isPresent()) {
