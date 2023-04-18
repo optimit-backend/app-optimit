@@ -13,6 +13,7 @@ import uz.pdp.springsecurity.service.JobService;
 import java.util.UUID;
 
 @RestController
+@RequestMapping(value = "/api/job")
 @RequiredArgsConstructor
 public class JobController {
     private final JobService service;
