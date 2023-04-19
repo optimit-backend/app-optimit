@@ -98,7 +98,7 @@ public class FormService {
             }
             FormLidHistory newHistory = new FormLidHistory();
             Date date = new Date();
-            String newDate = new SimpleDateFormat("dd.MM.yyyy").format(date);
+            String newDate = new SimpleDateFormat("dd.MM.yyyy HH:ss").format(date);
             newHistory.setTotalSumma(formDto.getTotalSumma());
             newHistory.setName(newDate);
             newHistory.setActive(true);
@@ -124,6 +124,7 @@ public class FormService {
 
         return new ApiResponse("successfully saved", true);
     }
+
 
 
     public ApiResponse delete(UUID id) {
