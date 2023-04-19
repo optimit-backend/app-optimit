@@ -57,19 +57,25 @@ public class UserService {
         boolean b = userRepository.existsByUsernameIgnoreCase(userDto.getUsername());
         if (b) return new ApiResponse("USER ALREADY EXISTS", false);
 
-        ApiResponse response = roleService.get(userDto.getRoleId());
-        if (!response.isSuccess())
-            return response;
+        Optional<Role> optionalRole = roleRepository.findById(userDto.getRoleId());
+        if (optionalRole.isEmpty()) {
+            return new ApiResponse("not found role", false);
+        }
+
+        Role role = optionalRole.get();
+        if (role.getName().equals(Constants.ADMIN)) {
+            return new ApiResponse("Admin rolelik hodim qo'shaolmaysiz!", false);
+        }
 
         HashSet<Branch> branches = new HashSet<>();
-            for (UUID branchId : userDto.getBranchId()) {
-                Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-                if (optionalBranch.isPresent()) {
-                    branches.add(optionalBranch.get());
-                } else {
-                    return new ApiResponse("BRANCH NOT FOUND", false);
-                }
+        for (UUID branchId : userDto.getBranchId()) {
+            Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+            if (optionalBranch.isPresent()) {
+                branches.add(optionalBranch.get());
+            } else {
+                return new ApiResponse("BRANCH NOT FOUND", false);
             }
+        }
 
         User user = userMapper.toEntity(userDto);
         user.setActive(true);
@@ -233,8 +239,8 @@ public class UserService {
         int total = projectRepository.countAllByUsersId(userId);
         int completed1 = projectRepository.countAllByProjectStatus_NameAndUsersId("Completed", userId);
         int expired = projectRepository.countAllByExpiredTrue();
-        int process = projectRepository.countAllByProjectStatus_NameAndUsersId("Process",userId);
-        ProjectInfoDto projectInfoDto=new ProjectInfoDto();
+        int process = projectRepository.countAllByProjectStatus_NameAndUsersId("Process", userId);
+        ProjectInfoDto projectInfoDto = new ProjectInfoDto();
         projectInfoDto.setTotal(total);
         projectInfoDto.setCompleted(completed1);
         projectInfoDto.setProcess(process);
