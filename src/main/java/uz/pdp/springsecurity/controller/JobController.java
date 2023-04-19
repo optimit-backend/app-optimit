@@ -18,35 +18,35 @@ import java.util.UUID;
 public class JobController {
     private final JobService service;
 
-    @CheckPermission("VIEW_JOB")
+//    @CheckPermission("VIEW_JOB")
     @GetMapping("/getByBusinessId/{businessId}")
     public HttpEntity<?> getAll(@PathVariable UUID businessId) {
         ApiResponse apiResponse = service.getAll(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("VIEW_JOB")
+//    @CheckPermission("VIEW_JOB")
     @GetMapping("/{id}")
     public HttpEntity<?> getById(@PathVariable UUID id) {
         ApiResponse apiResponse = service.getById(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("ADD_JOB")
+//    @CheckPermission("ADD_JOB")
     @PostMapping
     public HttpEntity<?> create(@RequestBody JobDto jobDto) {
         ApiResponse apiResponse = service.create(jobDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("EDIT_JOB")
+//    @CheckPermission("EDIT_JOB")
     @PutMapping("/{id}")
     public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody JobDto jobDto) {
         ApiResponse apiResponse = service.edit(id, jobDto);
     return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("DELETE_JOB")
+//    @CheckPermission("DELETE_JOB")
     @DeleteMapping("/{id}")
     public HttpEntity<?> delete(@PathVariable UUID id) {
         ApiResponse apiResponse = service.delete(id);
