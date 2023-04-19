@@ -28,6 +28,7 @@ public class UserService {
     private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;
     private final TradeRepository tradeRepository;
+    private final JobRepository jobRepository;
 
 
     public ApiResponse add(UserDto userDto, boolean isNewUser) {
@@ -78,6 +79,10 @@ public class UserService {
         }
 
         User user = userMapper.toEntity(userDto);
+        if (userDto.getJobId() != null) {
+            Optional<Job> optionalJob = jobRepository.findById(userDto.getJobId());
+            optionalJob.ifPresent(user::setJob);
+        }
         user.setActive(true);
         user.setBranches(branches);
         if (userDto.getPhotoId() != null) {
@@ -109,6 +114,13 @@ public class UserService {
         assert userDto.getPassword() != null;
         if (userDto.getPassword().length() > 2) {
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        }
+
+        if (userDto.getJobId() != null) {
+            Optional<Job> optionalJob = jobRepository.findById(userDto.getJobId());
+            if (optionalJob.isPresent()) {
+                optionalJob.ifPresent(user::setJob);
+            }
         }
 
         Set<Branch> branches = new HashSet<>();
