@@ -46,4 +46,12 @@ public class FormController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+
+    @GetMapping("/getFormLidHistory/{businessId}")
+    public HttpEntity<?> getFormLidHistory(@PathVariable UUID businessId) {
+        ApiResponse apiResponse = service.getFormLidHistory(businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+
 }

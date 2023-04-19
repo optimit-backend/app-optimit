@@ -4,18 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
+
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FormDto {
-    private List<UUID> lidFieldIds;
-
-    private List<UUID> sourceId;
-
+public class FormLidHistoryDto {
+    private String name;
+    private double totalSumma;
+    private long totalLid;
+    private double average;
     private UUID businessId;
-
-    private Double totalSumma;
+    private boolean active;
 }

@@ -30,6 +30,7 @@ public class LidService {
     private final FormRepository formRepository;
     private final SourceRepository sourceRepository;
     private final PrizeService prizeService;
+    private final FormLidHistoryRepository formLidHistoryRepository;
 
     public ApiResponse getAll(UUID businessId, int page, int size, UUID sourceId, UUID statusId, Date startDate, Date endDate) {
         Pageable pageable = PageRequest.of(page, size);
@@ -129,6 +130,13 @@ public class LidService {
             notification.setObjectId(lid.getId());
             notification.setUserTo(user);
             notificationRepository.save(notification);
+        }
+        Optional<FormLidHistory> historyOptional = formLidHistoryRepository.findByActiveIsTrue();
+        if (historyOptional.isPresent()) {
+            FormLidHistory history = historyOptional.get();
+            history.setTotalLid(history.getTotalLid() + 1);
+            history.setAverage(history.getTotalSumma() / history.getTotalLid());
+            formLidHistoryRepository.save(history);
         }
 
         return new ApiResponse("successfully saved", true);
