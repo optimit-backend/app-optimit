@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 import uz.pdp.springsecurity.enums.Importance;
 
@@ -17,12 +19,14 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 public class Task extends AbsEntity {
+
     private String name;
 
     @ManyToOne
     private TaskType taskType;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
     @ManyToOne
@@ -37,24 +41,29 @@ public class Task extends AbsEntity {
     private Date deadLine;
 
     @ManyToMany
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<User> users;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private TaskStatus taskStatus;
 
     @Enumerated(EnumType.STRING)
     private Importance importance;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Task dependTask;
 
     @Column(nullable = false)
     private boolean isProductions;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Production production;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Content content;
 
     private double goalAmount;

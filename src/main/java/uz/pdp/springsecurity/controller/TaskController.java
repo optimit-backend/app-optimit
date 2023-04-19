@@ -90,6 +90,12 @@ public class TaskController {
         ApiResponse apiResponse = taskServise.getAllByProjectId(projectId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+    @CheckPermission("GET_ALL_TASK")
+    @GetMapping("/get-by-name/{name}")
+    public HttpEntity<?> getAllByName(@PathVariable String name) {
+        ApiResponse apiResponse = taskServise.searchByName(name);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 
     @CheckPermission("GET_ALL_TASK")
     @GetMapping("/get-by-branch-pageable/{branchId}")

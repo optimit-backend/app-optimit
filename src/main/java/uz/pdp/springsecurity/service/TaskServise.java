@@ -188,10 +188,12 @@ public class TaskServise {
         }
         Task task = optionalTask.get();
         TaskStatus taskStatus = optionalTaskStatus.get();
-        if (task.getDependTask() != null && taskStatus.getOrginalName().equals("Completed")) {
-            Task depentTask = taskRepository.getById(task.getDependTask().getId());
-            if (depentTask.getTaskStatus().getOrginalName() != null && !depentTask.getTaskStatus().getOrginalName().equals("Completed")) {
-                return new ApiResponse("You can not change this task, Complete " + depentTask.getName() + " task", false);
+        if (taskStatus.getOrginalName() != null) {
+            if (task.getDependTask() != null && taskStatus.getOrginalName().equals("Completed")) {
+                Task depentTask = taskRepository.getById(task.getDependTask().getId());
+                if (depentTask.getTaskStatus().getOrginalName() != null && !depentTask.getTaskStatus().getOrginalName().equals("Completed")) {
+                    return new ApiResponse("You can not change this task, Complete " + depentTask.getName() + " task", false);
+                }
             }
         }
         if (task.getTaskStatus().getOrginalName() != null && task.getTaskStatus().getOrginalName().equals("Completed")) {
@@ -352,5 +354,17 @@ public class TaskServise {
             return new ApiResponse("Tasks not found",false);
         }
         return new ApiResponse("Found",true,taskList);
+    }
+
+    public ApiResponse searchByName(String name) {
+        String[] words = name.split("\\s+");
+        List<Task> tasks = new ArrayList<>();
+        for (String word : words) {
+            tasks.addAll(taskRepository.findByNameContainingIgnoreCase(word));
+        }
+        if (tasks.isEmpty()){
+            return new ApiResponse("Not Found",false);
+        }
+        return new ApiResponse("Found",true,tasks);
     }
 }

@@ -66,7 +66,7 @@ public class BranchService {
         uncompletedTaskStatus.setColor("#FF0000");
         uncompletedTaskStatus.setBranch(branch);
         taskStatusRepository.save(uncompletedTaskStatus);
-        return new ApiResponse("ADDED", true);
+        return new ApiResponse("ADDED", true,user);
     }
 
     public ApiResponse editBranch(UUID id, BranchDto branchDto) {
