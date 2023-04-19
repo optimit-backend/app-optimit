@@ -7,6 +7,7 @@ import uz.pdp.springsecurity.repository.FileDateRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -33,6 +34,9 @@ public class FileService {
     public FileData getFileFromDatabase(UUID fileId) {
         return fileDateRepository.findById(fileId).orElse(null);
     }
+    public FileData getAllFileByProjectID(UUID projectId) {
+        return fileDateRepository.findById(projectId).orElse(null);
+    }
 
     public ApiResponse deleteById(UUID fileId) {
         boolean exists = fileDateRepository.existsById(fileId);
@@ -42,4 +46,13 @@ public class FileService {
         fileDateRepository.deleteById(fileId);
         return new ApiResponse("Deleted",true);
     }
+
+    public ApiResponse getFileDataByProjectId(UUID projectId) {
+        List<FileData> fileDataList = fileDateRepository.findByProjectId(projectId);
+        if (fileDataList.isEmpty()){
+            return new ApiResponse("Not Found",false);
+        }
+        return new ApiResponse("Found",true,fileDataList);
+    }
+
 }
