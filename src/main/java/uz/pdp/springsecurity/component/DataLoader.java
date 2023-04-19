@@ -441,7 +441,12 @@ public class DataLoader implements CommandLineRunner {
                                     VIEW_LID_STATUS,
                                     ADD_LID_STATUS,
                                     EDIT_LID_STATUS,
-                                    DELETE_LID_STATUS
+                                    DELETE_LID_STATUS,
+
+                                    DELETE_JOB,
+                                    EDIT_JOB,
+                                    ADD_JOB,
+                                    VIEW_JOB
                             ),
                             business));
             Role manager = roleRepository.save(new Role(
@@ -632,7 +637,12 @@ public class DataLoader implements CommandLineRunner {
                             VIEW_LID_STATUS,
                             ADD_LID_STATUS,
                             EDIT_LID_STATUS,
-                            DELETE_LID_STATUS
+                            DELETE_LID_STATUS,
+
+                            DELETE_JOB,
+                            EDIT_JOB,
+                            ADD_JOB,
+                            VIEW_JOB
                     ),
                     business));
 
