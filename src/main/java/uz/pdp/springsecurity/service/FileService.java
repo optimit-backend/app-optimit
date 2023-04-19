@@ -18,10 +18,6 @@ public class FileService {
 
     public ApiResponse saveFileToDatabase(String fileName, byte[] fileData,long size) {
 
-        long maxSizeInBytes = 10000L * 1024 * 1024; // 5MB
-        if (fileData.length > maxSizeInBytes){
-            return new ApiResponse("File too large !",false);
-        }
 
         FileData fileDataEntity = new FileData();
         fileDataEntity.setFileName(fileName);
