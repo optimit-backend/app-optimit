@@ -2,24 +2,18 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Business;
-import uz.pdp.springsecurity.entity.Form;
-import uz.pdp.springsecurity.entity.LidField;
-import uz.pdp.springsecurity.entity.Source;
+import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.mapper.FormLidHistoryMapper;
 import uz.pdp.springsecurity.mapper.LidFieldMapper;
 import uz.pdp.springsecurity.mapper.SourceMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.FormDto;
 import uz.pdp.springsecurity.payload.FormGetDto;
-import uz.pdp.springsecurity.repository.BusinessRepository;
-import uz.pdp.springsecurity.repository.FormRepository;
-import uz.pdp.springsecurity.repository.LidFieldRepository;
-import uz.pdp.springsecurity.repository.SourceRepository;
+import uz.pdp.springsecurity.payload.FormLidHistoryDto;
+import uz.pdp.springsecurity.repository.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +24,9 @@ public class FormService {
     private final SourceMapper sourceMapper;
     private final LidFieldRepository fieldRepository;
     private final SourceRepository sourceRepository;
-
+    private final FormLidHistoryRepository formLidHistoryRepository;
     private final BusinessRepository businessRepository;
+    private final FormLidHistoryMapper formLidHistoryMapper;
 
     public ApiResponse getAll(UUID businessId) {
         List<Form> allByBusinessId =
@@ -72,7 +67,7 @@ public class FormService {
 
     public ApiResponse create(FormDto formDto) {
         List<Form> formList = new ArrayList<>();
-
+        Optional<Business> optionalBusiness = businessRepository.findById(formDto.getBusinessId());
         for (UUID uuid : formDto.getSourceId()) {
             Form form = new Form();
             List<LidField> lidFields = new ArrayList<>();
@@ -88,20 +83,44 @@ public class FormService {
                     lidFields.add(lidField);
                 }
             }
-            Optional<Business> optionalBusiness = businessRepository.findById(formDto.getBusinessId());
             optionalBusiness.ifPresent(form::setBusiness);
             form.setLidFields(lidFields);
             formList.add(form);
         }
 
         List<Form> forms = repository.findAll();
+        Optional<FormLidHistory> optional = formLidHistoryRepository.findByActiveIsTrue();
+        if (formDto.getTotalSumma() != null) {
+            if (optional.isPresent()) {
+                FormLidHistory history = optional.get();
+                history.setActive(false);
+                formLidHistoryRepository.save(history);
+            }
+            FormLidHistory newHistory = new FormLidHistory();
+            Date date = new Date();
+            String newDate = new SimpleDateFormat("dd.MM.yyyy").format(date);
+            newHistory.setTotalSumma(formDto.getTotalSumma());
+            newHistory.setName(newDate);
+            newHistory.setActive(true);
+            optionalBusiness.ifPresent(newHistory::setBusiness);
+            formLidHistoryRepository.save(newHistory);
+        } else {
+            if (optional.isPresent()) {
+                FormLidHistory history = optional.get();
+                history.setActive(false);
+                formLidHistoryRepository.save(history);
+            }
+        }
+
         repository.deleteAll(forms);
 
         if (formList.isEmpty()) {
             return new ApiResponse("not save ", false);
         }
 
+
         repository.saveAll(formList);
+
 
         return new ApiResponse("successfully saved", true);
     }
@@ -116,5 +135,14 @@ public class FormService {
         Form form = optionalForm.get();
         repository.delete(form);
         return new ApiResponse("successfully deleted", true);
+    }
+
+    public ApiResponse getFormLidHistory(UUID businessId) {
+        List<FormLidHistory> all = formLidHistoryRepository.findAllByBusinessIdOrderByCreatedAtAsc(businessId);
+        if (all.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+        List<FormLidHistoryDto> dto = formLidHistoryMapper.toDto(all);
+        return new ApiResponse("found", true, dto);
     }
 }
