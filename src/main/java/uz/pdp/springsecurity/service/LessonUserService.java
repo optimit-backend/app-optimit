@@ -36,7 +36,7 @@ public class LessonUserService {
     }
 
     public void connectToUserEdit(Lesson lesson) {
-        List<LessonUser> lessonUserList = lessonUserRepository.findAllByLessonId(lesson.getId());
+        List<LessonUser> lessonUserList = lessonUserRepository.findAllByLessonIdOrderByCreatedAtDesc(lesson.getId());
         for (LessonUser lessonUser : lessonUserList) {
             lessonUser.setLessonView(lesson.getView());
             if (lessonUser.getView() < lesson.getView())lessonUser.setFinish(false);
@@ -75,14 +75,14 @@ public class LessonUserService {
 
     public ApiResponse getByLesson(UUID lessonId) {
         if (!lessonRepository.existsById(lessonId))return new ApiResponse("LESSON NOT FOUND", false);
-        List<LessonUser> lessonUserList = lessonUserRepository.findAllByLessonId(lessonId);
+        List<LessonUser> lessonUserList = lessonUserRepository.findAllByLessonIdOrderByCreatedAtDesc(lessonId);
         if (lessonUserList.isEmpty())return new ApiResponse("USERS WITH LESSON NOT FOUND", false);
         return new ApiResponse(true, lessonUserMapper.toDtoList(lessonUserList));
     }
 
     public ApiResponse getAllByUser(UUID userId) {
         if (!userRepository.existsById(userId))return new ApiResponse("USER NOT FOUND", false);
-        List<LessonUser> lessonUserList = lessonUserRepository.findAllByUserId(userId);
+        List<LessonUser> lessonUserList = lessonUserRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
         if (lessonUserList.isEmpty())return new ApiResponse("LESSONS WITH USER NOT FOUND", false);
         return new ApiResponse(true, lessonUserMapper.toDtoList(lessonUserList));
     }

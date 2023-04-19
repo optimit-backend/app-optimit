@@ -10,6 +10,6 @@ import java.util.UUID;
 public interface LessonUserRepository extends JpaRepository<LessonUser, UUID> {
     Optional<LessonUser> findByUserIdAndLessonId(UUID userId, UUID lessonId);
 
-    List<LessonUser> findAllByLessonId(UUID lessonId);
-    List<LessonUser> findAllByUserId(UUID userId);
+    List<LessonUser> findAllByLessonIdOrderByCreatedAtDesc(UUID lessonId);
+    List<LessonUser> findAllByUserIdOrderByCreatedAtDesc(UUID userId);
 }
