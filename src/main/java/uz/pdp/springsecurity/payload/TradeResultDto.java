@@ -10,4 +10,9 @@ import lombok.NoArgsConstructor;
 public class TradeResultDto {
     private Integer totalTrade;
     private Double totalTradeSumma;
+    private double avarage;
+
+    public double getAvarage() {
+        return totalTradeSumma/totalTrade;
+    }
 }
