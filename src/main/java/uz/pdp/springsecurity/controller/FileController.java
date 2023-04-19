@@ -12,6 +12,7 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.service.FileService;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,6 +27,7 @@ public class FileController {
         try {
             byte[] fileData = file.getBytes();
             String fileName = file.getOriginalFilename();
+            String contentType = file.getContentType();
             long size = file.getSize();
             ApiResponse apiResponse = fileService.saveFileToDatabase(fileName, fileData, size);
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);

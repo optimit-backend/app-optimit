@@ -256,6 +256,16 @@ public class ProjectService {
         projectGetOne.setEndDate(project.getEndDate());
         projectGetOne.setDeadline(project.getDeadline());
 
+        List<FileData> fileDataList = project.getFileDataList();
+        List<FileDataDto> fileDataDtoList=new ArrayList<>();
+        for (FileData fileData : fileDataList) {
+            FileDataDto fileDataDto=new FileDataDto();
+            fileDataDto.setId(fileData.getId());
+            fileDataDto.setName(fileData.getFileName());
+            fileDataDto.setSize(fileData.getSize());
+            fileDataDtoList.add(fileDataDto);
+        }
+        projectGetOne.setFileDataList(fileDataDtoList);
         List<Stage> stageList = project.getStageList();
         List<StageProject> stageProjectList=new ArrayList<>();
         for (Stage stage : stageList) {
