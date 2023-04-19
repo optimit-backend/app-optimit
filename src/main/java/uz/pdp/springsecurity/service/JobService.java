@@ -42,12 +42,14 @@ public class JobService {
 
     public ApiResponse create(JobDto jobDto) {
         if (jobDto.getBusinessId() != null) {
-            Optional<Business> optionalBusiness =
-                    businessRepository.findById(jobDto.getBusinessId());
+            Optional<Business> optionalBusiness = businessRepository.findById(jobDto.getBusinessId());
             if (optionalBusiness.isEmpty()) {
                 return new ApiResponse("not found business", false);
             }
-            repository.save(mapper.toEntity(jobDto));
+            Job job = mapper.toEntity(jobDto);
+            job.setBusiness(optionalBusiness.get());
+
+            repository.save(job);
             return new ApiResponse("successfully saved", true);
         }
         return new ApiResponse("business id is null", false);
@@ -71,6 +73,7 @@ public class JobService {
         if (job == null) {
             return new ApiResponse("not found", false);
         }
+        job.setBusiness(optionalBusiness.get());
 
         mapper.update(jobDto, job);
         repository.save(job);

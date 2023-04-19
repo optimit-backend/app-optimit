@@ -30,7 +30,7 @@ public class WorkTime extends AbsEntity {
 
     private Timestamp leaveTime;
 
-    private double minute;
+    private long minute;
 
     private boolean active;
 
