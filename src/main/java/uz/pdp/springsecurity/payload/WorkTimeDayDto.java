@@ -17,4 +17,6 @@ public class WorkTimeDayDto {
     private String lastName;
 
     List<Timestamp> timestampList;
+
+    private double hour;
 }
