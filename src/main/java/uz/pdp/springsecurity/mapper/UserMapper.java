@@ -23,7 +23,7 @@ public interface UserMapper {
     @Mapping(target = "accountNonLocked", ignore = true)
     @Mapping(target = "accountNonExpired", ignore = true)
     @Mapping(source = "roleId", target = "role.id")
-    @Mapping(source = "jobId", target = "job.id")
+    @Mapping(target = "job", ignore = true)
     @Mapping(source = "businessId", target = "business.id")
     User toEntity(UserDto userDto);
 
@@ -51,7 +51,7 @@ public interface UserMapper {
     @Mapping(target = "accountNonLocked", ignore = true)
     @Mapping(target = "accountNonExpired", ignore = true)
     @Mapping(source = "roleId", target = "role.id")
-    @Mapping(source = "jobId", target = "job.id")
+    @Mapping(target = "job", ignore = true)
     @Mapping(source = "businessId", target = "business.id")
     void update(UserDto userDto, @MappingTarget User user);
 }

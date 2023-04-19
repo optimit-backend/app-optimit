@@ -130,6 +130,7 @@ public class RoleService {
 
             for (User user : allByRoleId) {
                 UserGetMetDto userGetMetDto = new UserGetMetDto();
+                userGetMetDto.setId(user.getId());
                 userGetMetDto.setFio(user.getFirstName() + " " + user.getLastName());
                 if (user.getPhoto() != null) {
                     userGetMetDto.setAttachmentId(user.getPhoto().getId());
