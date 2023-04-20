@@ -82,15 +82,4 @@ public class AddressController {
         ApiResponse apiResponse = addressService.deleteAddress(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-    /**
-     * HAMMA ADDRESSLARNI O'CHIRIB YUBORISH
-     * @return
-     */
-    @CheckPermission("DELETE_ADDRESS")
-    @DeleteMapping
-    public HttpEntity<?> delete() {
-        ApiResponse apiResponse = addressService.deleteAddresses();
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
 }
