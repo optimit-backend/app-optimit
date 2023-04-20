@@ -55,6 +55,7 @@ public class DataLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
 //------------------------------------------------------------------------------------------//
         if (initMode.equals("always")) {
+            Permissions[] permissions = Permissions.values();
 
             List<Tariff> tariffRepositoryAll = tariffRepository.findAll();
             Tariff tariff = null;
@@ -62,6 +63,7 @@ public class DataLoader implements CommandLineRunner {
                 tariff = new Tariff(
                         "test tariff",
                         "test uchun",
+                        List.of(permissions),
                         0,
                         0,
                         0,
@@ -211,11 +213,16 @@ public class DataLoader implements CommandLineRunner {
             }
 //------------------------------------------------------------------------------------------//
 
-            Permissions[] permissions = Permissions.values();
 
+            assert tariff != null;
+            Optional<Subscription> optionalSubscription = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
+            Subscription subscription = new Subscription();
+            if (optionalSubscription.isPresent()) {
+                subscription = optionalSubscription.get();
+            }
             Role superAdmin = roleRepository.save(new Role(
                     Constants.SUPERADMIN,
-                    List.of(permissions),
+                    subscription.getTariff().getPermissions(),
                     business
             ));
 
@@ -740,29 +747,27 @@ public class DataLoader implements CommandLineRunner {
                     branches.add(branch);
 
                     List<ProjectStatus> projectStatusList = projectStatusRepository.findAll();
-                    if (projectStatusList.isEmpty()){
+                    if (projectStatusList.isEmpty()) {
                         ProjectStatus projectStatus = new ProjectStatus();
                         projectStatus.setName("Uncompleted");
                         projectStatus.setColor("red");
                         projectStatus.setBranch(branch);
                         projectStatusRepository.save(projectStatus);
                     }
-                    if (projectStatusList.isEmpty()){
+                    if (projectStatusList.isEmpty()) {
                         ProjectStatus projectStatus = new ProjectStatus();
                         projectStatus.setColor("yellow");
                         projectStatus.setName("Process");
                         projectStatus.setBranch(branch);
                         projectStatusRepository.save(projectStatus);
                     }
-                    if (projectStatusList.isEmpty()){
+                    if (projectStatusList.isEmpty()) {
                         ProjectStatus projectStatus = new ProjectStatus();
                         projectStatus.setColor("green");
                         projectStatus.setName("Completed");
                         projectStatus.setBranch(branch);
                         projectStatusRepository.save(projectStatus);
                     }
-
-
 
 
                     List<TaskStatus> taskStatusList = taskStatusRepository.findAll();

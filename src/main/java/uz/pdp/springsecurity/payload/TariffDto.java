@@ -3,7 +3,9 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uz.pdp.springsecurity.enums.Permissions;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -37,4 +39,6 @@ public class TariffDto {
     private boolean isActive;
 
     private boolean isDelete;
+
+    private List<Permissions> permissionsList;
 }

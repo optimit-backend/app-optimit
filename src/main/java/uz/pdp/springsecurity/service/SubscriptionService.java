@@ -3,15 +3,19 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Business;
+import uz.pdp.springsecurity.entity.Role;
 import uz.pdp.springsecurity.entity.Subscription;
 import uz.pdp.springsecurity.enums.Lifetime;
+import uz.pdp.springsecurity.enums.Permissions;
 import uz.pdp.springsecurity.enums.StatusTariff;
 import uz.pdp.springsecurity.mapper.SubscriptionMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.SubscriptionGetDto;
 import uz.pdp.springsecurity.payload.SubscriptionPostDto;
 import uz.pdp.springsecurity.repository.BusinessRepository;
+import uz.pdp.springsecurity.repository.RoleRepository;
 import uz.pdp.springsecurity.repository.SubscriptionRepository;
+import uz.pdp.springsecurity.util.Constants;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -25,8 +29,8 @@ import java.util.UUID;
 public class SubscriptionService {
 
     private final SubscriptionRepository repository;
-
     private final SubscriptionMapper mapper;
+    private final RoleRepository roleRepository;
 
     public ApiResponse create(SubscriptionPostDto subscriptionPostDto) {
         UUID businessId = subscriptionPostDto.getBusinessId();
@@ -75,6 +79,11 @@ public class SubscriptionService {
                         oldSubscription.setActive(false);
                         oldSubscription.setDelete(true);
                         repository.save(oldSubscription);
+
+                        if (!oldSubscription.getTariff().getId().equals(subscription.getTariff().getId())) {
+                            ApiResponse apiResponse = setRolePermissionsHelper(subscription);
+                            if (apiResponse != null) return apiResponse;
+                        }
                     }
                     if (lifetime.equals(Lifetime.MONTH)) {
                         LocalDate date = LocalDate.now().plusMonths(interval);
@@ -148,6 +157,37 @@ public class SubscriptionService {
         return new ApiResponse("wrong statusTariff", false);
     }
 
+    private ApiResponse setRolePermissionsHelper(Subscription subscription) {
+        UUID businessId = subscription.getBusiness().getId();
+        List<Role> allRole = roleRepository.findAllByBusinessId(businessId);
+        Optional<Role> optionalAdmin = roleRepository.findByNameAndBusinessId(Constants.ADMIN, businessId);
+        if (optionalAdmin.isEmpty()) {
+            return new ApiResponse("bu biznessda admin mavjud emas", false);
+        }
+        Role admin = optionalAdmin.get();
+        admin.setPermissions(subscription.getTariff().getPermissions());
+        roleRepository.save(admin);
+
+        for (Role role : allRole) {
+            if (!role.getName().equals(admin.getName())) {
+                List<Permissions> newPermissions = new ArrayList<>();
+                List<Permissions> rolePermissions = role.getPermissions();
+                for (Permissions rolePermission : rolePermissions) {
+                    List<Permissions> adminPermissions = admin.getPermissions();
+                    for (Permissions adminPermission : adminPermissions) {
+                        if (rolePermission.name().equals(adminPermission.name())) {
+                            newPermissions.add(rolePermission);
+                            break;
+                        }
+                    }
+                }
+                role.setPermissions(newPermissions);
+                roleRepository.save(role);
+            }
+        }
+        return null;
+    }
+
     public ApiResponse active(UUID subscriptionId) {
         Optional<Subscription> optionalSubscription = repository.findById(subscriptionId);
         if (optionalSubscription.isEmpty()) {
@@ -161,6 +201,12 @@ public class SubscriptionService {
                 oldSubscription.setActive(false);
                 oldSubscription.setDelete(true);
                 repository.save(oldSubscription);
+
+                if (!oldSubscription.getTariff().getId().equals(subscription.getTariff().getId())) {
+                    ApiResponse apiResponse = setRolePermissionsHelper(subscription);
+                    if (apiResponse != null) return apiResponse;
+                }
+
             }
             Lifetime lifetime = subscription.getTariff().getLifetime();
             int interval = subscription.getTariff().getInterval();

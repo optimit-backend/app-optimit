@@ -164,23 +164,26 @@ public class BusinessService {
         branchIds.add(branch.getId());
         userDto.setBranchId(branchIds);
 
-        Optional<Role> optionalRole = roleRepository.findByName("Admin");
-        if (optionalRole.isPresent()) {
-            Role roleAdmin = optionalRole.get();
-            userDto.setRoleId(roleAdmin.getId());
-        }
+        Role admin = new Role();
+        admin.setDescription("Admin");
+        admin.setName("Admin");
+        admin.setBusiness(business);
+        admin.setPermissions(subscription.getTariff().getPermissions());
+        roleRepository.save(admin);
+
+        userDto.setRoleId(admin.getId());
         userDto.setBusinessId(business.getId());
 
         userService.add(userDto, true);
 
-        Optional<User> superadmin = userRepository.findByUsername("superadmin");
+        Optional<User> superAdmin = userRepository.findByUsername("superAdmin");
 
-        if (superadmin.isPresent()) {
+        if (superAdmin.isPresent()) {
             Notification notification = new Notification();
             notification.setRead(false);
             notification.setName("Yangi bizness qo'shildi!");
             notification.setMessage("Yangi User va bizness qo'shildi biznes tarifini aktivlashtishingiz mumkin!");
-            notification.setUserTo(superadmin.get());
+            notification.setUserTo(superAdmin.get());
             notification.setType(NotificationType.NEW_BUSINESS);
             notification.setObjectId(business.getId());
             notificationRepository.save(notification);

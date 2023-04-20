@@ -144,4 +144,13 @@ public class RoleService {
         if (roleGetMetDtoList.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, roleGetMetDtoList);
     }
+
+    public ApiResponse getRolePermissions(UUID businessId) {
+        Optional<Role> optional = roleRepository.findByNameAndBusinessId("Admin", businessId);
+        if (optional.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+        Role role = optional.get();
+        return new ApiResponse("found", true, role.getPermissions());
+    }
 }
