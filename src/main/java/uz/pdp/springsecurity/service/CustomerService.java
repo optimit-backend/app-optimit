@@ -123,7 +123,7 @@ public class CustomerService {
         if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
         if (repaymentDto.getPayDate() == null) return new ApiResponse("PAY_DATE NOT FOUND", false);
         Customer customer = optionalCustomer.get();
-        if (repaymentDto.getRepayment() != null && customer.getDebt() != null) {
+        if (repaymentDto.getRepayment() != null && customer.getDebt() != 0) {
             customer.setDebt(customer.getDebt() - repaymentDto.getRepayment());
             customer.setPayDate(repaymentDto.getPayDate());
             customerRepository.save(customer);

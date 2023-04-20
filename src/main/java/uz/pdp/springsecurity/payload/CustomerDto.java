@@ -28,6 +28,8 @@ public class CustomerDto {
 
     private String customerGroupName;
 
+    private double customerGroupPercent = 0;
+
     private UUID businessId;
 
     private UUID branchId;

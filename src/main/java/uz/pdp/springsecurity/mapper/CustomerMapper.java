@@ -10,9 +10,10 @@ import uz.pdp.springsecurity.payload.CustomerDto;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface CustomerMapper {
+public interface CustomerMapper {//eff
     @Mapping(target = "customerGroupId", source = "customerGroup.id")
     @Mapping(target = "customerGroupName", source = "customerGroup.name")
+    @Mapping(target = "customerGroupPercent", source = "customerGroup.percent")
     @Mapping(target = "businessId", source = "business.id")
     @Mapping(target = "branchId", source = "branch.id")
     CustomerDto toDto(Customer customer);
