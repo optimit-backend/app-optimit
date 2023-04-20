@@ -1,6 +1,8 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.Branch;
@@ -28,6 +30,10 @@ public class SalaryService {
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
     private final RoleRepository roleRepository;
+
+    @Autowired@Lazy
+    private PrizeService prizeService;
+
 
     public void add(User user, Branch branch, double salarySum) {
         Optional<Salary> optionalSalary = salaryRepository.findByUserIdAndBranch_IdAndActiveTrue(user.getId(), branch.getId());
@@ -74,6 +80,7 @@ public class SalaryService {
         try {
             salaryCountRepository.deleteAllByAgreement_UserIdAndBranchId(user.getId(), branch.getId());
             workTimeRepository.deleteAllByUserIdAndBranchIdAndActiveFalse(user.getId(), branch.getId());
+            prizeService.deActive(user.getId(), branch.getId());
             salaryRepository.save(salary);
             salaryRepository.save(newSalary);
             return new ApiResponse("SUCCESS", true);
@@ -127,10 +134,17 @@ public class SalaryService {
     }
 
     public ApiResponse getAllByUser(UUID userId, UUID branchId) {
-        if (!userRepository.existsById(userId))return new ApiResponse("NOT FOUND USER");
-        if (!branchRepository.existsById(branchId))return new ApiResponse("NOT FOUND BRANCH");
+        if (!userRepository.existsById(userId))return new ApiResponse("NOT FOUND USER", false);
+        if (!branchRepository.existsById(branchId))return new ApiResponse("NOT FOUND BRANCH",false);
         List<Salary> salaryList = salaryRepository.findAllByUserIdAndBranchId(userId, branchId);
         if (salaryList.isEmpty())return new ApiResponse("NOT FOUND SALARY");
         return new ApiResponse(true, salaryMapper.toDtoList(salaryList));
+    }
+
+    public ApiResponse getByUserLast(UUID userId, UUID branchId) {
+        if (!userRepository.existsById(userId))return new ApiResponse("NOT FOUND USER", false);
+        if (!branchRepository.existsById(branchId))return new ApiResponse("NOT FOUND BRANCH", false);
+        Optional<Salary> optionalSalary = salaryRepository.findByUserIdAndBranch_IdAndActiveTrue(userId, branchId);
+        return optionalSalary.map(salary -> new ApiResponse(true, salaryMapper.toDto(salary))).orElseGet(() -> new ApiResponse("SALARY FOUND BRANCH", false));
     }
 }
