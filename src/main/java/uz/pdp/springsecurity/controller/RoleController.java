@@ -90,4 +90,11 @@ public class RoleController {
         ApiResponse apiResponse = roleService.getByBusinessRole(business_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+
+    @GetMapping("/get-role-permissions/{business_id}")
+    public HttpEntity<?> getRolePermissions(@PathVariable UUID business_id) {
+        ApiResponse apiResponse = roleService.getRolePermissions(business_id);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }

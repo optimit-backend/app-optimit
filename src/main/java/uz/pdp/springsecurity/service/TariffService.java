@@ -46,13 +46,15 @@ public class TariffService {
             return new ApiResponse("not found tariff", false);
         }
         Tariff tariff = optionalTariff.get();
-
-        return new ApiResponse("found", true, mapper.toDto(tariff));
+        TariffDto dto = mapper.toDto(tariff);
+        dto.setPermissionsList(tariff.getPermissions());
+        return new ApiResponse("found", true, dto);
     }
 
 
     public ApiResponse create(TariffDto tariffDto) {
         Tariff tariff = mapper.toEntity(tariffDto);
+        tariff.setPermissions(tariffDto.getPermissionsList());
         repository.save(tariff);
         return new ApiResponse("successfully saved tariff", true);
     }
@@ -66,6 +68,7 @@ public class TariffService {
 
         Tariff tariff = optionalTariff.get();
         mapper.update(tariffDto, tariff);
+        tariff.setPermissions(tariffDto.getPermissionsList());
         repository.save(tariff);
 
         return new ApiResponse("successfully edited", true);

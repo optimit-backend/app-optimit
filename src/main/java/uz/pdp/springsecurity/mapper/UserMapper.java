@@ -26,6 +26,7 @@ public interface UserMapper {
     @Mapping(source = "businessId", target = "business.id")
     User toEntity(UserDto userDto);
 
+
     @Mapping(source = "role.name", target = "roleName")
     @Mapping(target = "photoId", ignore = true)
     @Mapping(target = "branchId", ignore = true)
@@ -35,7 +36,9 @@ public interface UserMapper {
     @Mapping(source = "business.id", target = "businessId")
     UserDto toDto(User user);
 
+
     List<UserDto> toDto(List<User> users);
+
 
     @Mapping(target = "updateAt", ignore = true)
     @Mapping(target = "role", ignore = true)
