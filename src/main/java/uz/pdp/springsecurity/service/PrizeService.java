@@ -15,7 +15,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PrizeService {
     private final BranchRepository branchRepository;
-    private final SalaryRepository salaryRepository;
     private final BonusRepository bonusRepository;
     private final PrizeRepository prizeRepository;
     private final UserRepository userRepository;
@@ -91,18 +90,22 @@ public class PrizeService {
     }
 
     public ApiResponse getByUserAll(UUID userId, UUID branchId) {
-        List<Prize> prizeList = prizeRepository.findAllByBranchIdAndUserIdOrderByDateDesc(branchId, userId);
+        List<Prize> prizeList = prizeRepository.findAllByBranchIdAndUserIdAndGivenTrueOrderByDateDesc(branchId, userId);
         if (prizeList.isEmpty()) return new ApiResponse("PRIZE NOT FOUND", false);
         return new ApiResponse(true, prizeMapper.toDtoList(prizeList));
     }
 
-    public ApiResponse getByUserMonth(UUID userId, UUID branchId) {
-        Optional<Salary> optionalSalary = salaryRepository.findByUserIdAndBranch_IdAndActiveTrue(userId, branchId);
-        if (optionalSalary.isEmpty()) return new ApiResponse("ERROR", false);
-        Salary salary = optionalSalary.get();
-        List<Prize> prizeList = prizeRepository.findAllByBranchIdAndUserIdAndDateAfterAndGivenTrue(branchId, userId, salary.getStartDate());
+    public ApiResponse getByUserLastMonth(UUID userId, UUID branchId) {
+        List<Prize> prizeList = prizeRepository.findAllByBranchIdAndUserIdAndActiveTrueAndGivenTrue(branchId, userId);
         if (prizeList.isEmpty()) return new ApiResponse("PRIZE NOT FOUND", false);
-        return new ApiResponse(true, prizeMapper.toDtoList(prizeList));
+        Map<String, Object> response = new HashMap<>();
+        double totalSum = 0;
+        for (Prize prize : prizeList) {
+            totalSum += prize.getBonus().getSumma();
+        }
+        response.put("totalSum", totalSum);
+        response.put("prizeGetDtoList", prizeMapper.toDtoList(prizeList));
+        return new ApiResponse(true, response);
     }
 
     public boolean delete(Prize prize) {
@@ -153,5 +156,13 @@ public class PrizeService {
             salaryService.add(user, branch, prize.getBonus().getSumma());
         }
         prizeRepository.save(prize);
+    }
+
+    public void deActive(UUID userId, UUID branchId) {
+        List<Prize> prizeList = prizeRepository.findAllByBranchIdAndUserIdAndActiveTrueAndGivenTrue(branchId, userId);
+        for (Prize prize : prizeList) {
+            prize.setActive(false);
+        }
+        prizeRepository.saveAll(prizeList);
     }
 }

@@ -9,10 +9,7 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.SalaryCountDto;
 import uz.pdp.springsecurity.repository.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +23,7 @@ public class SalaryCountService {
     private final TaskRepository taskRepository;
 
     public ApiResponse add(SalaryCountDto salaryCountDto) {
-        Optional<SalaryCount> optionalSalaryCount = salaryCountRepository.findAllByAgreementIdAndBranchId(salaryCountDto.getAgreementId(), salaryCountDto.getBranchId());
+        Optional<SalaryCount> optionalSalaryCount = salaryCountRepository.findByAgreementIdAndBranchId(salaryCountDto.getAgreementId(), salaryCountDto.getBranchId());
         if (optionalSalaryCount.isEmpty())
             return addEdit(new SalaryCount(), salaryCountDto);
         SalaryCount salaryCount = optionalSalaryCount.get();
@@ -65,9 +62,25 @@ public class SalaryCountService {
 
     public ApiResponse getByUserLastMonth(UUID userId, UUID branchId) {
         if (!userRepository.existsById(userId)) return new ApiResponse("USER NOT FOUND", false);
-        if (!branchRepository.existsById(branchId)) return new ApiResponse("USER NOT BRANCH", false);
-        List<SalaryCount> salaryCountList = salaryCountRepository.findAllByAgreement_UserIdAndBranch_IdOrderByDate(userId, branchId);
-        if (salaryCountList.isEmpty())return new ApiResponse("SALARY COUNT NOT FOUND", false);
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()) return new ApiResponse("USER NOT BRANCH", false);
+        List<SalaryCount> salaryCountList = new ArrayList<>();
+        List<Agreement> agreementList = agreementRepository.findAllByUserId(userId);
+        for (Agreement agreement : agreementList) {
+            Optional<SalaryCount> optionalSalaryCount = salaryCountRepository.findByAgreementIdAndBranchId(agreement.getId(), branchId);
+            if (optionalSalaryCount.isPresent()){
+                salaryCountList.add(optionalSalaryCount.get());
+            } else {
+                salaryCountList.add(salaryCountRepository.save(new SalaryCount(
+                        optionalBranch.get(),
+                        0,
+                        0,
+                        agreement,
+                        new Date(),
+                        "Bo'sh"
+                )));
+            }
+        }
         return new ApiResponse(true, salaryCountMapper.toGetDtoList(salaryCountList));
     }
 
