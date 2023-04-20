@@ -21,7 +21,7 @@ public class CustomerGroup extends AbsEntity {
     private String name;
 
     @Column(nullable = false)
-    private Double percent;
+    private double percent;
 
     @ManyToOne
     private Business business;

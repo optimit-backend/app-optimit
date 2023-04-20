@@ -220,12 +220,6 @@ public enum Permissions {
     ADD_PRIZE,
     VIEW_PRIZE,
 
-    //  NAMUNA ---------------------------------
-//    ADD_...,
-//    VIEW_...,
-//    EDIT_...,
-//    DELETE_...,
-
     ADD_LESSON,
     VIEW_LESSON,
     VIEW_LESSON_ROLE,
@@ -255,5 +249,11 @@ public enum Permissions {
     DELETE_JOB,
     EDIT_JOB,
     ADD_JOB,
-    VIEW_JOB
+    VIEW_JOB,
+
+    GET_ALL_PROJECT_STATUS,
+    DELETE_PROJECT_STATUS,
+    GET_PROJECT_STATUS,
+    EDIT_PROJECT_STATUS,
+    ADD_PROJECT_STATUS
 }

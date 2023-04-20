@@ -250,7 +250,6 @@ public class TradeService {
                     TradeProduct tradeProduct = tradeProductRepository.getById(tradeProductDto.getTradeProductId());
                     double tradedQuantity = tradeProductDto.getTradedQuantity(); // to send fifo calculation
                     tradeProductDto.setTradedQuantity(0);//  to make sold quantity 0
-//                    profit -= tradeProduct.getProfit();// to subtract profit of product
                     TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(tradeProduct.getTrade().getBranch(), tradeProduct, tradeProductDto);
                     fifoCalculationService.returnedTrade(branch, savedTradeProduct, tradedQuantity);
                     tradeProductRepository.deleteById(tradeProductDto.getTradeProductId());
