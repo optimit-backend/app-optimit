@@ -12,7 +12,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     boolean existsByBarcodeAndBusinessIdAndActiveTrue(String barcode, UUID businessId);
     boolean existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(String barcode, UUID businessId, UUID productId);
 
-    List<Product> findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(UUID brand_id, UUID category_id, UUID business_id);
+    List<Product> findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(UUID brand_id, UUID category_id, UUID branchId);
+    List<Product> findAllByBusinessIdAndBrandIdAndCategoryIdAndBranchIdAndActiveTrue(UUID business_id, UUID brand_id, UUID category_id, UUID branch_id);
 
     List<Product> findAllByBrandIdAndActiveIsTrue(UUID brand_id);
 
@@ -22,7 +23,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     List<Product> findAllByCategoryIdAndBranchIdAndActiveTrue(UUID category_id, UUID branch_id);
 
-    List<Product> findAllByBrandIdAndBranchIdAndActiveTrue(UUID brand_id, UUID branch_id);
     List<Product> findAllByBrandIdAndBusinessIdAndActiveTrue(UUID brand_id, UUID businessId);
 
     List<Product> findAllByBranchIdAndActiveIsTrue(UUID branch_id);
@@ -35,6 +35,9 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findAllByBranchIdAndActiveTrue(UUID branch_id);
 
     List<Product> findAllByCategoryIdAndBusinessIdAndActiveTrue(UUID categoryId, UUID businessId);
-
     List<Product> findAllByBusiness_IdAndActiveIsTrueAndTypeLike(UUID business_id, Type type);
+
+    List<Product> findAllByBrandIdAndBranchIdAndActiveTrue(UUID brandId, UUID branchId);
+
+    List<Product> findAllByBrandIdAndCategoryIdAndBusinessIdAndActiveTrue(UUID brandId, UUID categoryId, UUID businessId);
 }

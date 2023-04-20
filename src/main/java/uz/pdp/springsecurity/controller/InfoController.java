@@ -33,6 +33,7 @@ public class InfoController {
         ApiResponse apiResponse = infoService.getInfoByBranch(branchId,date,startDate,endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
     @CheckPermission("VIEW_INFO")
     @GetMapping("/get-info-by-outlay-trade/{branchId}")
     public HttpEntity<?> getInfoByOutlayTrade(@PathVariable UUID branchId) {

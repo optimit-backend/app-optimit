@@ -187,8 +187,10 @@ public class ProductController {
     @GetMapping("/get-by-business/{business_id}")
     public HttpEntity<?> getByBusiness(@PathVariable UUID business_id,
                                        @RequestParam(required = false) UUID branch_id,
-                                       @RequestParam(required = false) UUID brand_id) {
-        ApiResponse apiResponse = productService.getByBusiness(business_id,branch_id,brand_id);
+                                       @RequestParam(required = false) UUID brand_id,
+                                       @RequestParam(required = false) UUID categoryId
+    ) {
+        ApiResponse apiResponse = productService.getByBusiness(business_id,branch_id,brand_id,categoryId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

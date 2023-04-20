@@ -14,6 +14,7 @@ import uz.pdp.springsecurity.repository.*;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -35,7 +36,6 @@ public class InfoService {
     private final static LocalDateTime TODAY_END = LocalDateTime.of(TODAY_START.getYear(), TODAY_START.getMonth(), TODAY_START.getDayOfMonth(),23,59,59);
 
     private final static Date date = new Date(System.currentTimeMillis());
-    private final static Timestamp currentDay = new Timestamp(date.getTime());
     private final static Timestamp enDate = new Timestamp(date.getTime());
     private final static LocalDateTime dateTime = enDate.toLocalDateTime();
     private final static LocalDateTime LAST_MONTH = dateTime.minusMonths(1);
@@ -113,9 +113,10 @@ public class InfoService {
             from = new Timestamp(startDate.getTime());
             to = new Timestamp(endDate.getTime());
         } else if (Objects.equals(date, "TODAY")) {
-            Date today = new Date();
-            from = new Timestamp(today.getTime());
-            to = new Timestamp(today.getTime());
+            Date end = new Date();
+            LocalDate start= LocalDate.now().atStartOfDay().toLocalDate();
+            from = new Timestamp(start.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000);
+            to = new Timestamp(end.getTime());
         }
         UUID businessId = optionalBranch.get().getBusiness().getId();
 
