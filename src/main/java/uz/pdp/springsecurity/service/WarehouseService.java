@@ -1,14 +1,9 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.mapper.ExchangeProductMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
@@ -44,7 +39,7 @@ public class WarehouseService {
 
 
     private void createOrEditWareHouseHelper(Branch branch, Product product, ProductTypePrice productTypePrice, Double quantity) {
-        Warehouse warehouse = null;
+        Warehouse warehouse ;
         if (product != null) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), product.getId());
             if (optionalWarehouse.isPresent()) {
@@ -100,14 +95,6 @@ public class WarehouseService {
         return true;
     }
 
-    /**
-     * RETURN TRADEPRODUCT BY TRADEPRODUCTDTO AFTER CHECK AMOUNT
-     *
-     * @param branch
-     * @param tradeProductDto
-     * @return
-     */
-
     public TradeProduct createOrEditTrade(Branch branch, TradeProduct tradeProduct, TradeProductDto tradeProductDto) {
         double amount = tradeProduct.getTradedQuantity() - tradeProductDto.getTradedQuantity();
         if (tradeProductDto.getType().equalsIgnoreCase("single")) {
@@ -115,6 +102,7 @@ public class WarehouseService {
             if (optionalWarehouse.isEmpty()) return null;
             Warehouse warehouse = optionalWarehouse.get();
             warehouse.setAmount(warehouse.getAmount() + amount);
+            warehouse.setLastSoldDate(new Date());
             warehouseRepository.save(warehouse);
             tradeProduct.setProduct(warehouse.getProduct());
         } else if (tradeProductDto.getType().equalsIgnoreCase("many")) {
@@ -122,6 +110,7 @@ public class WarehouseService {
             if (optionalWarehouse.isEmpty()) return null;
             Warehouse warehouse = optionalWarehouse.get();
             warehouse.setAmount(warehouse.getAmount() + amount);
+            warehouse.setLastSoldDate(new Date());
             warehouseRepository.save(warehouse);
             tradeProduct.setProductTypePrice(warehouse.getProductTypePrice());
         } else {
@@ -133,6 +122,7 @@ public class WarehouseService {
                 if (optionalWarehouse.isEmpty()) continue;
                 Warehouse warehouse = optionalWarehouse.get();
                 warehouse.setAmount(warehouse.getAmount() + amount * combo.getAmount());
+                warehouse.setLastSoldDate(new Date());
                 warehouseRepository.save(warehouse);
             }
             tradeProduct.setProduct(optionalProduct.get());
@@ -165,10 +155,6 @@ public class WarehouseService {
     public ApiResponse createOrUpdateExchangeProductBranch(ExchangeProductBranchDTO branchDTO, ExchangeProductBranch exchangeProductBranch, boolean update) {
 
         List<ExchangeProduct> exchangeProductList = new ArrayList<>();
-
-        /**
-         * create exchange product object list
-         */
         for (ExchangeProductDTO exchangeProductDTO : branchDTO.getExchangeProductDTOS()) {
             ExchangeProduct exchangeProduct = new ExchangeProduct();
             exchangeProduct.setExchangeProductQuantity(exchangeProductDTO.getExchangeProductQuantity());
@@ -213,6 +199,7 @@ public class WarehouseService {
                     for (Branch branch : branchList) {
                         if (branch.getId().equals(receivedBranch.getId())) {
                             b = true;
+                            break;
                         }
                     }
                     Optional<Product> optionalProduct = productRepository.findById(exchangeProduct.getProduct().getId());
@@ -250,8 +237,9 @@ public class WarehouseService {
                     boolean b = false;
 
                     for (Branch branch : branchList) {
-                        if (branch.getId().equals(receivedBranch)) {
+                        if (branch.getId().equals(receivedBranch.getId())) {
                             b = true;
+                            break;
                         }
                     }
 
@@ -326,6 +314,29 @@ public class WarehouseService {
         response.put("currentPage", newPage.getNumber());
         response.put("totalItems", newPage.getTotalElements());
         response.put("totalPages", newPage.getTotalPages());
+        return new ApiResponse("all", true, response);
+    }
+
+    public ApiResponse getLessSoldProduct(UUID branchId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Warehouse> warehousePage = warehouseRepository.findAllByBranchIdAndAmountIsNotOrderByLastSoldDate(branchId, 0, pageable);
+        List<GetLessProductDto> getLessProductDtoList = new ArrayList<>();
+        for (Warehouse warehouse : warehousePage.getContent()) {
+            GetLessProductDto dto = new GetLessProductDto();
+            if (warehouse.getProduct() != null)
+                dto.setName(warehouse.getProduct().getName());
+            else
+                dto.setName(warehouse.getProductTypePrice().getName());
+            dto.setAmount(warehouse.getAmount());
+            dto.setLastSoldDate(warehouse.getLastSoldDate());
+            getLessProductDtoList.add(dto);
+        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("getLessProduct", getLessProductDtoList);
+        response.put("currentPage", warehousePage.getNumber());
+        response.put("totalItem", warehousePage.getTotalElements());
+        response.put("totalPage", warehousePage.getTotalPages());
         return new ApiResponse("all", true, response);
     }
 }

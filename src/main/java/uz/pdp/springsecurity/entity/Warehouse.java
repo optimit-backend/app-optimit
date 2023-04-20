@@ -7,6 +7,7 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -24,6 +25,7 @@ public class Warehouse extends AbsEntity {
     @ManyToOne
     private Branch branch;
 
-
     private double amount;
+
+    private Date lastSoldDate = new Date();
 }

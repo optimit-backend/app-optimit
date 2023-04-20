@@ -13,9 +13,9 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 
     Optional<Warehouse> findByBranchIdAndProductId(UUID branchId, UUID productId);
 
-    Page<Warehouse> findAllByProduct_BusinessIdAndAmountNotOrderByAmountAsc(UUID product_business_id, double amount, Pageable pageable);
     Page<Warehouse> findAllByBranch_BusinessIdAndAmountNotOrderByAmountAsc(UUID product_business_id, double amount, Pageable pageable);
     Page<Warehouse> findAllByBranchIdAndAmountNotOrderByAmountAsc(UUID branch_id, double amount, Pageable pageable);
+    Page<Warehouse> findAllByBranchIdAndAmountIsNotOrderByLastSoldDate(UUID branch_id, double amount, Pageable pageable);
     Optional<Warehouse> findByBranchIdAndProductTypePriceId(UUID branchId, UUID productTypePriceId);
     Optional<Warehouse> findByProductIdAndBranchId(UUID product_id, UUID branch_id);
     Optional<Warehouse> findByProductTypePriceIdAndBranchId(UUID productTypePrice_id, UUID branch_id);
