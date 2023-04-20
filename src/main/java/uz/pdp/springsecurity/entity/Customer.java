@@ -40,7 +40,7 @@ public class Customer extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
-    private Double debt;
+    private double debt;
 
     private Date payDate = new Date(System.currentTimeMillis());
 
