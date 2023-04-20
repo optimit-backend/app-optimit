@@ -53,8 +53,9 @@ public class TradeController {
 
     /**
      * ID ORQALI BITTA SAVDONI OLIB CHIQISH
-     * @id id
+     *
      * @return ApiResponse(success - > true, object - > value)
+     * @id id
      */
     @CheckPermission("VIEW_TRADE")
     @GetMapping("/{id}")
@@ -117,6 +118,7 @@ public class TradeController {
 
     /**
      * MIJOZ ID'SI ORQALI BARCHA SAVDOLARNI OLIB CHIQISH
+     *
      * @param customer_id
      * @return ApiResponse(success - > true, message - > FOUND)
      */
@@ -202,6 +204,13 @@ public class TradeController {
     @GetMapping("/get-by-business/{businessId}")
     public HttpEntity<?> getAllByBusinessId(@PathVariable UUID businessId) {
         ApiResponse apiResponse = tradeService.getAllByBusinessId(businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_TRADE")
+    @GetMapping("/get-by-branchId/{branchId}")
+    public HttpEntity<?> getAllByBranchId(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = tradeService.getAllByBranchId(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
