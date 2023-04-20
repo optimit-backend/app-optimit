@@ -95,7 +95,6 @@ public class LidService {
         return new ApiResponse("found", true, valueList);
     }
 
-
     public ApiResponse create(LidDto lidDto) {
         User admin = userRepository.findByBusinessIdAndRoleName(lidDto.getBusinessId(), Constants.ADMIN).orElse(null);
         List<User> users = userRepository.findAllByBusiness_IdAndRoleName(lidDto.getBusinessId(), Constants.OPERATOR);
