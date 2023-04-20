@@ -112,7 +112,10 @@ public class InfoService {
         } else if (startDate != null && endDate != null && date == null) {
             from = new Timestamp(startDate.getTime());
             to = new Timestamp(endDate.getTime());
-
+        } else if (Objects.equals(date, "TODAY")) {
+            Date today = new Date();
+            from = new Timestamp(today.getTime());
+            to = new Timestamp(today.getTime());
         }
         UUID businessId = optionalBranch.get().getBusiness().getId();
 
