@@ -50,8 +50,7 @@ public class TaskStatusController {
         ApiResponse apiResponse = taskStatusServise.delete(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-    @CheckPermission("GET_ALL_TASK_STATUS")
+    @CheckPermission("GET_TASK_STATUS")
     @GetMapping("/get-by-branchId/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
         ApiResponse apiResponse = taskStatusServise.getAllByBranch(branchId);

@@ -381,15 +381,12 @@ public class DataLoader implements CommandLineRunner {
                                     EDIT_PROJECT_TYPE,
                                     GET_PROJECT_TYPE,
                                     DELETE_PROJECT_TYPE,
-                                    GET_ALL_PROJECT_TYPE,
 
-                                    GET_ALL_TASK_STATUS,
                                     DELETE_TASK_STATUS,
                                     GET_TASK_STATUS,
                                     EDIT_TASK_STATUS,
                                     ADD_TASK_STATUS,
 
-                                    GET_ALL_TASK_TYPE,
                                     DELETE_TASK_TYPE,
                                     GET_TASK_TYPE,
                                     EDIT_TASK_TYPE,
@@ -404,9 +401,7 @@ public class DataLoader implements CommandLineRunner {
                                     EDIT_STAGE,
                                     GET_STAGE,
                                     DELETE_STAGE,
-                                    GET_ALL_STAGE,
 
-                                    GET_ALL_PROJECT,
                                     DELETE_PROJECT,
                                     GET_PROJECT,
                                     EDIT_PROJECT,
@@ -422,7 +417,6 @@ public class DataLoader implements CommandLineRunner {
                                     GET_TASK,
                                     EDIT_TASK,
                                     ADD_TASK,
-                                    GET_ALL_TASK,
 
                                     ADD_PRIZE,
                                     VIEW_PRIZE,
@@ -455,7 +449,6 @@ public class DataLoader implements CommandLineRunner {
                                     ADD_JOB,
                                     VIEW_JOB,
 
-                                    GET_ALL_PROJECT_STATUS,
                                     DELETE_PROJECT_STATUS,
                                     GET_PROJECT_STATUS,
                                     EDIT_PROJECT_STATUS,
@@ -595,15 +588,12 @@ public class DataLoader implements CommandLineRunner {
                             EDIT_PROJECT_TYPE,
                             GET_PROJECT_TYPE,
                             DELETE_PROJECT_TYPE,
-                            GET_ALL_PROJECT_TYPE,
 
-                            GET_ALL_TASK_STATUS,
                             DELETE_TASK_STATUS,
                             GET_TASK_STATUS,
                             EDIT_TASK_STATUS,
                             ADD_TASK_STATUS,
 
-                            GET_ALL_TASK_TYPE,
                             DELETE_TASK_TYPE,
                             GET_TASK_TYPE,
                             EDIT_TASK_TYPE,
@@ -613,9 +603,7 @@ public class DataLoader implements CommandLineRunner {
                             EDIT_STAGE,
                             GET_STAGE,
                             DELETE_STAGE,
-                            GET_ALL_STAGE,
 
-                            GET_ALL_PROJECT,
                             DELETE_PROJECT,
                             GET_PROJECT,
                             EDIT_PROJECT,
@@ -657,7 +645,6 @@ public class DataLoader implements CommandLineRunner {
                             ADD_JOB,
                             VIEW_JOB,
 
-                            GET_ALL_PROJECT_STATUS,
                             DELETE_PROJECT_STATUS,
                             GET_PROJECT_STATUS,
                             EDIT_PROJECT_STATUS,

@@ -47,14 +47,14 @@ public class ProjectTypeController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_PROJECT_TYPE")
+    @CheckPermission("GET_PROJECT_TYPE")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
         ApiResponse apiResponse = projectTypeServise.getAllByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_PROJECT_TYPE")
+    @CheckPermission("GET_PROJECT_TYPE")
     @GetMapping("/get-by-branchPageable/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
                                         @RequestParam(defaultValue = "0", required = false) int page,

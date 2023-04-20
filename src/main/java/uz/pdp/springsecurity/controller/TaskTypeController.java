@@ -49,14 +49,14 @@ public class TaskTypeController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_TASK_TYPE")
+    @CheckPermission("GET_TASK_TYPE")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBusiness(@PathVariable UUID branchId) {
         ApiResponse apiResponse = taskTypeServise.getAllByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_TASK_TYPE")
+    @CheckPermission("GET_TASK_TYPE")
     @GetMapping("/get-by-branchPageable/{branchId}")
     public HttpEntity<?> getAllByBusiness(@PathVariable UUID branchId,
                                           @RequestParam(defaultValue = "0", required = false) int page,

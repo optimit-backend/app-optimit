@@ -62,7 +62,7 @@ public class ProjectController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_PROJECT")
+    @CheckPermission("GET_PROJECT")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
                                         @RequestParam(required = false) UUID typeId,
@@ -75,7 +75,7 @@ public class ProjectController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_PROJECT")
+    @CheckPermission("GET_PROJECT")
     @GetMapping("/get-by-branchId/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
         ApiResponse apiResponse = projectService.getAllByBranch(branchId);
