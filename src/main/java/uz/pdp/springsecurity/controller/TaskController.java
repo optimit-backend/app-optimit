@@ -57,7 +57,7 @@ public class TaskController {
         ApiResponse apiResponse = taskServise.get(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-    @CheckPermission("GET_ALL_TASK")
+    @CheckPermission("GET_TASK")
     @GetMapping("/branch/{branchId}")
     public HttpEntity<?> getAll(@PathVariable UUID branchId) {
         ApiResponse apiResponse = taskServise.getAll(branchId);
@@ -71,7 +71,7 @@ public class TaskController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_TASK")
+    @CheckPermission("GET_TASK")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
                                         @RequestParam(required = false) UUID projectId,
@@ -84,20 +84,20 @@ public class TaskController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_TASK")
+    @CheckPermission("GET_TASK")
     @GetMapping("/get-by-project/{projectId}")
     public HttpEntity<?> getAllByProject(@PathVariable UUID projectId) {
         ApiResponse apiResponse = taskServise.getAllByProjectId(projectId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-    @CheckPermission("GET_ALL_TASK")
+    @CheckPermission("GET_TASK")
     @GetMapping("/get-by-name/{name}")
     public HttpEntity<?> getAllByName(@PathVariable String name) {
         ApiResponse apiResponse = taskServise.searchByName(name);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_TASK")
+    @CheckPermission("GET_TASK")
     @GetMapping("/get-by-branch-pageable/{branchId}")
     public HttpEntity<?> getAllByBranchPageable(@PathVariable UUID branchId,
                                                 @RequestParam(required = false) UUID projectId,
