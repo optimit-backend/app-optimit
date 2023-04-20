@@ -584,25 +584,51 @@ public class ProductService {
         }
     }
 
-    public ApiResponse getByBusiness(UUID businessId, UUID branch_id, UUID brand_id) {
+    public ApiResponse getByBusiness(UUID businessId, UUID branch_id, UUID brand_id,UUID categoryId) {
         List<ProductViewDto> productViewDtoList = new ArrayList<>();
         List<Product> productList = new ArrayList<>();
 
-        if (branch_id != null) {
-            if (brand_id != null) {
-                productList = productRepository.findAllByBrandIdAndBranchIdAndActiveTrue(brand_id, branch_id);
-            } else {
-                productList = productRepository.findAllByBranchIdAndActiveTrue(branch_id);
-            }
-            getProductMethod(productViewDtoList, productList, branch_id);
-        } else {
-            if (brand_id != null) {
-                productList = productRepository.findAllByBrandIdAndBusinessIdAndActiveTrue(brand_id, businessId);
-            } else {
-                productList = productRepository.findAllByBusiness_IdAndActiveTrue(businessId);
-            }
-            getProductMethod(productViewDtoList, productList, null);
+        boolean checkingBranch = false;
+        boolean checkingBrand = false;
+        boolean checkingCategory = false;
+        boolean checkingBusiness = false;
+
+        if (categoryId!=null){
+            checkingCategory = true;
         }
+        if (brand_id!=null){
+            checkingBrand = true;
+        }
+        if (branch_id!=null){
+            checkingBranch = true;
+        }
+        if (businessId!=null){
+            checkingBusiness = true;
+        }
+        if (checkingBranch){
+            checkingBusiness = false;
+        }
+
+        if (checkingCategory && checkingBrand && checkingBranch){
+            productList = productRepository.findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(brand_id,categoryId,branch_id);
+        } else if (checkingBrand && checkingBranch) {
+            productList = productRepository.findAllByBrandIdAndBranchIdAndActiveTrue(brand_id,branch_id);
+        } else if (checkingCategory && checkingBranch) {
+            productList = productRepository.findAllByCategoryIdAndBranchIdAndActiveTrue(categoryId,branch_id);
+        } else if (checkingCategory && checkingBrand && checkingBusiness) {
+            productList = productRepository.findAllByBrandIdAndCategoryIdAndBusinessIdAndActiveTrue(brand_id,categoryId,businessId);
+        } else if (checkingBrand && checkingBusiness) {
+            productList = productRepository.findAllByBrandIdAndBusinessIdAndActiveTrue(brand_id,businessId);
+        } else if (checkingCategory && checkingBusiness) {
+            productList = productRepository.findAllByCategoryIdAndBusinessIdAndActiveTrue(categoryId,businessId);
+        } else if (checkingBusiness) {
+            productList = productRepository.findAllByBusiness_IdAndActiveTrue(businessId);
+        } else if (checkingBranch) {
+            productList = productRepository.findAllByBranchIdAndActiveTrue(branch_id);
+        }
+
+        getProductMethod(productViewDtoList, productList, null);
+
 
         if (productList.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
