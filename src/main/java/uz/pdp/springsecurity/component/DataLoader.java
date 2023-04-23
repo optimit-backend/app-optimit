@@ -452,7 +452,10 @@ public class DataLoader implements CommandLineRunner {
                                     DELETE_PROJECT_STATUS,
                                     GET_PROJECT_STATUS,
                                     EDIT_PROJECT_STATUS,
-                                    ADD_PROJECT_STATUS
+                                    ADD_PROJECT_STATUS,
+                                    
+                                    VIEW_ORG
+
                             ),
                             business));
             Role manager = roleRepository.save(new Role(
@@ -648,7 +651,9 @@ public class DataLoader implements CommandLineRunner {
                             DELETE_PROJECT_STATUS,
                             GET_PROJECT_STATUS,
                             EDIT_PROJECT_STATUS,
-                            ADD_PROJECT_STATUS
+                            ADD_PROJECT_STATUS,
+                                    
+                            VIEW_ORG
                     ),
                     business));
 
