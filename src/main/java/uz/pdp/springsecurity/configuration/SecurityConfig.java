@@ -64,7 +64,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/tariff/getById/*",
                         "/api/attachment/download/**",
                         "/api/files/**",
-                        "/api/form-lid/*")
+                        "/api/form-lid/*",
+                        "/api/role/get-role-tariff/*"
+                )
                 .permitAll()
                 .anyRequest()
                 .authenticated()

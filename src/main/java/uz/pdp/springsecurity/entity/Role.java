@@ -58,4 +58,8 @@ public class Role extends AbsEntity {
         this.permissions = permissions;
     }
 
+    public void addPermission(Permissions permissions){
+        this.permissions.add(permissions);
+    }
+
 }
