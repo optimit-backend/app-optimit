@@ -38,6 +38,9 @@ public class Prize extends AbsEntity {
     @Column(nullable = false)
     private boolean given;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     private boolean task;
     private boolean lid;
     private Integer count;

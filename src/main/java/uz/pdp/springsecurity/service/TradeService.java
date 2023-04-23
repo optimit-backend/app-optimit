@@ -288,7 +288,7 @@ public class TradeService {
         tradeProductRepository.saveAll(tradeProductList);
         if (!edit) {
             Agreement agreementKpi = optionalAgreementKpi.get();
-            if (agreementKpi.getPrice() >= 0) {
+            if (agreementKpi.getPrice() > 0) {
                 double salarySum = trade.getTotalSum() * agreementKpi.getPrice() / 100;
                 salaryCountService.add(new SalaryCountDto(
                         1,

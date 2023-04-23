@@ -49,14 +49,14 @@ public class StageController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_STAGE")
+    @CheckPermission("GET_STAGE")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
         ApiResponse apiResponse = stageService.getAllByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_STAGE")
+    @CheckPermission("GET_STAGE")
     @GetMapping("/get-by-branchPageable/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
                                           @RequestParam(defaultValue = "0", required = false) int page,

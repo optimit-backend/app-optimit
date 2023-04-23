@@ -55,8 +55,8 @@ public class PrizeController {
 
     @CheckPermission("VIEW_PRIZE")
     @GetMapping("/by-user-last-month/{userId}")
-    public HttpEntity<?> getByUserMonth(@PathVariable UUID userId, @RequestParam UUID branchId) {
-        ApiResponse apiResponse = prizeService.getByUserMonth(userId, branchId);
+    public HttpEntity<?> getByUserLastMonth(@PathVariable UUID userId, @RequestParam UUID branchId) {
+        ApiResponse apiResponse = prizeService.getByUserLastMonth(userId, branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
