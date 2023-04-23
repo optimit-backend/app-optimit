@@ -26,4 +26,5 @@ public class ProductViewDto {
     private String brandName;
     private double minQuantity;
     private Date expiredDate;
+    private String category;
 }

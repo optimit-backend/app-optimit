@@ -727,6 +727,9 @@ public class ProductService {
                 }
                 productViewDto.setBuyPrice(product.getBuyPrice());
                 productViewDto.setSalePrice(product.getSalePrice());
+                if (product.getCategory()!=null){
+                    productViewDto.setCategory(product.getCategory().getName());
+                }
             }
 
             productViewDtoList.add(productViewDto);
