@@ -77,7 +77,7 @@ public class RoleController {
      * @param business_id
      * @return ApiResponse(success - > true, message - > FOUND)
      */
-    @CheckPermission("VIEW_ROLE_ADMIN")
+    @CheckPermission("VIEW_ORG")
     @GetMapping("/get-by-business/{business_id}")
     public HttpEntity<?> getAllByBusiness(@PathVariable UUID business_id) {
         ApiResponse apiResponse = roleService.getAllByBusiness(business_id);
