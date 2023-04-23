@@ -118,6 +118,7 @@ public class LidService {
                 lid.setSource(source);
             }
         }
+        lid.setDelete(false);
         repository.save(lid);
 
         for (User user : users) {
