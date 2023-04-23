@@ -55,21 +55,21 @@ public class LidService {
         Page<Lid> allLid = null;
 
         if (Boolean.TRUE.equals(checkingSourceId) && Boolean.TRUE.equals(checkingDate) && Boolean.TRUE.equals(checkingStatus)) {
-            allLid = repository.findAllByLidStatusIdAndSourceIdAndCreatedAtBetween(statusId, sourceId, startTimestamp, endTimestamp, pageable);
+            allLid = repository.findAllByLidStatusIdAndSourceIdAndCreatedAtBetweenAndDeleteIsFalse(statusId, sourceId, startTimestamp, endTimestamp, pageable);
         } else if (Boolean.TRUE.equals(checkingDate) && Boolean.TRUE.equals(checkingSourceId)) {
-            allLid = repository.findAllByBusinessIdAndSourceIdAndCreatedAtBetween(businessId, sourceId, startTimestamp, endTimestamp, pageable);
+            allLid = repository.findAllByBusinessIdAndSourceIdAndCreatedAtBetweenAndDeleteIsFalse(businessId, sourceId, startTimestamp, endTimestamp, pageable);
         } else if (Boolean.TRUE.equals(checkingDate) && Boolean.TRUE.equals(checkingStatus)) {
-            allLid = repository.findAllByLidStatusIdAndCreatedAtBetween(statusId, startTimestamp, endTimestamp, pageable);
+            allLid = repository.findAllByLidStatusIdAndCreatedAtBetweenAndDeleteIsFalse(statusId, startTimestamp, endTimestamp, pageable);
         } else if (Boolean.TRUE.equals(checkingSourceId) && Boolean.TRUE.equals(checkingStatus)) {
-            allLid = repository.findAllByLidStatusIdAndSourceId(statusId, sourceId, pageable);
+            allLid = repository.findAllByLidStatusIdAndSourceIdAndDeleteIsFalse(statusId, sourceId, pageable);
         } else if (Boolean.TRUE.equals(checkingStatus)) {
-            allLid = repository.findAllByLidStatus_Id(statusId, pageable);
+            allLid = repository.findAllByLidStatus_IdAndDeleteIsFalse(statusId, pageable);
         } else if (Boolean.TRUE.equals(checkingSourceId)) {
-            allLid = repository.findAllByBusinessIdAndSourceId(businessId, sourceId, pageable);
+            allLid = repository.findAllByBusinessIdAndSourceIdAndDeleteIsFalse(businessId, sourceId, pageable);
         } else if (Boolean.TRUE.equals(checkingDate)) {
-            allLid = repository.findAllByBusinessIdAndCreatedAtBetween(businessId, startTimestamp, endTimestamp, pageable);
+            allLid = repository.findAllByBusinessIdAndCreatedAtBetweenAndDeleteIsFalse(businessId, startTimestamp, endTimestamp, pageable);
         } else {
-            allLid = repository.findAllByBusinessId(businessId, pageable);
+            allLid = repository.findAllByBusinessIdAndDeleteIsFalse(businessId, pageable);
         }
 
         List<LidGetDto> dtoList = getDtoList(allLid.toList());
@@ -238,13 +238,13 @@ public class LidService {
             Pageable pageable = PageRequest.of(0, Objects.requireNonNullElse(integer, 5));
 
             if (Boolean.TRUE.equals(checkingSourceId) && Boolean.TRUE.equals(checkingDate)) {
-                allLid = repository.findAllByLidStatusIdAndSourceIdAndCreatedAtBetween(status.getId(), sourceId, startTimestamp, endTimestamp, pageable);
+                allLid = repository.findAllByLidStatusIdAndSourceIdAndCreatedAtBetweenAndDeleteIsFalse(status.getId(), sourceId, startTimestamp, endTimestamp, pageable);
             } else if (Boolean.TRUE.equals(checkingDate)) {
-                allLid = repository.findAllByLidStatusIdAndCreatedAtBetween(status.getId(), startTimestamp, endTimestamp, pageable);
+                allLid = repository.findAllByLidStatusIdAndCreatedAtBetweenAndDeleteIsFalse(status.getId(), startTimestamp, endTimestamp, pageable);
             } else if (Boolean.TRUE.equals(checkingSourceId)) {
-                allLid = repository.findAllByLidStatusIdAndSourceId(status.getId(), sourceId, pageable);
+                allLid = repository.findAllByLidStatusIdAndSourceIdAndDeleteIsFalse(status.getId(), sourceId, pageable);
             } else {
-                allLid = repository.findAllByLidStatus_Id(status.getId(), pageable);
+                allLid = repository.findAllByLidStatus_IdAndDeleteIsFalse(status.getId(), pageable);
             }
 
             List<LidGetDto> lidGetDtoList = getDtoList(allLid.toList());

@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.enums;
 
+
 public enum Permissions {
 
     ADD_BUSINESS,

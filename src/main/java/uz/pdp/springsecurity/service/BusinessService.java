@@ -1,11 +1,13 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.enums.NotificationType;
+import uz.pdp.springsecurity.enums.Permissions;
 import uz.pdp.springsecurity.enums.StatusTariff;
 import uz.pdp.springsecurity.enums.ValueType;
 import uz.pdp.springsecurity.mapper.AddressMapper;
@@ -93,7 +95,7 @@ public class BusinessService {
         optionalTariff.ifPresent(subscription::setTariff);
         subscription.setActive(false);
         subscription.setStatusTariff(StatusTariff.WAITING);
-        subscriptionRepository.save(subscription);
+        Subscription newSubscription = subscriptionRepository.save(subscription);
 
 
         AddressDto addressDto = businessDto.getAddressDto();
@@ -165,13 +167,12 @@ public class BusinessService {
         userDto.setBranchId(branchIds);
 
         Role admin = new Role();
-        admin.setDescription("Admin");
-        admin.setName("Admin");
+        admin.setName(Constants.ADMIN);
+        admin.setPermissions(businessDto.getPermissionsList());
         admin.setBusiness(business);
-        admin.setPermissions(subscription.getTariff().getPermissions());
-        roleRepository.save(admin);
+        Role newRole = roleRepository.save(admin);
 
-        userDto.setRoleId(admin.getId());
+        userDto.setRoleId(newRole.getId());
         userDto.setBusinessId(business.getId());
 
         userService.add(userDto, true);
