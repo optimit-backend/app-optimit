@@ -170,7 +170,8 @@ public class LidService {
         if (lid == null) {
             return new ApiResponse("not found", false);
         }
-        repository.delete(lid);
+        lid.setDelete(true);
+        repository.save(lid);
         return new ApiResponse("successfully saved", true);
     }
 
