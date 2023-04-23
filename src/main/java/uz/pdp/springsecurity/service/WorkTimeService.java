@@ -164,14 +164,6 @@ public class WorkTimeService {
                         minute += workTime.getMinute();
                     }
                 }
-
-                /*Optional<WorkTime> optionalWorkTime = workTimeRepository.findFirstByUserIdAndBranchIdAndArrivalTimeIsBetween(
-                        user.getId(),
-                        branchId,
-                        Timestamp.valueOf(startMonth.plusDays(day)),
-                        Timestamp.valueOf(startMonth.plusDays(day + 1))
-                );
-                optionalWorkTime.ifPresent(workTime -> timestampList.add(workTime.getArrivalTime()));*/
             }
             workTimeDayDtoList.add(new WorkTimeDayDto(
                     user.getId(),

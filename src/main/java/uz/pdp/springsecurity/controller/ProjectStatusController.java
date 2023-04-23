@@ -48,7 +48,7 @@ public class ProjectStatusController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_ALL_PROJECT_STATUS")
+    @CheckPermission("GET_PROJECT_STATUS")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
         ApiResponse apiResponse = projectStatusServise.getAllByBranch(branchId);
