@@ -36,7 +36,7 @@ public class TaskController {
     }
 
     @CheckPermission("EDIT_TASK")
-    @PatchMapping("/{id}/{statusId}")
+    @PutMapping("/edit/{id}/{statusId}")
     public HttpEntity<?> updateTaskStatus(@PathVariable UUID id,
                                           @PathVariable  UUID statusId) {
         ApiResponse apiResponse = taskServise.updateTaskStatus(id,statusId);
@@ -44,7 +44,7 @@ public class TaskController {
     }
 
     @CheckPermission("EDIT_TASK")
-    @PatchMapping("change/{statusId}")
+    @PutMapping("change/{statusId}")
     public HttpEntity<?> updateTaskStatus(@PathVariable  UUID statusId,
                                           @RequestParam boolean isIncrease) {
         ApiResponse apiResponse = taskServise.updateTaskStatusIncrease(statusId,isIncrease);

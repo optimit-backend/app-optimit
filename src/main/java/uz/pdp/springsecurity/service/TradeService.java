@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -419,6 +420,47 @@ public class TradeService {
             return new ApiResponse("not found", false);
         }
         return new ApiResponse("found", true, allByBranchId);
+    }
+
+    public ApiResponse getTradeByTrader(UUID branchId) {
+
+        List<TradeProduct> tradeList = tradeProductRepository.findAllByTrade_BranchId(branchId);
+        if (tradeList.isEmpty()){
+            return new ApiResponse("Not Found",false);
+        }
+
+        Map<UUID, Double> traderQuantities = new HashMap<>();
+
+        for (TradeProduct tradeProduct : tradeList) {
+            UUID traderId = tradeProduct.getTrade().getTrader().getId();
+            Double quantity = traderQuantities.getOrDefault(traderId, 0.0);
+            quantity += tradeProduct.getTradedQuantity();
+            traderQuantities.put(traderId, quantity);
+        }
+
+        List<TraderDto> traderDtos = new ArrayList<>();
+
+        for (Map.Entry<UUID, Double> entry : traderQuantities.entrySet()) {
+            UUID traderId = entry.getKey();
+            Optional<User> optionalUser = userRepository.findById(traderId);
+            UUID photoId = null;
+            if (optionalUser.isPresent()){
+                User user = optionalUser.get();
+                photoId = user.getPhoto().getId();
+            }
+            String traderName = tradeRepository.getTraderNameById(traderId);
+            Double quantitySold = entry.getValue();
+            if (photoId!=null){
+                traderDtos.add(new TraderDto(traderId,photoId, traderName, quantitySold));
+            }else {
+                traderDtos.add(new TraderDto(traderId, traderName, quantitySold));
+            }
+        }
+        List<TraderDto> sortedTraders = traderDtos.stream()
+                .sorted(Comparator.comparingDouble(TraderDto::getQuantitySold).reversed())
+                .toList();
+
+        return new ApiResponse("Found",true,sortedTraders);
     }
 
 //    private Trade generateTradeByActiveCourse(Trade trade){
