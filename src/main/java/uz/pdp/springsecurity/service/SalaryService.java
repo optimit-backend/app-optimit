@@ -30,6 +30,7 @@ public class SalaryService {
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
     private final RoleRepository roleRepository;
+    private final WorkTimeLateService workTimeLateService;
 
     @Autowired@Lazy
     private PrizeService prizeService;
@@ -81,6 +82,7 @@ public class SalaryService {
             salaryCountRepository.deleteAllByAgreement_UserIdAndBranchId(user.getId(), branch.getId());
             workTimeRepository.deleteAllByUserIdAndBranchIdAndActiveFalse(user.getId(), branch.getId());
             prizeService.deActive(user.getId(), branch.getId());
+            workTimeLateService.clear(user, branch);
             salaryRepository.save(salary);
             salaryRepository.save(newSalary);
             return new ApiResponse("SUCCESS", true);
