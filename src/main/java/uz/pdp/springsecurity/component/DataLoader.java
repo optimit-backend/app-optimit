@@ -454,7 +454,9 @@ public class DataLoader implements CommandLineRunner {
                                     EDIT_PROJECT_STATUS,
                                     ADD_PROJECT_STATUS,
 
-                                    VIEW_ORG
+                                    VIEW_ORG,
+                                    ADD_WORK_TIME,
+                                    GET_WORK_TIME
 
                             ),
                             business));
@@ -651,7 +653,9 @@ public class DataLoader implements CommandLineRunner {
                             DELETE_PROJECT_STATUS,
                             GET_PROJECT_STATUS,
                             EDIT_PROJECT_STATUS,
-                            ADD_PROJECT_STATUS
+                            ADD_PROJECT_STATUS,
+                            ADD_WORK_TIME,
+                            GET_WORK_TIME
                     ),
                     business));
 
@@ -692,7 +696,9 @@ public class DataLoader implements CommandLineRunner {
                             DELETE_CONTENT,
 
                             CREATE_PRODUCTION,
-                            GET_PRODUCTION
+                            GET_PRODUCTION,
+
+                            GET_WORK_TIME
 
                     ),
                     business
