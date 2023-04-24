@@ -52,4 +52,6 @@ public interface TradeRepository extends JpaRepository<Trade, UUID> {
     List<Trade> findAllByCreatedAtAfterAndCustomer_Id(Timestamp createdAt, UUID customer_id);
 
     List<Trade> findAllByCreatedAtBetweenAndCustomer_Id(Timestamp startTimestamp, Timestamp endTimestamp, UUID customer_id);
+
+    String getTraderNameById(UUID traderId);
 }

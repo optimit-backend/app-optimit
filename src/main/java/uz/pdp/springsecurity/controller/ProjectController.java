@@ -28,7 +28,7 @@ public class ProjectController {
     }
 
     @CheckPermission("EDIT_PROJECT")
-    @PatchMapping("/{projectId}/{statusId}")
+    @PutMapping("/patch/{projectId}/{statusId}")
     public HttpEntity<?> updateProjectStatus(@PathVariable  UUID projectId,
                                              @PathVariable  UUID statusId) {
         ApiResponse apiResponse = projectService.updateProjectStatus(projectId,statusId);
