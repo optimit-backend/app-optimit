@@ -1912,7 +1912,7 @@ public class ReportsService {
             }
         }
 
-        traderBestDtoList.sort(Comparator.comparing(TraderBestDto::getAverage));
+        traderBestDtoList.sort(Comparator.comparing(TraderBestDto::getAverage).reversed());
 
         return new ApiResponse("all traders", true, traderBestDtoList);
     }
