@@ -90,6 +90,8 @@ public class ReportsService {
     private LidStatusRepository lidStatusRepository;
     @Autowired
     private SourceRepository sourceRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public ApiResponse allProductAmount(UUID branchId, UUID brandId, UUID categoryId, String production) {
 
@@ -1882,5 +1884,36 @@ public class ReportsService {
         lidReportDto.setTotalSale(done.size());
 
         return new ApiResponse("all", true, lidReportDto);
+    }
+
+    public ApiResponse bestSellerReport(UUID businessId) {
+
+        List<User> allUserId = userRepository.findAllByBusiness_Id(businessId);
+        List<TraderBestDto> traderBestDtoList = new ArrayList<>();
+
+        for (User user : allUserId) {
+            List<Trade> all = tradeRepository.findAllByTrader_Id(user.getId());
+            if (!all.isEmpty()) {
+                int size = all.size();
+
+                TraderBestDto traderBestDto = new TraderBestDto();
+                traderBestDto.setFio(user.getFirstName() + " " + user.getLastName());
+                if (user.getPhoto() != null) {
+                    traderBestDto.setPhotoId(user.getPhoto().getId());
+                }
+                double total = 0;
+                for (Trade trade : all) {
+                    total += trade.getTotalSum();
+                }
+                if (total > 0) {
+                    traderBestDto.setAverage(total / size);
+                }
+                traderBestDtoList.add(traderBestDto);
+            }
+        }
+
+        traderBestDtoList.sort(Comparator.comparing(TraderBestDto::getAverage));
+
+        return new ApiResponse("all traders", true, traderBestDtoList);
     }
 }

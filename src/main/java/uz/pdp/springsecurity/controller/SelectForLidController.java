@@ -20,7 +20,6 @@ import java.util.UUID;
 public class SelectForLidController {
     private final SelectForLidService service;
 
-    @CheckPermission("VIEW_FORM_LID")
     @GetMapping("/getByBusinessId/{businessId}")
     public HttpEntity<?> getAll(@PathVariable UUID businessId) {
         ApiResponse apiResponse = service.getAll(businessId);

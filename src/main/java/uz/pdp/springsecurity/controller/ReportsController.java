@@ -166,4 +166,11 @@ public class ReportsController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("VIEW_REPORT")
+    @GetMapping("/get-best-seller/{businessId}")
+    public HttpEntity<?> bestSellerReport(@PathVariable UUID businessId) {
+        ApiResponse apiResponse = reportsService.bestSellerReport(businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
 }

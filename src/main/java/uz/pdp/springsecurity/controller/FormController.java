@@ -25,7 +25,7 @@ public class FormController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get-form/{id}")
     public HttpEntity<?> getById(@PathVariable UUID id) {
         ApiResponse apiResponse = service.getById(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
