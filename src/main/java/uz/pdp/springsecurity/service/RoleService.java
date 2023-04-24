@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Business;
 import uz.pdp.springsecurity.entity.Role;
+import uz.pdp.springsecurity.entity.Tariff;
 import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.exeptions.RescuersNotFoundEx;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -14,6 +15,7 @@ import uz.pdp.springsecurity.payload.RoleGetMetDto;
 import uz.pdp.springsecurity.payload.UserGetMetDto;
 import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.repository.RoleRepository;
+import uz.pdp.springsecurity.repository.TariffRepository;
 import uz.pdp.springsecurity.repository.UserRepository;
 import uz.pdp.springsecurity.util.Constants;
 
@@ -29,6 +31,7 @@ public class RoleService {
     private final RoleRepository roleRepository;
     private final BusinessRepository businessRepository;
     private final UserRepository userRepository;
+    private final TariffRepository tariffRepository;
 
     public ApiResponse add(RoleDto roleDto) {
         Optional<Business> optionalBusiness = businessRepository.findById(roleDto.getBusinessId());
@@ -152,5 +155,14 @@ public class RoleService {
         }
         Role role = optional.get();
         return new ApiResponse("found", true, role.getPermissions());
+    }
+
+    public ApiResponse getRoleByTariff(UUID tariffId) {
+        Optional<Tariff> optionalTariff = tariffRepository.findById(tariffId);
+        if (optionalTariff.isEmpty()) {
+            return new ApiResponse("not found tariff", false);
+        }
+        Tariff tariff = optionalTariff.get();
+        return new ApiResponse("found", true, tariff.getPermissions());
     }
 }

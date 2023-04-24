@@ -42,6 +42,11 @@ public class UserService {
         List<User> allUser = userRepository.findAllByBusiness_Id(businessId);
         int size = allUser.size();
 
+        Optional<Role> optionalRole = roleRepository.findById(userDto.getRoleId());
+        if (optionalRole.isEmpty()) {
+            return new ApiResponse("not found role", false);
+        }
+
         if (!isNewUser) {
             Optional<Subscription> optionalSubscription = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
             if (optionalSubscription.isEmpty()) {
@@ -53,20 +58,16 @@ public class UserService {
             } else {
                 return new ApiResponse("You have opened a sufficient branch according to the employee", false);
             }
+
+            Role role = optionalRole.get();
+            if (role.getName().equals(Constants.ADMIN)) {
+                return new ApiResponse("Admin rolelik hodim qo'shaolmaysiz!", false);
+            }
         }
 
         boolean b = userRepository.existsByUsernameIgnoreCase(userDto.getUsername());
         if (b) return new ApiResponse("USER ALREADY EXISTS", false);
 
-        Optional<Role> optionalRole = roleRepository.findById(userDto.getRoleId());
-        if (optionalRole.isEmpty()) {
-            return new ApiResponse("not found role", false);
-        }
-
-        Role role = optionalRole.get();
-        if (role.getName().equals(Constants.ADMIN)) {
-            return new ApiResponse("Admin rolelik hodim qo'shaolmaysiz!", false);
-        }
 
         HashSet<Branch> branches = new HashSet<>();
         for (UUID branchId : userDto.getBranchId()) {
@@ -88,7 +89,8 @@ public class UserService {
         if (userDto.getPhotoId() != null) {
             user.setPhoto(attachmentRepository.findById(userDto.getPhotoId()).orElseThrow());
         }
-
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setRole(optionalRole.get());
         userRepository.save(user);
         agreementService.add(user);
         return new ApiResponse("ADDED", true, user.getId());

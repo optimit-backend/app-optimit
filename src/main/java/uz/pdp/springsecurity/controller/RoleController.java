@@ -97,4 +97,10 @@ public class RoleController {
         ApiResponse apiResponse = roleService.getRolePermissions(business_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @GetMapping("/get-role-tariff/{tariff_id}")
+    public HttpEntity<?> getRoleByTariff(@PathVariable UUID tariff_id) {
+        ApiResponse apiResponse = roleService.getRoleByTariff(tariff_id);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }
