@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -60,8 +61,10 @@ public class UserDto {
 
     private List<UUID> bonusesId;
 
+    @NotNull
     private Date arrivalTime;
 
+    @NotNull
     private Date leaveTime;
 
     private boolean enabled;

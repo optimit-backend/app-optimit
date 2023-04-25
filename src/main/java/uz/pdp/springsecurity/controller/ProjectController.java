@@ -28,7 +28,7 @@ public class ProjectController {
     }
 
     @CheckPermission("EDIT_PROJECT")
-    @PatchMapping("/{projectId}/{statusId}")
+    @PutMapping("/patch/{projectId}/{statusId}")
     public HttpEntity<?> updateProjectStatus(@PathVariable  UUID projectId,
                                              @PathVariable  UUID statusId) {
         ApiResponse apiResponse = projectService.updateProjectStatus(projectId,statusId);
@@ -48,6 +48,7 @@ public class ProjectController {
         ApiResponse apiResponse = projectService.get(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
     @CheckPermission("GET_PROJECT")
     @GetMapping("/get-one/{id}")
     public HttpEntity<?> getOne(@PathVariable UUID id) {
@@ -79,6 +80,13 @@ public class ProjectController {
     @GetMapping("/get-by-branchId/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
         ApiResponse apiResponse = projectService.getAllByBranch(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("GET_PROJECT")
+    @GetMapping("/progress/{projectId}")
+    public HttpEntity<?> getProgress(@PathVariable UUID projectId) {
+        ApiResponse apiResponse = projectService.getProgress(projectId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
