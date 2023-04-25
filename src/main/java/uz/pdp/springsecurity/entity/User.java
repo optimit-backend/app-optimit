@@ -78,9 +78,9 @@ public class User extends AbsEntity implements UserDetails {
     @ManyToMany
     private List<Bonus> bonuses;
 
-    private Date arrivalTime;
+    private Date arrivalTime = new Date();
 
-    private Date leaveTime;
+    private Date leaveTime = new Date();
 
 
     //yoqilgan

@@ -11,6 +11,9 @@ import uz.pdp.springsecurity.enums.NotificationType;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -422,4 +425,40 @@ public class ProjectService {
         return new ApiResponse("Found", true, projectList);
     }
 
+    public ApiResponse getProgress(UUID projectId) {
+        Optional<Project> optionalProject = projectRepository.findById(projectId);
+        if (optionalProject.isEmpty()) return new ApiResponse("PROJECT NOT FOUND", false);
+        Project project = optionalProject.get();
+        if (project.getEndDate() != null) return new ApiResponse("PROJECT COMPLETED", false);
+        int totalTask = taskRepository.countByProjectId(project.getId());
+        if (totalTask == 0) return new ApiResponse("TASK NOT FOUND", false);
+        int completedTask = taskRepository.countByProjectIdAndTaskStatus_OrginalName(project.getId(), "Completed");
+        int percent = completedTask * 100 / totalTask;
+
+        LocalDate startDate = project.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate deadline = project.getDeadline().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate today = LocalDate.now();
+
+        int goalDay = deadline.getDayOfYear() - startDate.getDayOfYear();
+        int leftDay = today.getDayOfYear() - startDate.getDayOfYear();
+        int remainDay = goalDay - leftDay;
+        int lateDay = 0;
+        if (completedTask != 0) {
+            lateDay = leftDay * totalTask / completedTask;
+            lateDay -= goalDay;
+        }
+
+        return new ApiResponse("SUCCESS", true, new ProjectProgressDto(
+            totalTask,
+                completedTask,
+                percent,
+                java.sql.Date.valueOf(startDate),
+                java.sql.Date.valueOf(deadline),
+                java.sql.Date.valueOf(deadline.plusDays(lateDay)),
+                goalDay,
+                leftDay,
+                remainDay,
+                lateDay
+        ));
+    }
 }

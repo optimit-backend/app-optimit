@@ -15,6 +15,7 @@ import uz.pdp.springsecurity.util.Constants;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static uz.pdp.springsecurity.enums.ExchangeStatusName.*;
@@ -47,6 +48,8 @@ public class DataLoader implements CommandLineRunner {
     private final LidFieldRepository lidFieldRepository;
     private final SourceRepository sourceRepository;
     private final InvoiceService invoiceService;
+
+    private final static LocalDateTime TODAY = LocalDateTime.now().withHour(8);
 
     @Value("${spring.sql.init.mode}")
     private String initMode;
@@ -803,7 +806,7 @@ public class DataLoader implements CommandLineRunner {
                 }
             }
 
-            User userAdmin = userRepository.save(new User(
+            User userAdmin = new User(
                     "Admin",
                     "Admin",
                     "admin",
@@ -813,10 +816,13 @@ public class DataLoader implements CommandLineRunner {
                     business,
                     branches,
                     true
-            ));
+            );
+            userAdmin.setArrivalTime(Timestamp.valueOf(TODAY));
+            userAdmin.setLeaveTime(Timestamp.valueOf(TODAY.plusHours(8)));
+            userAdmin = userRepository.save(userAdmin);
             agreementService.add(userAdmin);
 
-            User userSuperAdmin = userRepository.save(new User(
+            User userSuperAdmin = new User(
                     "SuperAdmin",
                     "Admin of site",
                     "superadmin",
@@ -826,10 +832,13 @@ public class DataLoader implements CommandLineRunner {
                     business,
                     branches,
                     true
-            ));
+            );
+            userSuperAdmin.setArrivalTime(Timestamp.valueOf(TODAY));
+            userSuperAdmin.setLeaveTime(Timestamp.valueOf(TODAY.plusHours(8)));
+            userSuperAdmin = userRepository.save(userSuperAdmin);
             agreementService.add(userSuperAdmin);
 
-            User userManager = userRepository.save(new User(
+            User userManager = new User(
                     "Manager",
                     "manager",
                     "manager",
@@ -839,10 +848,13 @@ public class DataLoader implements CommandLineRunner {
                     business,
                     branches,
                     true
-            ));
+            );
+            userManager.setArrivalTime(Timestamp.valueOf(TODAY));
+            userManager.setLeaveTime(Timestamp.valueOf(TODAY.plusHours(8)));
+            userManager = userRepository.save(userManager);
             agreementService.add(userManager);
 
-            User userEmployee = userRepository.save(new User(
+            User userEmployee = new User(
                     "Employee",
                     "employee",
                     "employee",
@@ -852,7 +864,10 @@ public class DataLoader implements CommandLineRunner {
                     business,
                     branches,
                     true
-            ));
+            );
+            userEmployee.setArrivalTime(Timestamp.valueOf(TODAY));
+            userEmployee.setLeaveTime(Timestamp.valueOf(TODAY.plusHours(8)));
+            userEmployee = userRepository.save(userEmployee);
             agreementService.add(userEmployee);
 
             List<PaymentStatus> all = paymentStatusRepository.findAll();
