@@ -15,7 +15,7 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 import uz.pdp.springsecurity.enums.Permissions;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.sql.Time;
 import java.util.*;
 
 @Data
@@ -78,9 +78,9 @@ public class User extends AbsEntity implements UserDetails {
     @ManyToMany
     private List<Bonus> bonuses;
 
-    private Date arrivalTime = new Date();
+    private Time arrivalTime = new Time(System.currentTimeMillis());
 
-    private Date leaveTime = new Date();
+    private Time leaveTime = new Time(System.currentTimeMillis());
 
 
     //yoqilgan
@@ -136,9 +136,6 @@ public class User extends AbsEntity implements UserDetails {
         this.accountNonExpired = accountNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
-    }
-
-    public User(UUID id) {
     }
 
     @Override

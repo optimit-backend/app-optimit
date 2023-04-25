@@ -13,9 +13,11 @@ import uz.pdp.springsecurity.service.AgreementService;
 import uz.pdp.springsecurity.service.InvoiceService;
 import uz.pdp.springsecurity.util.Constants;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 import static uz.pdp.springsecurity.enums.ExchangeStatusName.*;
@@ -49,7 +51,7 @@ public class DataLoader implements CommandLineRunner {
     private final SourceRepository sourceRepository;
     private final InvoiceService invoiceService;
 
-    private final static LocalDateTime TODAY = LocalDateTime.now().withHour(8);
+    private final static LocalTime TODAY = LocalTime.now().withHour(8);
 
     @Value("${spring.sql.init.mode}")
     private String initMode;
@@ -817,8 +819,8 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             );
-            userAdmin.setArrivalTime(Timestamp.valueOf(TODAY));
-            userAdmin.setLeaveTime(Timestamp.valueOf(TODAY.plusHours(8)));
+            userAdmin.setArrivalTime(Time.valueOf(TODAY));
+            userAdmin.setLeaveTime(Time.valueOf(TODAY.plusHours(8)));
             userAdmin = userRepository.save(userAdmin);
             agreementService.add(userAdmin);
 
@@ -833,8 +835,8 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             );
-            userSuperAdmin.setArrivalTime(Timestamp.valueOf(TODAY));
-            userSuperAdmin.setLeaveTime(Timestamp.valueOf(TODAY.plusHours(8)));
+            userSuperAdmin.setArrivalTime(Time.valueOf(TODAY));
+            userSuperAdmin.setLeaveTime(Time.valueOf(TODAY.plusHours(8)));
             userSuperAdmin = userRepository.save(userSuperAdmin);
             agreementService.add(userSuperAdmin);
 
@@ -849,8 +851,8 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             );
-            userManager.setArrivalTime(Timestamp.valueOf(TODAY));
-            userManager.setLeaveTime(Timestamp.valueOf(TODAY.plusHours(8)));
+            userManager.setArrivalTime(Time.valueOf(TODAY));
+            userManager.setLeaveTime(Time.valueOf(TODAY.plusHours(8)));
             userManager = userRepository.save(userManager);
             agreementService.add(userManager);
 
@@ -865,8 +867,8 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             );
-            userEmployee.setArrivalTime(Timestamp.valueOf(TODAY));
-            userEmployee.setLeaveTime(Timestamp.valueOf(TODAY.plusHours(8)));
+            userEmployee.setArrivalTime(Time.valueOf(TODAY));
+            userEmployee.setLeaveTime(Time.valueOf(TODAY.plusHours(8)));
             userEmployee = userRepository.save(userEmployee);
             agreementService.add(userEmployee);
 

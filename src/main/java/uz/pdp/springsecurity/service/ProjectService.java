@@ -12,7 +12,6 @@ import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -364,7 +363,7 @@ public class ProjectService {
 
     public ApiResponse getAllByBranchId(UUID branchId, UUID typeId, UUID customerId,UUID projectStatusId, Date expired, int page, int size) {
         Pageable pageable = PageRequest.of(page,size);
-        Page<Project> projectList = null;
+        Page<Project> projectList;
 
         boolean checkingType = typeId != null;
         boolean checkingCustomer = customerId != null;
@@ -416,7 +415,7 @@ public class ProjectService {
             int completed = taskRepository.countByProjectIdAndTaskStatus_OrginalName(project.getId(), "Completed");
             int all = taskRepository.countByProjectId(project.getId());
             if (completed > 0) {
-                int process = 0;
+                int process ;
                 process = completed * 100 / all;
                 project.setProcess(process);
             }
