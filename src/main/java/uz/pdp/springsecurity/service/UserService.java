@@ -158,7 +158,20 @@ public class UserService {
         if (user == null) {
             return new ApiResponse("not found", false);
         }
-        return new ApiResponse("FOUND", true, userMapper.toDto(user));
+        UserDto dto = userMapper.toDto(user);
+        if (user.getPhoto() != null) {
+            dto.setPhotoId(user.getPhoto().getId());
+        }
+        Set<BranchGetDto> branchGetDtos = new HashSet<>();
+        for (Branch branch : user.getBranches()) {
+            BranchGetDto branchGetDto = new BranchGetDto();
+            branchGetDto.setId(branch.getId());
+            branchGetDto.setName(branch.getName());
+            branchGetDtos.add(branchGetDto);
+        }
+        dto.setBranches(branchGetDtos);
+
+        return new ApiResponse("FOUND", true, dto);
     }
 
     public ApiResponse delete(UUID id) {
@@ -221,7 +234,15 @@ public class UserService {
         Role superAdmin = optionalRole.get();
         List<User> allByBusiness_id = userRepository.findAllByBusiness_IdAndRoleIsNotAndActiveIsTrue(business_id, superAdmin);
         if (allByBusiness_id.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
-        return new ApiResponse("FOUND", true, userMapper.toDto(allByBusiness_id));
+        List<UserDto> dtoList = new ArrayList<>();
+        for (User user : allByBusiness_id) {
+            UserDto userDto = userMapper.toDto(user);
+            if (user.getPhoto() != null) {
+                userDto.setPhotoId(user.getPhoto().getId());
+            }
+            dtoList.add(userDto);
+        }
+        return new ApiResponse("FOUND", true, dtoList);
     }
 
 

@@ -4,7 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
+import javax.validation.constraints.NotNull;
+import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +43,8 @@ public class UserDto {
 
     private Set<UUID> branchId;
 
+    private Set<BranchGetDto> branches;
+
     private UUID photoId;
 
     private boolean active;
@@ -58,9 +61,11 @@ public class UserDto {
 
     private List<UUID> bonusesId;
 
-    private Date arrivalTime;
+    @NotNull
+    private Time arrivalTime;
 
-    private Date leaveTime;
+    @NotNull
+    private Time leaveTime;
 
     private boolean enabled;
 }

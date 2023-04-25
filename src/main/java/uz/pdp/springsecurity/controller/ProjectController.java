@@ -91,4 +91,11 @@ public class ProjectController {
         ApiResponse apiResponse = projectService.searchByName(name,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("GET_PROJECT")
+    @GetMapping("/progress/{projectId}")
+    public HttpEntity<?> getProgress(@PathVariable UUID projectId) {
+        ApiResponse apiResponse = projectService.getProgress(projectId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }

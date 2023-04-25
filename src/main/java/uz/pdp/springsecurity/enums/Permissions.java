@@ -251,6 +251,8 @@ public enum Permissions {
     EDIT_PROJECT_STATUS,
     ADD_PROJECT_STATUS,
 
-    VIEW_ORG
+    VIEW_ORG,
 
+    ADD_WORK_TIME,
+    GET_WORK_TIME
 }

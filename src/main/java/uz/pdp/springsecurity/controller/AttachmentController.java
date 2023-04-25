@@ -34,7 +34,6 @@ public class AttachmentController {
      * @throws IOException
      * @return ApiResponse(message - > FILE SUCCESSFULLY SAVED, success - > true)
      */
-    @CheckPermission("UPLOAD_MEDIA")
     @PostMapping("/upload")
     public ApiResponse uploadFile(MultipartHttpServletRequest request) throws IOException {
         Iterator<String> fileNames = request.getFileNames();
@@ -65,7 +64,6 @@ public class AttachmentController {
      * @param response
      * @return
      */
-    @CheckPermission("VIEW_MEDIA_INFO")
     @GetMapping("/info")
     public List<Attachment> getInfo(HttpServletResponse response) {
         List<Attachment> all = attachmentRepository.findAll();
@@ -117,7 +115,6 @@ public class AttachmentController {
      * @throws IOException
      */
 
-    @CheckPermission("DOWNLOAD_MEDIA")
     @GetMapping("/downloadWithName")
     public void downloadWithName(@RequestBody String name, HttpServletResponse response) throws IOException {
         Optional<Attachment> byId = attachmentRepository.findByName(name);
@@ -138,7 +135,6 @@ public class AttachmentController {
      * @param id
      * @return
      */
-    @CheckPermission("DELETE_MEDIA")
     @DeleteMapping("/{id}")
     public ApiResponse deleteMedia(@PathVariable UUID id) {
         Optional<Attachment> optionalAttachment = attachmentRepository.findById(id);
@@ -158,7 +154,6 @@ public class AttachmentController {
      * @return
      * @throws IOException
      */
-    @CheckPermission("UPLOAD_MEDIA")
     @PostMapping("/uploadAnyFile")
     public ApiResponse uploadAnyFiles(MultipartHttpServletRequest request) throws IOException {
         Iterator<String> fileNames = request.getFileNames();
