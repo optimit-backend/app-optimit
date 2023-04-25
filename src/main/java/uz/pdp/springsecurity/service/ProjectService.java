@@ -422,4 +422,16 @@ public class ProjectService {
         return new ApiResponse("Found", true, projectList);
     }
 
+    public ApiResponse searchByName(String name,int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        String[] words = name.split("\\s+");
+        Page<Project> projects = null;
+        for (String word : words) {
+            projects = projectRepository.findByNameContainingIgnoreCase(word, pageable);
+        }
+        if (projects==null){
+            return new ApiResponse("Not Found",false);
+        }
+        return new ApiResponse("Found",true,projects);
+    }
 }

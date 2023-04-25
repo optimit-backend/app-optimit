@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.geo.GeoPage;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.Importance;
@@ -357,15 +358,16 @@ public class TaskServise {
         return new ApiResponse("Found",true,taskList);
     }
 
-    public ApiResponse searchByName(String name) {
+    public ApiResponse searchByName(String name,int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         String[] words = name.split("\\s+");
-        List<Task> tasks = new ArrayList<>();
+        Page<Task> taskPage = null;
         for (String word : words) {
-            tasks.addAll(taskRepository.findByNameContainingIgnoreCase(word));
+            taskPage = taskRepository.findByNameContainingIgnoreCase(word, pageable);
         }
-        if (tasks.isEmpty()){
+        if (taskPage==null){
             return new ApiResponse("Not Found",false);
         }
-        return new ApiResponse("Found",true,tasks);
+        return new ApiResponse("Found",true,taskPage);
     }
 }
