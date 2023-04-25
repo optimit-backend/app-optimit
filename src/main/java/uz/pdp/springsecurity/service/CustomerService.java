@@ -74,9 +74,11 @@ public class CustomerService {
             return new ApiResponse("BRANCH NOT FOUND", false);
         }
 
-        Optional<CustomerGroup> optionalCustomerGroup = customerGroupRepository.findById(customerDto.getCustomerGroupId());
-        if (optionalCustomerGroup.isEmpty()) {
-            return new ApiResponse("NOT FOUND", false);
+        if (customerDto.getCustomerGroupId()!=null) {
+            Optional<CustomerGroup> optionalCustomerGroup = customerGroupRepository.findById(customerDto.getCustomerGroupId());
+            if (optionalCustomerGroup.isEmpty()) {
+                return new ApiResponse("NOT FOUND", false);
+            }
         }
 
         Customer customer = optionalCustomer.get();

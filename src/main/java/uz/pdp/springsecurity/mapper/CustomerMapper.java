@@ -23,6 +23,7 @@ public interface CustomerMapper {//eff
 
     @InheritInverseConfiguration
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "customerGroup", ignore = true)
     void update(CustomerDto customerDto, @MappingTarget Customer customer);
 
     @Mapping(target = "customerGroup", ignore = true)
