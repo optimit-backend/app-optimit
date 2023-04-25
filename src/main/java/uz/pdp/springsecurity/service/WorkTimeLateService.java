@@ -44,7 +44,7 @@ public class WorkTimeLateService {
             for (WorkTime time : workTimeList) {
                 previousMinute += time.getMinute();
             }
-            long minute = (user.getLeaveTime().getTime() - user.getArrivalTime().getTime()) / (1000 * 60);
+            long minute = (user.getLeaveTime().getTime() - user.getArrivalTime().getTime());
             long previousLateMinute = 0;
             if (previousMinute > 0) {
                 previousLateMinute = minute - previousMinute;
