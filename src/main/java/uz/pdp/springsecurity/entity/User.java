@@ -78,9 +78,9 @@ public class User extends AbsEntity implements UserDetails {
     @ManyToMany
     private List<Bonus> bonuses;
 
-    private Time arrivalTime = new Time(System.currentTimeMillis());
+    private String arrivalTime = "08:00";
 
-    private Time leaveTime = new Time(System.currentTimeMillis());
+    private String leaveTime = "16:00";
 
 
     //yoqilgan

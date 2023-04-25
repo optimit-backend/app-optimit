@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -62,10 +63,10 @@ public class UserDto {
     private List<UUID> bonusesId;
 
     @NotNull
-    private Time arrivalTime;
+    private String arrivalTime;
 
     @NotNull
-    private Time leaveTime;
+    private String leaveTime;
 
     private boolean enabled;
 }
