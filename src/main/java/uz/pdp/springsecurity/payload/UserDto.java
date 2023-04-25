@@ -43,6 +43,8 @@ public class UserDto {
 
     private Set<UUID> branchId;
 
+    private Set<BranchGetDto> branches;
+
     private UUID photoId;
 
     private boolean active;

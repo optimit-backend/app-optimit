@@ -62,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/tariff/getToChooseATariff",
                         "/api/notification/*",
                         "/api/tariff/getById/*",
-                        "/api/attachment/download/**",
+                        "/api/attachment/**",
                         "/api/files/**",
                         "/api/form-lid/*",
                         "/api/role/get-role-tariff/*",
