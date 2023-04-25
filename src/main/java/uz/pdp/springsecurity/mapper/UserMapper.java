@@ -26,9 +26,9 @@ public interface UserMapper {
     User toEntity(UserDto userDto);
 
 
+    @Mapping(target = "branchId", ignore = true)
     @Mapping(source = "role.name", target = "roleName")
     @Mapping(target = "photoId", ignore = true)
-    @Mapping(target = "branchId", ignore = true)
     @Mapping(target = "bonusesId", ignore = true)
     @Mapping(source = "role.id", target = "roleId")
     @Mapping(source = "job.id", target = "jobId")

@@ -455,7 +455,6 @@ public class DataLoader implements CommandLineRunner {
                                     ADD_PROJECT_STATUS,
 
                                     VIEW_ORG
-
                             ),
                             business));
             Role manager = roleRepository.save(new Role(
