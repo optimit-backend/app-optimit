@@ -29,6 +29,15 @@ public class BusinessService {
     BusinessRepository businessRepository;
 
     @Autowired
+    ProjectStatusRepository projectStatusRepository;
+
+    @Autowired
+    TaskStatusRepository taskStatusRepository;
+
+    @Autowired
+    TaskRepository taskRepository;
+
+    @Autowired
     RoleRepository roleRepository;
 
     @Autowired
@@ -189,6 +198,42 @@ public class BusinessService {
             notification.setObjectId(business.getId());
             notificationRepository.save(notification);
         }
+
+        TaskStatus taskStatusCompleted = new TaskStatus();
+        taskStatusCompleted.setName("Completed");
+        taskStatusCompleted.setOrginalName("Completed");
+        taskStatusCompleted.setRowNumber(2);
+        taskStatusCompleted.setABoolean(true);
+        taskStatusCompleted.setColor("#04d227");
+        taskStatusCompleted.setBranch(branch);
+        taskStatusRepository.save(taskStatusCompleted);
+
+        TaskStatus taskStatusUncompleted = new TaskStatus();
+        taskStatusUncompleted.setName("Uncompleted");
+        taskStatusUncompleted.setOrginalName("Uncompleted");
+        taskStatusUncompleted.setRowNumber(1);
+        taskStatusUncompleted.setABoolean(true);
+        taskStatusUncompleted.setColor("#FF0000");
+        taskStatusUncompleted.setBranch(branch);
+        taskStatusRepository.save(taskStatusUncompleted);
+
+        ProjectStatus projectStatus1 = new ProjectStatus();
+        projectStatus1.setName("Uncompleted");
+        projectStatus1.setColor("red");
+        projectStatus1.setBranch(branch);
+        projectStatusRepository.save(projectStatus1);
+
+        ProjectStatus projectStatus2 = new ProjectStatus();
+        projectStatus2.setColor("yellow");
+        projectStatus2.setName("Process");
+        projectStatus2.setBranch(branch);
+        projectStatusRepository.save(projectStatus2);
+
+        ProjectStatus projectStatus3 = new ProjectStatus();
+        projectStatus3.setColor("green");
+        projectStatus3.setName("Completed");
+        projectStatus3.setBranch(branch);
+        projectStatusRepository.save(projectStatus3);
 
         return new ApiResponse("ADDED", true);
     }

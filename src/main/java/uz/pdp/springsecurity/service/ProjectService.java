@@ -85,7 +85,7 @@ public class ProjectService {
         }
         project.setUsers(userList);
 
-        ProjectStatus uncompleted = projectStatusRepository.findByName("Uncompleted");
+        ProjectStatus uncompleted = projectStatusRepository.findByNameAndBranchId("Uncompleted",optionalBranch.get().getId());
         project.setProjectStatus(uncompleted);
 
         List<FileData> fileDataList = new ArrayList<>();
