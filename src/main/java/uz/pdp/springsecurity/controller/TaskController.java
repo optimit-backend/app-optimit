@@ -92,8 +92,11 @@ public class TaskController {
     }
     @CheckPermission("GET_TASK")
     @GetMapping("/get-by-name/{name}")
-    public HttpEntity<?> getAllByName(@PathVariable String name) {
-        ApiResponse apiResponse = taskServise.searchByName(name);
+    public HttpEntity<?> getAllByName(
+            @RequestParam(defaultValue = "0", required = false) int page,
+            @RequestParam(defaultValue = "10", required = false) int size,
+            @PathVariable String name) {
+        ApiResponse apiResponse = taskServise.searchByName(name,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

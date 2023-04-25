@@ -26,7 +26,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     List<Task> findAllByProjectId(UUID project_id);
     Page<Task> findAllByProject_Id(UUID project_id,Pageable pageable);
     List<Task> findAllByBranchId(UUID branch_id);
-    List<Task> findByNameContainingIgnoreCase(String name);
+    Page<Task> findByNameContainingIgnoreCase(String name, Pageable pageable);
     Page<Task> findAllByTaskStatus_Id(UUID project_id, Pageable pageable);
     Page<Task> findAllByTaskStatusIdAndProjectIdAndTaskTypeIdAndExpiredTrue(UUID taskStatus_id, UUID project_id, UUID taskType_id, Pageable pageable);
     Page<Task> findAllByTaskStatusIdAndProjectIdAndTaskTypeId(UUID id, UUID projectId, UUID typeId, Pageable pageable);
