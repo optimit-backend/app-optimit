@@ -819,8 +819,8 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             );
-            userAdmin.setArrivalTime(Time.valueOf(TODAY));
-            userAdmin.setLeaveTime(Time.valueOf(TODAY.plusHours(8)));
+            userAdmin.setArrivalTime("08:00");
+            userAdmin.setLeaveTime("16:00");
             userAdmin = userRepository.save(userAdmin);
             agreementService.add(userAdmin);
 
@@ -835,8 +835,8 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             );
-            userSuperAdmin.setArrivalTime(Time.valueOf(TODAY));
-            userSuperAdmin.setLeaveTime(Time.valueOf(TODAY.plusHours(8)));
+            userSuperAdmin.setArrivalTime("08:00");
+            userSuperAdmin.setLeaveTime("16:00");
             userSuperAdmin = userRepository.save(userSuperAdmin);
             agreementService.add(userSuperAdmin);
 
@@ -851,8 +851,8 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             );
-            userManager.setArrivalTime(Time.valueOf(TODAY));
-            userManager.setLeaveTime(Time.valueOf(TODAY.plusHours(8)));
+            userManager.setArrivalTime("08:00");
+            userManager.setLeaveTime("16:00");
             userManager = userRepository.save(userManager);
             agreementService.add(userManager);
 
@@ -867,8 +867,8 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             );
-            userEmployee.setArrivalTime(Time.valueOf(TODAY));
-            userEmployee.setLeaveTime(Time.valueOf(TODAY.plusHours(8)));
+            userEmployee.setArrivalTime("08:00");
+            userEmployee.setLeaveTime("16:00");
             userEmployee = userRepository.save(userEmployee);
             agreementService.add(userEmployee);
 

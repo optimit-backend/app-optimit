@@ -83,9 +83,9 @@ public class WorkTimeService {
         long minute = (workTime.getLeaveTime().getTime() - workTime.getArrivalTime().getTime()) / (1000 * 60);
         workTime.setMinute(minute);
         workTime.setActive(false);
-        workTimeLateService.add(workTime);
         // DO NOT TOUCH
         workTimeRepository.save(workTime);
+        workTimeLateService.add(workTime);
         countSalaryHour(workTime);
         return new ApiResponse("SUCCESS", true);
     }
@@ -191,7 +191,7 @@ public class WorkTimeService {
             minute = 0;
             List<Timestamp> timestampList = new ArrayList<>();
             for (int day = 0; day < thisDay; day++) {
-                List<WorkTime> workTimeList = workTimeRepository.findAllByUserIdAndBranchIdAndArrivalTimeIsBetween(
+                List<WorkTime> workTimeList = workTimeRepository.findAllByUserIdAndBranchIdAndArrivalTimeIsBetweenOrderByCreatedAt(
                         user.getId(),
                         branchId,
                         Timestamp.valueOf(startMonth.plusDays(day)),

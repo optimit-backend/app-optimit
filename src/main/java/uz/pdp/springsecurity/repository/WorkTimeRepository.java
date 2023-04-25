@@ -15,7 +15,7 @@ public interface WorkTimeRepository extends JpaRepository<WorkTime, UUID> {
 
     List<WorkTime> findAllByUserIdAndBranchId(UUID userId, UUID branchId);
 
-    List<WorkTime> findAllByUserIdAndBranchIdAndArrivalTimeIsBetween(UUID user_id, UUID branch_id, Timestamp from, Timestamp to);
+    List<WorkTime> findAllByUserIdAndBranchIdAndArrivalTimeIsBetweenOrderByCreatedAt(UUID user_id, UUID branch_id, Timestamp from, Timestamp to);
 
     int countAllByUserIdAndBranchIdAndArrivalTimeIsBetween(UUID user_id, UUID branch_id, Timestamp from, Timestamp to);
 
