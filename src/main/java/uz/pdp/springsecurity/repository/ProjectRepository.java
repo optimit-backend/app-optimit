@@ -32,5 +32,5 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     Page<Project> findAllByProjectTypeIdAndCustomerIdAndExpiredTrue(UUID projectType_id, UUID customer_id, Pageable pageable);
     Page<Project> findAllByProjectTypeIdAndProjectStatusIdAndExpiredTrue(UUID projectType_id, UUID projectStatus_id,Pageable pageable);
 
-    Page<Project> findByNameContainingIgnoreCase(String word, Pageable pageable);
+    Page<Project> findByNameContainingIgnoreCaseAndBranchId(String name, UUID branch_id, Pageable pageable);
 }

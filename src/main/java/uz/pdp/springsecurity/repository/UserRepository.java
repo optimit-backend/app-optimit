@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findAllByBranchesIdAndRoleIsNotAndActiveIsTrue(UUID branches_id, Role role);
     Optional<User> findByIdAndBranchesIdAndActiveIsTrue(UUID branches_id, UUID id);
     Optional<User> findByBusinessIdAndRoleName(UUID business_id, String role_name);
-    Page<User> findAllByFirstNameContainingIgnoreCaseAndBranchesId(String firstName, UUID branches_id, Pageable pageable);
+    Page<User> findAllByFirstNameContainingIgnoreCaseAndBranchesIdAndUsernameNot(String firstName, UUID branches_id, String username, Pageable pageable);
 
     List<User> findAllByBusiness_IdAndRoleName(UUID business_id, String role_name);
 

@@ -460,12 +460,12 @@ public class ProjectService {
                 lateDay
         ));
     }
-    public ApiResponse searchByName(String name,int page, int size) {
+    public ApiResponse searchByName(String name,UUID branchId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         String[] words = name.split("\\s+");
         Page<Project> projects = null;
         for (String word : words) {
-            projects = projectRepository.findByNameContainingIgnoreCase(word, pageable);
+            projects = projectRepository.findByNameContainingIgnoreCaseAndBranchId(word,branchId,pageable);
         }
         if (projects==null){
             return new ApiResponse("Not Found",false);
