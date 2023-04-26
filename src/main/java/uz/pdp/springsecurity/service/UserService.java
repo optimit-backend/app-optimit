@@ -1,6 +1,10 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
@@ -258,6 +262,8 @@ public class UserService {
         return new ApiResponse("NOT FOUND", false);
     }
 
+
+
     public ApiResponse getByPatron(UUID userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
@@ -318,5 +324,21 @@ public class UserService {
         }
 
         return new ApiResponse("found", true, userDtoForPatron);
+    }
+
+    public ApiResponse getAllByName(UUID branchId, String name, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        String[] words = name.split("\\s+");
+        Page<User> users = null;
+        for (String word : words) {
+            users = userRepository.findAllByFirstNameContainingIgnoreCaseAndBranchesId(word,branchId,pageable);
+        }
+        if (users==null){
+            return new ApiResponse("Not found",false);
+        }
+        List<User> userList = users.getContent();
+        List<UserDto> userDtoList = userMapper.toDto(userList);
+        Page<UserDto> pages = new PageImpl<>(userDtoList, pageable, userDtoList.size());
+        return new ApiResponse("Found",true,pages);
     }
 }

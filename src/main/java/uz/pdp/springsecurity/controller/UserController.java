@@ -128,6 +128,16 @@ public class UserController {
     }
 
     @CheckPermission("VIEW_USER")
+    @GetMapping("/get-user-by-name/{branch_id}")
+    public HttpEntity<?> getAllByUserName(@PathVariable UUID branch_id,
+                                          @RequestParam String name,
+                                          @RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size) {
+        ApiResponse apiResponse = userService.getAllByName(branch_id,name,page,size);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_USER")
     @GetMapping("/get-by-patron/{user_id}")
     public HttpEntity<?> getByPatron(@PathVariable UUID user_id) {
         ApiResponse apiResponse = userService.getByPatron(user_id);

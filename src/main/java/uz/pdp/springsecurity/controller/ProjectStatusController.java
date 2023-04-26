@@ -20,35 +20,30 @@ public class ProjectStatusController {
     @Autowired
     ProjectStatusServise projectStatusServise;
 
-    @CheckPermission("ADD_PROJECT_STATUS")
     @PostMapping
     public HttpEntity<?> add(@Valid @RequestBody ProjectStatusDto projectStatusDto) {
         ApiResponse apiResponse = projectStatusServise.add(projectStatusDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("EDIT_PROJECT_STATUS")
     @PutMapping("/{id}")
     public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody ProjectStatusDto projectStatusDto) {
         ApiResponse apiResponse = projectStatusServise.edit(id,projectStatusDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_PROJECT_STATUS")
     @GetMapping("/{id}")
     public HttpEntity<?> get(@PathVariable UUID id) {
         ApiResponse apiResponse = projectStatusServise.get(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("DELETE_PROJECT_STATUS")
     @DeleteMapping("/{id}")
     public HttpEntity<?> delete(@PathVariable UUID id) {
         ApiResponse apiResponse = projectStatusServise.delete(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_PROJECT_STATUS")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
         ApiResponse apiResponse = projectStatusServise.getAllByBranch(branchId);
