@@ -1,6 +1,7 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Branch;
 import uz.pdp.springsecurity.entity.User;
@@ -13,7 +14,9 @@ import uz.pdp.springsecurity.repository.UserRepository;
 import uz.pdp.springsecurity.repository.WorkTimeLateRepository;
 import uz.pdp.springsecurity.repository.WorkTimeRepository;
 
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,21 +33,26 @@ public class WorkTimeLateService {
     private final WorkTimeRepository workTimeRepository;
     private static final LocalDateTime TODAY_START = LocalDate.now().atStartOfDay();
 
+    @SneakyThrows
     public void add(WorkTime workTime) {
         User user = workTime.getUser();
         Optional<WorkTimeLate> optionalWorkTimeLate = workTimeLateRepository.findByUserIdAndBranchId(user.getId(), workTime.getBranch().getId());
         if (optionalWorkTimeLate.isPresent()){
-            List<WorkTime> workTimeList = workTimeRepository.findAllByUserIdAndBranchIdAndArrivalTimeIsBetween(
+            List<WorkTime> workTimeList = workTimeRepository.findAllByUserIdAndBranchIdAndArrivalTimeIsBetweenOrderByCreatedAt(
                     user.getId(),
                     workTime.getBranch().getId(),
                     Timestamp.valueOf(TODAY_START),
                     Timestamp.valueOf(TODAY_START.plusDays(1))
             );
             long previousMinute = 0;
-            for (WorkTime time : workTimeList) {
+            List<WorkTime> workTimeListNew = workTimeList.subList(0, workTimeList.size() - 1);
+            for (WorkTime time : workTimeListNew) {
                 previousMinute += time.getMinute();
             }
-            long minute = (user.getLeaveTime().getTime() - user.getArrivalTime().getTime());
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+            Time arrivalTime = new Time(format.parse(user.getArrivalTime()).getTime());
+            Time leaveTime = new Time(format.parse(user.getLeaveTime()).getTime());
+            long minute = (leaveTime.getTime() - arrivalTime.getTime()) / (1000 * 60);
             long previousLateMinute = 0;
             if (previousMinute > 0) {
                 previousLateMinute = minute - previousMinute;
@@ -52,7 +60,7 @@ public class WorkTimeLateService {
 
             minute = previousMinute + workTime.getMinute() - minute;
             WorkTimeLate workTimeLate = optionalWorkTimeLate.get();
-            workTimeLate.setMinute(workTimeLate.getMinute() +previousLateMinute + minute);
+            workTimeLate.setMinute(workTimeLate.getMinute() + previousLateMinute + minute);
             workTimeLateRepository.save(workTimeLate);
         }else {
             create(workTime.getUser(), workTime.getBranch());
