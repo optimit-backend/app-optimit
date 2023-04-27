@@ -40,6 +40,16 @@ public class ContentController {
     }
 
     @CheckPermission("GET_CONTENT")
+    @GetMapping("/by-branch-pageable/{branchId}")
+    public HttpEntity<?> getAllPageable(@PathVariable UUID branchId,
+                                        @RequestParam(required = false) String name,
+                                        @RequestParam(defaultValue = "0", required = false) int page,
+                                        @RequestParam(defaultValue = "10", required = false) int size) {
+        ApiResponse apiResponse = contentService.getAllPageable(branchId,name,page,size);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("GET_CONTENT")
     @GetMapping("/{contentId}")
     public HttpEntity<?> getOne(@PathVariable UUID contentId) {
         ApiResponse apiResponse = contentService.getOne(contentId);

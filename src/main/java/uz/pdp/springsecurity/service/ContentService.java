@@ -1,6 +1,7 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -8,6 +9,8 @@ import uz.pdp.springsecurity.payload.ContentDto;
 import uz.pdp.springsecurity.payload.ContentProductDto;
 import uz.pdp.springsecurity.payload.GetOneContentProductionDto;
 import uz.pdp.springsecurity.repository.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,6 +108,23 @@ public class ContentService {
         List<Content> contentList = contentRepository.findAllByBranchId(branchId);
         if (contentList.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse(true, contentList);
+    }
+
+    public ApiResponse getAllPageable(UUID branchId,String name, int page , int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
+        Page<Content> contents = null;
+        if (name != null) {
+            String[] words = name.split("\\s+");
+            for (String word : words) {
+                contents = contentRepository.findAllByProduct_NameContainingIgnoreCaseAndBranchId(word,branchId,pageable);
+            }
+        }else {
+            contents = contentRepository.findAllByBranch_Id(branchId,pageable);
+        }
+        if (contents==null) return new ApiResponse("NOT FOUND", false);
+        return new ApiResponse(true, contents);
     }
 
     public ApiResponse getOne(UUID contentId) {

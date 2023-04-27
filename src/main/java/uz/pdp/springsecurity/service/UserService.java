@@ -331,7 +331,7 @@ public class UserService {
         String[] words = name.split("\\s+");
         Page<User> users = null;
         for (String word : words) {
-            users = userRepository.findAllByFirstNameContainingIgnoreCaseAndBranchesId(word,branchId,pageable);
+            users = userRepository.findAllByFirstNameContainingIgnoreCaseAndBranchesIdAndUsernameNot(word,branchId,"superadmin",pageable);
         }
         if (users==null){
             return new ApiResponse("Not found",false);

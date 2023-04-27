@@ -83,12 +83,14 @@ public class ProjectController {
     }
 
     @CheckPermission("GET_PROJECT")
-    @GetMapping("/get-by-name/{name}")
+    @GetMapping("/get-by-name/{name}/{branchId}")
     public HttpEntity<?> getAllByName(
+            @PathVariable String name,
+            @PathVariable UUID branchId,
             @RequestParam(defaultValue = "0", required = false) int page,
-            @RequestParam(defaultValue = "10", required = false) int size,
-            @PathVariable String name) {
-        ApiResponse apiResponse = projectService.searchByName(name,page,size);
+            @RequestParam(defaultValue = "10", required = false) int size
+            ) {
+        ApiResponse apiResponse = projectService.searchByName(name,branchId,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
