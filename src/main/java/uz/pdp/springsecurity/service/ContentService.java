@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ContentDto;
@@ -28,6 +29,7 @@ public class ContentService {
 
     private final WarehouseRepository warehouseRepository;
 
+    @Transactional
     public ApiResponse add(ContentDto contentDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(contentDto.getBranchId());
         if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
@@ -36,6 +38,7 @@ public class ContentService {
         return createOrEdit(content, contentDto);
     }
 
+    @Transactional
     public ApiResponse edit(UUID contentId, ContentDto contentDto) {
         Optional<Content> optionalContent = contentRepository.findById(contentId);
         return optionalContent.map(content -> createOrEdit(content, contentDto)).orElseGet(() -> new ApiResponse("NOT FOUND CONTENT", false));
@@ -58,10 +61,18 @@ public class ContentService {
         content.setCost(contentDto.getCost());
         content.setTotalPrice(contentDto.getTotalPrice());
         contentRepository.save(content);
+        contentProductRepository.deleteAllByContentId(content.getId());
 
         List<ContentProductDto> contentProductDtoList = contentDto.getContentProductDtoList();
         List<ContentProduct> contentProductList = new ArrayList<>();
         for (ContentProductDto contentProductDto : contentProductDtoList) {
+            ContentProduct contentProduct = createOrEditContentProduct(new ContentProduct(), contentProductDto);
+            if (contentProduct == null)
+                return new ApiResponse("NOT FOUND PRODUCT OR PRODUCT TYPE PRICE (ONE OF THEM SHOULD BE NULL)", false);
+            contentProduct.setContent(content);
+            contentProductList.add(contentProduct);
+        }
+        /*for (ContentProductDto contentProductDto : contentProductDtoList) {
             if (contentProductDto.getContentProductIdForEditOrNull() == null) {
                 ContentProduct contentProduct = createOrEditContentProduct(new ContentProduct(), contentProductDto);
                 if (contentProduct == null)
@@ -81,7 +92,7 @@ public class ContentService {
                 contentProduct.setContent(content);
                 contentProductList.add(contentProduct);
             }
-        }
+        }*/
         contentProductRepository.saveAll(contentProductList);
         return new ApiResponse("successfully saved", true);
     }
@@ -98,7 +109,6 @@ public class ContentService {
         }
         contentProduct.setQuantity(contentProductDto.getQuantity());
         contentProduct.setTotalPrice(contentProductDto.getTotalPrice());
-        contentProduct.setDelete(contentProductDto.isDelete());
         return contentProduct;
     }
 
