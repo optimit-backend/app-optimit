@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import uz.pdp.springsecurity.entity.Role;
 import uz.pdp.springsecurity.entity.User;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,4 +30,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findAllByBusiness_IdAndRoleName(UUID business_id, String role_name);
 
     List<User> findAllByJobId(UUID id);
+        List<User> findAllByIdIn(Collection<UUID> id);
 }

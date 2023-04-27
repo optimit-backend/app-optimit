@@ -218,101 +218,101 @@ public class ProjectService {
         Optional<Project> optionalProject = projectRepository.findById(id);
         return optionalProject.map(project -> new ApiResponse("Found", true, project)).orElseGet(() -> new ApiResponse("Project Not Found", false));
     }
-    public ApiResponse getOne(UUID id) {
-        Optional<Project> optionalProject = projectRepository.findById(id);
-        if (optionalProject.isEmpty()){
-            return new ApiResponse("Not found",false);
-        }
-        int totalTask = taskRepository.countAllByProjectId(id);
-        int completed = taskRepository.countAllByTaskStatus_OrginalNameAndProjectId("Completed",id);
-        int expired = taskRepository.countAllByProjectIdAndExpiredTrue(id);
-        List<Task> tasks = taskRepository.findAllByProjectId(id);
-        double sum = 0;
-        for (Task task : tasks) {
-            int size = task.getUsers().size();
-            if (task.isEach()){
-                sum += task.getTaskPrice() * size;
-            }else {
-                sum += task.getTaskPrice();
-            }
-        }
-
-        int process = 0;
-        if (completed > 0) {
-            process = completed * 100 / totalTask;
-        }
-
-
-        ProjectGetOne projectGetOne=new ProjectGetOne();
-        Project project = optionalProject.get();
-        projectGetOne.setProjectName(project.getName());
-        projectGetOne.setProjectTypeName(project.getProjectType().getName());
-        projectGetOne.setProjectBudget(project.getBudget());
-        projectGetOne.setTotalTask(totalTask);
-        projectGetOne.setCompletedTask(completed);
-        projectGetOne.setExpiredTask(expired);
-        projectGetOne.setTotalTaskSum(sum);
-        projectGetOne.setCustomerName(project.getCustomer().getName());
-        projectGetOne.setProjectPercent(process);
-        projectGetOne.setStartDate(project.getStartDate());
-        projectGetOne.setEndDate(project.getEndDate());
-        projectGetOne.setDeadline(project.getDeadline());
-
-        List<FileData> fileDataList = project.getFileDataList();
-        List<FileDataDto> fileDataDtoList=new ArrayList<>();
-        for (FileData fileData : fileDataList) {
-            FileDataDto fileDataDto=new FileDataDto();
-            fileDataDto.setId(fileData.getId());
-            fileDataDto.setName(fileData.getFileName());
-            fileDataDto.setSize(fileData.getSize());
-            fileDataDtoList.add(fileDataDto);
-        }
-        projectGetOne.setFileDataList(fileDataDtoList);
-        List<Stage> stageList = project.getStageList();
-        List<StageProject> stageProjectList=new ArrayList<>();
-        for (Stage stage : stageList) {
-            int stageAmount = taskRepository.countAllByStageId(stage.getId());
-            int completedTasks = taskRepository.countAllByStageIdAndTaskStatus_OrginalName(stage.getId(), "Completed");
-            StageProject stageProject=new StageProject();
-            stageProject.setStageName(stage.getName());
-            stageProject.setStageTasks(stageAmount);
-            int percent = 0;
-            if (completedTasks > 0){
-                percent = (100*completedTasks) / stageAmount;
-            }
-            stageProject.setStagePercent(percent);
-            stageProjectList.add(stageProject);
-        }
-        projectGetOne.setStageProjectList(stageProjectList);
-
-        List<User> userList = project.getUsers();
-        List<UserProject> userProjectList=new ArrayList<>();
-        for (User user : userList) {
-            UserProject userProject=new UserProject();
-            userProject.setUserId(user.getId());
-            if (user.getPhoto() != null){
-                userProject.setPhotoId(user.getPhoto().getId());
-            }
-            userProject.setFirstname(user.getFirstName());
-            userProject.setLastname(user.getLastName());
-            userProjectList.add(userProject);
-        }
-        projectGetOne.setUserProjectList(userProjectList);
-
-        List<ContentProject> contentProjectList=new ArrayList<>();
-        for (Task task : tasks) {
-            if (task.isProductions()) {
-                ContentProject contentProject = new ContentProject();
-                contentProject.setContentName(task.getContent().getProduct().getName());
-                contentProject.setMeasurement(task.getContent().getProduct().getMeasurement().getName());
-                contentProject.setGoalAmount(task.getGoalAmount());
-                contentProjectList.add(contentProject);
-            }
-        }
-        projectGetOne.setContentProjectList(contentProjectList);
-
-        return new ApiResponse("Found",true,projectGetOne);
-    }
+//    public ApiResponse getOne(UUID id) {
+//        Optional<Project> optionalProject = projectRepository.findById(id);
+//        if (optionalProject.isEmpty()){
+//            return new ApiResponse("Not found",false);
+//        }
+//        int totalTask = taskRepository.countAllByProjectId(id);
+//        int completed = taskRepository.countAllByTaskStatus_OrginalNameAndProjectId("Completed",id);
+//        int expired = taskRepository.countAllByProjectIdAndExpiredTrue(id);
+//        List<Task> tasks = taskRepository.findAllByProjectId(id);
+//        double sum = 0;
+//        for (Task task : tasks) {
+//            int size = task.getUsers().size();
+//            if (task.isEach()){
+//                sum += task.getTaskPrice() * size;
+//            }else {
+//                sum += task.getTaskPrice();
+//            }
+//        }
+//
+//        int process = 0;
+//        if (completed > 0) {
+//            process = completed * 100 / totalTask;
+//        }
+//
+//
+//        ProjectGetOne projectGetOne=new ProjectGetOne();
+//        Project project = optionalProject.get();
+//        projectGetOne.setProjectName(project.getName());
+//        projectGetOne.setProjectTypeName(project.getProjectType().getName());
+//        projectGetOne.setProjectBudget(project.getBudget());
+//        projectGetOne.setTotalTask(totalTask);
+//        projectGetOne.setCompletedTask(completed);
+//        projectGetOne.setExpiredTask(expired);
+//        projectGetOne.setTotalTaskSum(sum);
+//        projectGetOne.setCustomerName(project.getCustomer().getName());
+//        projectGetOne.setProjectPercent(process);
+//        projectGetOne.setStartDate(project.getStartDate());
+//        projectGetOne.setEndDate(project.getEndDate());
+//        projectGetOne.setDeadline(project.getDeadline());
+//
+//        List<FileData> fileDataList = project.getFileDataList();
+//        List<FileDataDto> fileDataDtoList=new ArrayList<>();
+//        for (FileData fileData : fileDataList) {
+//            FileDataDto fileDataDto=new FileDataDto();
+//            fileDataDto.setId(fileData.getId());
+//            fileDataDto.setName(fileData.getFileName());
+//            fileDataDto.setSize(fileData.getSize());
+//            fileDataDtoList.add(fileDataDto);
+//        }
+//        projectGetOne.setFileDataList(fileDataDtoList);
+//        List<Stage> stageList = project.getStageList();
+//        List<StageProject> stageProjectList=new ArrayList<>();
+//        for (Stage stage : stageList) {
+//            int stageAmount = taskRepository.countAllByStageId(stage.getId());
+//            int completedTasks = taskRepository.countAllByStageIdAndTaskStatus_OrginalName(stage.getId(), "Completed");
+//            StageProject stageProject=new StageProject();
+//            stageProject.setStageName(stage.getName());
+//            stageProject.setStageTasks(stageAmount);
+//            int percent = 0;
+//            if (completedTasks > 0){
+//                percent = (100*completedTasks) / stageAmount;
+//            }
+//            stageProject.setStagePercent(percent);
+//            stageProjectList.add(stageProject);
+//        }
+//        projectGetOne.setStageProjectList(stageProjectList);
+//
+//        List<User> userList = project.getUsers();
+//        List<UserProject> userProjectList=new ArrayList<>();
+//        for (User user : userList) {
+//            UserProject userProject=new UserProject();
+//            userProject.setUserId(user.getId());
+//            if (user.getPhoto() != null){
+//                userProject.setPhotoId(user.getPhoto().getId());
+//            }
+//            userProject.setFirstname(user.getFirstName());
+//            userProject.setLastname(user.getLastName());
+//            userProjectList.add(userProject);
+//        }
+//        projectGetOne.setUserProjectList(userProjectList);
+//
+//        List<ContentProject> contentProjectList=new ArrayList<>();
+//        for (Task task : tasks) {
+//            if (task.isProductions()) {
+//                ContentProject contentProject = new ContentProject();
+//                contentProject.setContentName(task.getContent().getProduct().getName());
+//                contentProject.setMeasurement(task.getContent().getProduct().getMeasurement().getName());
+//                contentProject.setGoalAmount(task.getGoalAmount());
+//                contentProjectList.add(contentProject);
+//            }
+//        }
+//        projectGetOne.setContentProjectList(contentProjectList);
+//
+//        return new ApiResponse("Found",true,projectGetOne);
+//    }
 
     public ApiResponse delete(UUID id) {
         boolean exists = projectRepository.existsById(id);

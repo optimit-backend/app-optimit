@@ -27,6 +27,7 @@ public class TaskServise {
     private final UserRepository userRepository;
     private final TaskStatusRepository taskStatusRepository;
     private final TaskRepository taskRepository;
+    private final TaskPriceRepository taskPriceRepository;
     private final TaskMapper taskMapper;
     private final NotificationRepository notificationRepository;
     private final ContentRepository contentRepository;
@@ -59,13 +60,17 @@ public class TaskServise {
                 task.setContent(content);
             }
         }
-
-        List<User> userList = new ArrayList<>();
-        for (UUID userId : taskDto.getUsers()) {
-            Optional<User> optionalUser = userRepository.findById(userId);
-            optionalUser.ifPresent(userList::add);
+        List<TaskPrice> taskPriceList=new ArrayList<>();
+        for (TaskPriceDto taskPriceDto : taskDto.getTaskPriceDtos()) {
+            TaskPrice taskPrice = new TaskPrice();
+            taskPrice.setPrice(taskPriceDto.getPrice());
+            List<User> userList = userRepository.findAllByIdIn(taskPriceDto.getUserList());
+            taskPrice.setUserList(userList);
+            taskPrice.setEach(taskPriceDto.isEach());
+            taskPriceList.add(taskPrice);
         }
-        task.setUsers(userList);
+        taskPriceRepository.saveAll(taskPriceList);
+        task.setTaskPriceList(taskPriceList);
 
         Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findByBranchIdAndOrginalName(taskDto.getBranchId(), "Uncompleted");
         optionalTaskStatus.ifPresent(task::setTaskStatus);
@@ -80,7 +85,6 @@ public class TaskServise {
 
         task.setGoalAmount(taskDto.getGoalAmount());
         task.setTaskPrice(taskDto.getTaskPrice());
-        task.setEach(taskDto.isEach());
 
         if (taskDto.getStageId() != null) {
             Optional<Stage> optionalStage = stageRepository.findById(taskDto.getStageId());
@@ -98,24 +102,19 @@ public class TaskServise {
             if (optionalProject.isPresent()) {
                 project = optionalProject.get();
             }
+            assert project != null;
             double budget = project.getBudget();
             double taskPrice = task.getTaskPrice();
-            int size = userList.size();
-            if (taskDto.isEach()) {
-                budget = budget - (taskPrice * size);
+                budget = budget - taskPrice;
                 project.setBudget(budget);
                 projectRepository.save(project);
-            } else {
-                budget = budget - (taskPrice);
-                project.setBudget(budget);
-                projectRepository.save(project);
-            }
         }
-
         taskRepository.save(task);
 
-
-        List<User> users = task.getUsers();
+        List<User> users = new ArrayList<>();
+        for (TaskPrice taskPrice : taskPriceList) {
+            users.addAll(taskPrice.getUserList());
+        }
         for (User user : users) {
             Notification notification = new Notification();
             notification.setRead(false);
@@ -152,14 +151,17 @@ public class TaskServise {
 
         task.setStartDate(taskDto.getStartDate());
         task.setDeadLine(taskDto.getDeadLine());
-        if (taskDto.getUsers() != null) {
-            List<User> userList = new ArrayList<>();
-            for (UUID user : taskDto.getUsers()) {
-                Optional<User> optionalUser = userRepository.findById(user);
-                optionalUser.ifPresent(userList::add);
-            }
-            task.setUsers(userList);
+        List<TaskPrice> taskPriceList=new ArrayList<>();
+        for (TaskPriceDto taskPriceDto : taskDto.getTaskPriceDtos()) {
+            TaskPrice taskPrice = taskPriceRepository.getById(taskPriceDto.getId());
+            taskPrice.setPrice(taskPriceDto.getPrice());
+            taskPrice.setEach(taskPriceDto.isEach());
+            List<User> users = userRepository.findAllByIdIn(taskPriceDto.getUserList());
+            taskPrice.setUserList(users);
+            taskPriceList.add(taskPrice);
         }
+        task.setTaskPriceList(taskPriceList);
+        taskPriceRepository.saveAll(taskPriceList);
         if (taskDto.getTaskStatus() != null) {
             Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findById(taskDto.getTaskStatus());
             optionalTaskStatus.ifPresent(task::setTaskStatus);
@@ -172,7 +174,6 @@ public class TaskServise {
         task.setProductions(taskDto.isProductions());
         task.setGoalAmount(taskDto.getGoalAmount());
         task.setTaskPrice(taskDto.getTaskPrice());
-        task.setEach(taskDto.isEach());
         taskRepository.save(task);
         return new ApiResponse("Edited", true);
     }
@@ -200,14 +201,14 @@ public class TaskServise {
         if (task.getTaskStatus().getOrginalName() != null && task.getTaskStatus().getOrginalName().equals("Completed")) {
             return new ApiResponse("You can not change this task !", false);
         }
-        if (taskStatus.getOrginalName() != null && taskStatus.getOrginalName().equals("Completed")) {
-            Date deadline = task.getDeadLine();
-            Date endDate = new Date();
-            task.setExpired(!deadline.after(endDate));
-            task.setEndDate(endDate);
-            salaryCountService.addForTask(task);
-            prizeService.addForTask(task);
-        }
+//        if (taskStatus.getOrginalName() != null && taskStatus.getOrginalName().equals("Completed")) {
+//            Date deadline = task.getDeadLine();
+//            Date endDate = new Date();
+//            task.setExpired(!deadline.after(endDate));
+//            task.setEndDate(endDate);
+//            salaryCountService.addForTask(task);
+//            prizeService.addForTask(task);
+//        }
         task.setTaskStatus(taskStatus);
         taskRepository.save(task);
         return new ApiResponse("Edited", true);

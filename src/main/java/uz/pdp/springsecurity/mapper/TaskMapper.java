@@ -18,7 +18,7 @@ public interface TaskMapper {
 
     @Mapping(target = "contentId", source = "content.id")
     @Mapping(target = "projectName", source = "project.name")
-    @Mapping(target = "userList", source = "users")
+    @Mapping(target = "userList", ignore = true)
     @Mapping(target = "taskTypeId", source = "taskType.id")
     @Mapping(target = "taskStatusId", source = "taskStatus.id")
     @Mapping(target = "branchId", source = "branch.id")

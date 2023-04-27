@@ -169,7 +169,7 @@ public class ProductionService {
         }
 
         double taskPrice = task.getTaskPrice();
-        if (task.isEach())taskPrice *= task.getUsers().size();
+//        if (task.isEach())taskPrice *= task.getUsers().size();
 
         Production production = new Production();
         production.setBranch(branch);
@@ -219,8 +219,8 @@ public class ProductionService {
         task.setTaskStatus(taskStatus);
         task.setProduction(production);
         taskRepository.save(task);
-        salaryCountService.addForTask(task);
-        prizeService.addForTask(task);
+//        salaryCountService.addForTask(task);
+//        prizeService.addForTask(task);
         return new ApiResponse("SUCCESS", true);
     }
 }
