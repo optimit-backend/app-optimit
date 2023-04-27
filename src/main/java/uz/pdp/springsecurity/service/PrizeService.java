@@ -117,23 +117,23 @@ public class PrizeService {
         }
     }
 
-    public void addForTask(Task task) {
-        for (User user : task.getUsers()) {
-            Optional<Prize> optionalPrize = prizeRepository.findByUserIdAndBranchIdAndTaskTrueAndGivenFalse(user.getId(), task.getBranch().getId());
-            if (optionalPrize.isEmpty()) return;
-            Prize prize = optionalPrize.get();
-            if (prize.getDeadline().before(new Date())) {
-                delete(prize);
-                return;
-            }
-            prize.setCounter(prize.getCounter() + 1);
-            if (prize.getCount() <= prize.getCounter()) {
-                prize.setGiven(true);
-                salaryService.add(user, task.getBranch(), prize.getBonus().getSumma());
-            }
-            prizeRepository.save(prize);
-        }
-    }
+//    public void addForTask(Task task) {
+//        for (User user : task.getUsers()) {
+//            Optional<Prize> optionalPrize = prizeRepository.findByUserIdAndBranchIdAndTaskTrueAndGivenFalse(user.getId(), task.getBranch().getId());
+//            if (optionalPrize.isEmpty()) return;
+//            Prize prize = optionalPrize.get();
+//            if (prize.getDeadline().before(new Date())) {
+//                delete(prize);
+//                return;
+//            }
+//            prize.setCounter(prize.getCounter() + 1);
+//            if (prize.getCount() <= prize.getCounter()) {
+//                prize.setGiven(true);
+//                salaryService.add(user, task.getBranch(), prize.getBonus().getSumma());
+//            }
+//            prizeRepository.save(prize);
+//        }
+//    }
 
     public void addPrizeForLid() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

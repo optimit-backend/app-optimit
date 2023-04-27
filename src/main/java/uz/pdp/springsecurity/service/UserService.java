@@ -264,67 +264,67 @@ public class UserService {
 
 
 
-    public ApiResponse getByPatron(UUID userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            return new ApiResponse("not found User", false);
-        }
-        UserDtoForPatron userDtoForPatron = new UserDtoForPatron();
-        userDtoForPatron.setFio(user.getFirstName() + " " + user.getLastName());
-        if (user.getPhoto() != null) {
-            userDtoForPatron.setPhotosId(user.getPhoto().getId());
-        }
-        userDtoForPatron.setRole(user.getRole().getName());
-
-
-        int total = projectRepository.countAllByUsersId(userId);
-        int completed1 = projectRepository.countAllByProjectStatus_NameAndUsersId("Completed", userId);
-        int expired = projectRepository.countAllByExpiredTrue();
-        int process = projectRepository.countAllByProjectStatus_NameAndUsersId("Process", userId);
-        ProjectInfoDto projectInfoDto = new ProjectInfoDto();
-        projectInfoDto.setTotal(total);
-        projectInfoDto.setCompleted(completed1);
-        projectInfoDto.setProcess(process);
-        projectInfoDto.setExpired(expired);
-        userDtoForPatron.setProjectInfoDto(projectInfoDto);
-
-        int taskAmount = taskRepository.countAllByUsersId(userId);
-        int completed = taskRepository.countAllByUsersIdAndTaskStatus_OrginalName(userId, "Completed");
-        int expiredIsTrue = taskRepository.countAllByUsersIdAndExpiredIsTrue(userId);
-        TaskInfoGetDto taskInfoGetDto = new TaskInfoGetDto();
-        taskInfoGetDto.setTaskAmount(taskAmount);
-        taskInfoGetDto.setDoneTaskAmount(completed);
-        taskInfoGetDto.setNotDoneDeadlineAmount(expiredIsTrue);
-
-        userDtoForPatron.setTaskInfoGetDto(taskInfoGetDto);
-
-        List<Bonus> bonusList = user.getBonuses();
-        List<BonusGetMetDto> bonusGetMetDto = new ArrayList<>();
-        for (Bonus bonus : bonusList) {
-            BonusGetMetDto bonusDto = new BonusGetMetDto();
-            bonusDto.setName(bonus.getName());
-            bonusDto.setIcon(bonus.getIcon());
-            bonusGetMetDto.add(bonusDto);
-        }
-        userDtoForPatron.setBonusGetMetDtoList(bonusGetMetDto);
-
-        List<Trade> allTrade = tradeRepository.findAllByTrader_Id(userId);
-
-        if (!allTrade.isEmpty()) {
-
-            double totalSumma = 0;
-            for (Trade trade : allTrade) {
-                totalSumma += trade.getTotalSum();
-            }
-
-            TradeResultDto tradeResultDto = new TradeResultDto();
-            tradeResultDto.setTotalTrade(allTrade.size());
-            tradeResultDto.setTotalTradeSumma(totalSumma);
-            userDtoForPatron.setTradeResultDto(tradeResultDto);
-        }
-
-        return new ApiResponse("found", true, userDtoForPatron);
-    }
+//    public ApiResponse getByPatron(UUID userId) {
+//        User user = userRepository.findById(userId).orElse(null);
+//        if (user == null) {
+//            return new ApiResponse("not found User", false);
+//        }
+//        UserDtoForPatron userDtoForPatron = new UserDtoForPatron();
+//        userDtoForPatron.setFio(user.getFirstName() + " " + user.getLastName());
+//        if (user.getPhoto() != null) {
+//            userDtoForPatron.setPhotosId(user.getPhoto().getId());
+//        }
+//        userDtoForPatron.setRole(user.getRole().getName());
+//
+//
+//        int total = projectRepository.countAllByUsersId(userId);
+//        int completed1 = projectRepository.countAllByProjectStatus_NameAndUsersId("Completed", userId);
+//        int expired = projectRepository.countAllByExpiredTrue();
+//        int process = projectRepository.countAllByProjectStatus_NameAndUsersId("Process", userId);
+//        ProjectInfoDto projectInfoDto = new ProjectInfoDto();
+//        projectInfoDto.setTotal(total);
+//        projectInfoDto.setCompleted(completed1);
+//        projectInfoDto.setProcess(process);
+//        projectInfoDto.setExpired(expired);
+//        userDtoForPatron.setProjectInfoDto(projectInfoDto);
+//
+//        int taskAmount = taskRepository.countAllByUsersId(userId);
+//        int completed = taskRepository.countAllByUsersIdAndTaskStatus_OrginalName(userId, "Completed");
+//        int expiredIsTrue = taskRepository.countAllByUsersIdAndExpiredIsTrue(userId);
+//        TaskInfoGetDto taskInfoGetDto = new TaskInfoGetDto();
+//        taskInfoGetDto.setTaskAmount(taskAmount);
+//        taskInfoGetDto.setDoneTaskAmount(completed);
+//        taskInfoGetDto.setNotDoneDeadlineAmount(expiredIsTrue);
+//
+//        userDtoForPatron.setTaskInfoGetDto(taskInfoGetDto);
+//
+//        List<Bonus> bonusList = user.getBonuses();
+//        List<BonusGetMetDto> bonusGetMetDto = new ArrayList<>();
+//        for (Bonus bonus : bonusList) {
+//            BonusGetMetDto bonusDto = new BonusGetMetDto();
+//            bonusDto.setName(bonus.getName());
+//            bonusDto.setIcon(bonus.getIcon());
+//            bonusGetMetDto.add(bonusDto);
+//        }
+//        userDtoForPatron.setBonusGetMetDtoList(bonusGetMetDto);
+//
+//        List<Trade> allTrade = tradeRepository.findAllByTrader_Id(userId);
+//
+//        if (!allTrade.isEmpty()) {
+//
+//            double totalSumma = 0;
+//            for (Trade trade : allTrade) {
+//                totalSumma += trade.getTotalSum();
+//            }
+//
+//            TradeResultDto tradeResultDto = new TradeResultDto();
+//            tradeResultDto.setTotalTrade(allTrade.size());
+//            tradeResultDto.setTotalTradeSumma(totalSumma);
+//            userDtoForPatron.setTradeResultDto(tradeResultDto);
+//        }
+//
+//        return new ApiResponse("found", true, userDtoForPatron);
+//    }
 
     public ApiResponse getAllByName(UUID branchId, String name, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);

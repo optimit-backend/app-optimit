@@ -137,10 +137,10 @@ public class UserController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("VIEW_USER")
-    @GetMapping("/get-by-patron/{user_id}")
-    public HttpEntity<?> getByPatron(@PathVariable UUID user_id) {
-        ApiResponse apiResponse = userService.getByPatron(user_id);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+//    @CheckPermission("VIEW_USER")
+//    @GetMapping("/get-by-patron/{user_id}")
+//    public HttpEntity<?> getByPatron(@PathVariable UUID user_id) {
+//        ApiResponse apiResponse = userService.getByPatron(user_id);
+//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+//    }
 }

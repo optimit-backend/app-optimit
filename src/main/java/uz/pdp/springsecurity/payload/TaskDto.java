@@ -1,6 +1,7 @@
 package uz.pdp.springsecurity.payload;
 
 import lombok.Data;
+import uz.pdp.springsecurity.entity.TaskPrice;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -16,8 +17,8 @@ public class TaskDto {
     private UUID projectId;
     private UUID taskTypeId;
     private Date startDate;
+    private List<TaskPriceDto> taskPriceDtos;
     private Date deadLine;
-    private List<UUID> users;
     private UUID taskStatus;
     private String importance;
     private UUID dependTask;
@@ -26,7 +27,6 @@ public class TaskDto {
     private boolean isProductions;
     private double goalAmount;
     private double taskPrice;
-    private boolean isEach;
     @NotNull
     private UUID branchId;
 

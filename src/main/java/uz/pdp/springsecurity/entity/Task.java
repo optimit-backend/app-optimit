@@ -42,7 +42,7 @@ public class Task extends AbsEntity {
 
     @ManyToMany
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<User> users;
+    private List<TaskPrice> taskPriceList;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
