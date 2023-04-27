@@ -1,6 +1,8 @@
 package uz.pdp.springsecurity.repository;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import uz.pdp.springsecurity.entity.TradeProduct;
@@ -18,7 +20,7 @@ public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID
   List<TradeProduct> findAllByCreatedAtBetweenAndProduct_CategoryId(Timestamp startDate, Timestamp endDate, UUID product_category_id);
   List<TradeProduct> findAllByCreatedAtBetweenAndProductTypePrice_Product_CategoryId(Timestamp startDate, Timestamp endDate, UUID product_category_id);
   List<TradeProduct> findAllByCreatedAtBetweenAndProduct_BrandId(Timestamp startDate, Timestamp endDate, UUID product_brand_id);
-    List<TradeProduct> findAllByCreatedAtBetweenAndProductTypePrice_Product_BrandId(Timestamp startDate, Timestamp endDate, UUID product_brand_id);
+  List<TradeProduct> findAllByCreatedAtBetweenAndProductTypePrice_Product_BrandId(Timestamp startDate, Timestamp endDate, UUID product_brand_id);
   List<TradeProduct> findAllByCreatedAtBetweenAndTrade_CustomerId(Timestamp startDate, Timestamp endDate, UUID trade_customer_id);
   List<TradeProduct> findAllByProduct_BrandId(UUID brandId);
   List<TradeProduct> findAllByProductTypePrice_Product_BrandId(UUID brandId);
@@ -45,10 +47,12 @@ public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID
   List<TradeProduct> findAllByTrade_CustomerIdAndTrade_BranchIdAndTrade_PayMethodId(UUID customerId, UUID branchId, UUID payMethodId);
   List<TradeProduct> findAllByTrade_CustomerId(UUID customerId);
   List<TradeProduct> findAllByProduct_Business_IdOrderByTradedQuantity(UUID product_business_id);
-    List<TradeProduct> findAllByCreatedAtBetweenAndTrade_Customer_Id(Timestamp createdAt, Timestamp createdAt2, UUID trade_customer_id);
-    List<TradeProduct> findAllByProductTypePriceId(UUID productTypePrice_id);
-    List<TradeProduct> findAllByProductTypePriceIdAndTrade_CustomerId(UUID productTypePrice_id, UUID trade_customer_id);
+  List<TradeProduct> findAllByCreatedAtBetweenAndTrade_Customer_Id(Timestamp createdAt, Timestamp createdAt2, UUID trade_customer_id);
+  List<TradeProduct> findAllByProductTypePriceId(UUID productTypePrice_id);
+  List<TradeProduct> findAllByProductTypePriceIdAndTrade_CustomerId(UUID productTypePrice_id, UUID trade_customer_id);
   List<TradeProduct> findAllByProduct_CategoryId(UUID id);
   List<TradeProduct> findAllByProductTypePrice_Product_CategoryId(UUID id);
+  Page<TradeProduct> findAllByTrade_BranchIdAndProductIdOrderByCreatedAtDesc(UUID branchId, UUID productId, Pageable pageable);
+  Page<TradeProduct> findAllByTrade_BranchIdAndProductTypePriceIdOrderByCreatedAtDesc(UUID branchId, UUID productTypePriceId, Pageable pageable);
 }
 

@@ -1,7 +1,9 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.Type;
@@ -14,45 +16,33 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-    @Autowired
-    ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    BrandRepository brandRepository;
+    private final BrandRepository brandRepository;
 
-    @Autowired
-    CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    @Autowired
-    MeasurementRepository measurementRepository;
+    private final MeasurementRepository measurementRepository;
 
-    @Autowired
-    AttachmentRepository attachmentRepository;
+    private final AttachmentRepository attachmentRepository;
 
-    @Autowired
-    BranchRepository branchRepository;
+    private final BranchRepository branchRepository;
 
-    @Autowired
-    CurrencyRepository currencyRepository;
+    private final BusinessRepository businessRepository;
 
-    @Autowired
-    CurrentCourceRepository currentCourceRepository;
+    private final ProductTypePriceRepository productTypePriceRepository;
 
-    @Autowired
-    BusinessRepository businessRepository;
+    private final ProductTypeValueRepository productTypeValueRepository;
 
-    @Autowired
-    ProductTypePriceRepository productTypePriceRepository;
-
-    @Autowired
-    ProductTypeValueRepository productTypeValueRepository;
-
-    @Autowired
-    WarehouseRepository warehouseRepository;
+    private final WarehouseRepository warehouseRepository;
 
     private final ProductTypeComboRepository comboRepository;
 
     private final SubscriptionRepository subscriptionRepository;
+    private final PurchaseProductRepository purchaseProductRepository;
+    private final TradeProductRepository tradeProductRepository;
+    private final ContentProductRepository contentProductRepository;
+    private final ProductionRepository productionRepository;
 
 
     public ApiResponse addProduct(ProductDto productDto) {
@@ -143,7 +133,7 @@ public class ProductService {
         if (productDto.getType().equals(Type.SINGLE.name())) {
             return addProductTypeSingleDto(productDto, product, isUpdate);
         } else if (productDto.getType().equals(Type.MANY.name())) {
-            return addProductTypeManyDto(productDto, product, isUpdate);
+            return addProductTypeManyDto(productDto, product);
         } else if (productDto.getType().equals(Type.COMBO.name())) {
             return addProductTypeComboDto(productDto, product, isUpdate);
         } else {
@@ -236,7 +226,7 @@ public class ProductService {
     }
 
 
-    private ApiResponse addProductTypeManyDto(ProductDto productDto, Product product, boolean isUpdate) {
+    private ApiResponse addProductTypeManyDto(ProductDto productDto, Product product) {
         product.setType(Type.MANY);
 
         Product saveProduct = productRepository.save(product);
@@ -316,16 +306,14 @@ public class ProductService {
         if (isUpdate) {
             if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(barcode, businessId, productId) || productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndIdIsNot(barcode, businessId, productId))
                 return generateBarcode(businessId, productName, productId, isUpdate);
-            return barcode;
         } else {
             if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(barcode, businessId) || productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(barcode, businessId))
                 return generateBarcode(businessId, productName, productId, isUpdate);
-            return barcode;
         }
+        return barcode;
     }
 
     public ApiResponse getAll(User user) {
-        UUID businessId = user.getBusiness().getId();
         Set<Branch> branches = user.getBranches();
         List<Product> productList = new ArrayList<>();
         for (Branch branch : branches) {
@@ -690,7 +678,7 @@ public class ProductService {
                 double total = 0;
                 List<ProductTypePrice> typePriceRepositoryAllByProductId = productTypePriceRepository.findAllByProductId(product.getId());
                 for (ProductTypePrice productTypePrice : typePriceRepositoryAllByProductId) {
-                    List<Warehouse> allByByProductId = new ArrayList<>();
+                    List<Warehouse> allByByProductId;
                     if (branchId != null) {
                         allByByProductId = warehouseRepository.findAllByProductTypePrice_IdAndBranch_Id(productTypePrice.getId(), branchId);
                     } else {
@@ -710,7 +698,7 @@ public class ProductService {
                 }
                 productViewDto.setAmount(total);
             } else {
-                List<Warehouse> allByByProductId = new ArrayList<>();
+                List<Warehouse> allByByProductId;
                 if (branchId != null) {
                     allByByProductId = warehouseRepository.findAllByProduct_IdAndBranch_Id(product.getId(), branchId);
                 } else {
@@ -734,6 +722,131 @@ public class ProductService {
 
             productViewDtoList.add(productViewDto);
         }
+    }
+
+    public ApiResponse getPurchaseProduct(UUID branchId, UUID productId, int page, int size) {
+        if (!branchRepository.existsById(branchId)) return new ApiResponse("BRANCH NOT FOUND", false);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PurchaseProduct> purchaseProductPage;
+        if (productRepository.existsById(productId)) {
+            purchaseProductPage = purchaseProductRepository.findAllByPurchase_BranchIdAndProductIdOrderByCreatedAtDesc(branchId, productId, pageable);
+        } else if (productTypePriceRepository.existsById(productId)) {
+            purchaseProductPage = purchaseProductRepository.findAllByPurchase_BranchIdAndProductTypePriceIdOrderByCreatedAtDesc(branchId, productId, pageable);
+        }else {
+            return new ApiResponse("PRODUCT NOT FOUND", false);
+        }
+        if (purchaseProductPage.isEmpty()) return new ApiResponse("LIST EMPTY", false);
+
+        List<ProductHistoryDto> productHistoryDtoList = new ArrayList<>();
+        for (PurchaseProduct purchaseProduct : purchaseProductPage.getContent()) {
+            productHistoryDtoList.add(new ProductHistoryDto(
+                    purchaseProduct.getPurchasedQuantity(),
+                    purchaseProduct.getTotalSum(),
+                    purchaseProduct.getCreatedAt(),
+                    purchaseProduct.getPurchase().getSeller().getFirstName(),
+                    purchaseProduct.getPurchase().getSeller().getLastName(),
+                    purchaseProduct.getPurchase().getSupplier().getName()
+            ));
+        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("productHistoryDtoList", productHistoryDtoList);
+        response.put("currentPage", purchaseProductPage.getNumber());
+        response.put("totalItem", purchaseProductPage.getTotalElements());
+        response.put("totalPage", purchaseProductPage.getTotalPages());
+        return new ApiResponse("all", true, response);
+    }
+
+    public ApiResponse getProductionProduct(UUID branchId, UUID productId, int page, int size) {
+        if (!branchRepository.existsById(branchId)) return new ApiResponse("BRANCH NOT FOUND", false);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Production> productionPage;
+        if (productRepository.existsById(productId)) {
+            productionPage = productionRepository.findAllByBranchIdAndProductIdOrderByCreatedAtDesc(branchId, productId, pageable);
+        } else if (productTypePriceRepository.existsById(productId)) {
+            productionPage = productionRepository.findAllByBranchIdAndProductTypePriceIdOrderByCreatedAtDesc(branchId, productId, pageable);
+        }else {
+            return new ApiResponse("PRODUCT NOT FOUND", false);
+        }
+        if (productionPage.isEmpty()) return new ApiResponse("LIST EMPTY", false);
+
+        List<ProductHistoryDto> productHistoryDtoList = new ArrayList<>();
+        for (Production production : productionPage.getContent()) {
+            productHistoryDtoList.add(new ProductHistoryDto(
+                    production.getQuantity(),
+                    production.getTotalPrice(),
+                    production.getCreatedAt(),
+                    "",
+                    "",
+                    ""
+            ));
+        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("productHistoryDtoList", productHistoryDtoList);
+        response.put("currentPage", productionPage.getNumber());
+        response.put("totalItem", productionPage.getTotalElements());
+        response.put("totalPage", productionPage.getTotalPages());
+        return new ApiResponse("all", true, response);
+    }
+
+    public ApiResponse getTradeProduct(UUID branchId, UUID productId, int page, int size) {
+        if (!branchRepository.existsById(branchId)) return new ApiResponse("BRANCH NOT FOUND", false);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<TradeProduct> tradeProductPage;
+        if (productRepository.existsById(productId)) {
+            tradeProductPage = tradeProductRepository.findAllByTrade_BranchIdAndProductIdOrderByCreatedAtDesc(branchId, productId, pageable);
+        } else if (productTypePriceRepository.existsById(productId)) {
+            tradeProductPage = tradeProductRepository.findAllByTrade_BranchIdAndProductTypePriceIdOrderByCreatedAtDesc(branchId, productId, pageable);
+        }else {
+            return new ApiResponse("PRODUCT NOT FOUND", false);
+        }
+        if (tradeProductPage.isEmpty()) return new ApiResponse("LIST EMPTY", false);
+
+        List<ProductHistoryDto> productHistoryDtoList = new ArrayList<>();
+        for (TradeProduct tradeProduct : tradeProductPage.getContent()) {
+            productHistoryDtoList.add(new ProductHistoryDto(
+                    tradeProduct.getTradedQuantity(),
+                    tradeProduct.getTotalSalePrice(),
+                    tradeProduct.getCreatedAt(),
+                    tradeProduct.getTrade().getTrader().getFirstName(),
+                    tradeProduct.getTrade().getTrader().getLastName(),
+                    tradeProduct.getTrade().getCustomer()==null?"":tradeProduct.getTrade().getCustomer().getName()
+            ));
+        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("productHistoryDtoList", productHistoryDtoList);
+        response.put("currentPage", tradeProductPage.getNumber());
+        response.put("totalItem", tradeProductPage.getTotalElements());
+        response.put("totalPage", tradeProductPage.getTotalPages());
+        return new ApiResponse("all", true, response);
+    }
+
+    public ApiResponse getContentProduct(UUID branchId, UUID productId, int page, int size) {
+        if (!branchRepository.existsById(branchId)) return new ApiResponse("BRANCH NOT FOUND", false);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ContentProduct> contentProductPage;
+        if (productRepository.existsById(productId)) {
+            contentProductPage = contentProductRepository.findAllByProduction_BranchIdAndProductIdAndProductionIsNotNullOrderByCreatedAtDesc(branchId, productId, pageable);
+        } else if (productTypePriceRepository.existsById(productId)) {
+            contentProductPage = contentProductRepository.findAllByProduction_BranchIdAndProductTypePriceIdAndProductionIsNotNullOrderByCreatedAtDesc(branchId, productId, pageable);
+        }else {
+            return new ApiResponse("PRODUCT NOT FOUND", false);
+        }
+        if (contentProductPage.isEmpty()) return new ApiResponse("LIST EMPTY", false);
+
+        List<ProductHistoryDto> productHistoryDtoList = new ArrayList<>();
+        for (ContentProduct contentProduct : contentProductPage.getContent()) {
+            productHistoryDtoList.add(new ProductHistoryDto(
+                    contentProduct.getQuantity(),
+                    contentProduct.getTotalPrice(),
+                    contentProduct.getCreatedAt()
+            ));
+        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("productHistoryDtoList", productHistoryDtoList);
+        response.put("currentPage", contentProductPage.getNumber());
+        response.put("totalItem", contentProductPage.getTotalElements());
+        response.put("totalPage", contentProductPage.getTotalPages());
+        return new ApiResponse("all", true, response);
     }
 }
 

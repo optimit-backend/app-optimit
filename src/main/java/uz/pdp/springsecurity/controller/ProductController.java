@@ -12,6 +12,7 @@ import uz.pdp.springsecurity.payload.ProductBarcodeDto;
 import uz.pdp.springsecurity.payload.ProductDto;
 import uz.pdp.springsecurity.repository.ProductRepository;
 import uz.pdp.springsecurity.service.ProductService;
+import uz.pdp.springsecurity.utils.AppConstant;
 
 import javax.validation.Valid;
 import java.text.ParseException;
@@ -27,13 +28,6 @@ public class ProductController {
 
     @Autowired
     ProductRepository productRepository;
-
-    /**
-     * YANGI PRODUCT QO'SHISH
-     *
-     * @param productDto
-     * @return ApiResponse(success - > true message - > ADDED)
-     */
     @CheckPermission("ADD_PRODUCT")
     @PostMapping()
     public HttpEntity<?> add(@Valid @RequestBody ProductDto productDto) throws ParseException {
@@ -41,29 +35,12 @@ public class ProductController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-
-
-    /**
-     * PRODUCTNI EDIT QILISH
-     *
-     * @param id
-     * @param productDto
-     * @return ApiResponse(success - > false message - > EDITED)
-     */
     @CheckPermission("EDIT_PRODUCT")
     @PutMapping("{id}")
     public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody ProductDto productDto) {
         ApiResponse apiResponse = productService.editProduct(id, productDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-
-    /**
-     * USERDA TEGISHLI BARCHA PRODUCTLARNI OLIB CHIQISH
-     *
-     * @param
-     * @return ApiResponse(success - > true object - > value)
-     */
 
     @CheckPermission("VIEW_PRODUCT")
     @GetMapping
@@ -72,12 +49,6 @@ public class ProductController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * ID ORQALI BITTA PRODUCTNI YANI MAXSULOTNI OLIB CHIQISH
-     *
-     * @param id
-     * @return ApiResponse(success - > true object - > value)
-     */
     @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/{id}")
     public HttpEntity<?> getOne(@PathVariable UUID id, @CurrentUser User user) {
@@ -85,12 +56,6 @@ public class ProductController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * ID ORQALI DELETE QILSISH
-     *
-     * @param id
-     * @return ApiResponse(success - > true message - > DELETED)
-     */
     @CheckPermission("DELETE_PRODUCT")
     @DeleteMapping("/{id}")
     public HttpEntity<?> deleteOne(@PathVariable UUID id, @CurrentUser User user) {
@@ -98,26 +63,12 @@ public class ProductController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * BIR NECHATA PRODUCTNI KELGAN IDLAR BO'YICHA O'CHIRISH
-     *
-     * @param ids
-     * @return ApiResponse(success - > true message - > DELETED)
-     */
-
     @CheckPermission("DELETE_PRODUCT")
     @DeleteMapping("/delete-few")
-    public HttpEntity<?> deleteFew(@RequestBody List<UUID> ids, @CurrentUser User user) {
+    public HttpEntity<?> deleteFew(@RequestBody List<UUID> ids) {
         ApiResponse apiResponse = productService.deleteProducts(ids);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-    /**
-     * PRODUCTNI BARCODENI OLIB CHIQISH
-     *
-     * @param barcode
-     * @return ApiResponse(success - > true object - > value)
-     */
 
     @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/get-by-barcode/{barcode}")
@@ -126,27 +77,12 @@ public class ProductController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * CATEGORY ID ORQALI MAHSULOTLARNI OLIB CHIQISH
-     *
-     * @param category_id
-     * @return ApiResponse(success - > true object - > value)
-     */
-
     @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/get-by-category/{category_id}")
     public HttpEntity<?> getByCategory(@PathVariable UUID category_id, @CurrentUser User user) {
         ApiResponse apiResponse = productService.getByCategory(category_id, user);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-
-    /**
-     * BRANDIDLAR ORQALI MAHSULOTLARNI OLIB CHIQISH
-     *
-     * @param brand_id
-     * @return ApiResponse(success - > true object - > value)
-     */
     @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/get-by-brand/{brand_id}")
     public HttpEntity<?> getByBrand(@PathVariable UUID brand_id)  {
@@ -154,14 +90,6 @@ public class ProductController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-
-
-    /**
-     * BRANCHGA TEGISHLI BARCHA MAHSULOTLARNI OLIB CHIQISH
-     *
-     * @param branch_id
-     * @return ApiResponse(success - > true object - > value)
-     */
     @CheckPermission("VIEW_PRODUCT")
     @PostMapping("/get-by-branch-and-barcode/{branch_id}")
     public HttpEntity<?> getByBranch(@PathVariable UUID branch_id, @CurrentUser User user, @RequestBody ProductBarcodeDto productBarcodeDto) {
@@ -198,6 +126,50 @@ public class ProductController {
     @GetMapping("/get-all-by-branch/{branchId}")
     public HttpEntity<?> getByBranch(@PathVariable UUID branchId) {
         ApiResponse apiResponse = productService.getByBranchProduct(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_PRODUCT")
+    @GetMapping("/get-purchase-product/{branchId}")
+    public HttpEntity<?> getPurchaseProduct(@PathVariable UUID branchId,
+                                            @RequestParam UUID productId,
+                                            @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
+                                            @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size
+                                          ) {
+        ApiResponse apiResponse = productService.getPurchaseProduct(branchId, productId, page, size);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_PRODUCT")
+    @GetMapping("/get-production-product/{branchId}")
+    public HttpEntity<?> getProductionProduct(@PathVariable UUID branchId,
+                                          @RequestParam UUID productId,
+                                          @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
+                                          @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size
+                                          ) {
+        ApiResponse apiResponse = productService.getProductionProduct(branchId, productId, page, size);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_PRODUCT")
+    @GetMapping("/get-trade-product/{branchId}")
+    public HttpEntity<?> getTradeProduct(@PathVariable UUID branchId,
+                                          @RequestParam UUID productId,
+                                          @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
+                                          @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size
+                                          ) {
+        ApiResponse apiResponse = productService.getTradeProduct(branchId, productId, page, size);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_PRODUCT")
+    @GetMapping("/get-content-production-product/{branchId}")
+    public HttpEntity<?> getContentProduct(@PathVariable UUID branchId,
+                                           @RequestParam UUID productId,
+                                           @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
+                                           @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size
+                                          ) {
+        ApiResponse apiResponse = productService.getContentProduct(branchId, productId, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }

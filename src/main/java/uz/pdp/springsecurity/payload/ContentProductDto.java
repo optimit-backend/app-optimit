@@ -33,9 +33,7 @@ public class ContentProductDto{
     @NotNull
     private double totalPrice;
 
+    /*private UUID ContentProductIdForEditOrNull;
 
-    private UUID ContentProductIdForEditOrNull;
-
-    private boolean delete;
-
+    private boolean delete;*/
 }
