@@ -389,7 +389,7 @@ public class ProjectService {
         } else if (checkingCustomer && checkingExpired) {
             projectList = projectRepository.findAllByCustomerIdAndExpiredTrue(customerId,pageable);
         } else if (checkingType && checkingExpired) {
-            projectList = projectRepository.findAllByProjectTypeAndExpiredTrue(typeId,pageable);
+            projectList = projectRepository.findAllByProjectTypeIdAndExpiredTrue(typeId,pageable);
         } else if (checkingProjectStatus && checkingExpired) {
             projectList = projectRepository.findAllByProjectStatusIdAndExpiredTrue(projectStatusId,pageable);
         } else if (checkingCustomer && checkingProjectStatus) {
