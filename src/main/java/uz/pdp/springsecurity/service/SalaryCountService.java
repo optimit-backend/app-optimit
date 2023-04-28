@@ -89,24 +89,26 @@ public class SalaryCountService {
         return optionalSalaryCount.map(salaryCount -> new ApiResponse(true, salaryCountMapper.toGetDto(salaryCount))).orElseGet(() -> new ApiResponse("SALARY COUNT NOT FOUND", false));
     }
 
-//    public void addForTask(Task task) {
-//        if (task.isGiven()) return;
-//        if (task.getUsers().size() == 0) return;
-//        if (task.getTaskPrice() == 0) return;
-//        task.setGiven(true);
-//        double salarySum = task.isEach() ? task.getTaskPrice() : (task.getTaskPrice() / task.getUsers().size());
-//        for (User user : task.getUsers()) {
-//            Optional<Agreement> optionalAgreement = agreementRepository.findByUserIdAndSalaryStatus(user.getId(), SalaryStatus.KPI);
-//            if (optionalAgreement.isEmpty()) continue;
-//            add(new SalaryCountDto(
-//                    1,
-//                    salarySum,
-//                    optionalAgreement.get().getId(),
-//                    task.getBranch().getId(),
-//                    new Date(),
-//                    "vazifa nomi : " + task.getName()
-//            ));
-//        }
-//        taskRepository.save(task);
-//    }
+    public void addForTask(Task task) {
+        if (task.isGiven()) return;
+        if (task.getTaskPriceList().size() == 0) return;
+        if (task.getTaskPrice() == 0) return;
+        task.setGiven(true);
+        for (TaskPrice taskPrice : task.getTaskPriceList()) {
+            double salarySum = taskPrice.isEach() ? task.getTaskPrice() : (task.getTaskPrice() / taskPrice.getUserList().size());
+            for (User user : taskPrice.getUserList()) {
+                Optional<Agreement> optionalAgreement = agreementRepository.findByUserIdAndSalaryStatus(user.getId(), SalaryStatus.KPI);
+                if (optionalAgreement.isEmpty()) continue;
+                add(new SalaryCountDto(
+                        1,
+                        salarySum,
+                        optionalAgreement.get().getId(),
+                        task.getBranch().getId(),
+                        new Date(),
+                        "vazifa nomi : " + task.getName()
+                ));
+            }
+        }
+        taskRepository.save(task);
+    }
 }
