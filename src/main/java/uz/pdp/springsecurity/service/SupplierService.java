@@ -10,6 +10,7 @@ import uz.pdp.springsecurity.payload.RepaymentDto;
 import uz.pdp.springsecurity.payload.SupplierDto;
 import uz.pdp.springsecurity.repository.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +28,8 @@ public class SupplierService {
     BusinessRepository businessRepository;
     private final PurchaseRepository purchaseRepository;
     private final PaymentStatusRepository paymentStatusRepository;
+    private final PayMethodRepository payMethodRepository;
+    private final BalanceService balanceService;
 
     public ApiResponse add(SupplierDto supplierDto) {
         Optional<Business> optionalBusiness = businessRepository.findById(supplierDto.getBusinessId());
@@ -100,6 +103,20 @@ public class SupplierService {
         if (repaymentDto.getRepayment() != null) {
             supplier.setDebt(supplier.getDebt() - repaymentDto.getRepayment());
             supplierRepository.save(supplier);
+
+            Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findByType("Naqt");
+            List<Branch> allBranch = branchRepository.findAllByBusiness_Id(supplier.getBusiness().getId());
+            Branch branch = null;
+
+            for (Branch branch1 : allBranch) {
+                branch = branch1;
+            }
+            if (optionalPaymentMethod.isPresent()) {
+                List<UUID> paymentMethodList = new ArrayList<>();
+                paymentMethodList.add(optionalPaymentMethod.get().getId());
+                assert branch != null;
+                balanceService.edit(branch.getId(), repaymentDto.getRepayment(), false, paymentMethodList);
+            }
             try {
                 storeRepaymentHelper(repaymentDto.getRepayment(), supplier);
                 return new ApiResponse("Repayment Store !", true);

@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +16,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/business")
+@RequiredArgsConstructor
 public class BusinessController {
 
-    @Autowired
-    BusinessService businessService;
+    private final BusinessService businessService;
 
     /**
      * YANGI BUSINESS QO'SHISH

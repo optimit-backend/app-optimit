@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.entity.Currency;
-import uz.pdp.springsecurity.enums.NotificationType;
-import uz.pdp.springsecurity.enums.Permissions;
-import uz.pdp.springsecurity.enums.StatusTariff;
-import uz.pdp.springsecurity.enums.ValueType;
+import uz.pdp.springsecurity.enums.*;
 import uz.pdp.springsecurity.mapper.AddressMapper;
 import uz.pdp.springsecurity.mapper.BranchMapper;
 import uz.pdp.springsecurity.mapper.BusinessMapper;
@@ -62,6 +59,7 @@ public class BusinessService {
     private final LidStatusRepository lidStatusRepository;
     private final SourceRepository sourceRepository;
     private final LidFieldRepository lidFieldRepository;
+    private final BalanceRepository balanceRepository;
 
     private final static LocalDateTime TODAY = LocalDate.now().atStartOfDay();
     private final static LocalDateTime THIS_WEEK = TODAY.minusDays(TODAY.getDayOfWeek().ordinal());
@@ -175,6 +173,9 @@ public class BusinessService {
         branchIds.add(branch.getId());
         userDto.setBranchId(branchIds);
 
+        BranchService.createBalance(branch, balanceRepository, payMethodRepository);
+
+
         Role admin = new Role();
         admin.setName(Constants.ADMIN);
         admin.setPermissions(businessDto.getPermissionsList());
@@ -199,23 +200,7 @@ public class BusinessService {
             notificationRepository.save(notification);
         }
 
-        TaskStatus taskStatusCompleted = new TaskStatus();
-        taskStatusCompleted.setName("Completed");
-        taskStatusCompleted.setOrginalName("Completed");
-        taskStatusCompleted.setRowNumber(2);
-        taskStatusCompleted.setABoolean(true);
-        taskStatusCompleted.setColor("#04d227");
-        taskStatusCompleted.setBranch(branch);
-        taskStatusRepository.save(taskStatusCompleted);
-
-        TaskStatus taskStatusUncompleted = new TaskStatus();
-        taskStatusUncompleted.setName("Uncompleted");
-        taskStatusUncompleted.setOrginalName("Uncompleted");
-        taskStatusUncompleted.setRowNumber(1);
-        taskStatusUncompleted.setABoolean(true);
-        taskStatusUncompleted.setColor("#FF0000");
-        taskStatusUncompleted.setBranch(branch);
-        taskStatusRepository.save(taskStatusUncompleted);
+        BranchService.createTaskStatus(branch, taskStatusRepository);
 
         ProjectStatus projectStatus1 = new ProjectStatus();
         projectStatus1.setName("Uncompleted");

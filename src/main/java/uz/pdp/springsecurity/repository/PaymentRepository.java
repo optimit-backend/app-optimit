@@ -5,6 +5,7 @@ import uz.pdp.springsecurity.entity.Payment;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface PaymentRepository extends JpaRepository<Payment, UUID> {
@@ -13,6 +14,6 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     List<Payment> findAllByPayMethod_BusinessId(UUID businessId);
     List<Payment> findAllByPayMethodId(UUID businessId);
     List<Payment> findAllByTradeId(UUID tradeId);
-
     boolean existsByTradeId(UUID tradeId);
+
 }

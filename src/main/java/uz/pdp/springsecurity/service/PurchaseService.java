@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PurchaseService {
     @Autowired
     PurchaseRepository purchaseRepository;
@@ -58,6 +60,8 @@ public class PurchaseService {
 
     @Autowired
     WarehouseService warehouseService;
+    private final BalanceService balanceService;
+    private final PayMethodRepository payMethodRepository;
 
 
     public ApiResponse add(PurchaseDto purchaseDto) {
@@ -74,7 +78,7 @@ public class PurchaseService {
         Timestamp createdAt = purchase.getCreatedAt();
         long difference = System.currentTimeMillis() - createdAt.getTime();
         long oneDay = 1000 * 60 * 60 * 24;
-        if (difference > oneDay){
+        if (difference > oneDay) {
             purchase.setEditable(false);
             return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
         }
@@ -123,18 +127,18 @@ public class PurchaseService {
         List<PurchaseProduct> purchaseProductList = new ArrayList<>();
 
         for (PurchaseProductDto purchaseProductDto : purchaseProductDtoList) {
-            if (purchaseProductDto.getPurchaseProductId() == null){
+            if (purchaseProductDto.getPurchaseProductId() == null) {
                 PurchaseProduct purchaseProduct = createOrEditPurchaseProduct(new PurchaseProduct(), purchaseProductDto);
-                if (purchaseProduct == null)continue;
+                if (purchaseProduct == null) continue;
                 purchaseProduct.setPurchase(purchase);
                 purchaseProductRepository.save(purchaseProduct);
                 purchaseProductList.add(purchaseProduct);
                 fifoCalculationService.createPurchaseProduct(purchaseProduct);
                 warehouseService.createOrEditWareHouse(purchaseProduct, purchaseProduct.getPurchasedQuantity());
-            } else if (purchaseProductDto.isDelete()){
-                if(purchaseProductRepository.existsById(purchaseProductDto.getPurchaseProductId())){
+            } else if (purchaseProductDto.isDelete()) {
+                if (purchaseProductRepository.existsById(purchaseProductDto.getPurchaseProductId())) {
                     PurchaseProduct purchaseProduct = purchaseProductRepository.getById(purchaseProductDto.getPurchaseProductId());
-                    warehouseService.createOrEditWareHouse(purchaseProduct, - purchaseProduct.getPurchasedQuantity());
+                    warehouseService.createOrEditWareHouse(purchaseProduct, -purchaseProduct.getPurchasedQuantity());
                     purchaseProductRepository.deleteById(purchaseProductDto.getPurchaseProductId());
                 }
             } else {
@@ -144,7 +148,7 @@ public class PurchaseService {
                 double amount = purchaseProductDto.getPurchasedQuantity() - purchaseProduct.getPurchasedQuantity();
 
                 PurchaseProduct editPurchaseProduct = createOrEditPurchaseProduct(purchaseProduct, purchaseProductDto);
-                if (editPurchaseProduct == null)continue;
+                if (editPurchaseProduct == null) continue;
                 editPurchaseProduct.setPurchase(purchase);
                 purchaseProductList.add(editPurchaseProduct);
 
@@ -157,15 +161,25 @@ public class PurchaseService {
         }
         purchaseProductRepository.saveAll(purchaseProductList);
 
+        List<UUID> payMethodId = new ArrayList<>();
+        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findByType("Naqt");
+        if (optionalPaymentMethod.isPresent()) {
+            payMethodId.add(optionalPaymentMethod.get().getId());
+            for (PurchaseProduct purchaseProduct : purchaseProductList) {
+                balanceService.edit(branch.getId(), purchaseProduct.getTotalSum(), false, payMethodId);
+            }
+        }
+
+
         return new ApiResponse("SUCCESS", true);
     }
 
     private PurchaseProduct createOrEditPurchaseProduct(PurchaseProduct purchaseProduct, PurchaseProductDto purchaseProductDto) {
         //SINGLE TYPE
-        if (purchaseProductDto.getProductId()!=null) {
+        if (purchaseProductDto.getProductId() != null) {
             UUID productId = purchaseProductDto.getProductId();
             Optional<Product> optional = productRepository.findById(productId);
-            if (optional.isEmpty())return null;
+            if (optional.isEmpty()) return null;
             Product product = optional.get();
             product.setSalePrice(purchaseProductDto.getSalePrice());
             product.setBuyPrice(purchaseProductDto.getBuyPrice());
@@ -174,7 +188,7 @@ public class PurchaseService {
         } else {//MANY TYPE
             UUID productTypePriceId = purchaseProductDto.getProductTypePriceId();
             Optional<ProductTypePrice> optional = productTypePriceRepository.findById(productTypePriceId);
-            if (optional.isEmpty())return null;
+            if (optional.isEmpty()) return null;
             ProductTypePrice productTypePrice = optional.get();
             productTypePrice.setBuyPrice(purchaseProductDto.getBuyPrice());
             productTypePrice.setSalePrice(purchaseProductDto.getSalePrice());
@@ -207,6 +221,7 @@ public class PurchaseService {
 
     /**
      * check get one
+     *
      * @param id
      * @return
      */

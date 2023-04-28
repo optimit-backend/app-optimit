@@ -2,22 +2,13 @@ package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Branch;
-import uz.pdp.springsecurity.entity.Outlay;
-import uz.pdp.springsecurity.entity.OutlayCategory;
-import uz.pdp.springsecurity.entity.User;
+import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.OutlayDto;
-import uz.pdp.springsecurity.repository.BranchRepository;
-import uz.pdp.springsecurity.repository.OutlayCategoryRepository;
-import uz.pdp.springsecurity.repository.OutlayRepository;
-import uz.pdp.springsecurity.repository.UserRepository;
+import uz.pdp.springsecurity.repository.*;
 
 import java.sql.Date;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class OutlayService {
@@ -32,6 +23,10 @@ public class OutlayService {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    PayMethodRepository payMethodRepository;
+    @Autowired
+    BalanceService balanceService;
 
     public ApiResponse add(OutlayDto outlayDto) {
         Outlay outlay = new Outlay();
@@ -56,6 +51,15 @@ public class OutlayService {
         outlay.setDate(outlayDto.getDate());
 
         outlayRepository.save(outlay);
+
+        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findByType("Naqt");
+
+        if (optionalPaymentMethod.isPresent()) {
+            List<UUID> paymentMethodList = new ArrayList<>();
+            paymentMethodList.add(optionalPaymentMethod.get().getId());
+            balanceService.edit(optionalBranch.get().getId(), outlayDto.getTotalSum(), false, paymentMethodList);
+        }
+
         return new ApiResponse("ADDED", true);
     }
 

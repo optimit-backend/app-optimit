@@ -17,12 +17,16 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 public class Notification extends AbsEntity {
+
     private String name;
+
     private String message;
+
     @Enumerated(value = EnumType.STRING)
     private NotificationType type;
 
     private UUID objectId;
+
     @ManyToOne
     private User userFrom;
 
@@ -30,5 +34,6 @@ public class Notification extends AbsEntity {
     private User userTo;
 
     private boolean delivery;
+
     private boolean read;
 }
