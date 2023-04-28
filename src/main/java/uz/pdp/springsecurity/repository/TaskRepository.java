@@ -57,5 +57,8 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     int countExpiredTasksByUserId(@Param("userId") UUID userId);
 
     @Query("SELECT COUNT(t) FROM Task t JOIN t.taskPriceList tp JOIN tp.userList u WHERE u.id = :userId")
-    int countTasksByUserId(@Param("userId") UUID userId);
+    List<Task> findAllByTasksByUserId(@Param("userId") UUID userId);
+
+    @Query("SELECT t FROM Task t JOIN t.taskPriceList tp JOIN tp.userList u WHERE u.id = :userId")
+    List<Task> findTasksByUserId(@Param("userId") UUID userId);
 }

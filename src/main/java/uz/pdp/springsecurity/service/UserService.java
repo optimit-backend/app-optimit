@@ -288,7 +288,12 @@ public class UserService {
         projectInfoDto.setExpired(expired);
         userDtoForPatron.setProjectInfoDto(projectInfoDto);
 
-        int taskAmount = taskRepository.countTasksByUserId(userId);
+        int taskAmount = 0;
+
+        List<Task> taskList = taskRepository.findTasksByUserId(userId);
+        Set<Task> taskSet = new HashSet<>(taskList);
+        taskAmount = taskSet.size();
+
         int completed = taskRepository.countTasksByTaskStatusOriginalNameAndUserId( "Completed",userId);
         int expiredIsTrue = taskRepository.countExpiredTasksByUserId(userId);
         TaskInfoGetDto taskInfoGetDto = new TaskInfoGetDto();
