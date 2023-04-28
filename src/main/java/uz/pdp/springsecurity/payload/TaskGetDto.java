@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uz.pdp.springsecurity.entity.TaskPrice;
 import uz.pdp.springsecurity.entity.User;
 
 import java.util.Date;
@@ -24,7 +25,7 @@ public class TaskGetDto {
 
     private Date EndDate;
 
-    private List<User> userList;
+    private List<TaskPrice> taskPriceList;
 
     private UUID taskStatusId;
 
@@ -40,7 +41,6 @@ public class TaskGetDto {
 
     private double taskPrice;
 
-    private boolean isEach;
 
     private UUID branchId;
 }

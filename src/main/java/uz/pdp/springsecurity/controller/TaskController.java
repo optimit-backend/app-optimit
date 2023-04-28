@@ -57,6 +57,7 @@ public class TaskController {
         ApiResponse apiResponse = taskServise.get(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
     @CheckPermission("GET_TASK")
     @GetMapping("/branch/{branchId}")
     public HttpEntity<?> getAll(@PathVariable UUID branchId) {

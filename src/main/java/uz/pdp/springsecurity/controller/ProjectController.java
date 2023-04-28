@@ -48,12 +48,12 @@ public class ProjectController {
         ApiResponse apiResponse = projectService.get(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-//    @CheckPermission("GET_PROJECT")
-//    @GetMapping("/get-one/{id}")
-//    public HttpEntity<?> getOne(@PathVariable UUID id) {
-//        ApiResponse apiResponse = projectService.getOne(id);
-//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-//    }
+    @CheckPermission("GET_PROJECT")
+    @GetMapping("/get-one/{id}")
+    public HttpEntity<?> getOne(@PathVariable UUID id) {
+        ApiResponse apiResponse = projectService.getOne(id);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 
     @CheckPermission("DELETE_PROJECT")
     @DeleteMapping("/{id}")

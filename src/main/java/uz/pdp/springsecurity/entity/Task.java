@@ -19,60 +19,40 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 public class Task extends AbsEntity {
-
     private String name;
-
     @ManyToOne
     private TaskType taskType;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
-
     @ManyToOne
     private Stage stage;
-
     private Date startDate;
-
     private Date EndDate;
-
     private boolean expired;
-
     private Date deadLine;
-
     @ManyToMany
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<TaskPrice> taskPriceList;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private TaskStatus taskStatus;
-
     @Enumerated(EnumType.STRING)
     private Importance importance;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Task dependTask;
-
     @Column(nullable = false)
     private boolean isProductions;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Production production;
-
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Content content;
-
     private double goalAmount;
-
     private double taskPrice;
-
-    private boolean isEach;
     private boolean given = false;
-
     @ManyToOne
     private Branch branch;
 }
