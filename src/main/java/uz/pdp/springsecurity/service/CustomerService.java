@@ -7,10 +7,12 @@ import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.StatusName;
 import uz.pdp.springsecurity.mapper.CustomerMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.BalanceHistoryDto;
 import uz.pdp.springsecurity.payload.CustomerDto;
 import uz.pdp.springsecurity.payload.RepaymentDto;
 import uz.pdp.springsecurity.repository.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +37,9 @@ public class CustomerService {
     private final TradeRepository tradeRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentStatusRepository paymentStatusRepository;
+    private final BalanceRepository balanceRepository;
+    private final BalanceService balanceService;
+    private final PayMethodRepository payMethodRepository;
 
     public ApiResponse add(CustomerDto customerDto) {
 
@@ -74,7 +79,7 @@ public class CustomerService {
             return new ApiResponse("BRANCH NOT FOUND", false);
         }
 
-        if (customerDto.getCustomerGroupId()!=null) {
+        if (customerDto.getCustomerGroupId() != null) {
             Optional<CustomerGroup> optionalCustomerGroup = customerGroupRepository.findById(customerDto.getCustomerGroupId());
             if (optionalCustomerGroup.isEmpty()) {
                 return new ApiResponse("NOT FOUND", false);
@@ -96,10 +101,10 @@ public class CustomerService {
         }
         Customer customer = optional.get();
         CustomerDto customerDto = mapper.toDto(customer);
-        if (customer.getCustomerGroup() != null){
+        if (customer.getCustomerGroup() != null) {
             customerDto.setCustomerGroupId(customer.getCustomerGroup().getId());
         }
-        return new ApiResponse("FOUND", true,customerDto);
+        return new ApiResponse("FOUND", true, customerDto);
     }
 
     public ApiResponse delete(UUID id) {
@@ -129,6 +134,15 @@ public class CustomerService {
             customer.setDebt(customer.getDebt() - repaymentDto.getRepayment());
             customer.setPayDate(repaymentDto.getPayDate());
             customerRepository.save(customer);
+
+            Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findByType("Naqt");
+
+            if (optionalPaymentMethod.isPresent()) {
+                List<UUID> paymentMethodList = new ArrayList<>();
+                paymentMethodList.add(optionalPaymentMethod.get().getId());
+                balanceService.edit(customer.getBranch().getId(), repaymentDto.getRepayment(), true, paymentMethodList);
+            }
+
             try {
                 repaymentHelper(repaymentDto.getRepayment(), customer);
                 return new ApiResponse("Repayment Customer !", true);
@@ -147,21 +161,21 @@ public class CustomerService {
         for (Trade trade : tradeList) {
             List<Payment> paymentList = paymentRepository.findAllByTradeId(trade.getId());
             Payment payment = paymentList.get(0);
-            if (paidSum > trade.getDebtSum()){
+            if (paidSum > trade.getDebtSum()) {
                 paidSum -= trade.getDebtSum();
                 trade.setDebtSum(0);
                 trade.setPaidSum(trade.getTotalSum());
                 trade.setPaymentStatus(tolangan);
                 payment.setPaidSum(payment.getPaidSum() + trade.getDebtSum());
                 paymentRepository.save(payment);
-            }else if (paidSum == trade.getDebtSum()){
+            } else if (paidSum == trade.getDebtSum()) {
                 trade.setDebtSum(0);
                 trade.setPaidSum(trade.getTotalSum());
                 trade.setPaymentStatus(tolangan);
                 payment.setPaidSum(payment.getPaidSum() + trade.getDebtSum());
                 paymentRepository.save(payment);
                 break;
-            }else {
+            } else {
                 trade.setDebtSum(trade.getDebtSum() - paidSum);
                 trade.setPaidSum(trade.getPaidSum() + paidSum);
                 trade.setPaymentStatus(qisman_tolangan);

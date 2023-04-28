@@ -4,13 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Balance;
 import uz.pdp.springsecurity.entity.BalanceHistory;
-import uz.pdp.springsecurity.entity.Branch;
+import uz.pdp.springsecurity.entity.PaymentMethod;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.BalanceDto;
 import uz.pdp.springsecurity.repository.BalanceHistoryRepository;
 import uz.pdp.springsecurity.repository.BalanceRepository;
-import uz.pdp.springsecurity.repository.BranchRepository;
+import uz.pdp.springsecurity.repository.PayMethodRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,67 +20,65 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BalanceService {
     private final BalanceRepository repository;
-    private final BranchRepository branchRepository;
     private final BalanceHistoryRepository balanceHistoryRepository;
+    private final PayMethodRepository payMethodRepository;
 
-    public ApiResponse add(UUID branchId) {
-        Balance balance = repository.findByBranchId(branchId).orElse(null);
-        Branch branch = branchRepository.findById(branchId).orElse(null);
-        if (branch == null) {
-            return new ApiResponse("Branch id must not be null", false);
+    public ApiResponse edit(UUID branchId, Double summa, Boolean isPlus, List<UUID> payMethodId) {
+
+        List<Balance> balanceList = repository.findAllByBranchId(branchId);
+
+
+        if (payMethodId.isEmpty()) {
+            return new ApiResponse("not found pay method", false);
         }
-        if (balance != null) {
-            return new ApiResponse("Balance impossible to create", false);
-        }
-        Balance newBalance = new Balance();
-        newBalance.setBranch(branch);
-        newBalance.setAccountSumma(0);
-        repository.save(newBalance);
-
-        return new ApiResponse("successfully saved", true);
-    }
-
-    public ApiResponse edit(UUID branchId, Double summa) {
-
-        Optional<Balance> optionalBalance = repository.findByBranchId(branchId);
-        Branch branch = branchRepository.findById(branchId).orElse(null);
-
-        if (optionalBalance.isEmpty()) {
+        if (balanceList.isEmpty()) {
             return new ApiResponse("not found Balance", false);
         }
+        for (UUID paymentMethod : payMethodId) {
+            Optional<Balance> optionalBalance = repository.findByPaymentMethod_Id(paymentMethod);
+            if (optionalBalance.isPresent()) {
+                Balance balance = optionalBalance.get();
+                if (summa > 0) {
+                    BalanceHistory newBalanceHistory = new BalanceHistory();
+                    newBalanceHistory.setBalance(balance);
+                    newBalanceHistory.setAccountSumma(balance.getAccountSumma());
+                    newBalanceHistory.setTotalSumma(balance.getAccountSumma() + summa);
 
-        Balance balance = optionalBalance.get();
+                    if (isPlus) {
+                        balance.setAccountSumma(balance.getAccountSumma() + summa);
+                    } else {
+                        balance.setAccountSumma(balance.getAccountSumma() - summa);
+                    }
+                    newBalanceHistory.setPlus(isPlus);
 
-        if (summa > 0) {
+                    balanceHistoryRepository.save(newBalanceHistory);
+                    repository.save(balance);
 
-            BalanceHistory newBalanceHistory = new BalanceHistory();
-            newBalanceHistory.setPlus(true);
-            newBalanceHistory.setBranch(branch);
-            newBalanceHistory.setAccountSumma(balance.getAccountSumma());
-            newBalanceHistory.setTotalSumma(balance.getAccountSumma() + summa);
-
-            balance.setAccountSumma(balance.getAccountSumma() + summa);
-
-            balanceHistoryRepository.save(newBalanceHistory);
-            repository.save(balance);
-
-            return new ApiResponse("successfully saved", true);
+                    return new ApiResponse("successfully saved", true);
+                }
+                break;
+            }
         }
         return new ApiResponse("Must not be a number less than 0", false);
     }
 
     public ApiResponse getAll(UUID branchId) {
-        Optional<Balance> optionalBalance = repository.findByBranchId(branchId);
-        if (optionalBalance.isEmpty()) {
+        List<Balance> balanceList = repository.findAllByBranchId(branchId);
+        if (balanceList.isEmpty()) {
             return new ApiResponse("not found balance by branch id", false);
         }
 
-        Balance balance = optionalBalance.get();
+        List<BalanceDto> balanceDtoList = new ArrayList<>();
+        for (Balance balance : balanceList) {
+            BalanceDto balanceDto = new BalanceDto();
+            balanceDto.setBalanceSumma(balance.getAccountSumma());
+            balanceDto.setBranchName(balance.getBranch().getName());
+            balanceDto.setBranchId(balance.getBranch().getId());
+            balanceDto.setPayMethodName(balance.getPaymentMethod().getType());
+            balanceDto.setPaymentMethodId(balance.getPaymentMethod().getId());
+            balanceDtoList.add(balanceDto);
+        }
 
-        BalanceDto balanceDto = new BalanceDto();
-        balanceDto.setBalanceSumma(balance.getAccountSumma());
-        balanceDto.setBranchName(balance.getBranch().getName());
-
-        return new ApiResponse("found", true, balanceDto);
+        return new ApiResponse("found", true, balanceDtoList);
     }
 }

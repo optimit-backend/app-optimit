@@ -11,6 +11,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class BalanceDto {
     private double balanceSumma;
+    private UUID PaymentMethodId;
+    private String payMethodName;
     private UUID branchId;
     private String branchName;
 }

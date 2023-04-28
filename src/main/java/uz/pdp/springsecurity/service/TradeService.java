@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Customer;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.BalanceType;
 import uz.pdp.springsecurity.enums.SalaryStatus;
 import uz.pdp.springsecurity.mapper.PaymentMapper;
 import uz.pdp.springsecurity.payload.*;
@@ -15,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -74,6 +74,9 @@ public class TradeService {
     private final PaymentRepository paymentRepository;
     private final SalaryCountService salaryCountService;
     private final AgreementRepository agreementRepository;
+    private final BalanceRepository balanceRepository;
+    private final BalanceHistoryRepository balanceHistoryRepository;
+    private final BalanceService balanceService;
 
     @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
@@ -301,6 +304,13 @@ public class TradeService {
                 ));
             }
         }
+        List<UUID> paymentIdList = new ArrayList<>();
+        for (PaymentDto paymentDto : tradeDTO.getPaymentDtoList()) {
+            Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(paymentDto.getPaymentMethodId());
+            optionalPaymentMethod.ifPresent(paymentMethod -> paymentIdList.add(paymentMethod.getId()));
+        }
+
+        balanceService.edit(branch.getId(), trade.getTotalSum(), true, paymentIdList);
         return new ApiResponse("SAVED!", true);
     }
 
@@ -425,8 +435,8 @@ public class TradeService {
     public ApiResponse getTradeByTrader(UUID branchId) {
 
         List<TradeProduct> tradeList = tradeProductRepository.findAllByTrade_BranchId(branchId);
-        if (tradeList.isEmpty()){
-            return new ApiResponse("Not Found",false);
+        if (tradeList.isEmpty()) {
+            return new ApiResponse("Not Found", false);
         }
 
         Map<UUID, Double> traderQuantities = new HashMap<>();
@@ -444,15 +454,15 @@ public class TradeService {
             UUID traderId = entry.getKey();
             Optional<User> optionalUser = userRepository.findById(traderId);
             UUID photoId = null;
-            if (optionalUser.isPresent()){
+            if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
                 photoId = user.getPhoto().getId();
             }
             String traderName = tradeRepository.getTraderNameById(traderId);
             Double quantitySold = entry.getValue();
-            if (photoId!=null){
-                traderDtos.add(new TraderDto(traderId,photoId, traderName, quantitySold));
-            }else {
+            if (photoId != null) {
+                traderDtos.add(new TraderDto(traderId, photoId, traderName, quantitySold));
+            } else {
                 traderDtos.add(new TraderDto(traderId, traderName, quantitySold));
             }
         }
@@ -460,7 +470,7 @@ public class TradeService {
                 .sorted(Comparator.comparingDouble(TraderDto::getQuantitySold).reversed())
                 .toList();
 
-        return new ApiResponse("Found",true,sortedTraders);
+        return new ApiResponse("Found", true, sortedTraders);
     }
 
 //    private Trade generateTradeByActiveCourse(Trade trade){
