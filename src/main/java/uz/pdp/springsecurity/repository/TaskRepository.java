@@ -3,6 +3,8 @@ package uz.pdp.springsecurity.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import uz.pdp.springsecurity.entity.Task;
 
 import java.util.List;
@@ -45,4 +47,15 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     Page<Task> findAllByTaskStatusId(UUID statusId, Pageable pageable);
 
     Page<Task> findAllByProjectIdAndExpiredTrue(UUID projectId, Pageable pageable);
+
+
+    @Query("SELECT COUNT(t) FROM Task t JOIN t.taskStatus ts JOIN t.taskPriceList tp JOIN tp.userList u WHERE ts.orginalName = :taskStatusOriginalName AND u.id = :userId")
+    int countTasksByTaskStatusOriginalNameAndUserId(@Param("taskStatusOriginalName") String taskStatusOriginalName, @Param("userId") UUID userId);
+
+
+    @Query("SELECT COUNT(t) FROM Task t JOIN t.taskPriceList tp JOIN tp.userList u WHERE t.expired = true AND u.id = :userId")
+    int countExpiredTasksByUserId(@Param("userId") UUID userId);
+
+    @Query("SELECT COUNT(t) FROM Task t JOIN t.taskPriceList tp JOIN tp.userList u WHERE u.id = :userId")
+    int countTasksByUserId(@Param("userId") UUID userId);
 }
