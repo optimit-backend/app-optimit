@@ -201,7 +201,14 @@ public class TaskServise {
         if (task.getTaskStatus().getOrginalName() != null && task.getTaskStatus().getOrginalName().equals("Completed")) {
             return new ApiResponse("You can not change this task !", false);
         }
-
+        if (taskStatus.getOrginalName() != null && taskStatus.getOrginalName().equals("Completed")) {
+            Date deadline = task.getDeadLine();
+            Date endDate = new Date();
+            task.setExpired(!deadline.after(endDate));
+            task.setEndDate(endDate);
+            salaryCountService.addForTask(task);
+            prizeService.addForTask(task);
+        }
         task.setTaskStatus(taskStatus);
         taskRepository.save(task);
         return new ApiResponse("Edited", true);
