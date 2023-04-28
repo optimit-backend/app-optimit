@@ -95,10 +95,10 @@ public class SalaryCountService {
         if (task.getTaskPrice() == 0) return;
         task.setGiven(true);
         for (TaskPrice taskPrice : task.getTaskPriceList()) {
-            double salarySum = taskPrice.isEach() ? task.getTaskPrice() : (task.getTaskPrice() / taskPrice.getUserList().size());
+            double salarySum = taskPrice.isEach() ? taskPrice.getPrice() : (taskPrice.getPrice() / taskPrice.getUserList().size());
             for (User user : taskPrice.getUserList()) {
                 Optional<Agreement> optionalAgreement = agreementRepository.findByUserIdAndSalaryStatus(user.getId(), SalaryStatus.KPI);
-                if (optionalAgreement.isEmpty()) continue;
+                if (optionalAgreement.isEmpty() || salarySum == 0) continue;
                 add(new SalaryCountDto(
                         1,
                         salarySum,
