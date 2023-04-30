@@ -78,10 +78,11 @@ public class TaskController {
                                         @RequestParam(required = false) UUID projectId,
                                         @RequestParam(required = false) UUID statusId,
                                         @RequestParam(required = false) UUID typeId,
+                                        @RequestParam(required = false) UUID userId,
                                         @RequestParam(required = false) Date expired,
                                         @RequestParam(defaultValue = "0", required = false) int page,
                                         @RequestParam(defaultValue = "10", required = false) int size) {
-        ApiResponse apiResponse = taskServise.getAllByBranchId(branchId,projectId,statusId,typeId,expired,page,size);
+        ApiResponse apiResponse = taskServise.getAllByBranchId(branchId,projectId,statusId,typeId,userId,expired,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

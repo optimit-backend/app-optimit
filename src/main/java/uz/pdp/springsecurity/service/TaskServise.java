@@ -314,12 +314,13 @@ public class TaskServise {
         return new ApiResponse("Found", true, taskList);
     }
 
-    public ApiResponse getAllByBranchId(UUID branchId, UUID projectId, UUID statusId, UUID typeId, Date expired, int page, int size) {
+    public ApiResponse getAllByBranchId(UUID branchId, UUID projectId, UUID statusId, UUID typeId,UUID userId, Date expired, int page, int size) {
 
         Page<Task> tasks = null;
         Pageable pageable = PageRequest.of(page, size);
-
-        if (projectId != null && statusId != null && typeId != null) {
+        if (userId!=null){
+            tasks = taskRepository.findAllByTaskPriceList_UserList_Id(userId,pageable);
+        }else if (projectId != null && statusId != null && typeId != null) {
             tasks = taskRepository.findAllByProjectIdAndTaskStatusIdAndTaskTypeIdAndExpiredTrue(projectId,statusId,typeId,pageable);
         } else if (statusId != null && typeId != null) {
             tasks = taskRepository.findAllByTaskStatusIdAndTaskTypeIdAndExpiredTrue(statusId,typeId,pageable);

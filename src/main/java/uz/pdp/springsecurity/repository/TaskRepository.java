@@ -24,6 +24,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     int countAllByStageId(UUID stage_id);
     int countAllByStageIdAndTaskStatus_OrginalName(UUID stage_id, String taskStatus_orginalName);
     Page<Task> findAllByBranch_Id(UUID branch_id, Pageable pageable);
+    Page<Task> findAllByTaskPriceList_UserList_Id(UUID userId, Pageable pageable);
     Page<Task> findAllByProjectIdAndTaskStatusIdAndTaskTypeIdAndExpiredTrue(UUID project_id, UUID taskStatus_id, UUID taskType_id, Pageable pageable);
     List<Task> findAllByProjectId(UUID project_id);
     Page<Task> findAllByProject_Id(UUID project_id,Pageable pageable);
