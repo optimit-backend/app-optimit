@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.geo.GeoPage;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.Importance;
@@ -239,7 +241,7 @@ public class TaskServise {
         return new ApiResponse("Deleted", true);
     }
 
-    public ApiResponse getAllByBranchIdPageable(UUID branchId, Map<String, String> params, UUID projectId, UUID typeId, Date expired) {
+    public ApiResponse getAllByBranchIdPageable(UUID branchId, Map<String, String> params, UUID projectId, UUID typeId,UUID userId, Date expired) {
 
         boolean checkingProject = false;
         boolean checkingType = false;
@@ -273,22 +275,42 @@ public class TaskServise {
 
             Pageable pageable = PageRequest.of(0, Objects.requireNonNullElse(integer, 5));
 
-            if (checkingProject && checkingType && checkingExpired) {
-                allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndTaskTypeIdAndExpiredTrue(status.getId(),projectId, typeId,pageable);
-            } else if (checkingProject && checkingType) {
-                allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndTaskTypeId(status.getId(),projectId,typeId,pageable);
-            } else if (checkingProject && checkingExpired) {
-                allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndExpiredTrue(status.getId(),projectId,pageable);
-            } else if (checkingType && checkingExpired) {
-                allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeIdAndExpiredTrue(status.getId(),typeId, pageable);
-            } else if (checkingProject) {
-                allTask = taskRepository.findAllByTaskStatusIdAndProject_Id(status.getId(),projectId,pageable);
-            } else if (checkingType) {
-                allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeId(status.getId(),typeId, pageable);
-            } else if (checkingExpired) {
-                allTask = taskRepository.findAllByTaskStatusIdAndExpiredTrue(status.getId(), pageable);
-            } else {
-                allTask = taskRepository.findAllByTaskStatus_Id(status.getId(), pageable);
+            if (userId==null) {
+                if (checkingProject && checkingType && checkingExpired) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndTaskTypeIdAndExpiredTrue(status.getId(), projectId, typeId, pageable);
+                } else if (checkingProject && checkingType) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndTaskTypeId(status.getId(), projectId, typeId, pageable);
+                } else if (checkingProject && checkingExpired) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndExpiredTrue(status.getId(), projectId, pageable);
+                } else if (checkingType && checkingExpired) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeIdAndExpiredTrue(status.getId(), typeId, pageable);
+                } else if (checkingProject) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndProject_Id(status.getId(), projectId, pageable);
+                } else if (checkingType) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeId(status.getId(), typeId, pageable);
+                } else if (checkingExpired) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndExpiredTrue(status.getId(), pageable);
+                } else {
+                    allTask = taskRepository.findAllByTaskStatus_Id(status.getId(), pageable);
+                }
+            }else {
+                if (checkingProject && checkingType && checkingExpired) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndTaskTypeIdAndExpiredTrueAndTaskPriceList_UserList_Id(status.getId(),projectId,typeId,userId,pageable);
+                } else if (checkingProject && checkingType) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndTaskTypeIdAndTaskPriceList_UserList_Id(status.getId(), projectId, typeId,userId, pageable);
+                } else if (checkingProject && checkingExpired) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndProjectIdAndExpiredTrueAndTaskPriceList_UserList_Id(status.getId(), projectId,userId, pageable);
+                } else if (checkingType && checkingExpired) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeIdAndExpiredTrueAndTaskPriceList_UserList_Id(status.getId(), typeId,userId, pageable);
+                } else if (checkingProject) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndProject_IdAndTaskPriceList_UserList_Id(status.getId(),projectId,userId,pageable);
+                } else if (checkingType) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndTaskTypeIdAndTaskPriceList_UserList_Id(status.getId(),typeId,userId,pageable);
+                } else if (checkingExpired) {
+                    allTask = taskRepository.findAllByTaskStatusIdAndExpiredTrueAndTaskPriceList_UserList_Id(status.getId(),userId, pageable);
+                } else {
+                    allTask = taskRepository.findAllByTaskStatus_IdAndTaskPriceList_UserList_Id(status.getId(),userId, pageable);
+                }
             }
 
             List<TaskGetDto> taskGetDtoList = taskMapper.toDto(allTask.toList());
@@ -307,6 +329,7 @@ public class TaskServise {
     }
 
     public ApiResponse getAllByProjectId(UUID projectId) {
+
         List<Task> taskList = taskRepository.findAllByProjectId(projectId);
         if (taskList.isEmpty()) {
             return new ApiResponse("Not Found", false);
@@ -360,12 +383,18 @@ public class TaskServise {
         return new ApiResponse("Found",true,taskList);
     }
 
-    public ApiResponse searchByName(String name,int page, int size) {
+    public ApiResponse searchByName(String name,int page, int size,UUID userId) {
         Pageable pageable = PageRequest.of(page, size);
         String[] words = name.split("\\s+");
         Page<Task> taskPage = null;
-        for (String word : words) {
-            taskPage = taskRepository.findByNameContainingIgnoreCase(word, pageable);
+        if (userId==null) {
+            for (String word : words) {
+                taskPage = taskRepository.findByNameContainingIgnoreCase(word, pageable);
+            }
+        }else {
+            for (String word : words) {
+                taskPage = taskRepository.findByNameContainingIgnoreCaseAndTaskPriceList_UserList_Id(word, userId,pageable);
+            }
         }
         if (taskPage==null){
             return new ApiResponse("Not Found",false);

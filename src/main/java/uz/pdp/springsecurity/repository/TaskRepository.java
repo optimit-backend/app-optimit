@@ -30,9 +30,12 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     Page<Task> findAllByProject_Id(UUID project_id,Pageable pageable);
     List<Task> findAllByBranchId(UUID branch_id);
     Page<Task> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Task> findByNameContainingIgnoreCaseAndTaskPriceList_UserList_Id(String name, UUID user_id, Pageable pageable);
     Page<Task> findAllByTaskStatus_Id(UUID project_id, Pageable pageable);
     Page<Task> findAllByTaskStatusIdAndProjectIdAndTaskTypeIdAndExpiredTrue(UUID taskStatus_id, UUID project_id, UUID taskType_id, Pageable pageable);
+    Page<Task> findAllByTaskStatusIdAndProjectIdAndTaskTypeIdAndExpiredTrueAndTaskPriceList_UserList_Id(UUID taskStatus_id, UUID project_id, UUID taskType_id, UUID taskPriceList_userList_id, Pageable pageable);
     Page<Task> findAllByTaskStatusIdAndProjectIdAndTaskTypeId(UUID id, UUID projectId, UUID typeId, Pageable pageable);
+    Page<Task> findAllByTaskStatusIdAndProjectIdAndTaskTypeIdAndTaskPriceList_UserList_Id(UUID id, UUID projectId, UUID typeId,UUID userId, Pageable pageable);
     Page<Task> findAllByTaskStatusIdAndProjectIdAndExpiredTrue(UUID id, UUID projectId, Pageable pageable);
     Page<Task> findAllByTaskStatusIdAndProject_Id(UUID id, UUID projectId, Pageable pageable);
     Page<Task> findAllByTaskStatusIdAndTaskTypeId(UUID id, UUID typeId, Pageable pageable);
@@ -62,4 +65,11 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
 
     @Query("SELECT t FROM Task t JOIN t.taskPriceList tp JOIN tp.userList u WHERE u.id = :userId")
     List<Task> findTasksByUserId(@Param("userId") UUID userId);
+
+    Page<Task> findAllByTaskStatusIdAndProjectIdAndExpiredTrueAndTaskPriceList_UserList_Id(UUID taskStatus_id, UUID project_id, UUID taskPriceList_userList_id, Pageable pageable);
+    Page<Task> findAllByTaskStatusIdAndTaskTypeIdAndExpiredTrueAndTaskPriceList_UserList_Id(UUID id, UUID typeId,UUID userId, Pageable pageable);
+    Page<Task> findAllByTaskStatusIdAndProject_IdAndTaskPriceList_UserList_Id(UUID taskStatus_id, UUID project_id, UUID taskPriceList_userList_id, Pageable pageable);
+    Page<Task> findAllByTaskStatusIdAndTaskTypeIdAndTaskPriceList_UserList_Id(UUID taskStatus_id, UUID taskType_id, UUID taskPriceList_userList_id, Pageable pageable);
+    Page<Task> findAllByTaskStatusIdAndExpiredTrueAndTaskPriceList_UserList_Id(UUID id,UUID userId, Pageable pageable);
+    Page<Task> findAllByTaskStatus_IdAndTaskPriceList_UserList_Id(UUID id,UUID userId, Pageable pageable);
 }
