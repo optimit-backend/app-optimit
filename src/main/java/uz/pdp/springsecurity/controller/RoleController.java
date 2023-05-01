@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -77,14 +78,14 @@ public class RoleController {
      * @param business_id
      * @return ApiResponse(success - > true, message - > FOUND)
      */
-    @CheckPermission("VIEW_ORG")
+    @CheckPermission("VIEW_ROLE")
     @GetMapping("/get-by-business/{business_id}")
     public HttpEntity<?> getAllByBusiness(@PathVariable UUID business_id) {
         ApiResponse apiResponse = roleService.getAllByBusiness(business_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("VIEW_ROLE_ADMIN")
+    @PreAuthorize("hasRole('VIEW_ROLE') or hasRole('VIEW_ORG')")
     @GetMapping("/get-by-business-role/{business_id}")
     public HttpEntity<?> getByBusinessRole(@PathVariable UUID business_id) {
         ApiResponse apiResponse = roleService.getByBusinessRole(business_id);

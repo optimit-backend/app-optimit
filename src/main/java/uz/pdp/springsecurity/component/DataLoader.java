@@ -368,6 +368,7 @@ public class DataLoader implements CommandLineRunner {
                                     POST_EXCEL,
 
                                     VIEW_INFO,
+                                    VIEW_INFO_ADMIN,
 
 
                                     CREATE_CONTENT,
@@ -581,6 +582,7 @@ public class DataLoader implements CommandLineRunner {
                             POST_EXCEL,
 
                             VIEW_INFO,
+                            VIEW_INFO_ADMIN,
 
                             GET_BUSINESS_ALL_AMOUNT,
 

@@ -53,7 +53,6 @@ public class SupplierController {
 
     /**
      * ID ORQALI BITTA TA'MINOTCHINI OLIB CHIQISH
-     *
      * @param id
      * @return ApiResponse(success - > true, message - > FOUND)
      */
@@ -83,13 +82,12 @@ public class SupplierController {
      * @Id businessId
      * @return ApiResponse(success - > true, message - > FOUND)
      */
-    @CheckPermission("VIEW_SUPPLIER_ADMIN")
+    @CheckPermission("VIEW_SUPPLIER")
     @GetMapping("/get-by-business/{businessId}")
     public HttpEntity<?> getAllByBusiness(@PathVariable UUID businessId) {
         ApiResponse apiResponse = supplierService.getAllByBusiness(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
     /**
      * DO'KON QARZINI TO'LASHI
      */

@@ -144,6 +144,74 @@ public class InfoService {
 
     }
 
+    public ApiResponse getInfoByBusiness(UUID businessId, String date, Date startDate, Date endDate) {
+
+        Optional<Business> optionalBusiness = businessRepository.findById(businessId);
+        if (optionalBusiness.isEmpty()) {
+            return new ApiResponse("Branch Not Found", false);
+        }
+
+        Timestamp from = Timestamp.valueOf(TODAY_START);
+        Timestamp to = new Timestamp(System.currentTimeMillis());
+        if (startDate != null && endDate != null) {
+            from = new Timestamp(startDate.getTime());
+            to = new Timestamp(endDate.getTime());
+        }
+        if (Objects.equals(date, "LAST_DAY") && startDate == null && endDate == null) {
+            from = Timestamp.valueOf(START_OF_DAY);
+            to = Timestamp.valueOf(END_OF_DAY);
+        } else if (Objects.equals(date, "LAST_WEEK") && startDate == null && endDate == null) {
+            from = Timestamp.valueOf(LocalDateTime.now().minusDays(7));
+            to = Timestamp.valueOf(LocalDateTime.now());
+        } else if (Objects.equals(date, "LAST_THIRTY_DAY") && startDate == null && endDate == null) {
+            from = Timestamp.valueOf(LAST_MONTH);
+            to = Timestamp.valueOf(LocalDateTime.now());
+        } else if (Objects.equals(date, "LAST_MONTH") && startDate == null && endDate == null) {
+            from = Timestamp.valueOf(START_OF_MONTH);
+            to = Timestamp.valueOf(END_OF_MONTH);
+        } else if (Objects.equals(date, "THIS_MONTH") && startDate == null && endDate == null) {
+            from = Timestamp.valueOf(THIS_MONTH);
+            to = Timestamp.valueOf(LocalDateTime.now());
+        } else if (Objects.equals(date, "LAST_YEAR") && startDate == null && endDate == null) {
+            from = Timestamp.valueOf(START_OF_YEAR);
+            to = Timestamp.valueOf(END_OF_YEAR);
+        } else if (Objects.equals(date, "THIS_YEAR") && startDate == null && endDate == null) {
+            from = Timestamp.valueOf(START_OF_YEAR_FOR_THIS);
+            to = Timestamp.valueOf(LocalDateTime.now());
+        } else if (startDate != null && endDate != null && date == null) {
+            from = new Timestamp(startDate.getTime());
+            to = new Timestamp(endDate.getTime());
+        } else if (Objects.equals(date, "TODAY")) {
+            Date end = new Date();
+            LocalDate start= LocalDate.now().atStartOfDay().toLocalDate();
+            from = new Timestamp(start.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000);
+            to = new Timestamp(end.getTime());
+        }
+
+        if (Objects.equals(date, "ALL") && startDate == null && endDate == null) {
+            return getInfoHelper(
+                    businessId,
+                    purchaseRepository.findAllByBranch_BusinessId(businessId),
+                    tradeRepository.findAllByBranch_BusinessId(businessId),
+                    outlayRepository.findAllByBusinessId(businessId),
+                    paymentRepository.findAllByTrade_Branch_BusinessId(businessId),
+                    outlayRepository.findAllByCreatedAtBetweenAndBranch_BusinessId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), businessId),
+                    customerRepository.findAllByBranch_BusinessIdAndDebtIsNotOrderByPayDateAsc(businessId, 0d)
+            );
+        }
+
+        return getInfoHelper(
+                businessId,
+                purchaseRepository.findAllByCreatedAtBetweenAndBranch_BusinessId(from, to, businessId),
+                tradeRepository.findAllByCreatedAtBetweenAndBranch_BusinessId(from, to, businessId),
+                outlayRepository.findAllByCreatedAtBetweenAndBranch_BusinessId(from, to, businessId),
+                paymentRepository.findAllByCreatedAtBetweenAndTrade_Branch_BusinessId(from, to, businessId),
+                outlayRepository.findAllByCreatedAtBetweenAndBranch_BusinessId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), businessId),
+                customerRepository.findAllByBranch_BusinessIdAndDebtIsNotOrderByPayDateAsc(businessId, 0d)
+        );
+
+    }
+
     private ApiResponse getInfoHelper(
             UUID businessId,
             List<Purchase> purchaseList,
