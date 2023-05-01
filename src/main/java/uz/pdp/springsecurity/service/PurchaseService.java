@@ -66,7 +66,7 @@ public class PurchaseService {
 
     public ApiResponse add(PurchaseDto purchaseDto) {
         Purchase purchase = new Purchase();
-        return createOrEditPurchase(purchase, purchaseDto);
+        return createOrEditPurchase(false, purchase, purchaseDto);
     }
 
     public ApiResponse edit(UUID id, PurchaseDto purchaseDto) {
@@ -82,10 +82,20 @@ public class PurchaseService {
             purchase.setEditable(false);
             return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
         }
-        return createOrEditPurchase(purchase, purchaseDto);
+        return createOrEditPurchase(true, purchase, purchaseDto);
     }
 
-    private ApiResponse createOrEditPurchase(Purchase purchase, PurchaseDto purchaseDto) {
+    private ApiResponse createOrEditPurchase(boolean isEdit, Purchase purchase, PurchaseDto purchaseDto) {
+
+        double oldSumma = 0;
+        UUID payMethodId = null;
+        if (isEdit) {
+            if (purchase.getPaidSum() >= 0) {
+                oldSumma = purchase.getPaidSum();
+            }
+            payMethodId = purchase.getPaymentMethod().getId();
+        }
+
         Optional<Supplier> optionalSupplier = supplierRepository.findById(purchaseDto.getSupplerId());
         if (optionalSupplier.isEmpty()) return new ApiResponse("SUPPLIER NOT FOUND", false);
         Supplier supplier = optionalSupplier.get();
@@ -108,6 +118,13 @@ public class PurchaseService {
         Branch branch = optionalBranch.get();
         purchase.setBranch(branch);
 
+        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(purchaseDto.getPaymentMethodId());
+        if (optionalPaymentMethod.isEmpty()) {
+            return new ApiResponse("NOT FOUND PAYMENT METHOD", false);
+        }
+        PaymentMethod paymentMethod = optionalPaymentMethod.get();
+        purchase.setPaymentMethod(paymentMethod);
+
         double debtSum = purchase.getDebtSum();
         if (purchaseDto.getDebtSum() > 0 || debtSum != purchase.getDebtSum()) {
             supplier.setDebt(supplier.getDebt() - debtSum + purchaseDto.getDebtSum());
@@ -120,6 +137,7 @@ public class PurchaseService {
         purchase.setDeliveryPrice(purchaseDto.getDeliveryPrice());
         purchase.setDate(purchaseDto.getDate());
         purchase.setDescription(purchaseDto.getDescription());
+
 
         purchaseRepository.save(purchase);
 
@@ -161,15 +179,20 @@ public class PurchaseService {
         }
         purchaseProductRepository.saveAll(purchaseProductList);
 
-        List<UUID> payMethodId = new ArrayList<>();
-        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findByType("Naqt");
-        if (optionalPaymentMethod.isPresent()) {
-            payMethodId.add(optionalPaymentMethod.get().getId());
-            for (PurchaseProduct purchaseProduct : purchaseProductList) {
-                balanceService.edit(branch.getId(), purchaseProduct.getTotalSum(), false, payMethodId);
+
+        if (isEdit) {
+            if (purchaseDto.getPaidSum() > 0) {
+                List<UUID> payMethodIds = new ArrayList<>();
+                payMethodIds.add(payMethodId);
+                balanceService.edit(branch.getId(), oldSumma, true, payMethodIds);
             }
         }
 
+        List<UUID> payMethodIds = new ArrayList<>();
+        if (purchaseDto.getPaidSum() > 0) {
+            payMethodIds.add(purchaseDto.getPaymentMethodId());
+            balanceService.edit(branch.getId(), purchaseDto.getPaidSum(), false, payMethodIds);
+        }
 
         return new ApiResponse("SUCCESS", true);
     }
