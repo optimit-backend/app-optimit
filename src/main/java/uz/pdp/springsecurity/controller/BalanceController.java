@@ -5,12 +5,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
-import uz.pdp.springsecurity.enums.BalanceType;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.BalancePostDto;
 import uz.pdp.springsecurity.service.BalanceService;
 
-import javax.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,10 +19,9 @@ public class BalanceController {
 
     @CheckPermission("EDIT_BALANCE")
     @PutMapping("/{branchId}")
-    public HttpEntity<?> edit(@PathVariable UUID branchId,
-                              @Valid @RequestBody Double summa,
-                              @RequestBody List<UUID> payMethodId) {
-        ApiResponse apiResponse = balanceService.edit(branchId, summa, true, payMethodId);
+    public HttpEntity<?> edit(@PathVariable UUID branchId, @RequestBody BalancePostDto balancePostDto) {
+
+        ApiResponse apiResponse = balanceService.edit(branchId, balancePostDto.getSumma(), true, balancePostDto.getPayMethodId());
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

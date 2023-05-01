@@ -26,6 +26,9 @@ public class Purchase extends AbsEntity {
     @ManyToOne
     private PaymentStatus paymentStatus;
     @ManyToOne
+    private PaymentMethod paymentMethod;
+
+    @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
     private Date date;
@@ -35,4 +38,6 @@ public class Purchase extends AbsEntity {
     private double paidSum;
     private double debtSum = 0;
     private boolean editable = true;
+
+
 }

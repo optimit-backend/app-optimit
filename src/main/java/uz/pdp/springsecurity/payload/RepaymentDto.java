@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 public class RepaymentDto {
@@ -11,4 +12,8 @@ public class RepaymentDto {
     private Double repayment;
 
     private Date payDate;
+
+    private UUID paymentMethodId;
+
+    private UUID branchId;
 }

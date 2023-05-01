@@ -103,22 +103,13 @@ public class SupplierService {
         if (repaymentDto.getRepayment() != null) {
             supplier.setDebt(supplier.getDebt() - repaymentDto.getRepayment());
             supplierRepository.save(supplier);
-
-            Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findByType("Naqt");
-            List<Branch> allBranch = branchRepository.findAllByBusiness_Id(supplier.getBusiness().getId());
-            Branch branch = null;
-
-            for (Branch branch1 : allBranch) {
-                branch = branch1;
-            }
-            if (optionalPaymentMethod.isPresent()) {
-                List<UUID> paymentMethodList = new ArrayList<>();
-                paymentMethodList.add(optionalPaymentMethod.get().getId());
-                assert branch != null;
-                balanceService.edit(branch.getId(), repaymentDto.getRepayment(), false, paymentMethodList);
-            }
             try {
                 storeRepaymentHelper(repaymentDto.getRepayment(), supplier);
+                //balancega qo'shish
+                List<UUID> paymentMethodList = new ArrayList<>();
+                paymentMethodList.add(repaymentDto.getPaymentMethodId());
+                balanceService.edit(repaymentDto.getBranchId(), repaymentDto.getRepayment(), false, paymentMethodList);
+
                 return new ApiResponse("Repayment Store !", true);
             } catch (Exception e) {
                 return new ApiResponse("ERROR", false);
@@ -133,17 +124,17 @@ public class SupplierService {
         PaymentStatus qisman_tolangan = paymentStatusRepository.findByStatus(StatusName.QISMAN_TOLANGAN.name());
         List<Purchase> purchaseList = purchaseRepository.findAllBySupplierId(supplier.getId());
         for (Purchase purchase : purchaseList) {
-            if (paidSum > purchase.getDebtSum()){
+            if (paidSum > purchase.getDebtSum()) {
                 paidSum -= purchase.getDebtSum();
                 purchase.setDebtSum(0);
                 purchase.setPaidSum(purchase.getTotalSum());
                 purchase.setPaymentStatus(tolangan);
-            }else if (paidSum == purchase.getDebtSum()){
+            } else if (paidSum == purchase.getDebtSum()) {
                 purchase.setDebtSum(0);
                 purchase.setPaidSum(purchase.getTotalSum());
                 purchase.setPaymentStatus(tolangan);
                 break;
-            }else {
+            } else {
                 purchase.setDebtSum(purchase.getDebtSum() - paidSum);
                 purchase.setPaidSum(purchase.getPaidSum() + paidSum);
                 purchase.setPaymentStatus(qisman_tolangan);

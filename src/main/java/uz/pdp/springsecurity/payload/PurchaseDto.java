@@ -23,7 +23,7 @@ public class PurchaseDto {
     private UUID paymentStatusId;
     @NotNull(message = "required line")
     private UUID branchId;
-
+    private UUID paymentMethodId;
     @NotNull(message = "required line")
     private Date date;
 

@@ -131,24 +131,20 @@ public class CustomerService {
         if (repaymentDto.getPayDate() == null) return new ApiResponse("PAY_DATE NOT FOUND", false);
         Customer customer = optionalCustomer.get();
         if (repaymentDto.getRepayment() != null && customer.getDebt() != 0) {
+
             customer.setDebt(customer.getDebt() - repaymentDto.getRepayment());
             customer.setPayDate(repaymentDto.getPayDate());
             customerRepository.save(customer);
-
-            Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findByType("Naqt");
-
-            if (optionalPaymentMethod.isPresent()) {
-                List<UUID> paymentMethodList = new ArrayList<>();
-                paymentMethodList.add(optionalPaymentMethod.get().getId());
-                balanceService.edit(customer.getBranch().getId(), repaymentDto.getRepayment(), true, paymentMethodList);
-            }
-
             try {
                 repaymentHelper(repaymentDto.getRepayment(), customer);
+                List<UUID> paymentMethodList = new ArrayList<>();
+                paymentMethodList.add(repaymentDto.getPaymentMethodId());
+                balanceService.edit(customer.getBranch().getId(), repaymentDto.getRepayment(), true, paymentMethodList);
                 return new ApiResponse("Repayment Customer !", true);
             } catch (Exception e) {
                 return new ApiResponse("ERROR", false);
             }
+
         } else {
             return new ApiResponse("brat qarzingiz null kelyabdi !", false);
         }

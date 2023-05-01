@@ -21,12 +21,10 @@ import java.util.UUID;
 public class BalanceService {
     private final BalanceRepository repository;
     private final BalanceHistoryRepository balanceHistoryRepository;
-    private final PayMethodRepository payMethodRepository;
 
     public ApiResponse edit(UUID branchId, Double summa, Boolean isPlus, List<UUID> payMethodId) {
 
         List<Balance> balanceList = repository.findAllByBranchId(branchId);
-
 
         if (payMethodId.isEmpty()) {
             return new ApiResponse("not found pay method", false);
@@ -42,14 +40,18 @@ public class BalanceService {
                     BalanceHistory newBalanceHistory = new BalanceHistory();
                     newBalanceHistory.setBalance(balance);
                     newBalanceHistory.setAccountSumma(balance.getAccountSumma());
-                    newBalanceHistory.setTotalSumma(balance.getAccountSumma() + summa);
 
                     if (isPlus) {
-                        balance.setAccountSumma(balance.getAccountSumma() + summa);
+                        double totalSumma = balance.getAccountSumma() + summa;
+                        balance.setAccountSumma(totalSumma);
+                        newBalanceHistory.setTotalSumma(totalSumma);
                     } else {
-                        balance.setAccountSumma(balance.getAccountSumma() - summa);
+                        double totalSumma = balance.getAccountSumma() - summa;
+                        balance.setAccountSumma(totalSumma);
+                        newBalanceHistory.setTotalSumma(totalSumma);
                     }
                     newBalanceHistory.setPlus(isPlus);
+                    newBalanceHistory.setSumma(summa);
 
                     balanceHistoryRepository.save(newBalanceHistory);
                     repository.save(balance);
