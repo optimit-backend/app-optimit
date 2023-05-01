@@ -1927,13 +1927,17 @@ public class ReportsService {
         Branch branch=null;
         Business business=null;
         List<Task> taskList = null;
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if(optionalBranch.isPresent()){
-            branch = optionalBranch.get();
+        if (branchId!=null){
+            Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+            if(optionalBranch.isPresent()){
+                branch = optionalBranch.get();
+            }
         }
-        Optional<Business> optionalBusiness = businessRepository.findById(businessId);
-        if(optionalBusiness.isPresent()){
-            business = optionalBusiness.get();
+        if (businessId!=null){
+            Optional<Business> optionalBusiness = businessRepository.findById(businessId);
+            if(optionalBusiness.isPresent()){
+                business = optionalBusiness.get();
+            }
         }
         if (branch==null && business ==null){
             return new ApiResponse("Not Found",false);
