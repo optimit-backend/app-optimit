@@ -12,10 +12,6 @@ import java.util.UUID;
 
 public interface TaskRepository extends JpaRepository<Task, UUID> {
     int countAllByProjectId(UUID project_id);
-
-//    int countAllByUsersId(UUID users_id);
-//    int countAllByUsersIdAndTaskStatus_OrginalName(UUID users_id, String taskStatus_orginalName);
-//    int countAllByUsersIdAndExpiredIsTrue(UUID users_id);
     int countByTaskStatusId(UUID taskStatus_id);
     int countByProjectIdAndTaskStatus_OrginalName(UUID project_id, String taskStatus_orginalName);
     int countByProjectId(UUID project_id);
@@ -29,6 +25,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     List<Task> findAllByProjectId(UUID project_id);
     Page<Task> findAllByProject_Id(UUID project_id,Pageable pageable);
     List<Task> findAllByBranchId(UUID branch_id);
+    List<Task> findAllByBranch_BusinessId(UUID branch_id);
     Page<Task> findByNameContainingIgnoreCase(String name, Pageable pageable);
     Page<Task> findByNameContainingIgnoreCaseAndTaskPriceList_UserList_Id(String name, UUID user_id, Pageable pageable);
     Page<Task> findAllByTaskStatus_Id(UUID project_id, Pageable pageable);

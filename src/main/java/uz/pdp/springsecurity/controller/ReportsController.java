@@ -51,6 +51,14 @@ public class ReportsController {
         ApiResponse apiResponse = reportsService.allProductByCategory(branchId, categoryId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("VIEW_REPORT")
+    @GetMapping("/amounts-by-project")
+    public HttpEntity<?> getAllProject(@RequestParam(required = false) UUID branchId,
+                                       @RequestParam(required = false) UUID businessId) {
+        ApiResponse apiResponse = reportsService.projectReport(branchId, businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
     @CheckPermission("VIEW_REPORT")
     @GetMapping("/amounts-branch/{branchId}")
     public HttpEntity<?> getAllDateByBrand(@PathVariable UUID branchId) {

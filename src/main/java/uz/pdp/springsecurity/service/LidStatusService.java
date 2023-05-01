@@ -2,7 +2,6 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uz.pdp.springsecurity.entity.Lid;
 import uz.pdp.springsecurity.entity.LidStatus;
 import uz.pdp.springsecurity.mapper.LidStatusMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -28,7 +27,7 @@ public class LidStatusService {
         List<LidStatusDto> list = new ArrayList<>();
         for (LidStatus lidStatus : allByBusinessId) {
             LidStatusDto statusDto = mapper.toDto(lidStatus);
-            int count = lidRepository.countByLidStatusId(lidStatus.getId());
+            int count = lidRepository.countByLidStatusIdAndDeleteIsFalse(lidStatus.getId());
             statusDto.setNumberOfLids(count);
             list.add(statusDto);
         }
@@ -48,6 +47,10 @@ public class LidStatusService {
     }
 
     public ApiResponse create(LidStatusPostDto lidStatusPostDto) {
+
+        if (lidStatusPostDto.getName().isEmpty()) {
+            return new ApiResponse("Status nomini kiriting!", false);
+        }
         List<LidStatus> allByOrderBySortDesc = repository.findAllByBusiness_IdOrderBySortAsc(lidStatusPostDto.getBusinessId());
         LidStatus newLidStatus = mapper.toEntity(lidStatusPostDto);
         if (allByOrderBySortDesc.size() != 0) {
@@ -114,6 +117,10 @@ public class LidStatusService {
         LidStatus lidStatus = optional.get();
         if (lidStatus.isSaleStatus()) {
             return new ApiResponse("not deleted", false);
+        }
+
+        if (lidStatus.getOrginalName() != null) {
+            return new ApiResponse("Bu statusni o'chirib bo'lmaydi", false);
         }
         repository.delete(lidStatus);
 
