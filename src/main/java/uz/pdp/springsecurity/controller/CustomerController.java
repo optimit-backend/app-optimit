@@ -90,7 +90,7 @@ public class CustomerController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("VIEW_CUSTOMER_ADMIN")
+    @CheckPermission("VIEW_CUSTOMER")
     @GetMapping("/get-by-branchId/{branchId}")
     public HttpEntity<?> getAllByBranchId(@PathVariable UUID branchId) {
         ApiResponse apiResponse = customerService.getAllByBranchId(branchId);

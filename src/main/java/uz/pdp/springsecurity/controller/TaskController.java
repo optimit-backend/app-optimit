@@ -97,8 +97,9 @@ public class TaskController {
     public HttpEntity<?> getAllByName(
             @RequestParam(defaultValue = "0", required = false) int page,
             @RequestParam(defaultValue = "10", required = false) int size,
+            @RequestParam(required = false) UUID userId,
             @PathVariable String name) {
-        ApiResponse apiResponse = taskServise.searchByName(name,page,size);
+        ApiResponse apiResponse = taskServise.searchByName(name,page,size,userId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -107,9 +108,10 @@ public class TaskController {
     public HttpEntity<?> getAllByBranchPageable(@PathVariable UUID branchId,
                                                 @RequestParam(required = false) UUID projectId,
                                                 @RequestParam(required = false) UUID typeId,
+                                                @RequestParam(required = false) UUID userId,
                                                 @RequestParam(required = false) Date expired,
                                                 @RequestParam(required = false) Map<String,String> params) {
-        ApiResponse apiResponse = taskServise.getAllByBranchIdPageable(branchId,params,projectId,typeId,expired);
+        ApiResponse apiResponse = taskServise.getAllByBranchIdPageable(branchId,params,projectId,typeId,userId,expired);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }

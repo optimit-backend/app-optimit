@@ -23,7 +23,7 @@ public interface OutlayRepository extends JpaRepository<Outlay, UUID> {
     List<Outlay> findAllByDateAndBusinessId(UUID business_id, java.sql.Date date);
 
     List<Outlay> findAllByBranch_Id(UUID branch_id);
-   // @Query(value = "SELECT sum(totalSum) FROM Outlay ")
+    List<Outlay> findAllByBranch_BusinessId(UUID branch_id);
     List<Outlay> findAllByCreatedAtBetweenAndBranchId(Timestamp startDate, Timestamp endDate, UUID branch_id);
     List<Outlay> findAllByCreatedAtBetweenAndBranch_BusinessId(Timestamp startDate, Timestamp endDate, UUID businessId);
 
@@ -32,9 +32,6 @@ public interface OutlayRepository extends JpaRepository<Outlay, UUID> {
 
     @Query(value = "select * from outlay inner join branches b on b.business_id = ?1",nativeQuery = true)
     List<Outlay> findAllByBusinessId(UUID businessId);
-
-
-    List<Outlay> findAllByBranch_BusinessId(UUID businessId);
     List<Outlay> findAllByDateBetweenAndBranchId(Date firstDate, Date secondDate,UUID uuid);
 
 }

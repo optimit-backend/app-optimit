@@ -43,7 +43,11 @@ public class ExcelService {
 
     public List<ProductViewDtos> getByBusiness(UUID businessId) {
         List<ProductViewDtos> productViewDtoList = new ArrayList<>();
-        List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(businessId);
+        List<Product> productList = null;
+        productList = productRepository.findAllByBranchIdAndActiveTrue(businessId);
+        if (productList.isEmpty()){
+            productList = productRepository.findAllByBusiness_IdAndActiveTrue(businessId);
+        }
         if (productList.isEmpty()) {
             return null;
         } else {

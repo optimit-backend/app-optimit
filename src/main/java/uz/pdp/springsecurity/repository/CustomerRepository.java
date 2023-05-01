@@ -12,5 +12,6 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     List<Customer> findAllByBranchId(UUID branchId);
     List<Customer> findAllByBranchIdAndDebtIsNotOrderByPayDateAsc(UUID branchId, Double debt);
+    List<Customer> findAllByBranch_BusinessIdAndDebtIsNotOrderByPayDateAsc(UUID branchId, Double debt);
 
 }

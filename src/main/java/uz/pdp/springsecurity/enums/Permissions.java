@@ -146,6 +146,7 @@ public enum Permissions {
     POST_EXCEL,
 
     VIEW_INFO,
+    VIEW_INFO_ADMIN,
 
     GET_TARIFF,
     CREATE_TARIFF,
