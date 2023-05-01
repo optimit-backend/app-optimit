@@ -60,6 +60,12 @@ public class ReportsService {
     @Autowired
     ProductTypePriceRepository productTypePriceRepository;
 
+    @Autowired
+    ProjectRepository projectRepository;
+
+    @Autowired
+    TaskRepository taskRepository;
+
     private final static Date date = new Date();
     private final static Timestamp currentDay = new Timestamp(System.currentTimeMillis());
     private final static Timestamp enDate = new Timestamp(date.getTime());
@@ -1916,4 +1922,65 @@ public class ReportsService {
 
         return new ApiResponse("all traders", true, traderBestDtoList);
     }
+
+    public ApiResponse projectReport(UUID branchId,UUID businessId) {
+        Branch branch=null;
+        Business business=null;
+        List<Task> taskList = null;
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if(optionalBranch.isPresent()){
+            branch = optionalBranch.get();
+        }
+        Optional<Business> optionalBusiness = businessRepository.findById(businessId);
+        if(optionalBusiness.isPresent()){
+            business = optionalBusiness.get();
+        }
+        if (branch==null && business ==null){
+            return new ApiResponse("Not Found",false);
+        }
+        List<Project> projectList=null;
+        if (branch!=null){
+            projectList = projectRepository.findAllByBranchId(branchId);
+            taskList = taskRepository.findAllByBranchId(branchId);
+        }else {
+            projectList = projectRepository.findAllByBranch_BusinessId(businessId);
+            taskList = taskRepository.findAllByBranch_BusinessId(branchId);
+
+        }
+
+        double projectAmount = 0;
+        List<ProjectDTOS> projectDTOSList=new ArrayList<>();
+        for (Project project : projectList) {
+
+            int i = taskRepository.countAllByProjectId(project.getId());
+            List<Task> tasks = taskRepository.findAllByProjectId(project.getId());
+            double taskAmount = 0;
+            for (Task task : tasks) {
+                taskAmount+=task.getTaskPrice();
+            }
+            ProjectDTOS projectDTOS=new ProjectDTOS();
+            projectDTOS.setProjectName(project.getName());
+            projectDTOS.setProjectTaskCount(i);
+            projectDTOS.setProjectAmount(project.getBudget());
+            projectDTOS.setTasksAmount(taskAmount);
+            projectDTOSList.add(projectDTOS);
+
+            projectAmount += project.getBudget();
+        }
+
+        double taskAmount = 0;
+        for (Task task : taskList) {
+            taskAmount += task.getTaskPrice();
+        }
+
+
+        ProjectReportDto projectReportDto=new ProjectReportDto();
+        projectReportDto.setProjectQuantity(projectList.size());
+        projectReportDto.setProjectAmount(projectAmount);
+        projectReportDto.setTasksAmount(taskAmount);
+        projectReportDto.setProjectDTOSList(projectDTOSList);
+
+        return new ApiResponse("Found",true,projectReportDto);
+    }
+
 }

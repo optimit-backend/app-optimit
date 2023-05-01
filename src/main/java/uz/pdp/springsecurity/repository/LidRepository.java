@@ -15,7 +15,7 @@ public interface LidRepository extends JpaRepository<Lid, UUID> {
     List<Lid> findAllByLidStatusId(UUID lidStatus_id);
     List<Lid> findAllBySourceId(UUID source_id);
     List<Lid> findAllByLidStatus_OrginalName(String lidStatus_orginalName);
-    int countByLidStatusId(UUID lidStatus_id);
+    int countByLidStatusIdAndDeleteIsFalse(UUID lidStatus_id);
     Page<Lid> findAllByLidStatusIdAndSourceIdAndDeleteIsFalse(UUID lidStatus_id, UUID source_id, Pageable pageable);
 
     Page<Lid> findAllByLidStatusIdAndCreatedAtBetweenAndDeleteIsFalse(UUID lidStatus_id, Timestamp startDate, Timestamp endDate, Pageable pageable);
