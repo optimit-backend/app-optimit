@@ -218,6 +218,7 @@ public class ProjectService {
         Optional<Project> optionalProject = projectRepository.findById(id);
         return optionalProject.map(project -> new ApiResponse("Found", true, project)).orElseGet(() -> new ApiResponse("Project Not Found", false));
     }
+
     public ApiResponse getOne(UUID id) {
         Optional<Project> optionalProject = projectRepository.findById(id);
         if (optionalProject.isEmpty()){
@@ -228,14 +229,9 @@ public class ProjectService {
         int expired = taskRepository.countAllByProjectIdAndExpiredTrue(id);
         List<Task> tasks = taskRepository.findAllByProjectId(id);
         double sum = 0;
-//        for (Task task : tasks) {
-//            int size = task.getUsers().size();
-//            if (task.isEach()){
-//                sum += task.getTaskPrice() * size;
-//            }else {
-//                sum += task.getTaskPrice();
-//            }
-//        }
+        for (Task task : tasks) {
+            sum+=task.getTaskPrice();
+        }
 
         int process = 0;
         if (completed > 0) {

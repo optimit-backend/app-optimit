@@ -1948,7 +1948,7 @@ public class ReportsService {
             taskList = taskRepository.findAllByBranchId(branchId);
         }else {
             projectList = projectRepository.findAllByBranch_BusinessId(businessId);
-            taskList = taskRepository.findAllByBranch_BusinessId(branchId);
+            taskList = taskRepository.findAllByBranch_BusinessId(businessId);
 
         }
 
