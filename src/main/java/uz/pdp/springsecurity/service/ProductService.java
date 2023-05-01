@@ -614,8 +614,12 @@ public class ProductService {
         } else if (checkingBranch) {
             productList = productRepository.findAllByBranchIdAndActiveTrue(branch_id);
         }
+        if (checkingBranch){
 
-        getProductMethod(productViewDtoList, productList, null);
+            getProductMethod(productViewDtoList, productList, branch_id);
+        }else {
+            getProductMethod(productViewDtoList, productList, null);
+        }
 
 
         if (productList.isEmpty()) {
