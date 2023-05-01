@@ -1,19 +1,19 @@
-package uz.pdp.springsecurity.entity;
+package uz.pdp.springsecurity.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uz.pdp.springsecurity.entity.template.AbsEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import java.sql.Timestamp;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-public class BalanceHistory extends AbsEntity {
-    //qancha summa otqazmoqchi yoki olmoqchi
+public class BalanceHistoryDto {
+    //history vaqti
+    private Timestamp date;
+
     private double summa;
 
     //otqazdimi yoki oldimi ?
@@ -25,6 +25,10 @@ public class BalanceHistory extends AbsEntity {
     //otqazilgan yoki olingan summadan keyingi balancedagi holat
     private double totalSumma;
 
-    @ManyToOne
-    private Balance balance;
+    private UUID balanceId;
+
+    private UUID payMethodId;
+
+    private String payMethodType;
+
 }

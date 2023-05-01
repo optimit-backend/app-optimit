@@ -255,5 +255,14 @@ public enum Permissions {
     VIEW_ORG,
 
     ADD_WORK_TIME,
-    GET_WORK_TIME
+    GET_WORK_TIME,
+
+
+    VIEW_BALANCE_HISTORY,
+    VIEW_BALANCE,
+    EDIT_BALANCE,
+    ADD_BALANCE
+
+
+
 }

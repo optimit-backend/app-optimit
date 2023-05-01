@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.BalanceType;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.BranchDto;
 import uz.pdp.springsecurity.repository.*;
@@ -32,6 +33,8 @@ public class BranchService {
     BusinessRepository businessRepository;
     private final InvoiceService invoiceService;
     private final UserRepository userRepository;
+    private final BalanceRepository balanceRepository;
+    private final PayMethodRepository payMethodRepository;
 
     public ApiResponse addBranch(BranchDto branchDto) {
         Branch branch = new Branch();
@@ -52,6 +55,7 @@ public class BranchService {
         userRepository.save(user);
         invoiceService.create(branch);
 
+
         ProjectStatus projectStatus = new ProjectStatus();
         projectStatus.setName("Uncompleted");
         projectStatus.setColor("red");
@@ -70,6 +74,7 @@ public class BranchService {
         projectStatus3.setBranch(branch);
         projectStatusRepository.save(projectStatus3);
 
+
         TaskStatus completedTaskStatus = new TaskStatus();
         completedTaskStatus.setName("Completed");
         completedTaskStatus.setOrginalName("Completed");
@@ -87,7 +92,18 @@ public class BranchService {
         uncompletedTaskStatus.setColor("#FF0000");
         uncompletedTaskStatus.setBranch(branch);
         taskStatusRepository.save(uncompletedTaskStatus);
-        return new ApiResponse("ADDED", true,user);
+    }
+
+    static void createBalance(Branch branch, BalanceRepository balanceRepository, PayMethodRepository payMethodRepository) {
+        List<PaymentMethod> allByBusinessId = payMethodRepository.findAllByBusiness_Id(branch.getBusiness().getId());
+
+        for (PaymentMethod paymentMethod : allByBusinessId) {
+            Balance balance = new Balance();
+            balance.setAccountSumma(0);
+            balance.setBranch(branch);
+            balance.setPaymentMethod(paymentMethod);
+            balanceRepository.save(balance);
+        }
     }
 
     public ApiResponse editBranch(UUID id, BranchDto branchDto) {
@@ -120,7 +136,7 @@ public class BranchService {
 
     public ApiResponse getByBusinessId(UUID business_id) {
         List<Branch> allByBusiness_id = branchRepository.findAllByBusiness_Id(business_id);
-        if (allByBusiness_id.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND",false);
-        return new ApiResponse("FOUND",true,allByBusiness_id);
+        if (allByBusiness_id.isEmpty()) return new ApiResponse("BUSINESS NOT FOUND", false);
+        return new ApiResponse("FOUND", true, allByBusiness_id);
     }
 }

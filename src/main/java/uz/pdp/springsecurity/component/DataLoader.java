@@ -50,6 +50,7 @@ public class DataLoader implements CommandLineRunner {
     private final LidFieldRepository lidFieldRepository;
     private final SourceRepository sourceRepository;
     private final InvoiceService invoiceService;
+    private final BalanceRepository balanceRepository;
 
     private final static LocalTime TODAY = LocalTime.now().withHour(8);
 
@@ -462,7 +463,12 @@ public class DataLoader implements CommandLineRunner {
 
                                     VIEW_ORG,
                                     ADD_WORK_TIME,
-                                    GET_WORK_TIME
+                                    GET_WORK_TIME,
+
+                                    VIEW_BALANCE_HISTORY,
+                                    VIEW_BALANCE,
+                                    EDIT_BALANCE,
+                                    ADD_BALANCE
 
                             ),
                             business));
@@ -810,6 +816,7 @@ public class DataLoader implements CommandLineRunner {
                 }
             }
 
+
             User userAdmin = new User(
                     "Admin",
                     "Admin",
@@ -888,6 +895,19 @@ public class DataLoader implements CommandLineRunner {
                         TOLANMAGAN.name()
                 ));
             }
+
+
+            List<PaymentMethod> newAll = payMethodRepository.findAll();
+            for (PaymentMethod paymentMethod : newAll) {
+                Balance balance = new Balance();
+                balance.setAccountSumma(0);
+                balance.setPaymentMethod(paymentMethod);
+                for (Branch branch : branches) {
+                    balance.setBranch(branch);
+                }
+                balanceRepository.save(balance);
+            }
+
 
             List<ExchangeStatus> exchangeStatusRepositoryAll = exchangeStatusRepository.findAll();
             if (exchangeStatusRepositoryAll.isEmpty()) {

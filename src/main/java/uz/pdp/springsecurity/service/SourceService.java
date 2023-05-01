@@ -2,10 +2,12 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uz.pdp.springsecurity.entity.Form;
 import uz.pdp.springsecurity.entity.Source;
 import uz.pdp.springsecurity.mapper.SourceMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.SourceDto;
+import uz.pdp.springsecurity.repository.FormRepository;
 import uz.pdp.springsecurity.repository.SourceRepository;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class SourceService {
     private final SourceRepository repository;
 
     private final SourceMapper mapper;
+    private final FormRepository formRepository;
 
     public ApiResponse getAll(UUID businessId) {
         List<Source> allByBusinessId =
@@ -61,6 +64,10 @@ public class SourceService {
 
         if (source.getBusiness() == null) {
             return new ApiResponse("o'chirib bolmaydi", false);
+        }
+        Optional<Form> sourceId = formRepository.findBySourceId(source.getId());
+        if (sourceId.isPresent()) {
+            return new ApiResponse("formaga biriktirilgan o'chirib bo'lmaydi!   ",false);
         }
 
         repository.delete(source);
