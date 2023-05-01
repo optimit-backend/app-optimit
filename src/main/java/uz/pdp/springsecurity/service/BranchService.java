@@ -55,6 +55,10 @@ public class BranchService {
         userRepository.save(user);
         invoiceService.create(branch);
 
+        createTaskStatus(branch, taskStatusRepository);
+
+        createBalance(branch, balanceRepository, payMethodRepository);
+
 
         ProjectStatus projectStatus = new ProjectStatus();
         projectStatus.setName("Uncompleted");
@@ -75,6 +79,28 @@ public class BranchService {
         projectStatusRepository.save(projectStatus3);
 
 
+        TaskStatus completedTaskStatus = new TaskStatus();
+        completedTaskStatus.setName("Completed");
+        completedTaskStatus.setOrginalName("Completed");
+        completedTaskStatus.setRowNumber(2);
+        completedTaskStatus.setABoolean(true);
+        completedTaskStatus.setColor("#04d227");
+        completedTaskStatus.setBranch(branch);
+        taskStatusRepository.save(completedTaskStatus);
+
+        TaskStatus uncompletedTaskStatus = new TaskStatus();
+        uncompletedTaskStatus.setName("Uncompleted");
+        uncompletedTaskStatus.setOrginalName("Uncompleted");
+        uncompletedTaskStatus.setRowNumber(1);
+        uncompletedTaskStatus.setABoolean(true);
+        uncompletedTaskStatus.setColor("#FF0000");
+        uncompletedTaskStatus.setBranch(branch);
+        taskStatusRepository.save(uncompletedTaskStatus);
+
+        return new ApiResponse("Added",true);
+    }
+
+    static void createTaskStatus(Branch branch, TaskStatusRepository taskStatusRepository) {
         TaskStatus completedTaskStatus = new TaskStatus();
         completedTaskStatus.setName("Completed");
         completedTaskStatus.setOrginalName("Completed");
