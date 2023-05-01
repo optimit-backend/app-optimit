@@ -27,6 +27,9 @@ public class BranchService {
     TaskStatusRepository taskStatusRepository;
 
     @Autowired
+    ProjectStatusRepository projectStatusRepository;
+
+    @Autowired
     BusinessRepository businessRepository;
     private final InvoiceService invoiceService;
     private final UserRepository userRepository;
@@ -52,14 +55,26 @@ public class BranchService {
         userRepository.save(user);
         invoiceService.create(branch);
 
-        createTaskStatus(branch, taskStatusRepository);
 
-        createBalance(branch, balanceRepository, payMethodRepository);
+        ProjectStatus projectStatus = new ProjectStatus();
+        projectStatus.setName("Uncompleted");
+        projectStatus.setColor("red");
+        projectStatus.setBranch(branch);
+        projectStatusRepository.save(projectStatus);
 
-        return new ApiResponse("ADDED", true, user);
-    }
+        ProjectStatus projectStatus2 = new ProjectStatus();
+        projectStatus2.setColor("yellow");
+        projectStatus2.setName("Process");
+        projectStatus2.setBranch(branch);
+        projectStatusRepository.save(projectStatus2);
 
-    static void createTaskStatus(Branch branch, TaskStatusRepository taskStatusRepository) {
+        ProjectStatus projectStatus3 = new ProjectStatus();
+        projectStatus3.setColor("green");
+        projectStatus3.setName("Completed");
+        projectStatus3.setBranch(branch);
+        projectStatusRepository.save(projectStatus3);
+
+
         TaskStatus completedTaskStatus = new TaskStatus();
         completedTaskStatus.setName("Completed");
         completedTaskStatus.setOrginalName("Completed");
