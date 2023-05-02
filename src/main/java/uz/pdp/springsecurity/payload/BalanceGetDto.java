@@ -9,7 +9,8 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BalancePostDto {
-    private Double summa;
-    private UUID payMethodId;
+public class BalanceGetDto {
+    private double balanceSumma;
+    private UUID PaymentMethodId;
+    private String payMethodName;
 }

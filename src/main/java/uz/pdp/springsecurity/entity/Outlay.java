@@ -36,6 +36,9 @@ public class Outlay extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User spender;
 
+    @ManyToOne
+    private PaymentMethod paymentMethod;
+
     private String description;
 
     private Date date;

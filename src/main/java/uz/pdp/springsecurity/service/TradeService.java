@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Customer;
 import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.enums.BalanceType;
 import uz.pdp.springsecurity.enums.SalaryStatus;
 import uz.pdp.springsecurity.mapper.PaymentMapper;
 import uz.pdp.springsecurity.payload.*;
@@ -310,7 +309,7 @@ public class TradeService {
             optionalPaymentMethod.ifPresent(paymentMethod -> paymentIdList.add(paymentMethod.getId()));
         }
 
-        balanceService.edit(branch.getId(), trade.getTotalSum(), true, paymentIdList);
+        balanceService.edit(branch.getId(), true, tradeDTO.getPaymentDtoList());
         return new ApiResponse("SAVED!", true);
     }
 

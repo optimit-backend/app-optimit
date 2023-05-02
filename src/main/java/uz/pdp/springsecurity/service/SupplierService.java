@@ -106,9 +106,7 @@ public class SupplierService {
             try {
                 storeRepaymentHelper(repaymentDto.getRepayment(), supplier);
                 //balancega qo'shish
-                List<UUID> paymentMethodList = new ArrayList<>();
-                paymentMethodList.add(repaymentDto.getPaymentMethodId());
-                balanceService.edit(repaymentDto.getBranchId(), repaymentDto.getRepayment(), false, paymentMethodList);
+                balanceService.edit(repaymentDto.getBranchId(), repaymentDto.getRepayment(), false, repaymentDto.getPaymentMethodId());
 
                 return new ApiResponse("Repayment Store !", true);
             } catch (Exception e) {

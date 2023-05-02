@@ -15,4 +15,6 @@ public class SalaryDto {
     private double salary;
 
     private String description;
+
+    private UUID paymentMethodId;
 }

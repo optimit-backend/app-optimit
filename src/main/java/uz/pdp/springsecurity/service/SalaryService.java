@@ -15,10 +15,7 @@ import uz.pdp.springsecurity.payload.SalaryDto;
 import uz.pdp.springsecurity.repository.*;
 import uz.pdp.springsecurity.util.Constants;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +29,11 @@ public class SalaryService {
     private final RoleRepository roleRepository;
     private final WorkTimeLateService workTimeLateService;
 
-    @Autowired@Lazy
+    @Autowired
+    @Lazy
     private PrizeService prizeService;
+
+    private final BalanceService balanceService;
 
 
     public void add(User user, Branch branch, double salarySum) {
@@ -54,7 +54,6 @@ public class SalaryService {
         salary.setSalary(salary.getSalary() + salarySum);
         salaryRepository.save(salary);
     }
-
 
 
     @Transactional
@@ -85,6 +84,10 @@ public class SalaryService {
             workTimeLateService.clear(user, branch);
             salaryRepository.save(salary);
             salaryRepository.save(newSalary);
+
+
+            balanceService.edit(salary.getBranch().getId(), salaryDto.getSalary(), false, salaryDto.getPaymentMethodId());
+
             return new ApiResponse("SUCCESS", true);
         } catch (Exception e) {
             return new ApiResponse("ERROR", false);
@@ -100,16 +103,19 @@ public class SalaryService {
         salary.setDescription(salaryDto.getDescription());
         salary.setEndDate(new Date());
         salaryRepository.save(salary);
+
+        balanceService.edit(salary.getBranch().getId(), salaryDto.getSalary(), false, salaryDto.getPaymentMethodId());
+
         return new ApiResponse("SUCCESS", true);
     }
 
     public ApiResponse getAll(UUID branchId) {
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isEmpty())return new ApiResponse("NOT FOUND BRANCH", false);
+        if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
         checkBeforeSalary(optionalBranch.get());
         List<Salary> salaryList = salaryRepository.findAllByBranchIdAndActiveTrue(branchId);
-        if (salaryList.isEmpty())return new ApiResponse("NOT FOUND SALARY");
-        return new ApiResponse( true, salaryMapper.toDtoList(salaryList));
+        if (salaryList.isEmpty()) return new ApiResponse("NOT FOUND SALARY");
+        return new ApiResponse(true, salaryMapper.toDtoList(salaryList));
     }
 
     private void checkBeforeSalary(Branch branch) {
@@ -136,16 +142,16 @@ public class SalaryService {
     }
 
     public ApiResponse getAllByUser(UUID userId, UUID branchId) {
-        if (!userRepository.existsById(userId))return new ApiResponse("NOT FOUND USER", false);
-        if (!branchRepository.existsById(branchId))return new ApiResponse("NOT FOUND BRANCH",false);
+        if (!userRepository.existsById(userId)) return new ApiResponse("NOT FOUND USER", false);
+        if (!branchRepository.existsById(branchId)) return new ApiResponse("NOT FOUND BRANCH", false);
         List<Salary> salaryList = salaryRepository.findAllByUserIdAndBranchId(userId, branchId);
-        if (salaryList.isEmpty())return new ApiResponse("NOT FOUND SALARY");
+        if (salaryList.isEmpty()) return new ApiResponse("NOT FOUND SALARY");
         return new ApiResponse(true, salaryMapper.toDtoList(salaryList));
     }
 
     public ApiResponse getByUserLast(UUID userId, UUID branchId) {
-        if (!userRepository.existsById(userId))return new ApiResponse("NOT FOUND USER", false);
-        if (!branchRepository.existsById(branchId))return new ApiResponse("NOT FOUND BRANCH", false);
+        if (!userRepository.existsById(userId)) return new ApiResponse("NOT FOUND USER", false);
+        if (!branchRepository.existsById(branchId)) return new ApiResponse("NOT FOUND BRANCH", false);
         Optional<Salary> optionalSalary = salaryRepository.findByUserIdAndBranch_IdAndActiveTrue(userId, branchId);
         return optionalSalary.map(salary -> new ApiResponse(true, salaryMapper.toDto(salary))).orElseGet(() -> new ApiResponse("SALARY FOUND BRANCH", false));
     }
