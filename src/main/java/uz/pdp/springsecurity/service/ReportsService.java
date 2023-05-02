@@ -66,6 +66,9 @@ public class ReportsService {
     @Autowired
     TaskRepository taskRepository;
 
+    @Autowired
+    FifoCalculationService fifoCalculationService;
+
     private final static Date date = new Date();
     private final static Timestamp currentDay = new Timestamp(System.currentTimeMillis());
     private final static Timestamp enDate = new Timestamp(date.getTime());
@@ -618,11 +621,15 @@ public class ReportsService {
                 amount += warehouse.getAmount();
             }
                 double salePrice = product.getSalePrice();
-                double buyPrice = product.getBuyPrice();
 
                 totalSumBySalePrice += amount * salePrice;
-                totalSumByBuyPrice += amount * buyPrice;
-                amounts.setTotalSumBySalePrice(totalSumBySalePrice);
+                double price = 0;
+                if (branchId!=null){
+                    price = fifoCalculationService.productBuyPriceByBranch(branchId);
+                }else {
+                    price = fifoCalculationService.productBuyPriceByBusiness(businessId);
+                }
+                amounts.setTotalSumBySalePrice(price);
                 amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
         }
         return new ApiResponse("Business Products Amount", true, amounts);
