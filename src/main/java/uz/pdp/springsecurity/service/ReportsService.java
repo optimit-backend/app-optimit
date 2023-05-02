@@ -352,7 +352,7 @@ public class ReportsService {
             }
             tradeReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
             tradeReportsDto.setAmount(tradeProduct.getTradedQuantity());
-            if (tradeProduct.getTrade().getCustomer() != null) {
+            if (tradeProduct.getTrade().getCustomer() != null && tradeProduct.getTrade().getCustomer().getCustomerGroup()!=null) {
                 tradeReportsDto.setDiscount(tradeProduct.getTrade().getCustomer().getCustomerGroup().getPercent());
             }
             tradeReportsDto.setTotalSum(tradeProduct.getTotalSalePrice());
@@ -1649,12 +1649,11 @@ public class ReportsService {
                 }
             } else {
                 List<TradeProduct> allByProductId = tradeProductRepository.findAllByTrade_CustomerId(customer.getId());
-                if (allByProductId.isEmpty()) {
-                    return new ApiResponse("Not Found", false);
-                }
-                for (TradeProduct product : allByProductId) {
-                    amount += product.getProfit();
-                    productAmount.put(product.getTrade().getCustomer().getId(), amount);
+                if (!allByProductId.isEmpty()) {
+                    for (TradeProduct product : allByProductId) {
+                        amount += product.getProfit();
+                        productAmount.put(product.getTrade().getCustomer().getId(), amount);
+                    }
                 }
             }
         }
