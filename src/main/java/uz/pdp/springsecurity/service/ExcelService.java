@@ -42,6 +42,13 @@ public class ExcelService {
     private final FifoCalculationRepository fifoCalculationRepository;
 
     public List<ProductViewDtos> getByBusiness(UUID businessId) {
+
+        boolean checkingBranch = false;
+        Optional<Branch> optionalBranch = branchRepository.findById(businessId);
+        if (optionalBranch.isPresent()){
+            checkingBranch = true;
+        }
+
         List<ProductViewDtos> productViewDtoList = new ArrayList<>();
         List<Product> productList = null;
         productList = productRepository.findAllByBranchIdAndActiveTrue(businessId);
@@ -62,8 +69,17 @@ public class ExcelService {
                 productViewDto.setExpiredDate(product.getExpireDate());
                 Optional<Measurement> optionalMeasurement = measurementRepository.findById(product.getMeasurement().getId());
                 optionalMeasurement.ifPresent(measurement -> productViewDto.setMeasurementId(measurement.getName()));
-                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(businessId, product.getId());
-                optionalWarehouse.ifPresent(warehouse -> productViewDto.setAmount(warehouse.getAmount()));
+                if (checkingBranch){
+                    Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(businessId, product.getId());
+                    optionalWarehouse.ifPresent(warehouse -> productViewDto.setAmount(warehouse.getAmount()));
+                }else {
+                    List<Warehouse> warehouseList = warehouseRepository.findAllByBranch_BusinessIdAndProductId(businessId, product.getId());
+                    double amount = 0;
+                    for (Warehouse warehouse : warehouseList) {
+                            amount+=warehouse.getAmount();
+                    }
+                    productViewDto.setAmount(amount);
+                }
                 productViewDtoList.add(productViewDto);
             }
             return productViewDtoList;

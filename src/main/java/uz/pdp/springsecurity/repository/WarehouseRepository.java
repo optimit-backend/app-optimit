@@ -12,6 +12,8 @@ import java.util.UUID;
 public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 
     Optional<Warehouse> findByBranchIdAndProductId(UUID branchId, UUID productId);
+    List<Warehouse> findAllByBranch_BusinessIdAndProductId(UUID branchId, UUID productId);
+    Optional<Warehouse> findByBranch_BusinessIdAndProductId(UUID branchId, UUID productId);
 
     Page<Warehouse> findAllByBranch_BusinessIdAndAmountNotOrderByAmountAsc(UUID product_business_id, double amount, Pageable pageable);
     Page<Warehouse> findAllByBranchIdAndAmountNotOrderByAmountAsc(UUID branch_id, double amount, Pageable pageable);
