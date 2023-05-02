@@ -23,4 +23,5 @@ public class OutlayDto {
     @NotNull(message = "required line")
     private String description;
     private Date date;
+    private UUID paymentMethodId;
 }

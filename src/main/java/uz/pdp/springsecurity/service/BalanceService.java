@@ -7,61 +7,49 @@ import uz.pdp.springsecurity.entity.BalanceHistory;
 import uz.pdp.springsecurity.entity.PaymentMethod;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.BalanceDto;
+import uz.pdp.springsecurity.payload.BalanceGetDto;
+import uz.pdp.springsecurity.payload.PaymentDto;
 import uz.pdp.springsecurity.repository.BalanceHistoryRepository;
 import uz.pdp.springsecurity.repository.BalanceRepository;
 import uz.pdp.springsecurity.repository.PayMethodRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class BalanceService {
     private final BalanceRepository repository;
     private final BalanceHistoryRepository balanceHistoryRepository;
+    private final PayMethodRepository payMethodRepository;
 
-    public ApiResponse edit(UUID branchId, Double summa, Boolean isPlus, List<UUID> payMethodId) {
+    public ApiResponse edit(UUID branchId, Double summa, Boolean isPlus, UUID payMethodId) {
+        Optional<Balance> optionalBalance = repository.findByPaymentMethod_IdAndBranchId(payMethodId, branchId);
 
-        List<Balance> balanceList = repository.findAllByBranchId(branchId);
+        if (optionalBalance.isPresent()) {
+            Balance balance = optionalBalance.get();
+            if (summa > 0) {
+                BalanceHistory newBalanceHistory = new BalanceHistory();
+                newBalanceHistory.setBalance(balance);
+                newBalanceHistory.setAccountSumma(balance.getAccountSumma());
 
-        if (payMethodId.isEmpty()) {
-            return new ApiResponse("not found pay method", false);
-        }
-        if (balanceList.isEmpty()) {
-            return new ApiResponse("not found Balance", false);
-        }
-        for (UUID paymentMethod : payMethodId) {
-            Optional<Balance> optionalBalance = repository.findByPaymentMethod_Id(paymentMethod);
-            if (optionalBalance.isPresent()) {
-                Balance balance = optionalBalance.get();
-                if (summa > 0) {
-                    BalanceHistory newBalanceHistory = new BalanceHistory();
-                    newBalanceHistory.setBalance(balance);
-                    newBalanceHistory.setAccountSumma(balance.getAccountSumma());
-
-                    if (isPlus) {
-                        double totalSumma = balance.getAccountSumma() + summa;
-                        balance.setAccountSumma(totalSumma);
-                        newBalanceHistory.setTotalSumma(totalSumma);
-                    } else {
-                        double totalSumma = balance.getAccountSumma() - summa;
-                        balance.setAccountSumma(totalSumma);
-                        newBalanceHistory.setTotalSumma(totalSumma);
-                    }
-                    newBalanceHistory.setPlus(isPlus);
-                    newBalanceHistory.setSumma(summa);
-
-                    balanceHistoryRepository.save(newBalanceHistory);
-                    repository.save(balance);
-
-                    return new ApiResponse("successfully saved", true);
+                double totalSumma;
+                if (isPlus) {
+                    totalSumma = balance.getAccountSumma() + summa;
+                } else {
+                    totalSumma = balance.getAccountSumma() - summa;
                 }
-                break;
+                balance.setAccountSumma(totalSumma);
+                newBalanceHistory.setTotalSumma(totalSumma);
+                newBalanceHistory.setPlus(isPlus);
+                newBalanceHistory.setSumma(summa);
+
+                balanceHistoryRepository.save(newBalanceHistory);
+                repository.save(balance);
+
+                return new ApiResponse("successfully saved", true);
             }
         }
-        return new ApiResponse("Must not be a number less than 0", false);
+        return new ApiResponse("not found balance", false);
     }
 
     public ApiResponse getAll(UUID branchId) {
@@ -81,6 +69,63 @@ public class BalanceService {
             balanceDtoList.add(balanceDto);
         }
 
+        balanceDtoList.sort(Comparator.comparing(BalanceDto::getPaymentMethodId));
+
         return new ApiResponse("found", true, balanceDtoList);
+    }
+
+    public ApiResponse edit(UUID branchId, boolean isPlus, List<PaymentDto> paymentDtoList) {
+        for (PaymentDto paymentMethod : paymentDtoList) {
+            Optional<Balance> optionalBalance = repository.findByPaymentMethod_IdAndBranchId(paymentMethod.getPaymentMethodId(), branchId);
+            if (optionalBalance.isPresent()) {
+                Balance balance = optionalBalance.get();
+                if (paymentMethod.getPaidSum() > 0) {
+
+                    BalanceHistory newBalanceHistory = new BalanceHistory();
+                    newBalanceHistory.setBalance(balance);
+                    newBalanceHistory.setAccountSumma(balance.getAccountSumma());
+
+                    double totalSumma;
+                    if (isPlus) {
+                        totalSumma = balance.getAccountSumma() + paymentMethod.getPaidSum();
+                    } else {
+                        totalSumma = balance.getAccountSumma() - paymentMethod.getPaidSum();
+                    }
+
+                    balance.setAccountSumma(totalSumma);
+                    newBalanceHistory.setTotalSumma(totalSumma);
+                    newBalanceHistory.setPlus(isPlus);
+                    newBalanceHistory.setSumma(paymentMethod.getPaidSum());
+
+                    balanceHistoryRepository.save(newBalanceHistory);
+                    repository.save(balance);
+
+                    return new ApiResponse("successfully saved", true);
+                }
+                break;
+            }
+        }
+
+        return new ApiResponse("Must not be a number less than 0", false);
+    }
+
+    public ApiResponse getAllByBusinessId(UUID businessId) {
+        List<PaymentMethod> allPaymentMethod = payMethodRepository.findAllByBusiness_Id(businessId);
+
+        List<BalanceGetDto> balanceGetDtoList = new ArrayList<>();
+        for (PaymentMethod paymentMethod : allPaymentMethod) {
+            List<Balance> all = repository.findAllByPaymentMethodId(paymentMethod.getId());
+            BalanceGetDto balanceGetDto = new BalanceGetDto();
+            double totalSumma = 0;
+            for (Balance balance : all) {
+                totalSumma = totalSumma + balance.getAccountSumma();
+                balanceGetDto.setPaymentMethodId(balance.getPaymentMethod().getId());
+                balanceGetDto.setPayMethodName(balance.getPaymentMethod().getType());
+                balanceGetDto.setBalanceSumma(totalSumma);
+            }
+            balanceGetDtoList.add(balanceGetDto);
+        }
+
+        return new ApiResponse("all", true, balanceGetDtoList);
     }
 }

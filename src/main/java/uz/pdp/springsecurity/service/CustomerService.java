@@ -137,9 +137,7 @@ public class CustomerService {
             customerRepository.save(customer);
             try {
                 repaymentHelper(repaymentDto.getRepayment(), customer);
-                List<UUID> paymentMethodList = new ArrayList<>();
-                paymentMethodList.add(repaymentDto.getPaymentMethodId());
-                balanceService.edit(customer.getBranch().getId(), repaymentDto.getRepayment(), true, paymentMethodList);
+                balanceService.edit(customer.getBranch().getId(), repaymentDto.getRepayment(), true, repaymentDto.getPaymentMethodId());
                 return new ApiResponse("Repayment Customer !", true);
             } catch (Exception e) {
                 return new ApiResponse("ERROR", false);

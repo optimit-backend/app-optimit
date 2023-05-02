@@ -27,6 +27,8 @@ public class OutlayService {
     PayMethodRepository payMethodRepository;
     @Autowired
     BalanceService balanceService;
+    @Autowired
+    private BalanceRepository balanceRepository;
 
     public ApiResponse add(OutlayDto outlayDto) {
         Outlay outlay = new Outlay();
@@ -50,23 +52,32 @@ public class OutlayService {
         outlay.setDescription(outlayDto.getDescription());
         outlay.setDate(outlayDto.getDate());
 
-        outlayRepository.save(outlay);
 
-        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findByType("Naqt");
-
-        if (optionalPaymentMethod.isPresent()) {
-            List<UUID> paymentMethodList = new ArrayList<>();
-            paymentMethodList.add(optionalPaymentMethod.get().getId());
-            balanceService.edit(optionalBranch.get().getId(), outlayDto.getTotalSum(), false, paymentMethodList);
+        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(outlayDto.getPaymentMethodId());
+        if (optionalPaymentMethod.isEmpty()) {
+            return new ApiResponse("not found pay method id", false);
         }
 
+        PaymentMethod paymentMethod = optionalPaymentMethod.get();
+        outlay.setPaymentMethod(paymentMethod);
+
+        balanceService.edit(optionalBranch.get().getId(), outlayDto.getTotalSum(), false, outlayDto.getPaymentMethodId());
+
+        outlayRepository.save(outlay);
         return new ApiResponse("ADDED", true);
     }
 
     public ApiResponse edit(UUID id, OutlayDto outlayDto) {
         if (!outlayRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
+        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(outlayDto.getPaymentMethodId());
+        if (optionalPaymentMethod.isEmpty()) {
+            return new ApiResponse("not found pay method id", false);
+        }
+
 
         Outlay outlay = outlayRepository.getById(id);
+        PaymentMethod paymentMethod = outlay.getPaymentMethod();
+        double totalSum = outlay.getTotalSum();
 
         Optional<OutlayCategory> optionalCategory = outlayCategoryRepository.findById(outlayDto.getOutlayCategoryId());
         if (optionalCategory.isEmpty()) return new ApiResponse("OUTLAY CATEGORY NOT FOUND", false);
@@ -83,9 +94,14 @@ public class OutlayService {
         Optional<User> spender = userRepository.findById(outlayDto.getSpenderId());
         if (spender.isEmpty()) return new ApiResponse("SPENDER NOT FOUND", false);
         outlay.setSpender(spender.get());
-
         outlay.setDescription(outlayDto.getDescription());
         outlay.setDate(outlayDto.getDate());
+
+        //eski summani balance ga qaytarish
+        balanceService.edit(outlay.getBranch().getId(), totalSum, true, paymentMethod.getId());
+
+        //yangi summa kiritish
+        balanceService.edit(outlay.getBranch().getId(), outlayDto.getTotalSum(), false, outlayDto.getPaymentMethodId());
 
         outlayRepository.save(outlay);
         return new ApiResponse("EDITED", true);
@@ -117,15 +133,15 @@ public class OutlayService {
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
         List<Outlay> allByBusinessId = outlayRepository.findAllByBranch_BusinessId(businessId);
-        if (allByBusinessId.isEmpty()){
+        if (allByBusinessId.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         }
         return new ApiResponse("FOUND", true, allByBusinessId);
     }
 
     public ApiResponse getAllByDate(Date date, UUID business_id) {
-        List<Outlay> allByDateAndBusinessId = outlayRepository.findAllByDateAndBusinessId(business_id,date);
-        if (allByDateAndBusinessId.isEmpty()) return new ApiResponse("NOT FOUND",false);
-        return new ApiResponse("FOUND",true,allByDateAndBusinessId);
+        List<Outlay> allByDateAndBusinessId = outlayRepository.findAllByDateAndBusinessId(business_id, date);
+        if (allByDateAndBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        return new ApiResponse("FOUND", true, allByDateAndBusinessId);
     }
 }

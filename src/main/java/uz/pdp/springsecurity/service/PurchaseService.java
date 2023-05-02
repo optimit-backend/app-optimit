@@ -182,16 +182,11 @@ public class PurchaseService {
 
         if (isEdit) {
             if (purchaseDto.getPaidSum() > 0) {
-                List<UUID> payMethodIds = new ArrayList<>();
-                payMethodIds.add(payMethodId);
-                balanceService.edit(branch.getId(), oldSumma, true, payMethodIds);
+                balanceService.edit(branch.getId(), oldSumma, true, payMethodId);
             }
         }
-
-        List<UUID> payMethodIds = new ArrayList<>();
         if (purchaseDto.getPaidSum() > 0) {
-            payMethodIds.add(purchaseDto.getPaymentMethodId());
-            balanceService.edit(branch.getId(), purchaseDto.getPaidSum(), false, payMethodIds);
+            balanceService.edit(branch.getId(), purchaseDto.getPaidSum(), false, payMethodId);
         }
 
         return new ApiResponse("SUCCESS", true);

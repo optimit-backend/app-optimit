@@ -18,6 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentDto{
+
     private UUID paymentMethodId;
 
     private Double paidSum;
