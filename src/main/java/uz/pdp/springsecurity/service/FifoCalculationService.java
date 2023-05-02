@@ -9,6 +9,7 @@ import uz.pdp.springsecurity.repository.ProductTypeComboRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -267,5 +268,19 @@ public class FifoCalculationService {
         fifoRepository.saveAll(fifoCalculationList);
     }
 
+    public double productBuyPriceByBranch(UUID branchId) {
+        return productBuyPrice(fifoRepository.findAllByBranchIdAndActiveTrue(branchId));
+    }
 
+    public double productBuyPriceByBusiness(UUID businessId) {
+        return productBuyPrice(fifoRepository.findAllByBranch_BusinessIdAndActiveTrue(businessId));
+    }
+
+    private double productBuyPrice(List<FifoCalculation> fifoCalculationList) {
+        double totalBuyPrice = 0;
+        for (FifoCalculation fifo : fifoCalculationList) {
+            totalBuyPrice += (fifo.getRemainAmount() * fifo.getBuyPrice());
+        }
+        return totalBuyPrice;
+    }
 }
