@@ -13,7 +13,12 @@ public interface FifoCalculationRepository extends JpaRepository<FifoCalculation
     List<FifoCalculation> findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDate(UUID branchId, UUID productTypePriceId);
 
     List<FifoCalculation> findFirst20ByBranchIdAndProductIdOrderByDateDesc(UUID branchId, UUID productId);
+
     List<FifoCalculation> findFirst20ByBranchIdAndProductTypePriceIdOrderByDateDesc(UUID branchId, UUID productId);
 
     Optional<FifoCalculation> findByPurchaseProductId(UUID purchaseProductId);
+
+    List<FifoCalculation> findAllByBranchIdAndActiveTrue(UUID branchId);
+
+    List<FifoCalculation> findAllByBranch_BusinessIdAndActiveTrue(UUID businessId);
 }
