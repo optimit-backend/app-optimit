@@ -33,6 +33,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     List<Product> findAllByBusiness_IdAndActiveTrue(UUID businessId);
     List<Product> findAllByBranchIdAndActiveTrue(UUID branch_id);
+    List<Product> findAllByBranch_BusinessIdAndActiveTrue(UUID branch_business_id);
 
     List<Product> findAllByCategoryIdAndBusinessIdAndActiveTrue(UUID categoryId, UUID businessId);
     List<Product> findAllByBusiness_IdAndActiveIsTrueAndTypeLike(UUID business_id, Type type);
