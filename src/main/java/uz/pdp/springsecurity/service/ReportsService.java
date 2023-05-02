@@ -547,15 +547,38 @@ public class ReportsService {
         return new ApiResponse("Business Products Amount", true, productReportDtoList);
     }
 
-    public ApiResponse allProductAmountByBranch(UUID branchId) {
+    public ApiResponse allProductAmountByBranch(UUID branchId,UUID businessId) {
 
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-
-        if (optionalBranch.isEmpty()) {
-            return new ApiResponse("Branch Not Found", false);
+        Optional<Branch> optionalBranch = Optional.empty();
+        Optional<Business> optionalBusiness = Optional.empty();
+        if (branchId!=null){
+            optionalBranch = branchRepository.findById(branchId);
         }
-        List<Product> productList = productRepository.findAllByBranchIdAndActiveTrue(branchId);
-        List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProduct_BranchId(branchId);
+        if (businessId!=null){
+            optionalBusiness = businessRepository.findById(businessId);
+        }
+
+        boolean checkingBranch = false;
+        boolean checkingBusiness= false;
+        if (optionalBranch.isEmpty()){
+            checkingBusiness = true;
+        }else {
+            checkingBranch = true;
+        }
+
+        if (optionalBranch.isEmpty() && optionalBusiness.isEmpty()) {
+            return new ApiResponse("Not Found", false);
+        }
+        List<Product> productList = null;
+        List<ProductTypePrice> productTypePriceList = null;
+        if (checkingBranch){
+             productList = productRepository.findAllByBranchIdAndActiveTrue(branchId);
+             productTypePriceList = productTypePriceRepository.findAllByProduct_BranchId(branchId);
+        }else {
+            productList = productRepository.findAllByBranch_BusinessIdAndActiveTrue(businessId);
+            productTypePriceList = productTypePriceRepository.findAllByProduct_BusinessId(businessId);
+        }
+
 
         if (productList.isEmpty() && productTypePriceList.isEmpty()) {
             return new ApiResponse("No Found Products", false);
@@ -564,9 +587,16 @@ public class ReportsService {
         double totalSumByBuyPrice = 0D;
         Amount amounts = new Amount();
         for (Product product : productList) {
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByProductIdAndBranchId(product.getId(), optionalBranch.get().getId());
-            if (optionalWarehouse.isPresent()) {
-                double amount = optionalWarehouse.get().getAmount();
+            List<Warehouse> warehouseList = null;
+            if (businessId!=null){
+                warehouseList = warehouseRepository.findByProductIdAndProduct_BusinessId(product.getId(), businessId);
+            }else {
+                warehouseList = warehouseRepository.findByProductIdAndBranch_Id(product.getId(), branchId);
+            }
+            double amount = 0;
+            for (Warehouse warehouse : warehouseList) {
+                amount += warehouse.getAmount();
+            }
                 double salePrice = product.getSalePrice();
                 double buyPrice = product.getBuyPrice();
 
@@ -574,12 +604,19 @@ public class ReportsService {
                 totalSumByBuyPrice += amount * buyPrice;
                 amounts.setTotalSumBySalePrice(totalSumBySalePrice);
                 amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
-            }
+
         }
         for (ProductTypePrice product : productTypePriceList) {
-            Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branchId, product.getId());
-            if (optionalWarehouse.isPresent()) {
-                double amount = optionalWarehouse.get().getAmount();
+            List<Warehouse> warehouseList = null;
+            if (businessId!=null){
+                warehouseList = warehouseRepository.findByBranch_BusinessIdAndProductTypePriceId(businessId, product.getId());
+            }else {
+                warehouseList = warehouseRepository.findByBranch_IdAndProductTypePriceId(branchId, product.getId());
+            }
+            double amount = 0;
+            for (Warehouse warehouse : warehouseList) {
+                amount += warehouse.getAmount();
+            }
                 double salePrice = product.getSalePrice();
                 double buyPrice = product.getBuyPrice();
 
@@ -587,7 +624,6 @@ public class ReportsService {
                 totalSumByBuyPrice += amount * buyPrice;
                 amounts.setTotalSumBySalePrice(totalSumBySalePrice);
                 amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
-            }
         }
         return new ApiResponse("Business Products Amount", true, amounts);
     }

@@ -59,18 +59,6 @@ public class RoleController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * ID ORQALI LAVOZIMNI DELETE QILISH
-     *
-     * @param id
-     * @return ApiResponse(success - > true, message - > DELETED)
-     */
-    @CheckPermission("DELETE_ROLE")
-    @DeleteMapping("/{id}")
-    public HttpEntity<?> delete(@PathVariable UUID id) {
-        ApiResponse apiResponse = roleService.delete(id);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
 
     /**
      * BUSINESS_ID ORQALI BARCHA LAVOZIMLARNI OLIB CHIQISH
