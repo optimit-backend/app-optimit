@@ -52,6 +52,9 @@ public class ProjectService {
     TaskRepository taskRepository;
 
     @Autowired
+    TaskStatusRepository taskStatusRepository;
+
+    @Autowired
     FileDateRepository fileDateRepository;
     private final NotificationRepository notificationRepository;
 
@@ -71,7 +74,9 @@ public class ProjectService {
         project.setStartDate(projectDto.getStartDate());
         project.setEndDate(projectDto.getEndDate());
         project.setDeadline(projectDto.getDeadline());
-        if (projectDto.getProjectTypeId() != null) {
+        if (projectDto.getProjectTypeId() == null){
+            return new ApiResponse("You need to add project type");
+        }else {
             Optional<ProjectType> optionalProjectType = projectTypeRepository.findById(projectDto.getProjectTypeId());
             optionalProjectType.ifPresent(project::setProjectType);
         }
@@ -229,7 +234,25 @@ public class ProjectService {
         int expired = taskRepository.countAllByProjectIdAndExpiredTrue(id);
         List<Task> tasks = taskRepository.findAllByProjectId(id);
         double sum = 0;
+        List<TaskGetOne> taskGetOneList=new ArrayList<>();
         for (Task task : tasks) {
+            TaskGetOne taskGetOne=new TaskGetOne();
+            taskGetOne.setTaskName(task.getName());
+            taskGetOne.setTaskStatusName(task.getTaskStatus().getName());
+            taskGetOne.setDeadline(task.getDeadLine());
+            taskGetOne.setTaskStatusColor(task.getTaskStatus().getColor());
+            long status = taskStatusRepository.countByBranchId(optionalProject.get().getBranch().getId())-1;
+            if (task.getTaskStatus().getOrginalName()!=null){
+                if (task.getTaskStatus().getOrginalName().equals("Uncompleted")){
+                    taskGetOne.setPercent(0);
+                } else if (task.getTaskStatus().getOrginalName().equals("Completed")) {
+                    taskGetOne.setPercent(100);
+                }
+            }else {
+                taskGetOne.setPercent(((task.getTaskStatus().getRowNumber()-1)*100)/status);
+            }
+
+            taskGetOneList.add(taskGetOne);
             sum+=task.getTaskPrice();
         }
 
@@ -253,6 +276,7 @@ public class ProjectService {
         projectGetOne.setStartDate(project.getStartDate());
         projectGetOne.setEndDate(project.getEndDate());
         projectGetOne.setDeadline(project.getDeadline());
+        projectGetOne.setTaskGetOneList(taskGetOneList);
 
         List<FileData> fileDataList = project.getFileDataList();
         List<FileDataDto> fileDataDtoList=new ArrayList<>();
@@ -302,6 +326,17 @@ public class ProjectService {
                 contentProject.setContentName(task.getContent().getProduct().getName());
                 contentProject.setMeasurement(task.getContent().getProduct().getMeasurement().getName());
                 contentProject.setGoalAmount(task.getGoalAmount());
+                if (task.getContent().getProduct() != null ){
+                    if (task.getContent().getProduct().getPhoto() != null){
+                        contentProject.setPhotoId(task.getContent().getProduct().getPhoto().getId());
+                    }
+                }else if (task.getContent().getProductTypePrice() != null){
+                    if (task.getContent().getProductTypePrice().getPhoto() != null){
+                        contentProject.setPhotoId(task.getContent().getProductTypePrice().getPhoto().getId());
+                    }
+                }else {
+                    contentProject.setPhotoId(null);
+                }
                 contentProjectList.add(contentProject);
             }
         }
