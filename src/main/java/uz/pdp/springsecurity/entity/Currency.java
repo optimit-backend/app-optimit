@@ -15,15 +15,23 @@ import javax.persistence.ManyToOne;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Currency extends AbsEntity {
+    @ManyToOne(optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Business business;
 
     @Column(nullable = false)
     private String name;
 
-    private String description;
+    @Column(nullable = false)
+    private double course;
 
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Business business;
+    private String description = "delete";
 
-    private boolean active;
+    private boolean active = true;
+
+    public Currency(String name, Business business, double course) {
+        this.name = name;
+        this.business = business;
+        this.course = course;
+    }
 }

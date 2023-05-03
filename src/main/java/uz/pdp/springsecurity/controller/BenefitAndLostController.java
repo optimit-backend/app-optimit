@@ -16,6 +16,7 @@ import java.text.ParseException;
 public class BenefitAndLostController {
     @Autowired
     BenefitAndLostService benefitAndLostService;
+    //todo delete
 
     /**
      * IKKTA VAQT ORASIDAGI FOYDA VA ZARARLARNI OLIB CHIQISH
@@ -23,12 +24,12 @@ public class BenefitAndLostController {
      * @return
      * @throws ParseException
      */
-    @CheckPermission("VIEW_BENEFIT_AND_LOST")
+    /*@CheckPermission("VIEW_BENEFIT_AND_LOST")
     @PostMapping
     public HttpEntity<?> find(@RequestBody BenefitAndLostDto benefitAndLostDto) throws ParseException {
         ApiResponse apiResponse = benefitAndLostService.findBenefitLost(benefitAndLostDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+    }*/
 
     /**
      * BITTA SANADAGI FOYDA VA ZARARLARNI OLIB CHIQISH
@@ -37,17 +38,17 @@ public class BenefitAndLostController {
      * @throws ParseException
      */
 
-    @CheckPermission("VIEW_BENEFIT_AND_LOST")
+    /*@CheckPermission("VIEW_BENEFIT_AND_LOST")
     @PostMapping("/one-date")
     public HttpEntity<?> findOneDate(@RequestBody BenefitAndLostDto benefitAndLostDto) throws ParseException {
         ApiResponse apiResponse = benefitAndLostService.findBenefitAndLostByDate(benefitAndLostDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+    }*/
 
-    @CheckPermission("VIEW_BENEFIT_AND_LOST")
+    /*@CheckPermission("VIEW_BENEFIT_AND_LOST")
     @PostMapping("/one-week")
     public HttpEntity<?> findOneWeek(@RequestBody BenefitAndLostDto benefitAndLostDto) throws ParseException {
         ApiResponse apiResponse = benefitAndLostService.findBenefitAndLostByWeek(benefitAndLostDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+    }*/
 }

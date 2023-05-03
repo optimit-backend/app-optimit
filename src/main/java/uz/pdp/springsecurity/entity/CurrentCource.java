@@ -17,6 +17,7 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 @Entity(name = "current_course")
 public class CurrentCource extends AbsEntity {
+    // todo delete
 
     @Column(nullable = false)
     private double currentCourse;

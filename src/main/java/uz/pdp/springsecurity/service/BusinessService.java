@@ -1,11 +1,9 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.enums.*;
 import uz.pdp.springsecurity.mapper.AddressMapper;
 import uz.pdp.springsecurity.mapper.BranchMapper;
@@ -41,9 +39,6 @@ public class BusinessService {
     UserRepository userRepository;
 
     @Autowired
-    CurrencyRepository currencyRepository;
-
-    @Autowired
     TariffRepository tariffRepository;
 
     @Autowired
@@ -77,11 +72,6 @@ public class BusinessService {
         business.setActive(businessDto.isActive());
         business.setDelete(false);
         business = businessRepository.save(business);
-        Currency currencyUZB = currencyRepository.save(new Currency(
-                "SO'M",
-                "UZB",
-                business,
-                true));
 
         payMethodRepository.save(new PaymentMethod(
                 "Naqd",
@@ -102,7 +92,7 @@ public class BusinessService {
         optionalTariff.ifPresent(subscription::setTariff);
         subscription.setActive(false);
         subscription.setStatusTariff(StatusTariff.WAITING);
-        Subscription newSubscription = subscriptionRepository.save(subscription);
+        subscriptionRepository.save(subscription);
 
 
         AddressDto addressDto = businessDto.getAddressDto();

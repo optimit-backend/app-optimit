@@ -34,8 +34,9 @@ public class BenefitAndLostService {
 
     @Autowired
     TradeProductRepository tradeProductRepository;
+    //todo delete
 
-    public ApiResponse findBenefitLost(BenefitAndLostDto benefitAndLostDto) throws ParseException {
+    /*public ApiResponse findBenefitLost(BenefitAndLostDto benefitAndLostDto) throws ParseException {
 
         List<Trade> allTrade = tradeRepository.findAllByPayDateIsBetweenAndBranch_Id(benefitAndLostDto.getFirstDate(), benefitAndLostDto.getSecondDate(), benefitAndLostDto.getBranchId());
         if (allTrade.isEmpty()) {
@@ -80,9 +81,9 @@ public class BenefitAndLostService {
         }
 
         return new ApiResponse("FOUND", true, benefitAndLost);
-    }
+    }*/
 
-    public ApiResponse findBenefitAndLostByDate(BenefitAndLostDto benefitAndLostDto) throws ParseException {
+    /*public ApiResponse findBenefitAndLostByDate(BenefitAndLostDto benefitAndLostDto) throws ParseException {
         System.out.println(benefitAndLostDto.getFirstDate());
         List<Trade> allTrade = tradeRepository.findTradeByOneDate(benefitAndLostDto.getFirstDate());
 
@@ -129,9 +130,9 @@ public class BenefitAndLostService {
         }
 
         return new ApiResponse("FOUND", true, benefitAndLost);
-    }
+    }*/
 
-    public ApiResponse findBenefitAndLostByWeek(BenefitAndLostDto benefitAndLostDto) throws ParseException {
+    /*public ApiResponse findBenefitAndLostByWeek(BenefitAndLostDto benefitAndLostDto) throws ParseException {
         Timestamp firstDate = new Timestamp(System.currentTimeMillis());
         Timestamp secondDate = new Timestamp(System.currentTimeMillis() - 604800000);
         List<Trade> tradeList = tradeRepository.findAllByPayDateAndBranchBetween(firstDate, secondDate,benefitAndLostDto.getBranchId());
@@ -179,5 +180,5 @@ public class BenefitAndLostService {
         }
 
         return new ApiResponse("FOUND",true,benefitAndLost);
-    }
+    }*/
 }

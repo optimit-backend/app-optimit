@@ -8,14 +8,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CurrencyRepository extends JpaRepository<Currency,UUID> {
+    Optional<Currency> findByBusinessId(UUID businessId);
 
-    List<Currency> findAllByBusinessId(UUID business_id);
-
-//    List<Currency> findAllByActiveTrueAndBusinessId(UUID business_id);
+    /*List<Currency> findAllByBusinessId(UUID business_id);
 
     List<Currency> findAllByBusinessIdAndActiveTrue(UUID business_id);
 
     Currency findByBusinessIdAndActiveTrue(UUID business_id);
 
-    long countByName(String name);
+    long countByName(String name);*/
 }

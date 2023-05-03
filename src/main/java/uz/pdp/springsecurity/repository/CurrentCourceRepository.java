@@ -6,6 +6,7 @@ import uz.pdp.springsecurity.entity.CurrentCource;
 import java.util.UUID;
 
 public interface CurrentCourceRepository extends JpaRepository<CurrentCource, UUID> {
+    // todo delete
 
     CurrentCource getByCurrencyId(UUID currency_id);
 

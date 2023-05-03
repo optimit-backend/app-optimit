@@ -413,7 +413,10 @@ public class TradeService {
         return new ApiResponse("FOUND", true, allByBusinessId);
     }
 
-    public ApiResponse createPdf(UUID id, HttpServletResponse response) throws IOException {
+
+    // todo delete
+
+    /*public ApiResponse createPdf(UUID id, HttpServletResponse response) throws IOException {
 
         Optional<Trade> tradeOptional = tradeRepository.findById(id);
         PDFService pdfService = new PDFService();
@@ -421,7 +424,7 @@ public class TradeService {
         pdfService.createPdf(tradeOptional.get(), response);
 
         return new ApiResponse("CREATED", true);
-    }
+    }*/
 
     public ApiResponse getAllByBranchId(UUID branchId) {
         List<Trade> allByBranchId = tradeRepository.findAllByBranch_Id(branchId);

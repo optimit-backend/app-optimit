@@ -29,8 +29,9 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class PDFService {
+    // todo delete
 
-    @Autowired
+    /*@Autowired
     CurrencyRepository currencyRepository;
 
     @Autowired
@@ -444,8 +445,8 @@ public class PDFService {
 
         Paragraph descritptionText = new Paragraph().add(new Text("Qisqa eslatma:  ").setBold().setFontSize(14)).setMarginTop(15);
         Paragraph descritptionValue = new Paragraph().add(new Text(value5).setFontSize(14)).setTextAlignment(TextAlignment.RIGHT).setMarginTop(15);
-/**
- */
+*//**
+ *//*
 
         texts.add(totalSum);
         values.add(totalValue);
@@ -491,6 +492,6 @@ public class PDFService {
         FileCopyUtils.copy(aByte, response.getOutputStream());
 
         file.delete();
-    }
+    }*/
 
 }
