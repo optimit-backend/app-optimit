@@ -118,8 +118,10 @@ public class UserService {
         User user = optionalUser.get();
         userMapper.update(userDto, user);
         assert userDto.getPassword() != null;
-        if (userDto.getPassword().length() > 2) {
-            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        if (!userDto.getPassword().isEmpty()){
+            if (userDto.getPassword().length() > 2) {
+                user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            }
         }
 
         if (userDto.getJobId() != null) {
@@ -249,7 +251,6 @@ public class UserService {
         return new ApiResponse("FOUND", true, dtoList);
     }
 
-
     public ApiResponse getAllByBranchId(UUID branch_id) {
         Optional<Branch> optionalBranch = branchRepository.findById(branch_id);
         if (optionalBranch.isPresent()) {
@@ -261,7 +262,6 @@ public class UserService {
         }
         return new ApiResponse("NOT FOUND", false);
     }
-
 
 
     public ApiResponse getByPatron(UUID userId) {

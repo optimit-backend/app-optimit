@@ -3,7 +3,6 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uz.pdp.springsecurity.entity.FileData;
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +24,7 @@ public class ProjectGetOne {
     private Date startDate;
     private Date endDate;
     private Date deadline;
+    private List<TaskGetOne> taskGetOneList;
     private List<FileDataDto> fileDataList;
     private List<StageProject> stageProjectList;
     private List<UserProject> userProjectList;

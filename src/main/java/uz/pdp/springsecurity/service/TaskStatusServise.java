@@ -36,7 +36,10 @@ public class TaskStatusServise {
         }
         TaskStatus taskStatus = new TaskStatus();
         taskStatus.setABoolean(taskStatusDto.isABoolean());
-        long ordinalNumber = taskStatusRepository.countByBranchId(optionalBranch.get().getId())+1;
+        long ordinalNumber = taskStatusRepository.countByBranchId(optionalBranch.get().getId());
+        TaskStatus completed = taskStatusRepository.getByOrginalNameAndBranchId("Completed",optionalBranch.get().getId());
+        completed.setRowNumber(ordinalNumber+1);
+        taskStatusRepository.save(completed);
         taskStatus.setRowNumber(ordinalNumber);
         taskStatus.setName(taskStatusDto.getName());
         taskStatus.setColor(taskStatusDto.getColor());
