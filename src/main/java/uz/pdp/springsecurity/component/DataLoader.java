@@ -13,11 +13,8 @@ import uz.pdp.springsecurity.service.AgreementService;
 import uz.pdp.springsecurity.service.InvoiceService;
 import uz.pdp.springsecurity.util.Constants;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 import static uz.pdp.springsecurity.enums.ExchangeStatusName.*;
@@ -52,13 +49,11 @@ public class DataLoader implements CommandLineRunner {
     private final InvoiceService invoiceService;
     private final BalanceRepository balanceRepository;
 
-    private final static LocalTime TODAY = LocalTime.now().withHour(8);
-
     @Value("${spring.sql.init.mode}")
     private String initMode;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 //------------------------------------------------------------------------------------------//
         if (initMode.equals("always")) {
             Permissions[] permissions = Permissions.values();
@@ -85,140 +80,108 @@ public class DataLoader implements CommandLineRunner {
                 tariffRepository.save(tariff);
             }
 
-            List<Business> allBusiness = businessRepository.findAll();
-            Business business = null;
-            if (allBusiness.isEmpty()) {
-                business = new Business();
-                business.setDescription("Test Uchun");
-                business.setName("Application");
-                business.setActive(true);
-                business.setDelete(false);
-                business = businessRepository.save(business);
-            }
+            Business business = new Business();
+            business.setDescription("Test Uchun");
+            business.setName("Application");
+            business.setActive(true);
+            business.setDelete(false);
+            business = businessRepository.save(business);
 
-            if (business != null) {
-                LidField lidField = new LidField();
-                lidField.setName("FIO");
-                lidField.setBusiness(business);
-                lidField.setValueType(ValueType.STRING);
-                lidField.setTanlangan(false);
-                lidFieldRepository.save(lidField);
+            LidField lidField = new LidField();
+            lidField.setName("FIO");
+            lidField.setBusiness(business);
+            lidField.setValueType(ValueType.STRING);
+            lidField.setTanlangan(false);
+            lidFieldRepository.save(lidField);
 
-                LidField lidField1 = new LidField();
-                lidField1.setName("PhoneNumber");
-                lidField1.setBusiness(business);
-                lidField1.setValueType(ValueType.INTEGER);
-                lidField1.setTanlangan(false);
-                lidFieldRepository.save(lidField1);
+            LidField lidField1 = new LidField();
+            lidField1.setName("PhoneNumber");
+            lidField1.setBusiness(business);
+            lidField1.setValueType(ValueType.INTEGER);
+            lidField1.setTanlangan(false);
+            lidFieldRepository.save(lidField1);
 
-                Source source = new Source();
-                source.setBusiness(business);
-                source.setName("Telegram");
-                sourceRepository.save(source);
-                Source source1 = new Source();
-                source1.setBusiness(business);
-                source1.setName("Facebook");
-                sourceRepository.save(source1);
-                Source source2 = new Source();
-                source2.setBusiness(business);
-                source2.setName("Instagram");
-                sourceRepository.save(source2);
+            Source source = new Source();
+            source.setBusiness(business);
+            source.setName("Telegram");
+            sourceRepository.save(source);
+            Source source1 = new Source();
+            source1.setBusiness(business);
+            source1.setName("Facebook");
+            sourceRepository.save(source1);
+            Source source2 = new Source();
+            source2.setBusiness(business);
+            source2.setName("Instagram");
+            sourceRepository.save(source2);
 
-                LidStatus newStatus = new LidStatus();
-                newStatus.setName("New");
-                newStatus.setIncrease(true);
-                newStatus.setOrginalName("New");
-                newStatus.setColor("rang");
-                newStatus.setSort(1);
-                newStatus.setBusiness(business);
-                lidStatusRepository.save(newStatus);
+            LidStatus newStatus = new LidStatus();
+            newStatus.setName("New");
+            newStatus.setIncrease(true);
+            newStatus.setOrginalName("New");
+            newStatus.setColor("rang");
+            newStatus.setSort(1);
+            newStatus.setBusiness(business);
+            lidStatusRepository.save(newStatus);
 
-                LidStatus progressStatus = new LidStatus();
-                progressStatus.setName("Progress");
-                progressStatus.setIncrease(true);
-                progressStatus.setOrginalName("Progress");
-                progressStatus.setColor("rang");
-                progressStatus.setSort(2);
-                progressStatus.setBusiness(business);
-                lidStatusRepository.save(progressStatus);
+            LidStatus progressStatus = new LidStatus();
+            progressStatus.setName("Progress");
+            progressStatus.setIncrease(true);
+            progressStatus.setOrginalName("Progress");
+            progressStatus.setColor("rang");
+            progressStatus.setSort(2);
+            progressStatus.setBusiness(business);
+            lidStatusRepository.save(progressStatus);
 
-                LidStatus doneStatus = new LidStatus();
-                doneStatus.setName("Done");
-                doneStatus.setIncrease(true);
-                doneStatus.setOrginalName("Done");
-                doneStatus.setColor("rang");
-                doneStatus.setSaleStatus(true);
-                doneStatus.setSort(3);
-                doneStatus.setBusiness(business);
-                lidStatusRepository.save(doneStatus);
-            }
+            LidStatus doneStatus = new LidStatus();
+            doneStatus.setName("Done");
+            doneStatus.setIncrease(true);
+            doneStatus.setOrginalName("Done");
+            doneStatus.setColor("rang");
+            doneStatus.setSaleStatus(true);
+            doneStatus.setSort(3);
+            doneStatus.setBusiness(business);
+            lidStatusRepository.save(doneStatus);
 
-            if (business != null) {
-                List<Measurement> measurementList = measurementRepository.findAllByBusiness_Id(business.getId());
-                if (measurementList.isEmpty()) {
-                    measurementRepository.save(
-                            new Measurement("dona",
-                                    business)
-                    );
-                }
-            }
 
-            if (business != null) {
-                List<Brand> allByBusinessId = brandRepository.findAllByBusiness_Id(business.getId());
-                if (allByBusinessId.isEmpty()) {
-                    brandRepository.save(
-                            new Brand("brand",
-                                    business)
-                    );
-                }
-            }
+            measurementRepository.save(
+                    new Measurement("dona",
+                            business)
+            );
 
-            if (business != null) {
-                List<Category> allByBusinessId = categoryRepository.findAllByBusiness_Id(business.getId());
-                if (allByBusinessId.isEmpty()) {
-                    categoryRepository.save(
-                            new Category("category",
+            brandRepository.save(
+                    new Brand(
+                            "brand",
+                            business
+                    ));
 
-                                    business)
-                    );
-                }
-            }
+            categoryRepository.save(
+                    new Category(
+                            "category",
+                            business
+                    ));
 
-            if (business != null) {
-                Optional<Subscription> subscriptionOptional = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
-                if (subscriptionOptional.isEmpty()) {
-                    Timestamp startDay = new Timestamp(System.currentTimeMillis());
-                    LocalDate date = LocalDate.now().plusMonths(1);
-                    Timestamp endDay = Timestamp.valueOf(date.atStartOfDay());
+            Timestamp startDay = new Timestamp(System.currentTimeMillis());
+            LocalDate date = LocalDate.now().plusMonths(1);
+            Timestamp endDay = Timestamp.valueOf(date.atStartOfDay());
 
-                    Subscription subscription = new Subscription(
-                            business,
-                            tariff,
-                            startDay,
-                            endDay,
-                            StatusTariff.CONFIRMED,
-                            PayType.OFFLINE,
-                            true,
-                            true,
-                            false
-                    );
-                    subscriptionRepository.save(subscription);
-                }
-            }
-//------------------------------------------------------------------------------------------//
-            List<Address> addresses = addressRepository.findAll();
-            Address address = null;
-            if (addresses.isEmpty()) {
-                address = new Address(
-                        "Tashkent",
-                        "Shayxontuxur",
-                        "Gulobod",
-                        "1"
-                );
-                addressRepository.save(address);
-            }
-//------------------------------------------------------------------------------------------//
+            subscriptionRepository.save(new Subscription(
+                    business,
+                    tariff,
+                    startDay,
+                    endDay,
+                    StatusTariff.CONFIRMED,
+                    PayType.OFFLINE,
+                    true,
+                    true,
+                    false
+            ));
 
+            Address address = addressRepository.save(new Address(
+                    "Tashkent",
+                    "Shayxontuxur",
+                    "Gulobod",
+                    "1"
+            ));
 
             assert tariff != null;
             Optional<Subscription> optionalSubscription = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
@@ -231,7 +194,6 @@ public class DataLoader implements CommandLineRunner {
                     subscription.getTariff().getPermissions(),
                     business
             ));
-
 
             Role admin = roleRepository.save(
                     new Role(
@@ -717,105 +679,74 @@ public class DataLoader implements CommandLineRunner {
                     business
             ));
 
-            List<PaymentMethod> all1 = payMethodRepository.findAll();
-            if (all1.isEmpty()) {
-                payMethodRepository.save(new PaymentMethod(
-                        "Naqd",
-                        business
-                ));
 
-                payMethodRepository.save(new PaymentMethod(
-                        "PlastikKarta",
-                        business
-                ));
+            payMethodRepository.save(new PaymentMethod(
+                    "Naqd",
+                    business
+            ));
 
-                payMethodRepository.save(new PaymentMethod(
-                        "BankOrqali",
-                        business
-                ));
-            }
+            payMethodRepository.save(new PaymentMethod(
+                    "PlastikKarta",
+                    business
+            ));
 
-            List<Currency> currencyList = currencyRepository.findAll();
-            Currency currencyUSA = new Currency();
-            if (currencyList.isEmpty()) {
-//            currencyUSA = currencyRepository.save(new Currency(
-//                    "DOLLAR",
-//                    "USA",
-//                    business,
-//                    true
-//            ));
+            payMethodRepository.save(new PaymentMethod(
+                    "BankOrqali",
+                    business
+            ));
 
-                Currency currencyUZB = currencyRepository.save(new Currency(
-                        "SO'M",
-                        "UZB",
-                        business,
-                        true
-                ));
-            }
+            currencyRepository.save(new Currency(
+                    "USD",
+                    business,
+                    11400
+            ));
 
             Set<Branch> branches = new HashSet<>();
-            if (business != null) {
-                List<Branch> allBranch = branchRepository.findAllByBusiness_Id(business.getId());
-                Branch branch = null;
-                if (allBranch.isEmpty()) {
-                    branch = new Branch(
-                            "Test Filial",
-                            address,
-                            business
-                    );
-                    branchRepository.save(branch);
-                    invoiceService.create(branch);
+            Branch branch = branchRepository.save(new Branch(
+                    "Test Filial",
+                    address,
+                    business
+            ));
+            invoiceService.create(branch);
                     branches.add(branch);
 
-                    List<ProjectStatus> projectStatusList = projectStatusRepository.findAll();
-                    if (projectStatusList.isEmpty()) {
-                        ProjectStatus projectStatus = new ProjectStatus();
-                        projectStatus.setName("Uncompleted");
-                        projectStatus.setColor("red");
-                        projectStatus.setBranch(branch);
-                        projectStatusRepository.save(projectStatus);
-                    }
-                    if (projectStatusList.isEmpty()) {
-                        ProjectStatus projectStatus = new ProjectStatus();
-                        projectStatus.setColor("yellow");
-                        projectStatus.setName("Process");
-                        projectStatus.setBranch(branch);
-                        projectStatusRepository.save(projectStatus);
-                    }
-                    if (projectStatusList.isEmpty()) {
-                        ProjectStatus projectStatus = new ProjectStatus();
-                        projectStatus.setColor("green");
-                        projectStatus.setName("Completed");
-                        projectStatus.setBranch(branch);
-                        projectStatusRepository.save(projectStatus);
-                    }
+
+            ProjectStatus projectStatus1 = new ProjectStatus();
+            projectStatus1.setName("Uncompleted");
+            projectStatus1.setColor("red");
+            projectStatus1.setBranch(branch);
+            projectStatusRepository.save(projectStatus1);
+
+            ProjectStatus projectStatus2 = new ProjectStatus();
+            projectStatus2.setColor("yellow");
+            projectStatus2.setName("Process");
+            projectStatus2.setBranch(branch);
+            projectStatusRepository.save(projectStatus2);
+
+            ProjectStatus projectStatus3 = new ProjectStatus();
+            projectStatus3.setColor("green");
+            projectStatus3.setName("Completed");
+            projectStatus3.setBranch(branch);
+            projectStatusRepository.save(projectStatus3);
 
 
-                    List<TaskStatus> taskStatusList = taskStatusRepository.findAll();
-                    if (taskStatusList.isEmpty()) {
-                        TaskStatus taskStatus = new TaskStatus();
-                        taskStatus.setName("Completed");
-                        taskStatus.setOrginalName("Completed");
-                        taskStatus.setRowNumber(2);
-                        taskStatus.setABoolean(true);
-                        taskStatus.setColor("#04d227");
-                        taskStatus.setBranch(branch);
-                        taskStatusRepository.save(taskStatus);
-                    }
+            TaskStatus taskStatus = new TaskStatus();
+            taskStatus.setName("Completed");
+            taskStatus.setOrginalName("Completed");
+            taskStatus.setRowNumber(2);
+            taskStatus.setABoolean(true);
+            taskStatus.setColor("#04d227");
+            taskStatus.setBranch(branch);
+            taskStatusRepository.save(taskStatus);
 
-                    if (taskStatusList.isEmpty()) {
-                        TaskStatus taskStatus = new TaskStatus();
-                        taskStatus.setName("Uncompleted");
-                        taskStatus.setOrginalName("Uncompleted");
-                        taskStatus.setRowNumber(1);
-                        taskStatus.setABoolean(true);
-                        taskStatus.setColor("#FF0000");
-                        taskStatus.setBranch(branch);
-                        taskStatusRepository.save(taskStatus);
-                    }
-                }
-            }
-
+            TaskStatus taskStatus2 = new TaskStatus();
+            taskStatus2.setName("Uncompleted");
+            taskStatus2.setOrginalName("Uncompleted");
+            taskStatus2.setRowNumber(1);
+            taskStatus2.setABoolean(true);
+            taskStatus2.setColor("#FF0000");
+            taskStatus2.setBranch(branch);
+            taskStatusRepository.save(taskStatus2);
 
             User userAdmin = new User(
                     "Admin",
@@ -828,6 +759,7 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             );
+
             userAdmin.setArrivalTime("08:00");
             userAdmin.setLeaveTime("16:00");
             userAdmin = userRepository.save(userAdmin);
@@ -881,48 +813,41 @@ public class DataLoader implements CommandLineRunner {
             userEmployee = userRepository.save(userEmployee);
             agreementService.add(userEmployee);
 
-            List<PaymentStatus> all = paymentStatusRepository.findAll();
-            if (all.isEmpty()) {
-                paymentStatusRepository.save(new PaymentStatus(
-                        TOLANGAN.name()
-                ));
 
-                paymentStatusRepository.save(new PaymentStatus(
-                        QISMAN_TOLANGAN.name()
-                ));
+            paymentStatusRepository.save(new PaymentStatus(
+                    TOLANGAN.name()
+            ));
 
-                paymentStatusRepository.save(new PaymentStatus(
-                        TOLANMAGAN.name()
-                ));
-            }
+            paymentStatusRepository.save(new PaymentStatus(
+                    QISMAN_TOLANGAN.name()
+            ));
 
+            paymentStatusRepository.save(new PaymentStatus(
+                    TOLANMAGAN.name()
+            ));
 
             List<PaymentMethod> newAll = payMethodRepository.findAll();
             for (PaymentMethod paymentMethod : newAll) {
                 Balance balance = new Balance();
                 balance.setAccountSumma(0);
                 balance.setPaymentMethod(paymentMethod);
-                for (Branch branch : branches) {
-                    balance.setBranch(branch);
+                for (Branch branch1 : branches) {
+                    balance.setBranch(branch1);
                 }
                 balanceRepository.save(balance);
             }
 
+            exchangeStatusRepository.save(new ExchangeStatus(
+                    BUYURTMA_QILINGAN.name()
+            ));
 
-            List<ExchangeStatus> exchangeStatusRepositoryAll = exchangeStatusRepository.findAll();
-            if (exchangeStatusRepositoryAll.isEmpty()) {
-                exchangeStatusRepository.save(new ExchangeStatus(
-                        BUYURTMA_QILINGAN.name()
-                ));
+            exchangeStatusRepository.save(new ExchangeStatus(
+                    KUTILMOQDA.name()
+            ));
 
-                exchangeStatusRepository.save(new ExchangeStatus(
-                        KUTILMOQDA.name()
-                ));
-
-                exchangeStatusRepository.save(new ExchangeStatus(
-                        QABUL_QILINGAN.name()
-                ));
-            }
+            exchangeStatusRepository.save(new ExchangeStatus(
+                    QABUL_QILINGAN.name()
+            ));
         }
     }
 }

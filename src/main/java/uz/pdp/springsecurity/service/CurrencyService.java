@@ -1,35 +1,32 @@
 package uz.pdp.springsecurity.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.Business;
 import uz.pdp.springsecurity.entity.Currency;
-import uz.pdp.springsecurity.entity.CurrentCource;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.CurrencyDto;
-import uz.pdp.springsecurity.payload.EditCourse;
 import uz.pdp.springsecurity.repository.BusinessRepository;
 import uz.pdp.springsecurity.repository.CurrencyRepository;
-import uz.pdp.springsecurity.repository.CurrentCourceRepository;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class CurrencyService {
-    @Autowired
-    CurrencyRepository currencyRepository;
+    private final CurrencyRepository currencyRepository;
 
-    @Autowired
-    CurrentCourceRepository currentCourceRepository;
+    private final BusinessRepository businessRepository;
 
-    @Autowired
-    BusinessRepository businessRepository;
+    public ApiResponse getByBusiness(UUID businessId) {
+        return null;
+    }
 
-    public ApiResponse add(CurrencyDto currencyDto) {
+    public ApiResponse edit(UUID businessId, CurrencyDto currencyDto) {
+        return null;
+    }
+
+    /*public ApiResponse add(CurrencyDto currencyDto) {
         Optional<Business> optionalBusiness = businessRepository.findById(currencyDto.getBusinessId());
         if (optionalBusiness.isEmpty()) {
             return new ApiResponse("BUSINESS NOT FOUND", false);
@@ -57,14 +54,14 @@ public class CurrencyService {
         currentCourceRepository.save(currentCource);
 
         return new ApiResponse("ADDED", true, currency.getId());
-    }
+    }*/
 
-    public ApiResponse get(UUID id) {
+    /*public ApiResponse get(UUID id) {
         if (!currencyRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, currencyRepository.findById(id).get());
-    }
+    }*/
 
-    public ApiResponse delete(UUID id) {
+    /*public ApiResponse delete(UUID id) {
         Optional<Currency> optionalCurrency = currencyRepository.findById(id);
         if (optionalCurrency.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
@@ -77,9 +74,9 @@ public class CurrencyService {
             currencyRepository.deleteById(id);
         }
         return new ApiResponse("DELETED", true);
-    }
+    }*/
 
-    public ApiResponse getAllCurrency(UUID businessId) {
+    /*public ApiResponse getAllCurrency(UUID businessId) {
         List<Currency> all = currencyRepository.findAllByBusinessId(businessId);
         if (all.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
@@ -89,9 +86,9 @@ public class CurrencyService {
             dtoList.add(generateCurrencyDtoFromCurrency(currency));
         }
         return new ApiResponse("All Currencies", true, dtoList);
-    }
+    }*/
 
-    public CurrencyDto generateCurrencyDtoFromCurrency(Currency currency) {
+    /*public CurrencyDto generateCurrencyDtoFromCurrency(Currency currency) {
         CurrencyDto dto = new CurrencyDto();
         dto.setId(currency.getId());
         dto.setName(currency.getName());
@@ -103,9 +100,9 @@ public class CurrencyService {
             dto.setCurrentCourse(currentCourceRepository.getByCurrencyId(currency.getId()).getCurrentCourse());
         }
         return dto;
-    }
+    }*/
 
-    public ApiResponse getOneCurrency(UUID id) {
+    /*public ApiResponse getOneCurrency(UUID id) {
         Optional<Currency> byId = currencyRepository.findById(id);
 
         if (byId.isPresent()) {
@@ -113,9 +110,9 @@ public class CurrencyService {
             return new ApiResponse("One Currency", true, dto);
         }
         return new ApiResponse("NOT FOUND", false);
-    }
+    }*/
 
-    public ApiResponse editCurrency(UUID id, CurrencyDto dto) {
+    /*public ApiResponse editCurrency(UUID id, CurrencyDto dto) {
         Optional<Currency> byId = currencyRepository.findById(id);
         if (byId.isPresent()) {
             Currency currency = byId.get();
@@ -132,16 +129,16 @@ public class CurrencyService {
             return new ApiResponse("Edited", true, currencyDto);
         }
         return new ApiResponse("NOT FOUND", false);
-    }
+    }*/
 
-    public Currency generateCurrencyFromCurrencyDto(CurrencyDto dto) {
+    /*public Currency generateCurrencyFromCurrencyDto(CurrencyDto dto) {
         Currency currency = new Currency();
         currency.setName(dto.getName());
         currency.setDescription(dto.getDescription());
         return currency;
-    }
+    }*/
 
-    public ApiResponse editCourse(UUID id, double course) {
+    /*public ApiResponse editCourse(UUID id, double course) {
         Optional<Currency> currencyOptional = currencyRepository.findById(id);
         if (currencyOptional.isPresent()) {
             Currency currency = currencyOptional.get();
@@ -154,9 +151,9 @@ public class CurrencyService {
             return new ApiResponse("Edited", true);
         }
         return new ApiResponse("NOT FOUND", false);
-    }
+    }*/
 
-    @Transactional
+    /*@Transactional
     public ApiResponse editActiveCourse(EditCourse editCourse) {
         List<Currency> allByActiveTrueAndBusinessId = currencyRepository.findAllByBusinessIdAndActiveTrue(editCourse.getBusinessId());
         for (Currency currency : allByActiveTrueAndBusinessId) {
@@ -172,14 +169,14 @@ public class CurrencyService {
         }else {
             return new ApiResponse("NOT FOUND", false);
         }
-    }
+    }*/
 
-    public double getValueByActiveCourse(double value, UUID businessId){
+    /*public double getValueByActiveCourse(double value, UUID businessId){
         Currency currency = currencyRepository.findByBusinessIdAndActiveTrue(businessId);
         CurrentCource cource = currentCourceRepository.getByCurrencyIdAndActive(currency.getId(), true);
         if (!currency.getName().equalsIgnoreCase("SO'M")){
             return value / cource.getCurrentCourse();
         }
         return value;
-    }
+    }*/
 }

@@ -139,29 +139,20 @@ public class PurchaseController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * XARID SANASI ORQALI BARCHA XARIDLARNI OLIB CHIQISH
-     *
-     * @param date
-     * @return ApiResponse(success - > true message - > FOUND)
-     */
-    @CheckPermission("VIEW_PURCHASE")
+
+   /* @CheckPermission("VIEW_PURCHASE")
     @GetMapping("get-purchase-by-date/{date}")
     public HttpEntity<?> getByDate(@PathVariable Date date) {
         ApiResponse apiResponse = purchaseService.getByDate(date);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+    }*/
 
-    /**
-     * XARID ID'SI ORQALI XARIDNING PDF CHEKINI DOWNLOAD QILISH
-     *
-     * @param id
-     * @return ApiResponse(success - > true message - > CREATED)
-     */
-    @CheckPermission("VIEW_PURCHASE")
+    // todo delete
+
+    /*@CheckPermission("VIEW_PURCHASE")
     @GetMapping("/get-pdf/{id}")
     public HttpEntity<?> getPdf(@PathVariable UUID id, HttpServletResponse response) throws IOException {
         ApiResponse apiResponse = purchaseService.getPdfFile(id, response);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+    }*/
 }
