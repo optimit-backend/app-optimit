@@ -82,6 +82,16 @@ public class ProjectController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("GET_OWN_PROJECT")
+    @GetMapping("/get-by-branchId/{branchId}/{userId}")
+    public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
+                                        @PathVariable UUID userId,
+                                        @RequestParam(defaultValue = "0", required = false) int page,
+                                        @RequestParam(defaultValue = "10", required = false) int size) {
+        ApiResponse apiResponse = projectService.getOwnProject(branchId,userId,page,size);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
     @CheckPermission("GET_PROJECT")
     @GetMapping("/get-by-name/{name}/{branchId}")
     public HttpEntity<?> getAllByName(

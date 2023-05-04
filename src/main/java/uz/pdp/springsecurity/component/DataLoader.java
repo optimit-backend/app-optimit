@@ -386,6 +386,7 @@ public class DataLoader implements CommandLineRunner {
                                     GET_TASK,
                                     EDIT_TASK,
                                     ADD_TASK,
+                                    GET_OWN_TASK,
 
                                     ADD_PRIZE,
                                     VIEW_PRIZE,
@@ -630,7 +631,9 @@ public class DataLoader implements CommandLineRunner {
                             EDIT_PROJECT_STATUS,
                             ADD_PROJECT_STATUS,
                             ADD_WORK_TIME,
-                            GET_WORK_TIME
+                            GET_WORK_TIME,
+
+                            GET_OWN_TASK
                     ),
                     business));
 

@@ -12,6 +12,7 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
     boolean existsByProjectTypeId(UUID projectType_id);
     List<Project> findAllByBranchId(UUID branch_id);
+    Page<Project> findAllByBranchIdAndUsers_Id(UUID branch_id, UUID users_id, Pageable pageable);
     List<Project> findAllByBranch_BusinessId(UUID branch_id);
     int countAllByUsersId(UUID users_id);
     int countAllByBranchId(UUID branch_id);
@@ -32,8 +33,5 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     Page<Project> findAllByProjectTypeIdAndCustomerIdAndProjectStatusId(UUID projectType_id, UUID customer_id, UUID projectStatus_id, Pageable pageable);
     Page<Project> findAllByProjectTypeIdAndCustomerIdAndExpiredTrue(UUID projectType_id, UUID customer_id, Pageable pageable);
     Page<Project> findAllByProjectTypeIdAndProjectStatusIdAndExpiredTrue(UUID projectType_id, UUID projectStatus_id,Pageable pageable);
-
     Page<Project> findByNameContainingIgnoreCaseAndBranchId(String name, UUID branch_id, Pageable pageable);
-
-//    int countAllById();
 }

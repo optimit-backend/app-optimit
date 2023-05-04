@@ -401,4 +401,23 @@ public class TaskServise {
         }
         return new ApiResponse("Found",true,taskPage);
     }
+
+    public ApiResponse getOwnTask(UUID userId,UUID branchId,int page,int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch Not Found",false);
+        }
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()){
+            return new ApiResponse("User Not Found");
+        }
+
+        Page<Task> tasks = taskRepository.findAllByBranch_IdAndTaskPriceList_UserList_Id(branchId, userId, pageable);
+
+
+        return new ApiResponse("Found",true,tasks);
+    }
 }
