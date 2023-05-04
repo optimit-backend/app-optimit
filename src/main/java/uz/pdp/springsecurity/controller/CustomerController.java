@@ -1,18 +1,20 @@
 package uz.pdp.springsecurity.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.CustomerDto;
 import uz.pdp.springsecurity.payload.RepaymentDto;
 import uz.pdp.springsecurity.repository.CustomerRepository;
+import uz.pdp.springsecurity.service.CustomerExcelService;
 import uz.pdp.springsecurity.service.CustomerService;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -23,6 +25,9 @@ public class CustomerController {
 
     @Autowired
     CustomerService customerService;
+
+    @Autowired
+    CustomerExcelService customerExcelService;
 
     /**
      * YANGI CUSTOMER QO'SHISH MIJOZ YANI
@@ -106,5 +111,22 @@ public class CustomerController {
     public HttpEntity<?> addRepayment(@PathVariable UUID id, @RequestBody RepaymentDto repaymentDto) {
         ApiResponse response = customerService.repayment(id, repaymentDto);
         return ResponseEntity.status(response.isSuccess() ? 201 : 409).body(response);
+    }
+
+
+    @PostMapping("/import/{branchId}")
+    public ResponseEntity<Void> importCustomersFromExcel(@PathVariable UUID branchId, @RequestParam("file") MultipartFile file) throws IOException {
+        customerExcelService.importCustomersFromExcel(file, branchId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/export/{branchId}")
+    public ResponseEntity<byte[]> exportCustomersToExcel(@PathVariable UUID branchId) throws IOException {
+        byte[] excelData = customerExcelService.exportCustomersToExcel(branchId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", "customers.xlsx");
+
+        return new ResponseEntity<>(excelData, headers, HttpStatus.OK);
     }
 }
