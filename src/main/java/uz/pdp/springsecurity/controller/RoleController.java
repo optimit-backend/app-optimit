@@ -73,7 +73,7 @@ public class RoleController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @PreAuthorize("hasRole('VIEW_ROLE') or hasRole('VIEW_ORG')")
+    @CheckPermission("VIEW_ORG")
     @GetMapping("/get-by-business-role/{business_id}")
     public HttpEntity<?> getByBusinessRole(@PathVariable UUID business_id) {
         ApiResponse apiResponse = roleService.getByBusinessRole(business_id);
