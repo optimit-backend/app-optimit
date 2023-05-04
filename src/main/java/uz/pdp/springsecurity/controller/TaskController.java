@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -35,7 +36,7 @@ public class TaskController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("EDIT_TASK")
+    @PreAuthorize("hasAnyAuthority('GET_TASK', 'GET_OWN_TASK')")
     @PutMapping("/edit/{id}/{statusId}")
     public HttpEntity<?> updateTaskStatus(@PathVariable UUID id,
                                           @PathVariable  UUID statusId) {
@@ -43,7 +44,7 @@ public class TaskController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("EDIT_TASK")
+    @PreAuthorize("hasAnyAuthority('GET_TASK', 'GET_OWN_TASK')")
     @PutMapping("change/{statusId}")
     public HttpEntity<?> updateTaskStatus(@PathVariable  UUID statusId,
                                           @RequestParam boolean isIncrease) {
@@ -51,7 +52,7 @@ public class TaskController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_TASK")
+    @PreAuthorize("hasAnyAuthority('GET_TASK', 'GET_OWN_TASK')")
     @GetMapping("/{id}")
     public HttpEntity<?> get(@PathVariable UUID id) {
         ApiResponse apiResponse = taskServise.get(id);
@@ -82,9 +83,9 @@ public class TaskController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_TASK")
-    @GetMapping("/get-by-branch/{branchId}")
-    public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
+    @PreAuthorize("hasAnyAuthority('GET_TASK', 'GET_OWN_TASK')")
+    @GetMapping("/get-by-branch/")
+    public HttpEntity<?> getAllByBranch(@RequestParam(required = false) UUID branchId,
                                         @RequestParam(required = false) UUID projectId,
                                         @RequestParam(required = false) UUID statusId,
                                         @RequestParam(required = false) UUID typeId,
@@ -113,9 +114,9 @@ public class TaskController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_TASK")
-    @GetMapping("/get-by-branch-pageable/{branchId}")
-    public HttpEntity<?> getAllByBranchPageable(@PathVariable UUID branchId,
+    @PreAuthorize("hasAnyAuthority('GET_TASK', 'GET_OWN_TASK')")
+    @GetMapping("/get-by-branch-pageable/")
+    public HttpEntity<?> getAllByBranchPageable(@RequestParam(required = false) UUID branchId,
                                                 @RequestParam(required = false) UUID projectId,
                                                 @RequestParam(required = false) UUID typeId,
                                                 @RequestParam(required = false) UUID userId,
