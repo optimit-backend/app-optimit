@@ -68,6 +68,8 @@ public class RoleService {
         if (exist || roleDto.getName().equalsIgnoreCase(Constants.SUPERADMIN) || roleDto.getName().equalsIgnoreCase(Constants.ADMIN))
             return new ApiResponse("ROLE ALREADY EXISTS", false);
 
+        List<Role> allByBusinessId = roleRepository.findAllByBusinessId(roleDto.getBusinessId());
+        System.out.println(allByBusinessId);
         Role role = optionalRole.get();
         role.setName(roleDto.getName());
         role.setPermissions(roleDto.getPermissions());

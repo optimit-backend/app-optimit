@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.springsecurity.annotations.CheckPermission;
@@ -13,8 +14,10 @@ import uz.pdp.springsecurity.repository.CustomerRepository;
 import uz.pdp.springsecurity.service.CustomerExcelService;
 import uz.pdp.springsecurity.service.CustomerService;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.util.UUID;
 
 @RestController
@@ -121,12 +124,11 @@ public class CustomerController {
     }
 
     @GetMapping("/export/{branchId}")
-    public ResponseEntity<byte[]> exportCustomersToExcel(@PathVariable UUID branchId) throws IOException {
+    public void exportCustomersToExcel(@PathVariable  UUID branchId, HttpServletResponse response) throws IOException {
         byte[] excelData = customerExcelService.exportCustomersToExcel(branchId);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", "customers.xlsx");
-
-        return new ResponseEntity<>(excelData, headers, HttpStatus.OK);
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=customers.xlsx");
+        response.getOutputStream().write(excelData);
     }
+
 }

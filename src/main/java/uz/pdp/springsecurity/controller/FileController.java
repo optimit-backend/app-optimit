@@ -57,6 +57,7 @@ public class FileController {
         }
 
     }
+
     @DeleteMapping("/files/{fileId}")
     public HttpEntity<?> deleteFile(@PathVariable UUID fileId) {
         ApiResponse apiResponse = fileService.deleteById(fileId);

@@ -78,18 +78,28 @@ public class CustomerService {
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("BRANCH NOT FOUND", false);
         }
-
+        CustomerGroup customerGroup = null;
         if (customerDto.getCustomerGroupId() != null) {
             Optional<CustomerGroup> optionalCustomerGroup = customerGroupRepository.findById(customerDto.getCustomerGroupId());
-            if (optionalCustomerGroup.isEmpty()) {
-                return new ApiResponse("NOT FOUND", false);
+            if (optionalCustomerGroup.isPresent()) {
+                customerGroup = optionalCustomerGroup.get();
             }
+
         }
-
         Customer customer = optionalCustomer.get();
-        mapper.update(customerDto, customer);
-        customerRepository.save(customer);
 
+        customer.setName(customerDto.getName());
+        customer.setPayDate(customerDto.getPayDate());
+        customer.setPhoneNumber(customerDto.getPhoneNumber());
+        customer.setTelegram(customerDto.getTelegram());
+        customer.setDebt(customerDto.getDebt());
+        if (customerGroup!=null){
+            customer.setCustomerGroup(customerGroup);
+        }
+        customer.setBusiness(optionalBusiness.get());
+        customer.setBranch(optionalBranch.get());
+
+        customerRepository.save(customer);
 
         return new ApiResponse("EDITED", true);
     }
