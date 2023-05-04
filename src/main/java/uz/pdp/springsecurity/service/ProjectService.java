@@ -503,4 +503,22 @@ public class ProjectService {
         }
         return new ApiResponse("Found",true,projects);
     }
+
+    public ApiResponse getOwnProject(UUID branchId, UUID userId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch Not Found",false);
+        }
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()){
+            return new ApiResponse("User Not Found");
+        }
+
+        Page<Project> projects = projectRepository.findAllByBranchIdAndUsers_Id(branchId, userId, pageable);
+
+        return new ApiResponse("Found",true,projects);
+    }
 }

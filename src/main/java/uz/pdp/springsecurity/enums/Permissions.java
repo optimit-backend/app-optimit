@@ -207,6 +207,7 @@ public enum Permissions {
     GET_TASK,
     EDIT_TASK,
     ADD_TASK,
+    GET_OWN_TASK,
 
     ADD_BONUS,
     GET_BONUS,

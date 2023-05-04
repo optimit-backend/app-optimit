@@ -65,6 +65,16 @@ public class TaskController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("GET_OWN_TASK")
+    @GetMapping("/branch/{userId}/{branchId}")
+    public HttpEntity<?> getOwnTask(@PathVariable UUID userId,
+                                    @PathVariable UUID branchId,
+                                    @RequestParam(defaultValue = "0", required = false) int page,
+                                    @RequestParam(defaultValue = "10", required = false) int size) {
+        ApiResponse apiResponse = taskServise.getOwnTask(userId,branchId,page,size);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
     @CheckPermission("DELETE_TASK")
     @DeleteMapping("/{id}")
     public HttpEntity<?> delete(@PathVariable UUID id) {

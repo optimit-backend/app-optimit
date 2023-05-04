@@ -115,9 +115,9 @@ public class CustomerController {
 
 
     @PostMapping("/import/{branchId}")
-    public ResponseEntity<Void> importCustomersFromExcel(@PathVariable UUID branchId, @RequestParam("file") MultipartFile file) throws IOException {
-        customerExcelService.importCustomersFromExcel(file, branchId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> importCustomersFromExcel(@PathVariable UUID branchId, @RequestParam("file") MultipartFile file) throws IOException {
+        ApiResponse apiResponse = customerExcelService.importCustomersFromExcel(file, branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 201 : 409).body(apiResponse);
     }
 
     @GetMapping("/export/{branchId}")

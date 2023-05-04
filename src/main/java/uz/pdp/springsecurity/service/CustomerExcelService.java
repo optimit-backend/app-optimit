@@ -2,11 +2,13 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.springsecurity.entity.Branch;
 import uz.pdp.springsecurity.entity.Customer;
+import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.CustomerRepository;
 
@@ -14,7 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,11 +27,11 @@ public class CustomerExcelService {
     private final CustomerRepository customerRepository;
     private final BranchRepository branchRepository;
 
-    public void importCustomersFromExcel(MultipartFile file, UUID branchId) throws IOException {
+    public ApiResponse importCustomersFromExcel(MultipartFile file, UUID branchId) throws IOException {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()){
-            return;
+            return new ApiResponse("Branch not found");
         }
 
         InputStream is = file.getInputStream();
@@ -42,28 +43,36 @@ public class CustomerExcelService {
                 continue;
             }
 
-            Customer customer = new Customer();
-            customer.setName(row.getCell(0).getStringCellValue());
-            customer.setPhoneNumber(row.getCell(1) != null ? row.getCell(1).getStringCellValue() : null);
-            customer.setTelegram(row.getCell(2) != null ? row.getCell(2).getStringCellValue() : null);
-            Cell debtCell = row.getCell(3);
-            if (debtCell != null && debtCell.getCellType() == CellType.NUMERIC) {
-                customer.setDebt(debtCell.getNumericCellValue());
-            } else {
-                customer.setDebt(0);
+            try {
+                Customer customer = new Customer();
+                customer.setName(row.getCell(0).getStringCellValue());
+                customer.setPhoneNumber(row.getCell(1) != null ?
+                        row.getCell(1).getCellType() == CellType.STRING ?
+                                row.getCell(1).getStringCellValue() :
+                                NumberToTextConverter.toText(row.getCell(1).getNumericCellValue())
+                        : null);
+                customer.setTelegram(row.getCell(2) != null ? row.getCell(2).getStringCellValue() : null);
+                Cell debtCell = row.getCell(3);
+                if (debtCell != null && debtCell.getCellType() == CellType.NUMERIC) {
+                    customer.setDebt(debtCell.getNumericCellValue());
+                } else {
+                    customer.setDebt(0);
+                }
+                customer.setCustomerGroup(null);
+                Cell payDateCell = row.getCell(4);
+                if (payDateCell != null && payDateCell.getCellType() == CellType.NUMERIC) {
+                    customer.setPayDate(payDateCell.getDateCellValue());
+                } else {
+                    customer.setPayDate(null);
+                }
+                customer.setBusiness(optionalBranch.get().getBusiness());
+                customer.setBranch(optionalBranch.get());
+                customerRepository.save(customer);
+            }catch (Exception e){
+                return new ApiResponse("Failed",false);
             }
-            customer.setCustomerGroup(null);
-            Cell payDateCell = row.getCell(4);
-            if (payDateCell != null && payDateCell.getCellType() == CellType.NUMERIC) {
-                customer.setPayDate(payDateCell.getDateCellValue());
-            } else {
-                customer.setPayDate(null);
-            }
-            customer.setBusiness(optionalBranch.get().getBusiness());
-            customer.setBranch(optionalBranch.get());
-
-            customerRepository.save(customer);
         }
+        return new ApiResponse("Saved",true);
     }
 
     public byte[] exportCustomersToExcel(UUID branchId) throws IOException {
