@@ -20,17 +20,16 @@ public class Currency extends AbsEntity {
     private Business business;
 
     @Column(nullable = false)
-    private String name;
+    private String name = "USD";
 
     @Column(nullable = false)
     private double course;
 
-    private String description = "delete";
+    private String description = "DOLLAR";
 
     private boolean active = true;
 
-    public Currency(String name, Business business, double course) {
-        this.name = name;
+    public Currency(Business business, double course) {
         this.business = business;
         this.course = course;
     }

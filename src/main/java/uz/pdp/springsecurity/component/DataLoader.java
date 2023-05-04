@@ -696,7 +696,6 @@ public class DataLoader implements CommandLineRunner {
             ));
 
             currencyRepository.save(new Currency(
-                    "USD",
                     business,
                     11400
             ));
