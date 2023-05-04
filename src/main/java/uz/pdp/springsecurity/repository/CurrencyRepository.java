@@ -10,6 +10,8 @@ import java.util.UUID;
 public interface CurrencyRepository extends JpaRepository<Currency,UUID> {
     Optional<Currency> findByBusinessId(UUID businessId);
 
+    Optional<Currency> findFirstByCourseIsNotNullOrderByUpdateAtDesc();
+
     /*List<Currency> findAllByBusinessId(UUID business_id);
 
     List<Currency> findAllByBusinessIdAndActiveTrue(UUID business_id);

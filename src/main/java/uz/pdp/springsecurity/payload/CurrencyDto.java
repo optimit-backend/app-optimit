@@ -11,13 +11,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CurrencyDto {
-
-    private UUID id;
     @NotNull(message = "required line")
+    private double course;
+    /*private UUID id;
     private String name;
-    @NotNull(message = "required line")
-    private double currentCourse;
-    private String description;
-    private UUID businessId;
-    private boolean active;
+    private String description;*/
 }

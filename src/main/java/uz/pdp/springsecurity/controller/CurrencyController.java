@@ -17,8 +17,8 @@ public class CurrencyController {
 
     private final CurrencyService currencyService;
     @GetMapping("/{businessId}")
-    public HttpEntity<?> getByBusiness(@PathVariable UUID businessId){
-        ApiResponse response = currencyService.getByBusiness(businessId);
+    public HttpEntity<?> get(@PathVariable UUID businessId){
+        ApiResponse response = currencyService.get(businessId);
         return ResponseEntity.status(response.isSuccess()? 200:409).body(response);
     }
 
