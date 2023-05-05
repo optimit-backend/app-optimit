@@ -371,12 +371,13 @@ public class TaskServise {
         return new ApiResponse("Found", true, tasks);
     }
 
-    public ApiResponse getAll(UUID branchId) {
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isEmpty()){
-            return new ApiResponse("Branch not found",false);
+    public ApiResponse getAll(UUID branchId,UUID userId) {
+        List<Task> taskList = null;
+        if (userId!=null){
+             taskList = taskRepository.findTasksByUserId(userId);
+        }else {
+             taskList = taskRepository.findAllByBranchId(branchId);
         }
-        List<Task> taskList = taskRepository.findAllByBranchId(branchId);
         if (taskList.isEmpty()){
             return new ApiResponse("Tasks not found",false);
         }
