@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -47,14 +48,14 @@ public class StageController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_PROJECT")
+    @PreAuthorize("hasAnyAuthority('GET_PROJECT', 'GET_OWN_PROJECT')")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
         ApiResponse apiResponse = stageService.getAllByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_PROJECT")
+    @PreAuthorize("hasAnyAuthority('GET_PROJECT', 'GET_OWN_PROJECT')")
     @GetMapping("/get-by-branchPageable/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
                                           @RequestParam(defaultValue = "0", required = false) int page,

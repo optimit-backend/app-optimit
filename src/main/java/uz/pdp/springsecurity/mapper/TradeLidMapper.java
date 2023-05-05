@@ -9,6 +9,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface TradeLidMapper {
+    @Mapping(source = "trader.firstName", target = "traderName")
     @Mapping(source = "createdAt", target = "timestamp")
     @Mapping(source = "paymentStatus.status", target = "paymentStatusName")
     @Mapping(source = "payMethod.type", target = "paymentMethodName")

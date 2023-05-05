@@ -36,7 +36,6 @@ public class ReportsService {
 
     @Autowired
     WarehouseRepository warehouseRepository;
-
     @Autowired
     BranchRepository branchRepository;
     @Autowired

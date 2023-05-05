@@ -68,9 +68,9 @@ public class TaskController {
     }
 
     @CheckPermission("GET_OWN_TASK")
-    @GetMapping("/branch/{userId}/{branchId}")
-    public HttpEntity<?> getOwnTask(@PathVariable UUID userId,
-                                    @PathVariable UUID branchId,
+    @GetMapping("/branch/{branchId}")
+    public HttpEntity<?> getOwnTask(@PathVariable UUID branchId,
+                                    @RequestParam(required = false) UUID userId,
                                     @RequestParam(defaultValue = "0", required = false) int page,
                                     @RequestParam(defaultValue = "10", required = false) int size) {
         ApiResponse apiResponse = taskServise.getOwnTask(userId,branchId,page,size);
