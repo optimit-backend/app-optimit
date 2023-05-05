@@ -55,8 +55,6 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        System.out.println(initMode);
-//------------------------------------------------------------------------------------------//
         if (initMode.equals("always")) {
             Permissions[] permissions = Permissions.values();
 

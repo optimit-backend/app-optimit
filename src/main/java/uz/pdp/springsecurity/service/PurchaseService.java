@@ -7,9 +7,6 @@ import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +93,10 @@ public class PurchaseService {
             payMethodId = purchase.getPaymentMethod().getId();
         }
 
+        if (purchaseDto.getPurchaseProductsDto().isEmpty()) {
+            return new ApiResponse("NOT FOUND PURCHASE PRODUCT", false);
+        }
+
         Optional<Supplier> optionalSupplier = supplierRepository.findById(purchaseDto.getSupplerId());
         if (optionalSupplier.isEmpty()) return new ApiResponse("SUPPLIER NOT FOUND", false);
         Supplier supplier = optionalSupplier.get();
@@ -141,12 +142,19 @@ public class PurchaseService {
 
         purchaseRepository.save(purchase);
 
+        UUID businessId = branch.getBusiness().getId();
+        Optional<Currency> optionalCurrency = currencyRepository.findByBusinessId(businessId);
+        double course = 11400;
+        if (optionalCurrency.isPresent()){
+            course = optionalCurrency.get().getCourse();
+        }
+
         List<PurchaseProductDto> purchaseProductDtoList = purchaseDto.getPurchaseProductsDto();
         List<PurchaseProduct> purchaseProductList = new ArrayList<>();
 
         for (PurchaseProductDto purchaseProductDto : purchaseProductDtoList) {
             if (purchaseProductDto.getPurchaseProductId() == null) {
-                PurchaseProduct purchaseProduct = createOrEditPurchaseProduct(new PurchaseProduct(), purchaseProductDto);
+                PurchaseProduct purchaseProduct = createOrEditPurchaseProduct(new PurchaseProduct(), purchaseProductDto, course);
                 if (purchaseProduct == null) continue;
                 purchaseProduct.setPurchase(purchase);
                 purchaseProductRepository.save(purchaseProduct);
@@ -165,7 +173,7 @@ public class PurchaseService {
                 PurchaseProduct purchaseProduct = optionalPurchaseProduct.get();
                 double amount = purchaseProductDto.getPurchasedQuantity() - purchaseProduct.getPurchasedQuantity();
 
-                PurchaseProduct editPurchaseProduct = createOrEditPurchaseProduct(purchaseProduct, purchaseProductDto);
+                PurchaseProduct editPurchaseProduct = createOrEditPurchaseProduct(purchaseProduct, purchaseProductDto, course);
                 if (editPurchaseProduct == null) continue;
                 editPurchaseProduct.setPurchase(purchase);
                 purchaseProductList.add(editPurchaseProduct);
@@ -192,7 +200,8 @@ public class PurchaseService {
         return new ApiResponse("SUCCESS", true);
     }
 
-    private PurchaseProduct createOrEditPurchaseProduct(PurchaseProduct purchaseProduct, PurchaseProductDto purchaseProductDto) {
+    private PurchaseProduct createOrEditPurchaseProduct(PurchaseProduct purchaseProduct, PurchaseProductDto purchaseProductDto, double course) {
+
         //SINGLE TYPE
         if (purchaseProductDto.getProductId() != null) {
             UUID productId = purchaseProductDto.getProductId();
@@ -201,6 +210,8 @@ public class PurchaseService {
             Product product = optional.get();
             product.setSalePrice(purchaseProductDto.getSalePrice());
             product.setBuyPrice(purchaseProductDto.getBuyPrice());
+            product.setBuyPriceDollar(Math.round(purchaseProductDto.getBuyPrice() / course * 100) / 100.);
+            product.setSalePriceDollar(Math.round(purchaseProductDto.getSalePrice() / course * 100) / 100.);
             productRepository.save(product);
             purchaseProduct.setProduct(product);
         } else {//MANY TYPE
@@ -210,6 +221,8 @@ public class PurchaseService {
             ProductTypePrice productTypePrice = optional.get();
             productTypePrice.setBuyPrice(purchaseProductDto.getBuyPrice());
             productTypePrice.setSalePrice(purchaseProductDto.getSalePrice());
+            productTypePrice.setBuyPriceDollar(Math.round(purchaseProductDto.getBuyPrice() / course * 100) / 100.);
+            productTypePrice.setSalePriceDollar(Math.round(purchaseProductDto.getSalePrice() / course * 100) / 100.);
             productTypePriceRepository.save(productTypePrice);
             purchaseProduct.setProductTypePrice(productTypePrice);
         }
@@ -229,15 +242,10 @@ public class PurchaseService {
         return new ApiResponse("FOUND", true, purchaseList);
     }
 
-    /**
-     * check get one
-     *
-     * @param id
-     * @return
-     */
     public ApiResponse getOne(UUID id) {
-        if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
-        Purchase purchase = purchaseRepository.findById(id).get();
+        Optional<Purchase> optionalPurchase = purchaseRepository.findById(id);
+        if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        Purchase purchase = optionalPurchase.get();
         List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
         if (purchaseProductList.isEmpty()) return new ApiResponse("NOT FOUND PRODUCTS", false);
         PurchaseGetOneDto purchaseGetOneDto = new PurchaseGetOneDto();

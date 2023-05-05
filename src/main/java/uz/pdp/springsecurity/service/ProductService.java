@@ -894,38 +894,19 @@ public class ProductService {
     }
 
     public void editPriceAccordingToDollar(UUID businessId, double course) {
-        List<Product> productListBuy = productRepository.findAllByBusinessIdAndActiveTrueAndBuyDollarTrue(businessId);
-        editBuyPriceSingleHelper(productListBuy, course);
-
-        List<Product> productListSale = productRepository.findAllByBusinessIdAndActiveTrueAndSaleDollarTrue(businessId);
-        editSalePriceSingleHelper(productListSale, course);
-
-        List<ProductTypePrice> productTypePriceListBuy = productTypePriceRepository.findAllByProduct_BusinessIdAndProduct_BuyDollarTrue(businessId);
-        editBuyPriceManyHelper(productTypePriceListBuy, course);
-
-        List<ProductTypePrice> productTypePriceListSale = productTypePriceRepository.findAllByProduct_BusinessIdAndProduct_BuyDollarTrue(businessId);
-        editSalePriceManyHelper(productTypePriceListSale, course);
+        List<Product> productListBuy = productRepository.findAllByBusinessIdAndActiveTrueAndBuyDollarTrueOrSaleDollarTrue(businessId);
+        editPriceHelper(productListBuy, course);
     }
 
-    private void editBuyPriceSingleHelper(List<Product> productList, double course) {
+    private void editPriceHelper(List<Product> productList, double course) {
         for (Product product : productList) {
-            product.setBuyPrice(course * product.getBuyPriceDollar());
+            if (product.getType().equals(Type.MANY)){
+                editSalePriceManyHelper(productTypePriceRepository.findAllByProductId(product.getId()), course);
+            }else {
+                product.setSalePrice(course * product.getSalePriceDollar());
+            }
         }
         productRepository.saveAll(productList);
-    }
-
-    private void editSalePriceSingleHelper(List<Product> productList, double course) {
-        for (Product product : productList) {
-            product.setSalePrice(course * product.getSalePriceDollar());
-        }
-        productRepository.saveAll(productList);
-    }
-
-    private void editBuyPriceManyHelper(List<ProductTypePrice> productTypePriceList, double course) {
-        for (ProductTypePrice productTypePrice : productTypePriceList) {
-            productTypePrice.setBuyPrice(course * productTypePrice.getBuyPriceDollar());
-        }
-        productTypePriceRepository.saveAll(productTypePriceList);
     }
 
     private void editSalePriceManyHelper(List<ProductTypePrice> productTypePriceList, double course) {
