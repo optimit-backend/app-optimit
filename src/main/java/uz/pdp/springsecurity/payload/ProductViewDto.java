@@ -27,4 +27,8 @@ public class ProductViewDto {
     private double minQuantity;
     private Date expiredDate;
     private String category;
+    private double buyPriceDollar;
+    private boolean buyDollar;
+    private double salePriceDollar;
+    private boolean saleDollar;
 }

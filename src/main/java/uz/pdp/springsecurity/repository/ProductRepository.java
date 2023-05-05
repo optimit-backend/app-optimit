@@ -41,4 +41,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findAllByBrandIdAndBranchIdAndActiveTrue(UUID brandId, UUID branchId);
 
     List<Product> findAllByBrandIdAndCategoryIdAndBusinessIdAndActiveTrue(UUID brandId, UUID categoryId, UUID businessId);
+
+    List<Product> findAllByBusinessIdAndActiveTrueAndBuyDollarTrue(UUID businessId);
+    List<Product> findAllByBusinessIdAndActiveTrueAndSaleDollarTrue(UUID businessId);
 }

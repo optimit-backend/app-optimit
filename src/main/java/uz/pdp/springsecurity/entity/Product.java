@@ -29,6 +29,10 @@ public class Product extends AbsEntity {
     private double tax = 1;
     private double buyPrice;
     private double salePrice;
+    private double buyPriceDollar = 1;
+    private boolean buyDollar = false;
+    private double salePriceDollar = 1;
+    private boolean saleDollar = false;
     private Date expireDate;
 
     @Column(nullable = false)

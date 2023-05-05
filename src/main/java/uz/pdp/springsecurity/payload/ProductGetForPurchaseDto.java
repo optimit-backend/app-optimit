@@ -3,14 +3,8 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.enums.Type;
 
-import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -30,8 +24,11 @@ public class ProductGetForPurchaseDto {
     private String barcode;
 
     private double buyPrice;
-
     private double salePrice;
+    private double buyPriceDollar = 1;
+    private boolean buyDollar = false;
+    private double salePriceDollar = 1;
+    private boolean saleDollar = false;
 
     private double amount;
 

@@ -19,6 +19,7 @@ public class CurrencyService {
 
     private final BusinessRepository businessRepository;
     private final CurrencyMapper currencyMapper;
+    private final ProductService productService;
 
     public ApiResponse get(UUID businessId) {
         Optional<Currency> optionalCurrency = currencyRepository.findByBusinessId(businessId);
@@ -38,6 +39,7 @@ public class CurrencyService {
             Currency currency = optionalCurrency.get();
             currency.setCourse(currencyDto.getCourse());
             currencyRepository.save(currency);
+            productService.editPriceAccordingToDollar(businessId, currency.getCourse());
             return new ApiResponse("SUCCESS", true);
         }
         Optional<Business> optionalBusiness = businessRepository.findById(businessId);
@@ -47,7 +49,7 @@ public class CurrencyService {
         return edit(businessId, currencyDto);
     }
 
-    private void create(Business business) {
+    public void create(Business business) {
         Optional<Currency> optionalCurrency = currencyRepository.findFirstByCourseIsNotNullOrderByUpdateAtDesc();
         if (optionalCurrency.isPresent()){
             currencyRepository.save(new Currency(
