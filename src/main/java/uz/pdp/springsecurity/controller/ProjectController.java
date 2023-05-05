@@ -29,16 +29,16 @@ public class ProjectController {
 
     @CheckPermission("EDIT_PROJECT")
     @PutMapping("/patch/{projectId}/{statusId}")
-    public HttpEntity<?> updateProjectStatus(@PathVariable  UUID projectId,
-                                             @PathVariable  UUID statusId) {
-        ApiResponse apiResponse = projectService.updateProjectStatus(projectId,statusId);
+    public HttpEntity<?> updateProjectStatus(@PathVariable UUID projectId,
+                                             @PathVariable UUID statusId) {
+        ApiResponse apiResponse = projectService.updateProjectStatus(projectId, statusId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
     @CheckPermission("EDIT_PROJECT")
     @PutMapping("/{id}")
     public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody ProjectDto projectDto) {
-        ApiResponse apiResponse = projectService.edit(id,projectDto);
+        ApiResponse apiResponse = projectService.edit(id, projectDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -48,6 +48,7 @@ public class ProjectController {
         ApiResponse apiResponse = projectService.get(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
     @CheckPermission("GET_PROJECT")
     @GetMapping("/get-one/{id}")
     public HttpEntity<?> getOne(@PathVariable UUID id) {
@@ -71,7 +72,7 @@ public class ProjectController {
                                         @RequestParam(required = false) Date expired,
                                         @RequestParam int page,
                                         @RequestParam int size) {
-        ApiResponse apiResponse = projectService.getAllByBranchId(branchId,typeId,customerId,projectStatusId,expired,page,size);
+        ApiResponse apiResponse = projectService.getAllByBranchId(branchId, typeId, customerId, projectStatusId, expired, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -83,14 +84,15 @@ public class ProjectController {
     }
 
     @CheckPermission("GET_OWN_PROJECT")
-    @GetMapping("/get-by-branchId/{branchId}/{userId}")
+    @GetMapping("/get-by-own-branchId/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
-                                        @PathVariable UUID userId,
                                         @RequestParam(defaultValue = "0", required = false) int page,
-                                        @RequestParam(defaultValue = "10", required = false) int size) {
-        ApiResponse apiResponse = projectService.getOwnProject(branchId,userId,page,size);
+                                        @RequestParam(defaultValue = "10", required = false) int size,
+                                        @RequestParam UUID userId) {
+        ApiResponse apiResponse = projectService.getOwnProject(branchId, userId, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
 
     @CheckPermission("GET_PROJECT")
     @GetMapping("/get-by-name/{name}/{branchId}")
@@ -99,8 +101,8 @@ public class ProjectController {
             @PathVariable UUID branchId,
             @RequestParam(defaultValue = "0", required = false) int page,
             @RequestParam(defaultValue = "10", required = false) int size
-            ) {
-        ApiResponse apiResponse = projectService.searchByName(name,branchId,page,size);
+    ) {
+        ApiResponse apiResponse = projectService.searchByName(name, branchId, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

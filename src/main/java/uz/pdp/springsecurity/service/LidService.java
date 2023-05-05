@@ -186,6 +186,7 @@ public class LidService {
         Business business = businessRepository.findById(lid.getBusiness().getId()).orElse(null);
 
         lidGetDto.setId(lid.getId());
+        lidGetDto.setTimestamp(lid.getCreatedAt());
         lidGetDto.setLidStatusId(lidStatus != null ? lidStatus.getId() : null);
         lidGetDto.setLidStatusName(lidStatus != null ? lidStatus.getName() : null);
         lidGetDto.setBusinessId(business != null ? business.getId() : null);
@@ -275,5 +276,18 @@ public class LidService {
             list.add(getDto(lid));
         }
         return list;
+    }
+
+    public ApiResponse editDescription(UUID id, String description) {
+        Optional<Lid> optionalLid = repository.findById(id);
+        if (optionalLid.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+
+        Lid lid = optionalLid.get();
+        lid.setDescription(description);
+        repository.save(lid);
+
+        return new ApiResponse("successfully edited", true);
     }
 }

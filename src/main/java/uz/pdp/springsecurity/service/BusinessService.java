@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.*;
 import uz.pdp.springsecurity.mapper.AddressMapper;
@@ -20,29 +21,14 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class BusinessService {
-    @Autowired
-    BusinessRepository businessRepository;
-
-    @Autowired
-    ProjectStatusRepository projectStatusRepository;
-
-    @Autowired
-    TaskStatusRepository taskStatusRepository;
-
-    @Autowired
-    TaskRepository taskRepository;
-
-    @Autowired
-    RoleRepository roleRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    TariffRepository tariffRepository;
-
-    @Autowired
-    UserService userService;
+    private final BusinessRepository businessRepository;
+    private final ProjectStatusRepository projectStatusRepository;
+    private final TaskStatusRepository taskStatusRepository;
+    private final TaskRepository taskRepository;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final TariffRepository tariffRepository;
+    private final UserService userService;
     private final BranchRepository branchRepository;
     private final AddressRepository addressRepository;
     private final BranchMapper branchMapper;
@@ -61,6 +47,7 @@ public class BusinessService {
     private final static LocalDateTime THIS_MONTH = LocalDateTime.of(TODAY.getYear(), TODAY.getMonth(), 1, 0, 0, 0);
     private final static LocalDateTime THIS_YEAR = LocalDateTime.of(TODAY.getYear(), 1, 1, 0, 0, 0);
 
+    @Transactional
     public ApiResponse add(BusinessDto businessDto) {
         if (businessRepository.existsByNameIgnoreCase(businessDto.getName()))
             return new ApiResponse("A BUSINESS WITH THAT NAME ALREADY EXISTS", false);
@@ -101,60 +88,7 @@ public class BusinessService {
 
         Address address = addressRepository.save(addressMapper.toEntity(addressDto));
 
-
-        LidField lidField = new LidField();
-        lidField.setName("FIO");
-        lidField.setBusiness(business);
-        lidField.setValueType(ValueType.STRING);
-        lidField.setTanlangan(false);
-        lidFieldRepository.save(lidField);
-
-        LidField lidField1 = new LidField();
-        lidField1.setName("Phone number");
-        lidField1.setBusiness(business);
-        lidField1.setValueType(ValueType.INTEGER);
-        lidField1.setTanlangan(false);
-        lidFieldRepository.save(lidField1);
-
-        Source source = new Source();
-        source.setBusiness(business);
-        source.setName("Telegram");
-        sourceRepository.save(source);
-        Source source1 = new Source();
-        source1.setBusiness(business);
-        source1.setName("Facebook");
-        sourceRepository.save(source1);
-        Source source2 = new Source();
-        source2.setBusiness(business);
-        source2.setName("Instagram");
-        sourceRepository.save(source2);
-
-        LidStatus newStatus = new LidStatus();
-        newStatus.setName("New");
-        newStatus.setIncrease(true);
-        newStatus.setColor("rang");
-        newStatus.setSort(1);
-        newStatus.setBusiness(business);
-        lidStatusRepository.save(newStatus);
-
-        LidStatus progressStatus = new LidStatus();
-        progressStatus.setName("Progress");
-        progressStatus.setIncrease(true);
-        progressStatus.setColor("rang");
-        progressStatus.setSort(2);
-        progressStatus.setBusiness(business);
-        lidStatusRepository.save(progressStatus);
-
-        LidStatus doneStatus = new LidStatus();
-        doneStatus.setName("Done");
-        doneStatus.setIncrease(true);
-        doneStatus.setOrginalName("Done");
-        doneStatus.setColor("rang");
-        doneStatus.setSaleStatus(true);
-        doneStatus.setSort(3);
-        progressStatus.setBusiness(business);
-        lidStatusRepository.save(doneStatus);
-
+        createStatusAndOther(business);
 
         branchDto.setAddressId(address.getId());
         branchDto.setBusinessId(business.getId());
@@ -192,6 +126,16 @@ public class BusinessService {
 
         BranchService.createTaskStatus(branch, taskStatusRepository);
 
+        createProjectStatus(branch);
+
+        return new ApiResponse("ADDED", true);
+    }
+
+    private void createProjectStatus(Branch branch) {
+        createProjectStatus(branch, projectStatusRepository);
+    }
+
+    public static void createProjectStatus(Branch branch, ProjectStatusRepository projectStatusRepository) {
         ProjectStatus projectStatus1 = new ProjectStatus();
         projectStatus1.setName("Uncompleted");
         projectStatus1.setColor("red");
@@ -209,8 +153,66 @@ public class BusinessService {
         projectStatus3.setName("Completed");
         projectStatus3.setBranch(branch);
         projectStatusRepository.save(projectStatus3);
+    }
 
-        return new ApiResponse("ADDED", true);
+    private void createStatusAndOther(Business business) {
+        LidField lidField = new LidField();
+        lidField.setName("FIO");
+        lidField.setBusiness(business);
+        lidField.setValueType(ValueType.STRING);
+        lidField.setTanlangan(false);
+        lidFieldRepository.save(lidField);
+
+        LidField lidField1 = new LidField();
+        lidField1.setName("Phone number");
+        lidField1.setBusiness(business);
+        lidField1.setValueType(ValueType.INTEGER);
+        lidField1.setTanlangan(false);
+        lidFieldRepository.save(lidField1);
+
+        Source source = new Source();
+        source.setBusiness(business);
+        source.setName("Telegram");
+        sourceRepository.save(source);
+        Source source1 = new Source();
+        source1.setBusiness(business);
+        source1.setName("Facebook");
+        sourceRepository.save(source1);
+        Source source2 = new Source();
+        source2.setBusiness(business);
+        source2.setName("Instagram");
+        sourceRepository.save(source2);
+
+        Source source3 = new Source();
+        source3.setBusiness(business);
+        source3.setName("HandleWrite");
+        sourceRepository.save(source3);
+
+        LidStatus newStatus = new LidStatus();
+        newStatus.setName("New");
+        newStatus.setIncrease(true);
+        newStatus.setColor("rang");
+        newStatus.setSort(1);
+        newStatus.setBusiness(business);
+        lidStatusRepository.save(newStatus);
+
+        LidStatus progressStatus = new LidStatus();
+        progressStatus.setName("Progress");
+        progressStatus.setIncrease(true);
+        progressStatus.setColor("rang");
+        progressStatus.setSort(2);
+        progressStatus.setBusiness(business);
+        lidStatusRepository.save(progressStatus);
+
+        LidStatus doneStatus = new LidStatus();
+        doneStatus.setName("Done");
+        doneStatus.setIncrease(true);
+        doneStatus.setOrginalName("Done");
+        doneStatus.setColor("rang");
+        doneStatus.setSaleStatus(true);
+        doneStatus.setSort(3);
+        progressStatus.setBusiness(business);
+        lidStatusRepository.save(doneStatus);
     }
 
     public ApiResponse edit(UUID id, BusinessEditDto businessEditDto) {

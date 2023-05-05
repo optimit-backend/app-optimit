@@ -30,5 +30,7 @@ public class Lid extends AbsEntity {
     @ManyToOne
     private Source source;
 
+    private String description;
+
     private boolean delete;
 }

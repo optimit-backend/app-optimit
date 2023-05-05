@@ -34,7 +34,7 @@ public class Trade extends AbsEntity {
     private PaymentStatus paymentStatus;
 
     /**
-     *  DO NOT USE THIS FIELD/ USE PAYMENT ENTITY
+     * DO NOT USE THIS FIELD/ USE PAYMENT ENTITY
      */
 
     @ManyToOne
@@ -54,4 +54,6 @@ public class Trade extends AbsEntity {
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Address address;
+
+    private boolean lid ;
 }

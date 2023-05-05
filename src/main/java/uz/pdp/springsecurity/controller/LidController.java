@@ -65,6 +65,13 @@ public class LidController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("EDIT_LID")
+    @PutMapping("/edit-description/{id}")
+    HttpEntity<?> editDescription(@PathVariable UUID id, @RequestParam String description) {
+        ApiResponse apiResponse = lidService.editDescription(id,description);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
     @CheckPermission("DELETE_LID")
     @DeleteMapping("/{id}")
     HttpEntity<?> delete(@PathVariable UUID id) {
