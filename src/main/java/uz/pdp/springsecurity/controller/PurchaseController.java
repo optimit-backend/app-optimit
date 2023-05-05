@@ -1,6 +1,6 @@
 package uz.pdp.springsecurity.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,23 +9,14 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.PurchaseDto;
 import uz.pdp.springsecurity.service.PurchaseService;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.Date;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/purchase")
+@RequiredArgsConstructor
 public class PurchaseController {
-    @Autowired
-    PurchaseService purchaseService;
+    private final PurchaseService purchaseService;
 
-    /**
-     * YANGI XARID QO'SHISH
-     *
-     * @param purchaseDto
-     * @return ApiResponse(success - > true message - > ADDED)
-     */
     @CheckPermission("ADD_PURCHASE")
     @PostMapping
     public HttpEntity<?> add(@RequestBody PurchaseDto purchaseDto) {
@@ -33,13 +24,6 @@ public class PurchaseController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * ID ORQALI XARIDNI TAHRIRLASH
-     *
-     * @param id
-     * @param purchaseDto
-     * @return ApiResponse(success - > true message - > EDITED)
-     */
     @CheckPermission("EDIT_PURCHASE")
     @PutMapping("/{id}")
     public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody PurchaseDto purchaseDto) {
