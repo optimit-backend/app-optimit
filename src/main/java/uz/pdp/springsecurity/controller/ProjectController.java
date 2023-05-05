@@ -88,7 +88,7 @@ public class ProjectController {
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
                                         @RequestParam(defaultValue = "0", required = false) int page,
                                         @RequestParam(defaultValue = "10", required = false) int size,
-                                        @RequestParam UUID userId) {
+                                        @RequestParam(required = false) UUID userId) {
         ApiResponse apiResponse = projectService.getOwnProject(branchId, userId, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }

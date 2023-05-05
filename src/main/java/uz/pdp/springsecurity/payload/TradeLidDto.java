@@ -18,6 +18,7 @@ public class TradeLidDto {
     private String branchName;
     private String paymentStatusName;
     private String paymentMethodName;
+    private String traderName;
     private double totalSum;
     private double paidSum;
     private double debtSum = 0;

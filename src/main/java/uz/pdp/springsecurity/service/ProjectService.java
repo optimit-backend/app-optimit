@@ -510,6 +510,11 @@ public class ProjectService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Project> projects = null;
 
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()) {
+            return new ApiResponse("Branch Not Found", false);
+        }
+
         if (userId != null) {
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isEmpty()) {
@@ -517,10 +522,6 @@ public class ProjectService {
             }
             projects = projectRepository.findAllByBranchIdAndUsers_Id(branchId, userId, pageable);
         } else {
-            Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-            if (optionalBranch.isEmpty()) {
-                return new ApiResponse("Branch Not Found", false);
-            }
             projects = projectRepository.findAllByBranch_Id(branchId, pageable);
         }
 
