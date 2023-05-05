@@ -48,4 +48,6 @@ public class TradeDTO {
      * product idlari
      */
     private List<TradeProductDto> productTraderDto;
+
+    private boolean lid;
 }

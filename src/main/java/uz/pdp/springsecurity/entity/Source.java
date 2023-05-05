@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 @Entity
 public class Source extends AbsEntity {
-    private String name;
+    private String name; //qolda kiritish125445625624
     private String icon;
     @ManyToOne
     private Business business;

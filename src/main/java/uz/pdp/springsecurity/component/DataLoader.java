@@ -10,6 +10,7 @@ import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.enums.*;
 import uz.pdp.springsecurity.repository.*;
 import uz.pdp.springsecurity.service.AgreementService;
+import uz.pdp.springsecurity.service.BusinessService;
 import uz.pdp.springsecurity.service.InvoiceService;
 import uz.pdp.springsecurity.util.Constants;
 
@@ -54,6 +55,7 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        System.out.println(initMode);
 //------------------------------------------------------------------------------------------//
         if (initMode.equals("always")) {
             Permissions[] permissions = Permissions.values();
@@ -113,6 +115,10 @@ public class DataLoader implements CommandLineRunner {
             source2.setBusiness(business);
             source2.setName("Instagram");
             sourceRepository.save(source2);
+            Source source3 = new Source();
+            source3.setBusiness(business);
+            source3.setName("HandleWrite");
+            sourceRepository.save(source3);
 
             LidStatus newStatus = new LidStatus();
             newStatus.setName("New");
@@ -380,7 +386,6 @@ public class DataLoader implements CommandLineRunner {
                                     GET_BONUS,
                                     EDIT_BONUS,
                                     ADD_BONUS,
-
 
                                     DELETE_TASK,
                                     GET_TASK,
@@ -713,23 +718,7 @@ public class DataLoader implements CommandLineRunner {
                     branches.add(branch);
 
 
-            ProjectStatus projectStatus1 = new ProjectStatus();
-            projectStatus1.setName("Uncompleted");
-            projectStatus1.setColor("red");
-            projectStatus1.setBranch(branch);
-            projectStatusRepository.save(projectStatus1);
-
-            ProjectStatus projectStatus2 = new ProjectStatus();
-            projectStatus2.setColor("yellow");
-            projectStatus2.setName("Process");
-            projectStatus2.setBranch(branch);
-            projectStatusRepository.save(projectStatus2);
-
-            ProjectStatus projectStatus3 = new ProjectStatus();
-            projectStatus3.setColor("green");
-            projectStatus3.setName("Completed");
-            projectStatus3.setBranch(branch);
-            projectStatusRepository.save(projectStatus3);
+            BusinessService.createProjectStatus(branch, projectStatusRepository);
 
 
             TaskStatus taskStatus = new TaskStatus();

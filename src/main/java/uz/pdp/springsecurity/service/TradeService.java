@@ -100,6 +100,7 @@ public class TradeService {
 
         if (subscription.getTariff().getTradeAmount() >= size || subscription.getTariff().getTradeAmount() == 0) {
             Trade trade = new Trade();
+            trade.setLid(tradeDTO.isLid());
             return createOrEditTrade(trade, tradeDTO, false);
         }
         return new ApiResponse("You have opened a sufficient branch according to the trade", false);

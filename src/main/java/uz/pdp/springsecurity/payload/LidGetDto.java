@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,4 +17,5 @@ public class LidGetDto {
     private UUID lidStatusId;
     private String lidStatusName;
     private UUID businessId;
+    private Timestamp timestamp;
 }

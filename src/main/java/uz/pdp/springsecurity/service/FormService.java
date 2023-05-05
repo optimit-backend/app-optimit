@@ -68,6 +68,23 @@ public class FormService {
     public ApiResponse create(FormDto formDto) {
         List<Form> formList = new ArrayList<>();
         Optional<Business> optionalBusiness = businessRepository.findById(formDto.getBusinessId());
+
+        Optional<Source> optionalHandleWrite = sourceRepository.findByName("HandleWrite");
+        List<UUID> sourceIdList = formDto.getSourceId();
+        boolean b = true;
+        if (optionalHandleWrite.isPresent()) {
+            if (!sourceIdList.isEmpty()) {
+                for (UUID uuid : sourceIdList) {
+                    if (uuid.equals(optionalHandleWrite.get().getId())) {
+                        b = false;
+                    }
+                }
+            }
+            if (b) {
+                optionalHandleWrite.ifPresent(source -> formDto.getSourceId().add(source.getId()));
+            }
+        }
+
         for (UUID uuid : formDto.getSourceId()) {
             Form form = new Form();
             List<LidField> lidFields = new ArrayList<>();
@@ -124,7 +141,6 @@ public class FormService {
 
         return new ApiResponse("successfully saved", true);
     }
-
 
 
     public ApiResponse delete(UUID id) {
