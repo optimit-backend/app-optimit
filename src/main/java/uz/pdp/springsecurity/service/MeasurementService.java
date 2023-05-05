@@ -27,10 +27,14 @@ public class MeasurementService {
         if (optionalBusiness.isEmpty()) {
             return new ApiResponse("BUSINESS NOT FOUND", false);
         }
-        Measurement measurement = new Measurement(
-                measurementDto.getName(),
-                optionalBusiness.get()
-        );
+        Measurement measurement = new Measurement();
+        measurement.setName(measurementDto.getName());
+        measurement.setBusiness(optionalBusiness.get());
+        if (measurementDto.getSubMeasurement() != null) {
+            Optional<Measurement> optionalMeasurement = measurementRepository.findById(measurementDto.getSubMeasurement());
+            optionalMeasurement.ifPresent(measurement::setSubMeasurement);
+            measurement.setValue(measurementDto.getValue());
+        }
         measurementRepository.save(measurement);
         return new ApiResponse("ADDED", true);
     }
@@ -40,6 +44,12 @@ public class MeasurementService {
 
         Measurement measurement = measurementRepository.getById(id);
         measurement.setName(measurementDto.getName());
+        if (measurementDto.getSubMeasurement() != null) {
+            Optional<Measurement> optionalMeasurement = measurementRepository.findById(measurementDto.getSubMeasurement());
+            optionalMeasurement.ifPresent(measurement::setSubMeasurement);
+            measurement.setValue(measurementDto.getValue());
+        }
+
         measurementRepository.save(measurement);
         return new ApiResponse("EDITED", true);
 

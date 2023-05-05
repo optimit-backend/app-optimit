@@ -1,8 +1,14 @@
 package uz.pdp.springsecurity.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.mapper.TradeLidMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
@@ -12,10 +18,12 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class ReportsService {
 
     @Autowired
     BusinessRepository businessRepository;
+
 
     @Autowired
     ProductionRepository productionRepository;
@@ -101,6 +109,8 @@ public class ReportsService {
     private SourceRepository sourceRepository;
     @Autowired
     private UserRepository userRepository;
+
+    private final TradeLidMapper tradeLidMapper;
 
     public ApiResponse allProductAmount(UUID branchId, UUID brandId, UUID categoryId, String production) {
 
@@ -355,7 +365,7 @@ public class ReportsService {
             }
             tradeReportsDto.setPayMethod(tradeProduct.getTrade().getPayMethod().getType());
             tradeReportsDto.setAmount(tradeProduct.getTradedQuantity());
-            if (tradeProduct.getTrade().getCustomer() != null && tradeProduct.getTrade().getCustomer().getCustomerGroup()!=null) {
+            if (tradeProduct.getTrade().getCustomer() != null && tradeProduct.getTrade().getCustomer().getCustomerGroup() != null) {
                 tradeReportsDto.setDiscount(tradeProduct.getTrade().getCustomer().getCustomerGroup().getPercent());
             }
             tradeReportsDto.setTotalSum(tradeProduct.getTotalSalePrice());
@@ -550,22 +560,22 @@ public class ReportsService {
         return new ApiResponse("Business Products Amount", true, productReportDtoList);
     }
 
-    public ApiResponse allProductAmountByBranch(UUID branchId,UUID businessId) {
+    public ApiResponse allProductAmountByBranch(UUID branchId, UUID businessId) {
 
         Optional<Branch> optionalBranch = Optional.empty();
         Optional<Business> optionalBusiness = Optional.empty();
-        if (branchId!=null){
+        if (branchId != null) {
             optionalBranch = branchRepository.findById(branchId);
         }
-        if (businessId!=null){
+        if (businessId != null) {
             optionalBusiness = businessRepository.findById(businessId);
         }
 
         boolean checkingBranch = false;
-        boolean checkingBusiness= false;
-        if (optionalBranch.isEmpty()){
+        boolean checkingBusiness = false;
+        if (optionalBranch.isEmpty()) {
             checkingBusiness = true;
-        }else {
+        } else {
             checkingBranch = true;
         }
 
@@ -574,10 +584,10 @@ public class ReportsService {
         }
         List<Product> productList = null;
         List<ProductTypePrice> productTypePriceList = null;
-        if (checkingBranch){
-             productList = productRepository.findAllByBranchIdAndActiveTrue(branchId);
-             productTypePriceList = productTypePriceRepository.findAllByProduct_BranchId(branchId);
-        }else {
+        if (checkingBranch) {
+            productList = productRepository.findAllByBranchIdAndActiveTrue(branchId);
+            productTypePriceList = productTypePriceRepository.findAllByProduct_BranchId(branchId);
+        } else {
             productList = productRepository.findAllByBranch_BusinessIdAndActiveTrue(businessId);
             productTypePriceList = productTypePriceRepository.findAllByProduct_BusinessId(businessId);
         }
@@ -591,46 +601,46 @@ public class ReportsService {
         Amount amounts = new Amount();
         for (Product product : productList) {
             List<Warehouse> warehouseList = null;
-            if (businessId!=null){
+            if (businessId != null) {
                 warehouseList = warehouseRepository.findByProductIdAndProduct_BusinessId(product.getId(), businessId);
-            }else {
+            } else {
                 warehouseList = warehouseRepository.findByProductIdAndBranch_Id(product.getId(), branchId);
             }
             double amount = 0;
             for (Warehouse warehouse : warehouseList) {
                 amount += warehouse.getAmount();
             }
-                double salePrice = product.getSalePrice();
-                double buyPrice = product.getBuyPrice();
+            double salePrice = product.getSalePrice();
+            double buyPrice = product.getBuyPrice();
 
-                totalSumBySalePrice += amount * salePrice;
-                totalSumByBuyPrice += amount * buyPrice;
-                amounts.setTotalSumBySalePrice(totalSumBySalePrice);
-                amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
+            totalSumBySalePrice += amount * salePrice;
+            totalSumByBuyPrice += amount * buyPrice;
+            amounts.setTotalSumBySalePrice(totalSumBySalePrice);
+            amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
 
         }
         for (ProductTypePrice product : productTypePriceList) {
             List<Warehouse> warehouseList = null;
-            if (businessId!=null){
+            if (businessId != null) {
                 warehouseList = warehouseRepository.findByBranch_BusinessIdAndProductTypePriceId(businessId, product.getId());
-            }else {
+            } else {
                 warehouseList = warehouseRepository.findByBranch_IdAndProductTypePriceId(branchId, product.getId());
             }
             double amount = 0;
             for (Warehouse warehouse : warehouseList) {
                 amount += warehouse.getAmount();
             }
-                double salePrice = product.getSalePrice();
+            double salePrice = product.getSalePrice();
 
-                totalSumBySalePrice += amount * salePrice;
-                double price = 0;
-                if (branchId!=null){
-                    price = fifoCalculationService.productBuyPriceByBranch(branchId);
-                }else {
-                    price = fifoCalculationService.productBuyPriceByBusiness(businessId);
-                }
-                amounts.setTotalSumBySalePrice(price);
-                amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
+            totalSumBySalePrice += amount * salePrice;
+            double price = 0;
+            if (branchId != null) {
+                price = fifoCalculationService.productBuyPriceByBranch(branchId);
+            } else {
+                price = fifoCalculationService.productBuyPriceByBusiness(businessId);
+            }
+            amounts.setTotalSumBySalePrice(price);
+            amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
         }
         return new ApiResponse("Business Products Amount", true, amounts);
     }
@@ -1965,46 +1975,46 @@ public class ReportsService {
         return new ApiResponse("all traders", true, traderBestDtoList);
     }
 
-    public ApiResponse projectReport(UUID branchId,UUID businessId) {
-        Branch branch=null;
-        Business business=null;
+    public ApiResponse projectReport(UUID branchId, UUID businessId) {
+        Branch branch = null;
+        Business business = null;
         List<Task> taskList = null;
-        if (branchId!=null){
+        if (branchId != null) {
             Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-            if(optionalBranch.isPresent()){
+            if (optionalBranch.isPresent()) {
                 branch = optionalBranch.get();
             }
         }
-        if (businessId!=null){
+        if (businessId != null) {
             Optional<Business> optionalBusiness = businessRepository.findById(businessId);
-            if(optionalBusiness.isPresent()){
+            if (optionalBusiness.isPresent()) {
                 business = optionalBusiness.get();
             }
         }
-        if (branch==null && business ==null){
-            return new ApiResponse("Not Found",false);
+        if (branch == null && business == null) {
+            return new ApiResponse("Not Found", false);
         }
-        List<Project> projectList=null;
-        if (branch!=null){
+        List<Project> projectList = null;
+        if (branch != null) {
             projectList = projectRepository.findAllByBranchId(branchId);
             taskList = taskRepository.findAllByBranchId(branchId);
-        }else {
+        } else {
             projectList = projectRepository.findAllByBranch_BusinessId(businessId);
             taskList = taskRepository.findAllByBranch_BusinessId(businessId);
 
         }
 
         double projectAmount = 0;
-        List<ProjectDTOS> projectDTOSList=new ArrayList<>();
+        List<ProjectDTOS> projectDTOSList = new ArrayList<>();
         for (Project project : projectList) {
 
             int i = taskRepository.countAllByProjectId(project.getId());
             List<Task> tasks = taskRepository.findAllByProjectId(project.getId());
             double taskAmount = 0;
             for (Task task : tasks) {
-                taskAmount+=task.getTaskPrice();
+                taskAmount += task.getTaskPrice();
             }
-            ProjectDTOS projectDTOS=new ProjectDTOS();
+            ProjectDTOS projectDTOS = new ProjectDTOS();
             projectDTOS.setProjectName(project.getName());
             projectDTOS.setProjectTaskCount(i);
             projectDTOS.setProjectAmount(project.getBudget());
@@ -2020,13 +2030,38 @@ public class ReportsService {
         }
 
 
-        ProjectReportDto projectReportDto=new ProjectReportDto();
+        ProjectReportDto projectReportDto = new ProjectReportDto();
         projectReportDto.setProjectQuantity(projectList.size());
         projectReportDto.setProjectAmount(projectAmount);
         projectReportDto.setTasksAmount(taskAmount);
         projectReportDto.setProjectDTOSList(projectDTOSList);
 
-        return new ApiResponse("Found",true,projectReportDto);
+        return new ApiResponse("Found", true, projectReportDto);
     }
 
+
+    public ApiResponse getLidTradeReport(UUID businessId, int size, int page) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        if (businessId == null) {
+            return new ApiResponse("business id is null", false);
+        }
+
+        Optional<Business> optionalBusiness = businessRepository.findById(businessId);
+        if (optionalBusiness.isEmpty()) {
+            return new ApiResponse("not found by business id", false);
+        }
+
+        Page<Trade> allTrade = tradeRepository.findAllByBranch_Business_IdAndLidIsTrue(businessId, pageable);
+
+        List<TradeLidDto> lidMapperDto = tradeLidMapper.toDto(allTrade.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("getAllTrade", lidMapperDto);
+        response.put("currentPage", allTrade.getNumber());
+        response.put("totalItems", allTrade.getTotalElements());
+        response.put("totalPages", allTrade.getTotalPages());
+
+        return new ApiResponse("all trade lid", true, response);
+    }
 }

@@ -1,6 +1,8 @@
 package uz.pdp.springsecurity.repository;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import uz.pdp.springsecurity.entity.Trade;
@@ -13,6 +15,7 @@ import java.util.UUID;
 public interface TradeRepository extends JpaRepository<Trade, UUID> {
     List<Trade> findAllByTrader_Id(UUID trader_id);
 
+    Page<Trade> findAllByBranch_Business_IdAndLidIsTrue(UUID branch_business_id, Pageable pageable);
     List<Trade> findAllByBranch_Id(UUID branch_id);
     List<Trade> findAllByCreatedAtBetweenAndBranchId(Timestamp start, Timestamp end, UUID branch_id);
     List<Trade> findAllByCreatedAtBetweenAndBranch_BusinessId(Timestamp start, Timestamp end, UUID businessId);

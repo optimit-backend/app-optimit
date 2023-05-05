@@ -182,4 +182,13 @@ public class ReportsController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("VIEW_REPORT")
+    @GetMapping("/get-trade-by-lid/{businessId}")
+    public HttpEntity<?> getLidTradeReport(@PathVariable UUID businessId,
+                                            @RequestParam(defaultValue = "10") int size,
+                                            @RequestParam(defaultValue = "0") int page) {
+        ApiResponse apiResponse = reportsService.getLidTradeReport(businessId,size,page);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
 }
