@@ -89,7 +89,9 @@ public class LidService {
             return new ApiResponse("not found", false);
         }
         LidGetDto dto = getDto(lid);
+        dto.setDescription(lid.getDescription());
         Map<String, String> values = dto.getValues();
+        values.put("description", lid.getDescription());
         List<Map<String, String>> valueList = new ArrayList<>();
         valueList.add(values);
         return new ApiResponse("found", true, valueList);

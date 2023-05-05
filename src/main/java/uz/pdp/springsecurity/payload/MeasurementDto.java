@@ -15,4 +15,7 @@ public class MeasurementDto {
     private String name;
     @NotNull(message = "required line")
     private UUID businessId;
+
+    private UUID subMeasurement;
+    private Double value;
 }

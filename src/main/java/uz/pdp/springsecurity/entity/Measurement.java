@@ -22,6 +22,16 @@ public class Measurement extends AbsEntity {
     private String name;
 
     @ManyToOne
+    private Measurement subMeasurement;
+
+    private Double value;
+
+    @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Business business;
+
+    public Measurement(String name, Business business) {
+        this.name = name;
+        this.business = business;
+    }
 }
