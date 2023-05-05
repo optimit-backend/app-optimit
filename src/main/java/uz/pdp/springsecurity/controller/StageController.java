@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,45 +17,44 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StageController {
 
-    @Autowired
-    StageService stageService;
+    private final StageService stageService;
 
-    @CheckPermission("ADD_STAGE")
+    @CheckPermission("ADD_PROJECT")
     @PostMapping
     public HttpEntity<?> add(@Valid @RequestBody StageDto stageDto) {
         ApiResponse apiResponse = stageService.add(stageDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("EDIT_STAGE")
+    @CheckPermission("ADD_PROJECT")
     @PutMapping("/{id}")
     public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody StageDto stageDto) {
         ApiResponse apiResponse = stageService.edit(id,stageDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_STAGE")
+    @CheckPermission("GET_PROJECT")
     @GetMapping("/{id}")
     public HttpEntity<?> get(@PathVariable UUID id) {
         ApiResponse apiResponse = stageService.get(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("DELETE_STAGE")
+    @CheckPermission("EDIT_PROJECT")
     @DeleteMapping("/{id}")
     public HttpEntity<?> delete(@PathVariable UUID id) {
         ApiResponse apiResponse = stageService.delete(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_STAGE")
+    @CheckPermission("GET_PROJECT")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
         ApiResponse apiResponse = stageService.getAllByBranch(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_STAGE")
+    @CheckPermission("GET_PROJECT")
     @GetMapping("/get-by-branchPageable/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
                                           @RequestParam(defaultValue = "0", required = false) int page,
