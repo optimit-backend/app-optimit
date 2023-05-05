@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.enums.Type;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
@@ -43,7 +44,7 @@ public class ProductService {
     private final TradeProductRepository tradeProductRepository;
     private final ContentProductRepository contentProductRepository;
     private final ProductionRepository productionRepository;
-
+    private final CurrencyRepository currencyRepository;
 
     public ApiResponse addProduct(ProductDto productDto) {
         UUID businessId = productDto.getBusinessId();
@@ -103,6 +104,8 @@ public class ProductService {
         product.setExpireDate(productDto.getExpireDate());
         product.setMinQuantity(productDto.getMinQuantity());
         product.setDueDate(productDto.getDueDate());
+        product.setBuyDollar(productDto.isBuyDollar());
+        product.setSaleDollar(productDto.isSaleDollar());
         product.setActive(true);
 
         if (productDto.getCategoryId() != null) {
@@ -130,22 +133,38 @@ public class ProductService {
             optionalAttachment.ifPresent(product::setPhoto);
         }
 
+        Business business = allBranch.get(0).getBusiness();
+        Optional<Currency> optionalCurrency = currencyRepository.findByBusinessId(business.getId());
+        Currency currency;
+        if (optionalCurrency.isPresent()){
+            currency = optionalCurrency.get();
+        }else {
+            Optional<Currency> optional = currencyRepository.findFirstByCourseIsNotNullOrderByUpdateAtDesc();
+            currency = optional.orElseGet(() -> currencyRepository.save(new Currency(
+                    business,
+                    11400
+            )));
+        }
+
         if (productDto.getType().equals(Type.SINGLE.name())) {
-            return addProductTypeSingleDto(productDto, product, isUpdate);
+            return addProductTypeSingleDto(productDto, product, isUpdate, currency);
         } else if (productDto.getType().equals(Type.MANY.name())) {
-            return addProductTypeManyDto(productDto, product);
+            return addProductTypeManyDto(productDto, product, currency);
         } else if (productDto.getType().equals(Type.COMBO.name())) {
-            return addProductTypeComboDto(productDto, product, isUpdate);
+            return addProductTypeComboDto(productDto, product, isUpdate, currency);
         } else {
             return new ApiResponse("no such type exists", false);
         }
     }
 
-    private ApiResponse addProductTypeComboDto(ProductDto productDto, Product product, boolean isUpdate) {
+    private ApiResponse addProductTypeComboDto(ProductDto productDto, Product product, boolean isUpdate, Currency currency) {
 
         product.setType(Type.COMBO);
         product.setBuyPrice(productDto.getBuyPrice());
         product.setSalePrice(productDto.getSalePrice());
+        product.setBuyPriceDollar(Math.round(productDto.getBuyPrice() / currency.getCourse() * 100) / 100.);
+        product.setSalePriceDollar(Math.round(productDto.getSalePrice() / currency.getCourse() * 100) / 100.);
+        product.setProfitPercent(productDto.getProfitPercent());
         if (productDto.getBarcode() != null && !productDto.getBarcode().isBlank()) {
             if (isUpdate) {
                 if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId(), product.getId()))
@@ -200,10 +219,12 @@ public class ProductService {
         return new ApiResponse("successfully saved", true);
     }
 
-    private ApiResponse addProductTypeSingleDto(ProductDto productDto, Product product, boolean isUpdate) {
+    private ApiResponse addProductTypeSingleDto(ProductDto productDto, Product product, boolean isUpdate, Currency currency) {
         product.setType(Type.SINGLE);
         product.setBuyPrice(productDto.getBuyPrice());
         product.setSalePrice(productDto.getSalePrice());
+        product.setBuyPriceDollar(Math.round(productDto.getBuyPrice() / currency.getCourse() * 100) / 100.);
+        product.setSalePriceDollar(Math.round(productDto.getSalePrice() / currency.getCourse() * 100) / 100.);
         product.setProfitPercent(productDto.getProfitPercent());
         if (productDto.getBarcode() != null && !productDto.getBarcode().isBlank()) {
             if (isUpdate) {
@@ -226,7 +247,7 @@ public class ProductService {
     }
 
 
-    private ApiResponse addProductTypeManyDto(ProductDto productDto, Product product) {
+    private ApiResponse addProductTypeManyDto(ProductDto productDto, Product product, Currency currency) {
         product.setType(Type.MANY);
 
         Product saveProduct = productRepository.save(product);
@@ -248,6 +269,8 @@ public class ProductService {
                 productTypePrice.setProductTypeValue(optionalProductTypeValue.get());
                 productTypePrice.setBuyPrice(typePricePostDto.getBuyPrice());
                 productTypePrice.setSalePrice(typePricePostDto.getSalePrice());
+                productTypePrice.setBuyPriceDollar(Math.round(typePricePostDto.getBuyPrice() / currency.getCourse() * 100) / 100.);
+                productTypePrice.setSalePriceDollar(Math.round(typePricePostDto.getSalePrice() / currency.getCourse() * 100) / 100.);
                 productTypePrice.setProfitPercent(typePricePostDto.getProfitPercent());
                 if (typePricePostDto.getPhotoId() != null){
                     Optional<Attachment> optionalAttachment = attachmentRepository.findById(typePricePostDto.getPhotoId());
@@ -273,6 +296,8 @@ public class ProductService {
                 productTypePrice.setProductTypeValue(optionalProductTypeValue.get());
                 productTypePrice.setBuyPrice(typePricePostDto.getBuyPrice());
                 productTypePrice.setSalePrice(typePricePostDto.getSalePrice());
+                productTypePrice.setBuyPriceDollar(Math.round(typePricePostDto.getBuyPrice() / currency.getCourse() * 100) / 100.);
+                productTypePrice.setSalePriceDollar(Math.round(typePricePostDto.getSalePrice() / currency.getCourse() * 100) / 100.);
                 productTypePrice.setProfitPercent(typePricePostDto.getProfitPercent());
                 if (typePricePostDto.getPhotoId() != null){
                     Optional<Attachment> optionalAttachment = attachmentRepository.findById(typePricePostDto.getPhotoId());
@@ -359,6 +384,8 @@ public class ProductService {
                 productTypePriceGetDto.setProfitPercent(productTypePrice.getProfitPercent());
                 productTypePriceGetDto.setBuyPrice(productTypePrice.getBuyPrice());
                 productTypePriceGetDto.setSalePrice(productTypePrice.getSalePrice());
+                productTypePriceGetDto.setBuyPriceDollar(productTypePrice.getBuyPriceDollar());
+                productTypePriceGetDto.setSalePriceDollar(productTypePrice.getSalePriceDollar());
                 productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getProductTypeValue().getId());
                 if (productTypePrice.getPhoto() != null)productTypePriceGetDto.setPhotoId(productTypePrice.getPhoto().getId());
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), productTypePrice.getId());
@@ -536,6 +563,10 @@ public class ProductService {
                         getForPurchaseDto.setBarcode(productTypePrice.getBarcode());
                         getForPurchaseDto.setBuyPrice(productTypePrice.getBuyPrice());
                         getForPurchaseDto.setSalePrice(productTypePrice.getSalePrice());
+                        getForPurchaseDto.setBuyDollar(productTypePrice.getProduct().isBuyDollar());
+                        getForPurchaseDto.setSaleDollar(productTypePrice.getProduct().isSaleDollar());
+                        getForPurchaseDto.setBuyPriceDollar(productTypePrice.getSalePriceDollar());
+                        getForPurchaseDto.setSalePriceDollar(productTypePrice.getSalePriceDollar());
                         getForPurchaseDto.setProfitPercent(productTypePrice.getProfitPercent());
                         getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                         getForPurchaseDto.setExpiredDate(product.getExpireDate());
@@ -557,6 +588,10 @@ public class ProductService {
                     getForPurchaseDto.setBarcode(product.getBarcode());
                     getForPurchaseDto.setBuyPrice(product.getBuyPrice());
                     getForPurchaseDto.setSalePrice(product.getSalePrice());
+                    getForPurchaseDto.setBuyDollar(product.isBuyDollar());
+                    getForPurchaseDto.setSaleDollar(product.isSaleDollar());
+                    getForPurchaseDto.setBuyPriceDollar(product.getSalePriceDollar());
+                    getForPurchaseDto.setSalePriceDollar(product.getSalePriceDollar());
                     getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                     getForPurchaseDto.setExpiredDate(product.getExpireDate());
                     if (product.getMeasurement() != null)
@@ -669,7 +704,8 @@ public class ProductService {
             productViewDto.setBarcode(product.getBarcode());
 
             productViewDto.setMinQuantity(product.getMinQuantity());
-
+            productViewDto.setBuyDollar(product.isBuyDollar());
+            productViewDto.setSaleDollar(product.isSaleDollar());
             productViewDto.setBranch(product.getBranch());
             productViewDto.setExpiredDate(product.getExpireDate());
             if (product.getPhoto() != null) {
@@ -699,6 +735,8 @@ public class ProductService {
                     total += totalAmount;
                     productViewDto.setBuyPrice(productTypePrice.getBuyPrice());
                     productViewDto.setSalePrice(productTypePrice.getSalePrice());
+                    productViewDto.setBuyPriceDollar(productTypePrice.getBuyPriceDollar());
+                    productViewDto.setSalePriceDollar(productTypePrice.getSalePriceDollar());
                 }
                 productViewDto.setAmount(total);
             } else {
@@ -719,6 +757,8 @@ public class ProductService {
                 }
                 productViewDto.setBuyPrice(product.getBuyPrice());
                 productViewDto.setSalePrice(product.getSalePrice());
+                productViewDto.setBuyPriceDollar(product.getBuyPriceDollar());
+                productViewDto.setSalePriceDollar(product.getSalePriceDollar());
                 if (product.getCategory()!=null){
                     productViewDto.setCategory(product.getCategory().getName());
                 }
@@ -851,6 +891,48 @@ public class ProductService {
         response.put("totalItem", contentProductPage.getTotalElements());
         response.put("totalPage", contentProductPage.getTotalPages());
         return new ApiResponse("all", true, response);
+    }
+
+    public void editPriceAccordingToDollar(UUID businessId, double course) {
+        List<Product> productListBuy = productRepository.findAllByBusinessIdAndActiveTrueAndBuyDollarTrue(businessId);
+        editBuyPriceSingleHelper(productListBuy, course);
+
+        List<Product> productListSale = productRepository.findAllByBusinessIdAndActiveTrueAndSaleDollarTrue(businessId);
+        editSalePriceSingleHelper(productListSale, course);
+
+        List<ProductTypePrice> productTypePriceListBuy = productTypePriceRepository.findAllByProduct_BusinessIdAndProduct_BuyDollarTrue(businessId);
+        editBuyPriceManyHelper(productTypePriceListBuy, course);
+
+        List<ProductTypePrice> productTypePriceListSale = productTypePriceRepository.findAllByProduct_BusinessIdAndProduct_BuyDollarTrue(businessId);
+        editSalePriceManyHelper(productTypePriceListSale, course);
+    }
+
+    private void editBuyPriceSingleHelper(List<Product> productList, double course) {
+        for (Product product : productList) {
+            product.setBuyPrice(course * product.getBuyPriceDollar());
+        }
+        productRepository.saveAll(productList);
+    }
+
+    private void editSalePriceSingleHelper(List<Product> productList, double course) {
+        for (Product product : productList) {
+            product.setSalePrice(course * product.getSalePriceDollar());
+        }
+        productRepository.saveAll(productList);
+    }
+
+    private void editBuyPriceManyHelper(List<ProductTypePrice> productTypePriceList, double course) {
+        for (ProductTypePrice productTypePrice : productTypePriceList) {
+            productTypePrice.setBuyPrice(course * productTypePrice.getBuyPriceDollar());
+        }
+        productTypePriceRepository.saveAll(productTypePriceList);
+    }
+
+    private void editSalePriceManyHelper(List<ProductTypePrice> productTypePriceList, double course) {
+        for (ProductTypePrice productTypePrice : productTypePriceList) {
+            productTypePrice.setSalePrice(course * productTypePrice.getSalePriceDollar());
+        }
+        productTypePriceRepository.saveAll(productTypePriceList);
     }
 }
 

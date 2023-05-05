@@ -16,6 +16,7 @@ import javax.persistence.ManyToOne;
 @AllArgsConstructor
 @Entity
 public class ProductAmount extends AbsEntity {
+    // todo delete
 
 //    @Column(nullable = false)
 //    private Double quantity;

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.entity.Customer;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.SalaryStatus;
@@ -11,8 +12,6 @@ import uz.pdp.springsecurity.mapper.PaymentMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -211,6 +210,12 @@ public class TradeService {
             trade.setCustomer(customer);
         }
 
+        Optional<Currency> optionalCurrency = currencyRepository.findByBusinessId(branch.getBusiness().getId());
+        if (optionalCurrency.isPresent()) {
+            trade.setDebtSumDollar(Math.round(tradeDTO.getDebtSum()/optionalCurrency.get().getCourse()*100)/100.);
+            trade.setPaidSumDollar(Math.round(tradeDTO.getPaidSum()/optionalCurrency.get().getCourse()*100)/100.);
+            trade.setTotalSumDollar(Math.round(tradeDTO.getTotalSum()/optionalCurrency.get().getCourse()*100)/100.);
+        }
         trade.setPayDate(tradeDTO.getPayDate());
         trade.setTotalSum(tradeDTO.getTotalSum());
         trade.setPaidSum(tradeDTO.getPaidSum());

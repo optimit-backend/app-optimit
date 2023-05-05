@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import uz.pdp.springsecurity.entity.Brand;
 import uz.pdp.springsecurity.entity.ProductTypePrice;
 
 import java.util.List;
@@ -13,9 +12,8 @@ public interface ProductTypePriceRepository extends JpaRepository<ProductTypePri
 
     Optional<ProductTypePrice> findByProductId(UUID product_id);
 
-    List<ProductTypePrice> findAllByProduct_Business_Id(UUID product_business_id);
     List<ProductTypePrice> findAllByProduct_BranchId(UUID product_branch_id);
-    List<ProductTypePrice> findAllByProduct_BusinessId(UUID product_business_id);
+    List<ProductTypePrice> findAllByProduct_BusinessId(UUID businessId);
     List<ProductTypePrice> findAllByProduct_CategoryIdAndProduct_BranchIdAndProduct_ActiveTrue(UUID product_category_id, UUID product_branch_id);
 
 
@@ -28,4 +26,7 @@ public interface ProductTypePriceRepository extends JpaRepository<ProductTypePri
     boolean existsByBarcodeAndProduct_BusinessIdAndIdIsNot(String barcode, UUID businessId, UUID productTypePriceId);
 
     List<ProductTypePrice> findAllByProduct_BranchIdAndProduct_BrandId(UUID product_branch_id, UUID product_brand_id);
+
+    List<ProductTypePrice> findAllByProduct_BusinessIdAndProduct_BuyDollarTrue(UUID businessId);
+    List<ProductTypePrice> findAllByProduct_BusinessIdAndProduct_SaleDollarTrue(UUID businessId);
 }
