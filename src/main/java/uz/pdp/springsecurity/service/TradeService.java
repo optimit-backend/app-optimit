@@ -2,7 +2,6 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.entity.Customer;
@@ -18,53 +17,31 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class TradeService {
-    @Autowired
-    TradeRepository tradeRepository;
+    private final TradeRepository tradeRepository;
 
-    @Autowired
-    CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    @Autowired
-    ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    ProductTypePriceRepository productTypePriceRepository;
+    private final ProductTypePriceRepository productTypePriceRepository;
 
-    @Autowired
-    BranchRepository branchRepository;
+    private final BranchRepository branchRepository;
 
-    @Autowired
-    PaymentStatusRepository paymentStatusRepository;
+    private final PaymentStatusRepository paymentStatusRepository;
 
-    @Autowired
-    PayMethodRepository payMethodRepository;
+    private final PayMethodRepository payMethodRepository;
 
-    @Autowired
-    AddressRepository addressRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    UserRepository userRepository;
+    private final TradeProductRepository tradeProductRepository;
 
-    @Autowired
-    TradeProductRepository tradeProductRepository;
+    private final CurrencyRepository currencyRepository;
 
-    @Autowired
-    CurrencyRepository currencyRepository;
+    private final WarehouseService warehouseService;
 
-    @Autowired
-    CurrentCourceRepository currentCourceRepository;
+    private final FifoCalculationService fifoCalculationService;
 
-    @Autowired
-    CurrencyService currencyService;
-
-    @Autowired
-    WarehouseService warehouseService;
-
-    @Autowired
-    FifoCalculationService fifoCalculationService;
-
-    @Autowired
-    WarehouseRepository warehouseRepository;
+    private final WarehouseRepository warehouseRepository;
 
     private final PaymentMapper paymentMapper;
     private final SubscriptionRepository subscriptionRepository;
@@ -72,8 +49,6 @@ public class TradeService {
     private final PaymentRepository paymentRepository;
     private final SalaryCountService salaryCountService;
     private final AgreementRepository agreementRepository;
-    private final BalanceRepository balanceRepository;
-    private final BalanceHistoryRepository balanceHistoryRepository;
     private final BalanceService balanceService;
 
     @SneakyThrows
