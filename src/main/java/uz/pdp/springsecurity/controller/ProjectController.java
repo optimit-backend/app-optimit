@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -63,7 +64,7 @@ public class ProjectController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_PROJECT")
+    @PreAuthorize(value = "hasAnyAuthority('GET_PROJECT', 'GET_OWN_PROJECT')")
     @GetMapping("/get-by-branch/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
                                         @RequestParam(required = false) UUID typeId,
@@ -76,7 +77,7 @@ public class ProjectController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_PROJECT")
+    @PreAuthorize(value = "hasAnyAuthority('GET_PROJECT', 'GET_OWN_PROJECT')")
     @GetMapping("/get-by-branchId/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId) {
         ApiResponse apiResponse = projectService.getAllByBranch(branchId);
@@ -106,7 +107,7 @@ public class ProjectController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_PROJECT")
+    @PreAuthorize(value = "hasAnyAuthority('GET_PROJECT', 'GET_OWN_PROJECT')")
     @GetMapping("/progress/{projectId}")
     public HttpEntity<?> getProgress(@PathVariable UUID projectId) {
         ApiResponse apiResponse = projectService.getProgress(projectId);
