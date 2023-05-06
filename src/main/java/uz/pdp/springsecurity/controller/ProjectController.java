@@ -9,6 +9,7 @@ import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProjectDto;
 import uz.pdp.springsecurity.service.ProjectService;
+import uz.pdp.springsecurity.utils.AppConstant;
 
 import javax.validation.Valid;
 import java.util.Date;
@@ -28,7 +29,7 @@ public class ProjectController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("EDIT_PROJECT")
+    @PreAuthorize(value = "hasAnyAuthority('GET_PROJECT', 'GET_OWN_PROJECT', 'EDIT_PROJECT')")
     @PutMapping("/patch/{projectId}/{statusId}")
     public HttpEntity<?> updateProjectStatus(@PathVariable UUID projectId,
                                              @PathVariable UUID statusId) {
@@ -50,7 +51,7 @@ public class ProjectController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_PROJECT")
+    @PreAuthorize(value = "hasAnyAuthority('GET_PROJECT', 'GET_OWN_PROJECT')")
     @GetMapping("/get-one/{id}")
     public HttpEntity<?> getOne(@PathVariable UUID id) {
         ApiResponse apiResponse = projectService.getOne(id);
@@ -65,15 +66,16 @@ public class ProjectController {
     }
 
     @PreAuthorize(value = "hasAnyAuthority('GET_PROJECT', 'GET_OWN_PROJECT')")
-    @GetMapping("/get-by-branch/{branchId}")
+    @GetMapping("/get-by-branch-sorted/{branchId}")
     public HttpEntity<?> getAllByBranch(@PathVariable UUID branchId,
+                                        @RequestParam(required = false) UUID userId,
                                         @RequestParam(required = false) UUID typeId,
                                         @RequestParam(required = false) UUID customerId,
                                         @RequestParam(required = false) UUID projectStatusId,
                                         @RequestParam(required = false) Date expired,
-                                        @RequestParam int page,
-                                        @RequestParam int size) {
-        ApiResponse apiResponse = projectService.getAllByBranchId(branchId, typeId, customerId, projectStatusId, expired, page, size);
+                                        @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
+                                        @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size) {
+        ApiResponse apiResponse = projectService.getAllByBranchId(branchId, userId,  typeId, customerId, projectStatusId, expired, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

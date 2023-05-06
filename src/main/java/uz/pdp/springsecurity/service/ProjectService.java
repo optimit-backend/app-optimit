@@ -392,10 +392,11 @@ public class ProjectService {
         return new ApiResponse("Edited", true);
     }
 
-    public ApiResponse getAllByBranchId(UUID branchId, UUID typeId, UUID customerId, UUID projectStatusId, Date expired, int page, int size) {
+    public ApiResponse getAllByBranchId(UUID branchId, UUID userId, UUID typeId, UUID customerId, UUID projectStatusId, Date expired, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Project> projectList = null;
+        Page<Project> projectList;
 
+        boolean checkingUser = userId != null;
         boolean checkingType = typeId != null;
         boolean checkingCustomer = customerId != null;
         boolean checkingProjectStatus = projectStatusId != null;
@@ -406,35 +407,81 @@ public class ProjectService {
         }
 
         if (checkingType && checkingCustomer && checkingProjectStatus && checkingExpired) {
-            projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndProjectStatusIdAndExpiredTrue(typeId, customerId, projectStatusId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndProjectTypeIdAndCustomerIdAndProjectStatusIdAndExpiredTrue(userId, typeId, customerId, projectStatusId, pageable);
+            else
+                projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndProjectStatusIdAndExpiredTrue(typeId, customerId, projectStatusId, pageable);
         } else if (checkingType && checkingCustomer && checkingProjectStatus) {
-            projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndProjectStatusId(typeId, customerId, projectStatusId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndProjectTypeIdAndCustomerIdAndProjectStatusId(userId, typeId, customerId, projectStatusId, pageable);
+            else
+                projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndProjectStatusId(typeId, customerId, projectStatusId, pageable);
         } else if (checkingType && checkingCustomer && checkingExpired) {
-            projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndExpiredTrue(typeId, customerId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndProjectTypeIdAndCustomerIdAndExpiredTrue(userId, typeId, customerId, pageable);
+            else
+                projectList = projectRepository.findAllByProjectTypeIdAndCustomerIdAndExpiredTrue(typeId, customerId, pageable);
         } else if (checkingType && checkingProjectStatus && checkingExpired) {
-            projectList = projectRepository.findAllByProjectTypeIdAndProjectStatusIdAndExpiredTrue(typeId, projectStatusId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndProjectTypeIdAndProjectStatusIdAndExpiredTrue(userId, typeId, projectStatusId, pageable);
+            else
+                projectList = projectRepository.findAllByProjectTypeIdAndProjectStatusIdAndExpiredTrue(typeId, projectStatusId, pageable);
         } else if (checkingCustomer && checkingProjectStatus && checkingExpired) {
-            projectList = projectRepository.findAllByCustomerIdAndProjectStatusIdAndExpiredTrue(customerId, projectStatusId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndCustomerIdAndProjectStatusIdAndExpiredTrue(userId, customerId, projectStatusId, pageable);
+            else
+                projectList = projectRepository.findAllByCustomerIdAndProjectStatusIdAndExpiredTrue(customerId, projectStatusId, pageable);
+
         } else if (checkingType && checkingCustomer) {
-            projectList = projectRepository.findAllByProjectTypeIdAndCustomerId(typeId, customerId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndProjectTypeIdAndCustomerId(userId, typeId, customerId, pageable);
+            else
+                projectList = projectRepository.findAllByProjectTypeIdAndCustomerId(typeId, customerId, pageable);
         } else if (checkingCustomer && checkingExpired) {
-            projectList = projectRepository.findAllByCustomerIdAndExpiredTrue(customerId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByCustomerIdAndExpiredTrue(customerId, pageable);
+            else
+                projectList = projectRepository.findAllByCustomerIdAndExpiredTrue(customerId, pageable);
         } else if (checkingType && checkingExpired) {
-            projectList = projectRepository.findAllByProjectTypeIdAndExpiredTrue(typeId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndProjectTypeIdAndExpiredTrue(userId, typeId, pageable);
+            else
+                projectList = projectRepository.findAllByProjectTypeIdAndExpiredTrue(typeId, pageable);
         } else if (checkingProjectStatus && checkingExpired) {
-            projectList = projectRepository.findAllByProjectStatusIdAndExpiredTrue(projectStatusId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndProjectStatusIdAndExpiredTrue(userId, projectStatusId, pageable);
+            else
+                projectList = projectRepository.findAllByProjectStatusIdAndExpiredTrue(projectStatusId, pageable);
         } else if (checkingCustomer && checkingProjectStatus) {
-            projectList = projectRepository.findAllByCustomerIdAndProjectStatusId(customerId, projectStatusId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndCustomerIdAndProjectStatusId(userId, customerId, projectStatusId, pageable);
+            else
+                projectList = projectRepository.findAllByCustomerIdAndProjectStatusId(customerId, projectStatusId, pageable);
         } else if (checkingType) {
-            projectList = projectRepository.findAllByProjectTypeId(typeId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndProjectTypeId(userId, typeId, pageable);
+            else
+                projectList = projectRepository.findAllByProjectTypeId(typeId, pageable);
         } else if (checkingCustomer) {
-            projectList = projectRepository.findAllByCustomerId(customerId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndCustomerId(userId, customerId, pageable);
+            else
+                projectList = projectRepository.findAllByCustomerId(customerId, pageable);
         } else if (checkingProjectStatus) {
-            projectList = projectRepository.findAllByProjectStatusId(projectStatusId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndProjectStatusId(userId, projectStatusId, pageable);
+            else
+                projectList = projectRepository.findAllByProjectStatusId(projectStatusId, pageable);
         } else if (checkingExpired) {
-            projectList = projectRepository.findAllByBranch_IdAndExpiredTrue(branchId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByUsersIdAndBranch_IdAndExpiredTrue(userId, branchId, pageable);
+            else
+                projectList = projectRepository.findAllByBranch_IdAndExpiredTrue(branchId, pageable);
         } else {
-            projectList = projectRepository.findAllByBranch_Id(branchId, pageable);
+            if (checkingUser)
+                projectList = projectRepository.findAllByBranchIdAndUsers_Id(branchId, userId, pageable);
+            else
+                projectList = projectRepository.findAllByBranch_Id(branchId, pageable);
         }
 
         assert projectList != null;
@@ -446,7 +493,7 @@ public class ProjectService {
             int completed = taskRepository.countByProjectIdAndTaskStatus_OrginalName(project.getId(), "Completed");
             int all = taskRepository.countByProjectId(project.getId());
             if (completed > 0) {
-                int process = 0;
+                int process;
                 process = completed * 100 / all;
                 project.setProcess(process);
             }
@@ -508,7 +555,7 @@ public class ProjectService {
     public ApiResponse getOwnProject(UUID branchId, UUID userId, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Project> projects = null;
+        Page<Project> projects;
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()) {
