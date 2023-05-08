@@ -264,8 +264,8 @@ public enum Permissions {
     VIEW_BALANCE_HISTORY,
     VIEW_BALANCE,
     EDIT_BALANCE,
-    ADD_BALANCE
+    ADD_BALANCE,
 
-
+    VIEW_DASHBOARD
 
 }

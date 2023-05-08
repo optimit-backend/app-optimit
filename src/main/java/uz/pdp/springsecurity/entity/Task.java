@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -55,6 +56,13 @@ public class Task extends AbsEntity {
     private boolean given = false;
     @ManyToOne
     private Branch branch;
+
+    private String description;
+
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "task")
+    @JsonIgnore
+    private List<FileData> fileDataList;
+
 }
 
 

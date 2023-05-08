@@ -434,7 +434,9 @@ public class DataLoader implements CommandLineRunner {
                                     VIEW_BALANCE_HISTORY,
                                     VIEW_BALANCE,
                                     EDIT_BALANCE,
-                                    ADD_BALANCE
+                                    ADD_BALANCE,
+
+                                    VIEW_DASHBOARD
 
                             ),
                             business));
@@ -636,7 +638,9 @@ public class DataLoader implements CommandLineRunner {
                             ADD_WORK_TIME,
                             GET_WORK_TIME,
 
-                            GET_OWN_TASK
+                            GET_OWN_TASK,
+
+                            VIEW_DASHBOARD
                     ),
                     business));
 
@@ -679,7 +683,9 @@ public class DataLoader implements CommandLineRunner {
                             CREATE_PRODUCTION,
                             GET_PRODUCTION,
 
-                            GET_WORK_TIME
+                            GET_WORK_TIME,
+
+                            VIEW_DASHBOARD
 
                     ),
                     business

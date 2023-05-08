@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import uz.pdp.springsecurity.entity.Attachment;
 import uz.pdp.springsecurity.entity.Task;
 import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.payload.TaskGetDto;
@@ -16,6 +17,9 @@ public interface TaskMapper {
 
     TaskMapper INSTANCE = Mappers.getMapper(TaskMapper.class);
 
+    @Mapping(source = "stage.id", target = "stageId")
+    @Mapping(source = "project.id", target = "projectId")
+    @Mapping(target = "fileDataIdList", ignore = true)
     @Mapping(target = "contentId", source = "content.id")
     @Mapping(target = "projectName", source = "project.name")
     @Mapping(target = "taskTypeId", source = "taskType.id")

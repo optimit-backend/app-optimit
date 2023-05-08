@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface FileDateRepository extends JpaRepository<FileData, UUID> {
     List<FileData> findByProjectId(UUID projectId);
+    List<FileData> findAllByTask_Id(UUID task_id);
 }
