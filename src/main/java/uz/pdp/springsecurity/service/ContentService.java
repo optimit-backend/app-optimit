@@ -72,27 +72,7 @@ public class ContentService {
             contentProduct.setContent(content);
             contentProductList.add(contentProduct);
         }
-        /*for (ContentProductDto contentProductDto : contentProductDtoList) {
-            if (contentProductDto.getContentProductIdForEditOrNull() == null) {
-                ContentProduct contentProduct = createOrEditContentProduct(new ContentProduct(), contentProductDto);
-                if (contentProduct == null)
-                    return new ApiResponse("NOT FOUND PRODUCT OR PRODUCT TYPE PRICE (ONE OF THEM SHOULD BE NULL)", false);
-                contentProduct.setContent(content);
-                contentProductList.add(contentProduct);
-            } else if (contentProductDto.isDelete()) {
-                if (!contentProductRepository.existsById(contentProductDto.getContentProductIdForEditOrNull()))
-                    return new ApiResponse("NOT FOUND", false);
-                contentRepository.deleteById(contentProductDto.getContentProductIdForEditOrNull());
-            } else {
-                Optional<ContentProduct> optionalContentProduct = contentProductRepository.findById(contentProductDto.getContentProductIdForEditOrNull());
-                if (optionalContentProduct.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCT", false);
-                ContentProduct contentProduct = createOrEditContentProduct(optionalContentProduct.get(), contentProductDto);
-                if (contentProduct == null)
-                    return new ApiResponse("NOT FOUND PRODUCT OR PRODUCT TYPE PRICE (ONE OF THEM SHOULD BE NULL)", false);
-                contentProduct.setContent(content);
-                contentProductList.add(contentProduct);
-            }
-        }*/
+
         contentProductRepository.saveAll(contentProductList);
         return new ApiResponse("successfully saved", true);
     }
@@ -109,6 +89,7 @@ public class ContentService {
         }
         contentProduct.setQuantity(contentProductDto.getQuantity());
         contentProduct.setTotalPrice(contentProductDto.getTotalPrice());
+        contentProduct.setByProduct(contentProductDto.isByProduct());
         return contentProduct;
     }
 
