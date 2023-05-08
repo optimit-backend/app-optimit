@@ -1,6 +1,7 @@
 package uz.pdp.springsecurity.payload;
 
 import lombok.Data;
+import uz.pdp.springsecurity.entity.FileData;
 import uz.pdp.springsecurity.entity.TaskPrice;
 
 import javax.validation.constraints.NotNull;
@@ -29,5 +30,9 @@ public class TaskDto {
     private double taskPrice;
     @NotNull
     private UUID branchId;
+
+    private String description;
+
+    private List<UUID> fileDataList;
 
 }

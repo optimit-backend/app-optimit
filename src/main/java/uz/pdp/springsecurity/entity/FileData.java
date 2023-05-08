@@ -5,11 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Data
-@Entity
+@Entity(name = "file_data")
 @AllArgsConstructor
 @NoArgsConstructor
 public class FileData extends AbsEntity {
@@ -21,5 +20,8 @@ public class FileData extends AbsEntity {
     private long size;
 
     @ManyToOne
-    Project project;
+    private Project project;
+
+    @ManyToOne
+    private Task task;
 }

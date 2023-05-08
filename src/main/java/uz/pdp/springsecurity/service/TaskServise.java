@@ -36,6 +36,7 @@ public class TaskServise {
     private final StageRepository stageRepository;
     private final SalaryCountService salaryCountService;
     private final PrizeService prizeService;
+    private final FileDateRepository fileDateRepository;
 
     public ApiResponse add(TaskDto taskDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(taskDto.getBranchId());
@@ -87,6 +88,8 @@ public class TaskServise {
 
         task.setGoalAmount(taskDto.getGoalAmount());
         task.setTaskPrice(taskDto.getTaskPrice());
+        task.setDescription(taskDto.getDescription());
+
 
         if (taskDto.getStageId() != null) {
             Optional<Stage> optionalStage = stageRepository.findById(taskDto.getStageId());
@@ -111,7 +114,9 @@ public class TaskServise {
             project.setBudget(budget);
             projectRepository.save(project);
         }
-        taskRepository.save(task);
+        Task save = taskRepository.save(task);
+
+        saveFileData(taskDto, save);
 
         List<User> users = new ArrayList<>();
         for (TaskPrice taskPrice : taskPriceList) {
@@ -129,6 +134,20 @@ public class TaskServise {
         }
 
         return new ApiResponse("Added", true);
+    }
+
+    private void saveFileData(TaskDto taskDto, Task save) {
+        List<UUID> fileDataIdList = taskDto.getFileDataList();
+        if (!fileDataIdList.isEmpty()) {
+            for (UUID uuid : fileDataIdList) {
+                Optional<FileData> optionalFileData = fileDateRepository.findById(uuid);
+                if (optionalFileData.isPresent()) {
+                    FileData fileData = optionalFileData.get();
+                    fileData.setTask(save);
+                    fileDateRepository.save(fileData);
+                }
+            }
+        }
     }
 
     public ApiResponse edit(UUID id, TaskDto taskDto) {
@@ -176,6 +195,11 @@ public class TaskServise {
         task.setProductions(taskDto.isProductions());
         task.setGoalAmount(taskDto.getGoalAmount());
         task.setTaskPrice(taskDto.getTaskPrice());
+
+        task.setDescription(taskDto.getDescription());
+
+        saveFileData(taskDto, task);
+
         taskRepository.save(task);
         return new ApiResponse("Edited", true);
     }
@@ -229,7 +253,14 @@ public class TaskServise {
 
     public ApiResponse get(UUID id) {
         Optional<Task> optionalTask = taskRepository.findById(id);
-        return optionalTask.map(task -> new ApiResponse("Found", true, task)).orElseGet(() -> new ApiResponse("Not Found", false));
+
+        if (optionalTask.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+        TaskGetDto getDto = taskMapper.toDto(optionalTask.get());
+        List<FileData> allFileData = fileDateRepository.findAllByTask_Id(id);
+        getDto.setFileDataIdList(allFileData);
+        return new ApiResponse("found", true, getDto);
     }
 
     public ApiResponse delete(UUID id) {
@@ -313,11 +344,11 @@ public class TaskServise {
                 }
             }
 
-            List<TaskGetDto> taskGetDtoList = taskMapper.toDto(allTask.toList());
+            List<TaskGetDto> dtoListTask = toDtoListTask(allTask);
 
             Map<String, Object> response = new HashMap<>();
             response.put("statusId", status.getId());
-            response.put("getLessProduct", taskGetDtoList);
+            response.put("getLessProduct", dtoListTask);
             response.put("currentPage", allTask.getNumber());
             response.put("totalItems", allTask.getTotalElements());
             response.put("totalPages", allTask.getTotalPages());
@@ -334,7 +365,16 @@ public class TaskServise {
         if (taskList.isEmpty()) {
             return new ApiResponse("Not Found", false);
         }
-        return new ApiResponse("Found", true, taskList);
+
+        List<TaskGetDto> taskGetDtoList = new ArrayList<>();
+        for (Task task : taskList) {
+            List<FileData> allFileData = fileDateRepository.findAllByTask_Id(task.getId());
+            TaskGetDto taskGetDto = taskMapper.toDto(task);
+            taskGetDto.setFileDataIdList(allFileData);
+            taskGetDtoList.add(taskGetDto);
+        }
+
+        return new ApiResponse("Found", true, taskGetDtoList);
     }
 
     public ApiResponse getAllByBranchId(UUID branchId, UUID projectId, UUID statusId, UUID typeId, UUID userId, Date expired, int page, int size) {
@@ -368,7 +408,20 @@ public class TaskServise {
             return new ApiResponse("Not Found", false);
         }
 
+
         return new ApiResponse("Found", true, tasks);
+    }
+
+    private List<TaskGetDto> toDtoListTask(Page<Task> tasks) {
+        List<Task> taskList = tasks.toList();
+        List<TaskGetDto> taskGetDtoList = new ArrayList<>();
+        for (Task task : taskList) {
+            List<FileData> allFileData = fileDateRepository.findAllByTask_Id(task.getId());
+            TaskGetDto taskGetDto = taskMapper.toDto(task);
+            taskGetDto.setFileDataIdList(allFileData);
+            taskGetDtoList.add(taskGetDto);
+        }
+        return taskGetDtoList;
     }
 
     public ApiResponse getAll(UUID branchId, UUID userId) {
@@ -381,7 +434,16 @@ public class TaskServise {
         if (taskList.isEmpty()) {
             return new ApiResponse("Tasks not found", false);
         }
-        return new ApiResponse("Found", true, taskList);
+
+        List<TaskGetDto> taskGetDtoList = new ArrayList<>();
+        for (Task task : taskList) {
+            List<FileData> allFileData = fileDateRepository.findAllByTask_Id(task.getId());
+            TaskGetDto getDto = taskMapper.toDto(task);
+            taskGetDtoList.add(getDto);
+            getDto.setFileDataIdList(allFileData);
+        }
+
+        return new ApiResponse("Found", true, taskGetDtoList);
     }
 
     public ApiResponse searchByName(String name, int page, int size, UUID userId) {
@@ -423,7 +485,15 @@ public class TaskServise {
         } else {
             tasks = taskRepository.findAllByBranch_Id(branchId, pageable);
         }
-        
-        return new ApiResponse("Found", true, tasks);
+
+        List<TaskGetDto> taskGetDtoList = new ArrayList<>();
+        for (Task task : tasks) {
+            TaskGetDto getDto = taskMapper.toDto(task);
+            List<FileData> allFileData = fileDateRepository.findAllByTask_Id(task.getId());
+            getDto.setFileDataIdList(allFileData);
+            taskGetDtoList.add(getDto);
+        }
+
+        return new ApiResponse("Found", true, taskGetDtoList);
     }
 }
