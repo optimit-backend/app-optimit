@@ -39,7 +39,7 @@ public class WarehouseService {
 
 
     private void createOrEditWareHouseHelper(Branch branch, Product product, ProductTypePrice productTypePrice, Double quantity) {
-        Warehouse warehouse ;
+        Warehouse warehouse;
         if (product != null) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), product.getId());
             if (optionalWarehouse.isPresent()) {
@@ -314,8 +314,14 @@ public class WarehouseService {
             GetLessProductDto getLessProductDto = new GetLessProductDto();
             if (warehouse.getProductTypePrice() != null) {
                 getLessProductDto.setName(warehouse.getProductTypePrice().getName());
+                if (warehouse.getProductTypePrice().getProduct().getPhoto()!=null){
+                    getLessProductDto.setAttachmentId(warehouse.getProductTypePrice().getProduct().getPhoto().getId());
+                }
             } else {
                 getLessProductDto.setName(warehouse.getProduct().getName());
+                if (warehouse.getProduct().getPhoto()!=null){
+                    getLessProductDto.setAttachmentId(warehouse.getProduct().getPhoto().getId());
+                }
             }
             getLessProductDto.setAmount(warehouse.getAmount());
             getLessProductDtoList.add(getLessProductDto);

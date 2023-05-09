@@ -1044,6 +1044,9 @@ public class ReportsService {
                 mostSaleProductsDto.setBarcode(product.get().getBarcode());
                 mostSaleProductsDto.setMeasurement(product.get().getMeasurement().getName());
                 mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
+                if (product.get().getPhoto()!=null) {
+                    mostSaleProductsDto.setAttachmentId(product.get().getPhoto().getId());
+                }
                 mostSaleProductsDtoList.add(mostSaleProductsDto);
             } else {
                 Optional<ProductTypePrice> productTypePrice = productTypePriceRepository.findById(entry.getKey());
@@ -1055,6 +1058,9 @@ public class ReportsService {
                 mostSaleProductsDto.setBarcode(productTypePrice.get().getBarcode());
                 mostSaleProductsDto.setMeasurement(productTypePrice.get().getProduct().getMeasurement().getName());
                 mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
+                if (productTypePrice.get().getProduct().getPhoto()!=null){
+                    mostSaleProductsDto.setAttachmentId(productTypePrice.get().getProduct().getPhoto().getId());
+                }
                 mostSaleProductsDtoList.add(mostSaleProductsDto);
             }
 
@@ -2037,7 +2043,6 @@ public class ReportsService {
 
         return new ApiResponse("Found", true, projectReportDto);
     }
-
 
     public ApiResponse getLidTradeReport(UUID businessId, int size, int page) {
         Pageable pageable = PageRequest.of(page, size);
