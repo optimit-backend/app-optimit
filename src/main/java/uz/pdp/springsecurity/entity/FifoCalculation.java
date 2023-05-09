@@ -75,5 +75,11 @@ public class FifoCalculation extends AbsEntity {
         this.product = product;
     }
 
-
+    public FifoCalculation(Branch branch, double purchasedAmount, double remainAmount, Date date, Production production) {
+        this.branch = branch;
+        this.purchasedAmount = purchasedAmount;
+        this.remainAmount = remainAmount;
+        this.date = date;
+        this.production = production;
+    }
 }

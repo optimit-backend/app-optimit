@@ -152,6 +152,20 @@ public class WarehouseService {
         return contentProduct;
     }
 
+    public ContentProduct createByProduct(ContentProduct contentProduct, ContentProductDto contentProductDto) {
+        if (contentProductDto.getProductId() != null) {
+            Optional<Product> optional = productRepository.findById(contentProductDto.getProductId());
+            if (optional.isEmpty()) return null;
+            contentProduct.setProduct(optional.get());
+        } else {
+            Optional<ProductTypePrice> optional = productTypePriceRepository.findById(contentProductDto.getProductTypePriceId());
+            if (optional.isEmpty()) return null;
+            contentProduct.setProductTypePrice(optional.get());
+        }
+        createOrEditWareHouseHelper(contentProduct.getProduction().getBranch(), contentProduct.getProduct(), contentProduct.getProductTypePrice(), contentProductDto.getQuantity());
+        return contentProduct;
+    }
+
     public ApiResponse createOrUpdateExchangeProductBranch(ExchangeProductBranchDTO branchDTO, ExchangeProductBranch exchangeProductBranch, boolean update) {
 
         List<ExchangeProduct> exchangeProductList = new ArrayList<>();
