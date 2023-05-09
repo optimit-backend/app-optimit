@@ -37,4 +37,6 @@ public class CustomerDto {
     private double debt;
 
     private Date payDate;
+
+    private Date birthday;
 }

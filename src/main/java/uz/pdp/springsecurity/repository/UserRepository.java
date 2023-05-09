@@ -18,6 +18,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findAllByRole_Id(UUID role_id);
     List<User> findAllByRole_IdAndBusiness_Delete(UUID role_id, boolean delete);
     List<User> findAllByBusiness_Id(UUID business_id);
+    List<User> findAllByBranches_Id(UUID branches_id);
     List<User> findAllByBusiness_IdAndRoleIsNotAndActiveIsTrue(UUID business_id, Role role);
     List<User> findAllByBranchesIdAndRoleIsNotAndActiveIsTrue(UUID branches_id, Role role);
     Optional<User> findByBusinessIdAndRoleName(UUID business_id, String role_name);
@@ -25,4 +26,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findAllByBusiness_IdAndRoleName(UUID business_id, String role_name);
     List<User> findAllByJobId(UUID id);
     List<User> findAllByIdIn(Collection<UUID> id);
+
 }
