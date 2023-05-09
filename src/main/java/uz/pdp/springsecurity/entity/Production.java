@@ -37,13 +37,16 @@ public class Production extends AbsEntity {
     private Date date;
 
     @Column(nullable = false)
-    private Double quantity;
-
-    @Column(nullable = false)
     private double totalQuantity;
 
     @Column(nullable = false)
+    private Double quantity;
+
+    @Column(nullable = false)
     private double invalid = 0d;
+
+    @Column(nullable = false)
+    private double totalPrice;
 
     @Column(nullable = false)
     private double contentPrice;
@@ -54,6 +57,15 @@ public class Production extends AbsEntity {
     @Column(nullable = false)
     private boolean costEachOne;
 
-    @Column(nullable = false)
-    private double totalPrice;
+    public Production(Branch branch, Date date, double totalQuantity, Double quantity, double invalid, double totalPrice, double contentPrice, double cost, boolean costEachOne) {
+        this.branch = branch;
+        this.date = date;
+        this.totalQuantity = totalQuantity;
+        this.quantity = quantity;
+        this.invalid = invalid;
+        this.totalPrice = totalPrice;
+        this.contentPrice = contentPrice;
+        this.cost = cost;
+        this.costEachOne = costEachOne;
+    }
 }
