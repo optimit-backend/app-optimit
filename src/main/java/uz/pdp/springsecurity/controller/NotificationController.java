@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CurrentUser;
 import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.NotificationDto;
 import uz.pdp.springsecurity.service.NotificationService;
 
 import java.util.UUID;
@@ -34,6 +35,12 @@ public class NotificationController {
     @DeleteMapping
     public HttpEntity<?> deleteAll(@CurrentUser User user) {
         ApiResponse apiResponse = notificationService.delete(user);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @PostMapping
+    public HttpEntity<?> create(@RequestBody NotificationDto notificationDto) {
+        ApiResponse apiResponse = notificationService.create(notificationDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }

@@ -33,6 +33,9 @@ public class Notification extends AbsEntity {
     @ManyToOne
     private User userTo;
 
+    @ManyToOne
+    private Attachment attachment;
+
     private boolean delivery;
 
     private boolean read;

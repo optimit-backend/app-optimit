@@ -4,10 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Notification;
 import uz.pdp.springsecurity.entity.User;
+import uz.pdp.springsecurity.enums.NotificationType;
 import uz.pdp.springsecurity.mapper.NotificationMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.NotificationDto;
 import uz.pdp.springsecurity.payload.NotificationGetByIdDto;
+import uz.pdp.springsecurity.repository.AttachmentRepository;
 import uz.pdp.springsecurity.repository.NotificationRepository;
+import uz.pdp.springsecurity.repository.UserRepository;
 
 import java.util.*;
 
@@ -18,6 +22,8 @@ public class NotificationService {
     private final NotificationRepository repository;
 
     private final NotificationMapper mapper;
+    private final UserRepository userRepository;
+    private final AttachmentRepository attachmentRepository;
 
     public ApiResponse getAll(User user) {
         UUID userId = user.getId();
@@ -61,4 +67,43 @@ public class NotificationService {
 
         return new ApiResponse("deleted", true);
     }
+
+    public ApiResponse create(NotificationDto notificationDto) {
+        List<UUID> userToIdList = new ArrayList<>();
+
+        if (notificationDto.getNotificationKay().equals("ALL")) {
+            List<User> allByBusinessId = new ArrayList<>();
+            UUID businessOrBranchId = notificationDto.getBusinessOrBranchId();
+            allByBusinessId.addAll(userRepository.findAllByBusiness_Id(businessOrBranchId));
+            allByBusinessId.addAll(userRepository.findAllByBranches_Id(businessOrBranchId));
+            for (User user : allByBusinessId) {
+                userToIdList.add(user.getId());
+            }
+        } else {
+            userToIdList = notificationDto.getUserToId();
+        }
+
+        if (userToIdList.isEmpty()) {
+            return new ApiResponse("Userlarni belgilang", false);
+        }
+
+        for (UUID id : userToIdList) {
+            if (!id.equals(notificationDto.getUserFromId())) {
+                Notification notification = new Notification();
+                notification.setName("Yangi Xabar keldi!");
+                notification.setMessage(notificationDto.getMessage());
+                notification.setType(NotificationType.NOTIFICATION);
+                userRepository.findById(notificationDto.getUserFromId()).ifPresent(notification::setUserFrom);
+                userRepository.findById(id).ifPresent(notification::setUserTo);
+                if (notificationDto.getAttachmentId()!=null){
+                    attachmentRepository.findById(notificationDto.getAttachmentId()).ifPresent(notification::setAttachment);
+                }
+                repository.save(notification);
+            }
+        }
+
+        return new ApiResponse("Xabarlar jo'natildi!", true);
+    }
+
+
 }
