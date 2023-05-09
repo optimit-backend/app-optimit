@@ -51,6 +51,24 @@ public class FifoCalculationService {
         fifoRepository.save(fifoCalculation);
     }
 
+    public void createByProduct(Production production, ContentProduct contentProduct) {
+        FifoCalculation fifoCalculation = new FifoCalculation(
+                production.getBranch(),
+                contentProduct.getQuantity(),
+                contentProduct.getQuantity(),
+                production.getDate(),
+                production
+        );
+        if (contentProduct.getProduct()!=null){
+            fifoCalculation.setProduct(contentProduct.getProduct());
+            fifoCalculation.setBuyPrice(contentProduct.getProduct().getBuyPrice());
+        }else {
+            fifoCalculation.setProductTypePrice(contentProduct.getProductTypePrice());
+            fifoCalculation.setBuyPrice(contentProduct.getProductTypePrice().getBuyPrice());
+        }
+        fifoRepository.save(fifoCalculation);
+    }
+
     public void editPurchaseProduct(PurchaseProduct purchaseProduct, Double amount) {
         Optional<FifoCalculation> optionalFifoCalculation = fifoRepository.findByPurchaseProductId(purchaseProduct.getId());
         if (optionalFifoCalculation.isEmpty()) return;
