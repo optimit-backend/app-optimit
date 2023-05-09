@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -13,4 +14,5 @@ public class GetLessProductDto {
     private String name;
     private double amount;
     private Date lastSoldDate;
+    private UUID attachmentId;
 }

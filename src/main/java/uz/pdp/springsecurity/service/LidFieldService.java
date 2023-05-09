@@ -78,7 +78,11 @@ public class LidFieldService {
             return new ApiResponse("Ushbu lid fieldni o'chirib bo'lmaydi formaga bog'langan", false);
         }
 
-        repository.delete(lidField);
+        try {
+            repository.delete(lidField);
+        } catch (Exception e) {
+            return new ApiResponse("o'chirib bo'lmaydi!", false);
+        }
         return new ApiResponse("successfully deleted", true);
     }
 

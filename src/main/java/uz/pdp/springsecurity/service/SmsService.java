@@ -22,7 +22,7 @@ import java.util.Map;
 public class SmsService {
 
 
-    private final RestTemplate restTemplate;
+//    private final RestTemplate restTemplate;
     private static final String userEmail = "samandarshodmonov1998@gmail.com";
     private final static String userSecret = "TaEotaLMYaUqqGTgTrzjGnmIFo7whQfaf82vMU8o";
     private static final String GET_TOKEN = "https://notify.eskiz.uz/api/auth/login";
