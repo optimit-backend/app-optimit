@@ -52,6 +52,7 @@ public class DataLoader implements CommandLineRunner {
 
     @Value("${spring.sql.init.mode}")
     private String initMode;
+    private final ShablonRepository shablonRepository;
 
     @Override
     public void run(String... args) {
@@ -719,7 +720,7 @@ public class DataLoader implements CommandLineRunner {
                     business
             ));
             invoiceService.create(branch);
-                    branches.add(branch);
+            branches.add(branch);
 
 
             BusinessService.createProjectStatus(branch, projectStatusRepository);
@@ -843,6 +844,36 @@ public class DataLoader implements CommandLineRunner {
             exchangeStatusRepository.save(new ExchangeStatus(
                     QABUL_QILINGAN.name()
             ));
+        } else if (initMode.equals("never")) {
+            List<Business> businessRepositoryAll = businessRepository.findAll();
+            for (Business business : businessRepositoryAll) {
+                List<Shablon> all = shablonRepository.findAllByBusiness_Id(business.getId());
+                if (all.isEmpty()) {
+                    Shablon shablon = new Shablon();
+                    shablon.setName("Tug'ilgan kun uchun");
+                    shablon.setOriginalName("bithday");
+                    shablon.setBusiness(business);
+                    shablonRepository.save(shablon);
+
+                    Shablon shablon1 = new Shablon();
+                    shablon1.setName("Kam qolgan mahsulot");
+                    shablon1.setOriginalName("lessProduct");
+                    shablon1.setBusiness(business);
+                    shablonRepository.save(shablon1);
+
+                    Shablon shablon2 = new Shablon();
+                    shablon2.setName("Mijozlar qarzi");
+                    shablon2.setOriginalName("debtCustomer");
+                    shablon2.setBusiness(business);
+                    shablonRepository.save(shablon2);
+
+                    Shablon shablon3 = new Shablon();
+                    shablon3.setName("Task qo'shilganda");
+                    shablon3.setOriginalName("newTask");
+                    shablon3.setBusiness(business);
+                    shablonRepository.save(shablon3);
+                }
+            }
         }
     }
 }
