@@ -90,6 +90,7 @@ public class UserService {
         }
         user.setActive(true);
         user.setBranches(branches);
+        user.setBirthday(userDto.getBirthday());
         if (userDto.getPhotoId() != null) {
             user.setPhoto(attachmentRepository.findById(userDto.getPhotoId()).orElseThrow());
         }

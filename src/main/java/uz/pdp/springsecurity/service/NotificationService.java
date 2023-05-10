@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Notification;
+import uz.pdp.springsecurity.entity.Shablon;
 import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.enums.NotificationType;
 import uz.pdp.springsecurity.mapper.NotificationMapper;
@@ -11,6 +12,7 @@ import uz.pdp.springsecurity.payload.NotificationDto;
 import uz.pdp.springsecurity.payload.NotificationGetByIdDto;
 import uz.pdp.springsecurity.repository.AttachmentRepository;
 import uz.pdp.springsecurity.repository.NotificationRepository;
+import uz.pdp.springsecurity.repository.ShablonRepository;
 import uz.pdp.springsecurity.repository.UserRepository;
 
 import java.util.*;
@@ -24,6 +26,7 @@ public class NotificationService {
     private final NotificationMapper mapper;
     private final UserRepository userRepository;
     private final AttachmentRepository attachmentRepository;
+    private final ShablonRepository shablonRepository;
 
     public ApiResponse getAll(User user) {
         UUID userId = user.getId();
@@ -91,11 +94,21 @@ public class NotificationService {
             if (!id.equals(notificationDto.getUserFromId())) {
                 Notification notification = new Notification();
                 notification.setName("Yangi Xabar keldi!");
-                notification.setMessage(notificationDto.getMessage());
+                if (notificationDto.getShablonId() != null) {
+                    Optional<Shablon> optionalShablon = shablonRepository.findById(notificationDto.getShablonId());
+                    if (optionalShablon.isPresent()) {
+                        Shablon shablon = optionalShablon.get();
+                        notification.setMessage(shablon.getMessage());
+                    }
+                } else {
+                    notification.setMessage(notificationDto.getMessage());
+                }
                 notification.setType(NotificationType.NOTIFICATION);
-                userRepository.findById(notificationDto.getUserFromId()).ifPresent(notification::setUserFrom);
+                if (notificationDto.getUserFromId()!=null) {
+                    userRepository.findById(notificationDto.getUserFromId()).ifPresent(notification::setUserFrom);
+                }
                 userRepository.findById(id).ifPresent(notification::setUserTo);
-                if (notificationDto.getAttachmentId()!=null){
+                if (notificationDto.getAttachmentId() != null) {
                     attachmentRepository.findById(notificationDto.getAttachmentId()).ifPresent(notification::setAttachment);
                 }
                 repository.save(notification);
