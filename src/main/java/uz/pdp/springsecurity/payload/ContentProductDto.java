@@ -23,5 +23,5 @@ public class ContentProductDto{
     private double totalPrice;
 
     @NotNull
-    private boolean byProduct = false;
+    private boolean byProduct;
 }
