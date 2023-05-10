@@ -11,6 +11,7 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -43,5 +44,8 @@ public class ProductionDto{
     @NotNull
     private double totalPrice;
 
+    @NotNull
+    @NotEmpty
     List<ContentProductDto> contentProductDtoList;
+    List<ContentProductDto> lossContentProductDtoList;
 }

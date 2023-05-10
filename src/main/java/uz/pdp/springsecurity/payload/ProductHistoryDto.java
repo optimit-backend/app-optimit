@@ -10,6 +10,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductHistoryDto {
+    private String productName;
     private double amount;
     private double summa;
     private Date date;
@@ -17,7 +18,8 @@ public class ProductHistoryDto {
     private String userLastName;
     private String customerSupplierName;
 
-    public ProductHistoryDto(double amount, double summa, Date date) {
+    public ProductHistoryDto(String productName, double amount, double summa, Date date) {
+        this.productName = productName;
         this.amount = amount;
         this.summa = summa;
         this.date = date;

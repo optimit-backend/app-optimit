@@ -1,5 +1,7 @@
 package uz.pdp.springsecurity.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import uz.pdp.springsecurity.entity.FifoCalculation;
 
@@ -21,4 +23,7 @@ public interface FifoCalculationRepository extends JpaRepository<FifoCalculation
     List<FifoCalculation> findAllByBranchIdAndActiveTrue(UUID branchId);
 
     List<FifoCalculation> findAllByBranch_BusinessIdAndActiveTrue(UUID businessId);
+
+    Page<FifoCalculation> findAllByBranchIdAndProductIdAndProductionIsNotNullOrderByCreatedAtDesc(UUID branchId, UUID productId, Pageable pageable);
+    Page<FifoCalculation> findAllByBranchIdAndProductTypePriceIdAndProductionIsNotNullOrderByCreatedAtDesc(UUID branchId, UUID productTypePriceId, Pageable pageable);
 }

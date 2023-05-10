@@ -56,7 +56,7 @@ public class ProductionService {
         }
         productionRepository.save(production);
 
-        ApiResponse apiResponseSave = saveContentProductList(production, productionDto.getContentProductDtoList());
+        ApiResponse apiResponseSave = saveContentProductList(production, productionDto.getContentProductDtoList(), productionDto.getLossContentProductDtoList());
         if (!apiResponseSave.isSuccess()) return apiResponse;
 
         return new ApiResponse("SUCCESS", true);
@@ -103,7 +103,7 @@ public class ProductionService {
         }
         productionRepository.save(production);
 
-        ApiResponse apiResponseSave = saveContentProductList(production, productionTaskDto.getContentProductDtoList());
+        ApiResponse apiResponseSave = saveContentProductList(production, productionTaskDto.getContentProductDtoList(), productionTaskDto.getLossContentProductDtoList());
         if (!apiResponseSave.isSuccess()) return apiResponse;
 
         task.setTaskStatus(taskStatus);
@@ -139,7 +139,7 @@ public class ProductionService {
         return new ApiResponse("SUCCESS", true);
     }
 
-    private ApiResponse saveContentProductList(Production production, List<ContentProductDto> contentProductDtoList) {
+    private ApiResponse saveContentProductList(Production production, List<ContentProductDto> contentProductDtoList, List<ContentProductDto> lossContentProductDtoList) {
         List<ContentProduct>contentProductList = new ArrayList<>();
         double contentPrice = 0d;
         for (ContentProductDto contentProductDto : contentProductDtoList) {
@@ -149,6 +149,7 @@ public class ProductionService {
             contentProduct.setQuantity(contentProductDto.getQuantity());
             contentProduct.setTotalPrice(contentProductDto.getTotalPrice());
             contentProduct.setByProduct(contentProductDto.isByProduct());
+            contentProduct.setLossProduct(false);
             if (contentProductDto.isByProduct()) {
                 contentProduct = warehouseService.createByProduct(contentProduct, contentProductDto);
                 if (contentProduct == null) continue;
@@ -162,6 +163,23 @@ public class ProductionService {
             }
             contentProductList.add(contentProduct);
         }
+        for (ContentProductDto contentProductDto : lossContentProductDtoList) {
+            if (contentProductDto.getQuantity() == 0)continue;
+            ContentProduct contentProduct = new ContentProduct();
+            contentProduct.setProduction(production);
+            contentProduct.setQuantity(contentProductDto.getQuantity());
+            contentProduct.setTotalPrice(contentProductDto.getTotalPrice());
+            contentProduct.setByProduct(false);
+            contentProduct.setLossProduct(true);
+
+            contentProduct = warehouseService.createByProduct(contentProduct, contentProductDto);
+            if (contentProduct == null) continue;
+            fifoCalculationService.createByProduct(production, contentProduct);
+            contentPrice -= contentProduct.getTotalPrice();
+
+            contentProductList.add(contentProduct);
+        }
+
         if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
         contentProductRepository.saveAll(contentProductList);
         production.setContentPrice(contentPrice);

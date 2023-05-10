@@ -43,6 +43,8 @@ public class ContentProduct extends AbsEntity {
 
     private boolean byProduct = false;
 
+    private boolean lossProduct = false;
+
     //get uchun omborda bor maxsulotning amounti
     @Transient
     private double productWarehouseAmount;

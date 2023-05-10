@@ -45,6 +45,7 @@ public class ProductService {
     private final ContentProductRepository contentProductRepository;
     private final ProductionRepository productionRepository;
     private final CurrencyRepository currencyRepository;
+    private final FifoCalculationRepository fifoCalculationRepository;
 
     public ApiResponse addProduct(ProductDto productDto) {
         UUID businessId = productDto.getBusinessId();
@@ -784,6 +785,7 @@ public class ProductService {
         List<ProductHistoryDto> productHistoryDtoList = new ArrayList<>();
         for (PurchaseProduct purchaseProduct : purchaseProductPage.getContent()) {
             productHistoryDtoList.add(new ProductHistoryDto(
+                    purchaseProduct.getProduct() != null? purchaseProduct.getProduct().getName():purchaseProduct.getProductTypePrice().getName(),
                     purchaseProduct.getPurchasedQuantity(),
                     purchaseProduct.getTotalSum(),
                     purchaseProduct.getCreatedAt(),
@@ -803,32 +805,44 @@ public class ProductService {
     public ApiResponse getProductionProduct(UUID branchId, UUID productId, int page, int size) {
         if (!branchRepository.existsById(branchId)) return new ApiResponse("BRANCH NOT FOUND", false);
         Pageable pageable = PageRequest.of(page, size);
-        Page<Production> productionPage;
+        Page<FifoCalculation> fifoCalculationPage;
         if (productRepository.existsById(productId)) {
-            productionPage = productionRepository.findAllByBranchIdAndProductIdOrderByCreatedAtDesc(branchId, productId, pageable);
+            fifoCalculationPage = fifoCalculationRepository.findAllByBranchIdAndProductIdAndProductionIsNotNullOrderByCreatedAtDesc(branchId, productId, pageable);
+//            fifoCalculationPage = productionRepository.findAllByBranchIdAndProductIdOrderByCreatedAtDesc(branchId, productId, pageable);
         } else if (productTypePriceRepository.existsById(productId)) {
-            productionPage = productionRepository.findAllByBranchIdAndProductTypePriceIdOrderByCreatedAtDesc(branchId, productId, pageable);
+            fifoCalculationPage = fifoCalculationRepository.findAllByBranchIdAndProductTypePriceIdAndProductionIsNotNullOrderByCreatedAtDesc(branchId, productId, pageable);
+//            fifoCalculationPage = productionRepository.findAllByBranchIdAndProductTypePriceIdOrderByCreatedAtDesc(branchId, productId, pageable);
         }else {
             return new ApiResponse("PRODUCT NOT FOUND", false);
         }
-        if (productionPage.isEmpty()) return new ApiResponse("LIST EMPTY", false);
+        if (fifoCalculationPage.isEmpty()) return new ApiResponse("LIST EMPTY", false);
 
         List<ProductHistoryDto> productHistoryDtoList = new ArrayList<>();
-        for (Production production : productionPage.getContent()) {
-            productHistoryDtoList.add(new ProductHistoryDto(
-                    production.getQuantity(),
-                    production.getTotalPrice(),
-                    production.getCreatedAt(),
-                    "",
-                    "",
-                    ""
-            ));
+        for (FifoCalculation fifoCalculation : fifoCalculationPage.getContent()) {
+            ProductHistoryDto productHistoryDto = new ProductHistoryDto(
+                    fifoCalculation.getProduct() != null ? fifoCalculation.getProduct().getName() : fifoCalculation.getProductTypePrice().getName(),
+                    fifoCalculation.getPurchasedAmount(),
+                    0,
+                    fifoCalculation.getCreatedAt()
+            );
+            if (fifoCalculation.getProduct() != null) {
+                if (fifoCalculation.getProduct().equals(fifoCalculation.getProduction().getProduct()))
+                    productHistoryDto.setSumma(fifoCalculation.getProduction().getTotalPrice());
+                else
+                    productHistoryDto.setSumma(fifoCalculation.getProduct().getSalePrice() * fifoCalculation.getPurchasedAmount());
+            } else {
+                if (fifoCalculation.getProductTypePrice().equals(fifoCalculation.getProduction().getProductTypePrice()))
+                    productHistoryDto.setSumma(fifoCalculation.getProduction().getTotalPrice());
+                else
+                    productHistoryDto.setSumma(fifoCalculation.getProductTypePrice().getSalePrice() * fifoCalculation.getPurchasedAmount());
+            }
+            productHistoryDtoList.add(productHistoryDto);
         }
         Map<String, Object> response = new HashMap<>();
         response.put("productHistoryDtoList", productHistoryDtoList);
-        response.put("currentPage", productionPage.getNumber());
-        response.put("totalItem", productionPage.getTotalElements());
-        response.put("totalPage", productionPage.getTotalPages());
+        response.put("currentPage", fifoCalculationPage.getNumber());
+        response.put("totalItem", fifoCalculationPage.getTotalElements());
+        response.put("totalPage", fifoCalculationPage.getTotalPages());
         return new ApiResponse("all", true, response);
     }
 
@@ -848,6 +862,7 @@ public class ProductService {
         List<ProductHistoryDto> productHistoryDtoList = new ArrayList<>();
         for (TradeProduct tradeProduct : tradeProductPage.getContent()) {
             productHistoryDtoList.add(new ProductHistoryDto(
+                    tradeProduct.getProduct() != null? tradeProduct.getProduct().getName():tradeProduct.getProductTypePrice().getName(),
                     tradeProduct.getTradedQuantity(),
                     tradeProduct.getTotalSalePrice(),
                     tradeProduct.getCreatedAt(),
@@ -869,9 +884,9 @@ public class ProductService {
         Pageable pageable = PageRequest.of(page, size);
         Page<ContentProduct> contentProductPage;
         if (productRepository.existsById(productId)) {
-            contentProductPage = contentProductRepository.findAllByProduction_BranchIdAndProductIdAndProductionIsNotNullOrderByCreatedAtDesc(branchId, productId, pageable);
+            contentProductPage = contentProductRepository.findAllByProduction_BranchIdAndProductIdAndProductionIsNotNullAndByProductIsFalseAndLossProductIsFalseOrderByCreatedAtDesc(branchId, productId, pageable);
         } else if (productTypePriceRepository.existsById(productId)) {
-            contentProductPage = contentProductRepository.findAllByProduction_BranchIdAndProductTypePriceIdAndProductionIsNotNullOrderByCreatedAtDesc(branchId, productId, pageable);
+            contentProductPage = contentProductRepository.findAllByProduction_BranchIdAndProductTypePriceIdAndProductionIsNotNullAndByProductIsFalseAndLossProductIsFalseOrderByCreatedAtDesc(branchId, productId, pageable);
         }else {
             return new ApiResponse("PRODUCT NOT FOUND", false);
         }
@@ -880,6 +895,7 @@ public class ProductService {
         List<ProductHistoryDto> productHistoryDtoList = new ArrayList<>();
         for (ContentProduct contentProduct : contentProductPage.getContent()) {
             productHistoryDtoList.add(new ProductHistoryDto(
+                    contentProduct.getProduct() != null? contentProduct.getProduct().getName():contentProduct.getProductTypePrice().getName(),
                     contentProduct.getQuantity(),
                     contentProduct.getTotalPrice(),
                     contentProduct.getCreatedAt()

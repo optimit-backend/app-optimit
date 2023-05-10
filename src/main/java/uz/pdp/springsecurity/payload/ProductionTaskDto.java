@@ -34,4 +34,5 @@ public class ProductionTaskDto {
     @NotNull
     @NotEmpty
     List<ContentProductDto> contentProductDtoList;
+    List<ContentProductDto> lossContentProductDtoList;
 }
