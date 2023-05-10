@@ -15,7 +15,6 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 import uz.pdp.springsecurity.enums.Permissions;
 
 import javax.persistence.*;
-import java.sql.Time;
 import java.util.*;
 
 @Data
