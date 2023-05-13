@@ -107,7 +107,7 @@ public class LidService {
         for (Map.Entry<UUID, String> uuidStringEntry : values.entrySet()) {
             lidFieldRepository.findById(uuidStringEntry.getKey()).ifPresent(lidField -> value.put(lidField, uuidStringEntry.getValue()));
         }
-        Optional<LidStatus> optional = lidStatusRepository.findBySort(1);
+        Optional<LidStatus> optional = lidStatusRepository.findBySortAndBusinessId(1,lidDto.getBusinessId());
         optional.ifPresent(lidStatus -> lidDto.setLidStatusId(lidStatus.getId()));
 
         Lid lid = mapper.toEntity(lidDto);

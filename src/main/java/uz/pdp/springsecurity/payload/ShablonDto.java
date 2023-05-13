@@ -14,4 +14,5 @@ public class ShablonDto {
     private String name;
     private String message;
     private UUID businessId;
+    private String originalName;
 }

@@ -14,4 +14,5 @@ public interface SourceRepository extends JpaRepository<Source, UUID> {
     List<Source> findAllByBusinessIsNull();
 
     Optional<Source> findByName(String name);
+    Optional<Source> findByNameAndBusinessId(String name, UUID business_id);
 }
