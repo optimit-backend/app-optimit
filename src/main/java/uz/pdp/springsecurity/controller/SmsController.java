@@ -19,7 +19,7 @@ import javax.validation.Valid;
 public class SmsController {
     private final SmsService smsService;
     @PostMapping
-    public HttpEntity<?> addCustomer(@Valid @RequestBody SmsDto smsDto) {
+    public HttpEntity<?> sendSms(@Valid @RequestBody SmsDto smsDto) {
         ApiResponse apiResponse = smsService.add(smsDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
