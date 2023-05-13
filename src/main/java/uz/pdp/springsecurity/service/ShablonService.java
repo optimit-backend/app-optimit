@@ -21,8 +21,8 @@ public class ShablonService {
         return new ApiResponse("successfully saved", true);
     }
 
-    public ApiResponse getAll() {
-        return new ApiResponse("all", true, mapper.toDto(shablonRepository.findAll()));
+    public ApiResponse getAll(UUID businessId) {
+        return new ApiResponse("all", true, mapper.toDto(shablonRepository.findAllByBusiness_Id(businessId)));
     }
 
     public ApiResponse getById(UUID id) {

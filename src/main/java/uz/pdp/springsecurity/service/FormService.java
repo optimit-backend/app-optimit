@@ -69,7 +69,7 @@ public class FormService {
         List<Form> formList = new ArrayList<>();
         Optional<Business> optionalBusiness = businessRepository.findById(formDto.getBusinessId());
 
-        Optional<Source> optionalHandleWrite = sourceRepository.findByName("HandleWrite");
+        Optional<Source> optionalHandleWrite = sourceRepository.findByNameAndBusinessId("HandleWrite",formDto.getBusinessId());
         List<UUID> sourceIdList = formDto.getSourceId();
         boolean b = true;
         if (optionalHandleWrite.isPresent()) {

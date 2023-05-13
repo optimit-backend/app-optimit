@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ShablonDto;
-import uz.pdp.springsecurity.payload.SmsDto;
 import uz.pdp.springsecurity.service.ShablonService;
 
 import javax.validation.Valid;
@@ -24,9 +23,9 @@ public class ShablonController {
         ApiResponse apiResponse = shablonService.add(shablonDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-    @GetMapping("/getAll")
-    public HttpEntity<?> getAll() {
-        ApiResponse apiResponse = shablonService.getAll();
+    @GetMapping("/getAll/{businessId}")
+    public HttpEntity<?> getAll(@PathVariable UUID businessId) {
+        ApiResponse apiResponse = shablonService.getAll(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
     @GetMapping("/{id}")

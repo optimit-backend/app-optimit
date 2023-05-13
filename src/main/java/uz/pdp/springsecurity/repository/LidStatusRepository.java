@@ -19,5 +19,5 @@ public interface LidStatusRepository extends JpaRepository<LidStatus, UUID> {
     List<LidStatus> findAllByOrderBySortAsc();
 
     Optional<LidStatus> findByName(String name);
-    Optional<LidStatus> findBySort(Integer sort);
+    Optional<LidStatus> findBySortAndBusinessId(Integer sort, UUID business_id);
 }
