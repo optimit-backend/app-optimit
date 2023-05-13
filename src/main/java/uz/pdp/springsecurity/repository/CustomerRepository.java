@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import uz.pdp.springsecurity.entity.Customer;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
@@ -14,4 +15,5 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     List<Customer> findAllByBranchIdAndDebtIsNotOrderByPayDateAsc(UUID branchId, Double debt);
     List<Customer> findAllByBranch_BusinessIdAndDebtIsNotOrderByPayDateAsc(UUID branchId, Double debt);
 
+    Optional<Customer> findByPhoneNumber(String phoneNumber);
 }
