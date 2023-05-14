@@ -27,6 +27,7 @@ public class TaskDto {
     private UUID contentId;
     private boolean isProductions;
     private double goalAmount;
+    List<ContentProductDto> contentProductDtoList;
     private double taskPrice;
     @NotNull
     private UUID branchId;

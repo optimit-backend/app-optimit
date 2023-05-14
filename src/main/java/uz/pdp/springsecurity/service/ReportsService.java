@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.mapper.TradeLidMapper;
@@ -140,7 +139,7 @@ public class ReportsService {
             productList = productRepository.findAllByBrandIdAndBranchIdAndActiveTrue(brandId, branchId);
             productTypePriceList = productTypePriceRepository.findAllByProduct_Brand_IdAndProduct_Branch_IdAndProduct_ActiveIsTrue(brandId, branchId);
         } else if (production != null && categoryId != null) {
-            List<Production> productionList = productionRepository.findAllByProduct_CategoryIdAndProduct_BrandIdAndProduct_BranchId(categoryId, brandId, branchId);
+            List<Production> productionList = productionRepository.findAllByProduct_CategoryIdAndProduct_BrandIdAndProduct_BranchIdAndDoneIsTrue(categoryId, brandId, branchId);
             if (productionList.isEmpty()) {
                 return new ApiResponse("Production Not Found", false);
             }
@@ -160,7 +159,7 @@ public class ReportsService {
             productTypePriceList = priceList;
 
         } else if (production != null && categoryId != null && brandId == null) {
-            List<Production> productionList = productionRepository.findAllByProduct_CategoryIdAndProduct_BranchId(categoryId, branchId);
+            List<Production> productionList = productionRepository.findAllByProduct_CategoryIdAndProduct_BranchIdAndDoneIsTrue(categoryId, branchId);
             if (productionList.isEmpty()) {
                 return new ApiResponse("Production Not Found", false);
             }
@@ -180,7 +179,7 @@ public class ReportsService {
             productTypePriceList = priceList;
 
         } else if (production != null && categoryId == null && brandId != null) {
-            List<Production> productionList = productionRepository.findAllByProduct_BrandIdAndProduct_BranchId(categoryId, branchId);
+            List<Production> productionList = productionRepository.findAllByProduct_BrandIdAndProduct_BranchIdAndDoneIsTrue(categoryId, branchId);
             if (productionList.isEmpty()) {
                 return new ApiResponse("Production Not Found", false);
             }
@@ -201,7 +200,7 @@ public class ReportsService {
             productList = productRepository.findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(brandId, categoryId, branchId);
             productTypePriceList = productTypePriceRepository.findAllByProduct_BrandIdAndProduct_CategoryIdAndProduct_Branch_IdAndProduct_ActiveIsTrue(brandId, categoryId, branchId);
         } else if (production != null && categoryId == null && brandId == null) {
-            List<Production> productionList = productionRepository.findAllByBranchId(branchId);
+            List<Production> productionList = productionRepository.findAllByBranchIdAndDoneIsTrue(branchId);
             if (productionList.isEmpty()) {
                 return new ApiResponse("Production Not Found", false);
             }
@@ -1732,7 +1731,7 @@ public class ReportsService {
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found", false);
         }
-        List<Production> productionList = productionRepository.findAllByBranchId(branchId);
+        List<Production> productionList = productionRepository.findAllByBranchIdAndDoneIsTrue(branchId);
 
         return new ApiResponse("Found", true, productionList);
     }
