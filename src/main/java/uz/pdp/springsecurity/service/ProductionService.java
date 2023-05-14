@@ -105,6 +105,7 @@ public class ProductionService {
                 task.getTaskPrice(),
                 false
         );
+        production.setDone(false);
         if (task.getContent().getProduct() != null) {
             production.setProduct(task.getContent().getProduct());
         } else {
@@ -158,6 +159,7 @@ public class ProductionService {
         production.setCost(task.getTaskPrice());
         production.setContentPrice(production.getContentPrice() - lossContentPrice);
         production.setTotalPrice(production.getCost() + production.getContentPrice());
+        production.setDone(true);
 
         if (production.getProduct() != null) {
             Product product = production.getProduct();
