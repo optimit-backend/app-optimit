@@ -57,6 +57,8 @@ public class Production extends AbsEntity {
     @Column(nullable = false)
     private boolean costEachOne;
 
+    private boolean done = true;
+
     public Production(Branch branch, Date date, double totalQuantity, double quantity, double invalid, double totalPrice, double contentPrice, double cost, boolean costEachOne) {
         this.branch = branch;
         this.date = date;

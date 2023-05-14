@@ -28,7 +28,7 @@ public class ProductionController {
     @CheckPermission("CREATE_PRODUCTION")
     @PostMapping("/task-production")
     public HttpEntity<?> addForTask(@Valid @RequestBody ProductionTaskDto productionTaskDto) {
-        ApiResponse apiResponse = productionService.addForTask(productionTaskDto);
+        ApiResponse apiResponse = productionService.addProductionForTask(productionTaskDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

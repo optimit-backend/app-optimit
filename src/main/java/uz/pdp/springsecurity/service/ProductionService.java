@@ -56,43 +56,52 @@ public class ProductionService {
         }
         productionRepository.save(production);
 
-        ApiResponse apiResponseSave = saveContentProductList(production, productionDto.getContentProductDtoList(), productionDto.getLossContentProductDtoList());
-        if (!apiResponseSave.isSuccess()) return apiResponse;
+        List<ContentProduct>contentProductList = new ArrayList<>();
+        double contentPrice = saveContentProductList(contentProductList, production, productionDto.getContentProductDtoList());
+        contentPrice -= saveLossContentProductDtoList(contentProductList, production, productionDto.getLossContentProductDtoList());
+
+        if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
+        contentProductRepository.saveAll(contentProductList);
+        production.setContentPrice(contentPrice);
+        double cost = production.isCostEachOne()?production.getTotalQuantity():1;
+        production.setTotalPrice(cost * production.getCost() + contentPrice);
+
+        if (production.getProduct() != null) {
+            Product product = production.getProduct();
+            product.setBuyPrice(production.getTotalPrice() / production.getQuantity());
+            productRepository.save(product);
+        } else {
+            ProductTypePrice productTypePrice = production.getProductTypePrice();
+            productTypePrice.setBuyPrice(production.getTotalPrice() / production.getQuantity());
+            productTypePriceRepository.save(productTypePrice);
+        }
+
+        for (ContentProduct contentProduct : contentProductList) {
+            if (contentProduct.isByProduct()){
+                warehouseService.createOrEditWareHouseHelper(branch, contentProduct.getProduct(), contentProduct.getProductTypePrice(), contentProduct.getQuantity());
+                fifoCalculationService.createByProduct(production, contentProduct);
+            }
+        }
+        productionRepository.save(production);
+        fifoCalculationService.createProduction(production);
+        warehouseService.createOrEditWareHouse(production);
 
         return new ApiResponse("SUCCESS", true);
     }
 
-    public ApiResponse addForTask(ProductionTaskDto productionTaskDto) {
-        Optional<Task> optionalTask = taskRepository.findById(productionTaskDto.getTaskId());
-        if (optionalTask.isEmpty()) return new ApiResponse("TASK NOT FOUND", false);
-        Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findById(productionTaskDto.getTaskStatusId());
-        if (optionalTaskStatus.isEmpty()) {
-            return new ApiResponse("Not Found", false);
-        }
-        Task task = optionalTask.get();
-        TaskStatus taskStatus = optionalTaskStatus.get();
-        if (task.getTaskStatus().getOrginalName() != null && task.getTaskStatus().getOrginalName().equals("Completed")){
-            return new ApiResponse("You can not change this task !", false);
-        }
-        if (task.getDependTask() != null && taskStatus.getOrginalName().equals("Completed")) {
-            Task depentTask = task.getDependTask();
-            if (depentTask.getTaskStatus().getOrginalName() != null && !depentTask.getTaskStatus().getOrginalName().equals("Completed")) {
-                return new ApiResponse("You can not change this task, Complete " + depentTask.getName() + " task", false);
-            }
-        }
-        Branch branch = task.getBranch();
+    public ApiResponse addContentForTask(Task task, List<ContentProductDto> productionTaskDtoList) {
 
-        ApiResponse apiResponse = checkBeforeProduction(branch, productionTaskDto.getContentProductDtoList());
+        ApiResponse apiResponse = checkBeforeProduction(task.getBranch(), productionTaskDtoList);
         if (!apiResponse.isSuccess()) return apiResponse;
 
         Production production = new Production(
-                branch,
-                productionTaskDto.getDate(),
-                productionTaskDto.getTotalQuantity(),
-                productionTaskDto.getTotalQuantity() - productionTaskDto.getInvalid(),
-                productionTaskDto.getInvalid(),
-                productionTaskDto.getContentPrice() + task.getTaskPrice(),
-                productionTaskDto.getContentPrice(),
+                task.getBranch(),
+                task.getStartDate(),
+                task.getGoalAmount(),
+                task.getGoalAmount(),
+                0,
+                0,
+                0,
                 task.getTaskPrice(),
                 false
         );
@@ -102,9 +111,73 @@ public class ProductionService {
             production.setProductTypePrice(task.getContent().getProductTypePrice());
         }
         productionRepository.save(production);
+        task.setProduction(production);
 
-        ApiResponse apiResponseSave = saveContentProductList(production, productionTaskDto.getContentProductDtoList(), productionTaskDto.getLossContentProductDtoList());
-        if (!apiResponseSave.isSuccess()) return apiResponse;
+        List<ContentProduct>contentProductList = new ArrayList<>();
+        double contentPrice = saveContentProductList(contentProductList, production, productionTaskDtoList);
+
+        if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
+        contentProductRepository.saveAll(contentProductList);
+        production.setContentPrice(contentPrice);
+        production.setTotalPrice(production.getCost() + contentPrice);
+        productionRepository.save(production);
+
+        return new ApiResponse("SUCCESS", true);
+    }
+
+    public ApiResponse addProductionForTask(ProductionTaskDto productionTaskDto) {
+        Optional<Task> optionalTask = taskRepository.findById(productionTaskDto.getTaskId());
+        if (optionalTask.isEmpty()) return new ApiResponse("TASK NOT FOUND", false);
+        Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findById(productionTaskDto.getTaskStatusId());
+        if (optionalTaskStatus.isEmpty()) {
+            return new ApiResponse("NOT FOUND TASK STATUS", false);
+        }
+        Task task = optionalTask.get();
+        TaskStatus taskStatus = optionalTaskStatus.get();
+        if (task.getTaskStatus().getOrginalName() != null && task.getTaskStatus().getOrginalName().equals("Completed")){
+            return new ApiResponse("You can not change this task !", false);
+        }
+        if (task.getDependTask() != null) {
+            Task depentTask = task.getDependTask();
+            if (depentTask.getTaskStatus().getOrginalName() != null && !depentTask.getTaskStatus().getOrginalName().equals("Completed")) {
+                return new ApiResponse("You can not change this task, Complete " + depentTask.getName() + " task", false);
+            }
+        }
+        Branch branch = task.getBranch();
+        if (task.getProduction() == null) return new ApiResponse("THIS TASK IS NOT PRODUCTION", false);
+        Production production = task.getProduction();
+
+        List<ContentProduct> contentProductList = contentProductRepository.findAllByProductionId(production.getId());
+        double lossContentPrice = saveLossContentProductDtoList(contentProductList, production, productionTaskDto.getLossContentProductDtoList());
+
+        if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
+        contentProductRepository.saveAll(contentProductList);
+
+        production.setQuantity(production.getTotalQuantity() - productionTaskDto.getInvalid());
+        production.setInvalid(productionTaskDto.getInvalid());
+        production.setCost(task.getTaskPrice());
+        production.setContentPrice(production.getContentPrice() - lossContentPrice);
+        production.setTotalPrice(production.getCost() + production.getContentPrice());
+
+        if (production.getProduct() != null) {
+            Product product = production.getProduct();
+            product.setBuyPrice(production.getTotalPrice() / production.getQuantity());
+            productRepository.save(product);
+        } else {
+            ProductTypePrice productTypePrice = production.getProductTypePrice();
+            productTypePrice.setBuyPrice(production.getTotalPrice() / production.getQuantity());
+            productTypePriceRepository.save(productTypePrice);
+        }
+
+        for (ContentProduct contentProduct : contentProductList) {
+            if (contentProduct.isByProduct()){
+                warehouseService.createOrEditWareHouseHelper(branch, contentProduct.getProduct(), contentProduct.getProductTypePrice(), contentProduct.getQuantity());
+                fifoCalculationService.createByProduct(production, contentProduct);
+            }
+        }
+        productionRepository.save(production);
+        fifoCalculationService.createProduction(production);
+        warehouseService.createOrEditWareHouse(production);
 
         task.setTaskStatus(taskStatus);
         task.setProduction(production);
@@ -139,9 +212,8 @@ public class ProductionService {
         return new ApiResponse("SUCCESS", true);
     }
 
-    private ApiResponse saveContentProductList(Production production, List<ContentProductDto> contentProductDtoList, List<ContentProductDto> lossContentProductDtoList) {
-        List<ContentProduct>contentProductList = new ArrayList<>();
-        double contentPrice = 0d;
+    private double saveContentProductList(List<ContentProduct> contentProductList, Production production, List<ContentProductDto> contentProductDtoList) {
+        double contentPrice = 0;
         for (ContentProductDto contentProductDto : contentProductDtoList) {
             if (contentProductDto.getQuantity() == 0)continue;
             ContentProduct contentProduct = new ContentProduct();
@@ -151,9 +223,15 @@ public class ProductionService {
             contentProduct.setByProduct(contentProductDto.isByProduct());
             contentProduct.setLossProduct(false);
             if (contentProductDto.isByProduct()) {
-                contentProduct = warehouseService.createByProduct(contentProduct, contentProductDto);
-                if (contentProduct == null) continue;
-                fifoCalculationService.createByProduct(production, contentProduct);
+                if (contentProductDto.getProductId() != null) {
+                    Optional<Product> optional = productRepository.findById(contentProductDto.getProductId());
+                    if (optional.isEmpty()) continue;
+                    contentProduct.setProduct(optional.get());
+                } else {
+                    Optional<ProductTypePrice> optional = productTypePriceRepository.findById(contentProductDto.getProductTypePriceId());
+                    if (optional.isEmpty()) continue;
+                    contentProduct.setProductTypePrice(optional.get());
+                }
                 contentPrice -= contentProduct.getTotalPrice();
             }else {
                 contentProduct = warehouseService.createContentProduct(contentProduct, contentProductDto);
@@ -163,6 +241,11 @@ public class ProductionService {
             }
             contentProductList.add(contentProduct);
         }
+        return contentPrice;
+    }
+
+    private double saveLossContentProductDtoList(List<ContentProduct> contentProductList, Production production, List<ContentProductDto> lossContentProductDtoList) {
+        double lossContentPrice = 0;
         for (ContentProductDto contentProductDto : lossContentProductDtoList) {
             if (contentProductDto.getQuantity() == 0)continue;
             ContentProduct contentProduct = new ContentProduct();
@@ -171,40 +254,19 @@ public class ProductionService {
             contentProduct.setTotalPrice(contentProductDto.getTotalPrice());
             contentProduct.setByProduct(false);
             contentProduct.setLossProduct(true);
-
             contentProduct = warehouseService.createByProduct(contentProduct, contentProductDto);
             if (contentProduct == null) continue;
             fifoCalculationService.createByProduct(production, contentProduct);
-            contentPrice -= contentProduct.getTotalPrice();
-
+            lossContentPrice += contentProduct.getTotalPrice();
             contentProductList.add(contentProduct);
         }
-
-        if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
-        contentProductRepository.saveAll(contentProductList);
-        production.setContentPrice(contentPrice);
-        double cost = production.isCostEachOne()?production.getTotalQuantity():1;
-        production.setTotalPrice(cost * production.getCost() + contentPrice);
-
-        if (production.getProduct() != null) {
-            Product product = production.getProduct();
-            product.setBuyPrice(production.getTotalPrice() / production.getQuantity());
-            productRepository.save(product);
-        } else {
-            ProductTypePrice productTypePrice = production.getProductTypePrice();
-            productTypePrice.setBuyPrice(production.getTotalPrice() / production.getQuantity());
-            productTypePriceRepository.save(productTypePrice);
-        }
-        productionRepository.save(production);
-        fifoCalculationService.createProduction(production);
-        warehouseService.createOrEditWareHouse(production);
-        return new ApiResponse("SUCCESS", true);
+        return lossContentPrice;
     }
 
     public ApiResponse getAll(UUID branchId) {
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
-        List<Production> productionList = productionRepository.findAllByBranchId(branchId);
+        List<Production> productionList = productionRepository.findAllByBranchIdAndDoneIsTrue(branchId);
         if (productionList.isEmpty())return new ApiResponse("NOT FOUND", false);
         return new ApiResponse(true, productionList);
     }

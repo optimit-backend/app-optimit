@@ -37,6 +37,7 @@ public class TaskServise {
     private final SalaryCountService salaryCountService;
     private final PrizeService prizeService;
     private final FileDateRepository fileDateRepository;
+    private final ProductionService productionService;
 
     public ApiResponse add(TaskDto taskDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(taskDto.getBranchId());
@@ -115,6 +116,12 @@ public class TaskServise {
             projectRepository.save(project);
         }
         Task save = taskRepository.save(task);
+
+        if (task.isProductions()) {
+            ApiResponse apiResponse = productionService.addContentForTask(save, taskDto.getContentProductDtoList());
+            if (!apiResponse.isSuccess())
+                return apiResponse;
+        }
 
         saveFileData(taskDto, save);
 
