@@ -38,6 +38,9 @@ public class TaskServise {
     private final PrizeService prizeService;
     private final FileDateRepository fileDateRepository;
     private final ProductionService productionService;
+    private final FifoCalculationService fifoCalculationService;
+    private final ContentProductRepository contentProductRepository;
+    private final WarehouseService warehouseService;
 
     public ApiResponse add(TaskDto taskDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(taskDto.getBranchId());
@@ -274,6 +277,18 @@ public class TaskServise {
         Optional<Task> optionalTask = taskRepository.findById(id);
         if (optionalTask.isEmpty()) {
             return new ApiResponse("Task Not Found", false);
+        }
+        Task task = optionalTask.get();
+        if (task.isProductions()) {
+            if (!task.getProduction().isDone()) {
+                List<ContentProduct> contentProductList = contentProductRepository.findAllByProductionId(task.getProduction().getId());
+                for (ContentProduct contentProduct : contentProductList) {
+                    if (!contentProduct.isByProduct()) {
+                        warehouseService.createOrEditWareHouseHelper(task.getBranch(), contentProduct.getProduct(), contentProduct.getProductTypePrice(), contentProduct.getQuantity());
+                        fifoCalculationService.returnedTaskProduction(task.getBranch(), contentProduct);
+                    }
+                }
+            }
         }
         taskRepository.deleteById(id);
         return new ApiResponse("Deleted", true);

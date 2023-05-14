@@ -45,11 +45,11 @@ public class Task extends AbsEntity {
     private Task dependTask;
     @Column(nullable = false)
     private boolean isProductions;
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(cascade = CascadeType.REMOVE)
+//    @OnDelete(action = OnDeleteAction.CASCADE)
     private Production production;
     @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
+//    @OnDelete(action = OnDeleteAction.CASCADE)
     private Content content;
     private double goalAmount;
     private double taskPrice;

@@ -140,6 +140,23 @@ public class FifoCalculationService {
         return totalBuyPrice;
     }
 
+    public void returnedTaskProduction(Branch branch, ContentProduct contentProduct) {
+        List<FifoCalculation> fifoList;
+        if (contentProduct.getProduct() != null) {
+            Product product = contentProduct.getProduct();
+            if (product.getType().equals(Type.SINGLE)) {
+                fifoList = fifoRepository.findFirst20ByBranchIdAndProductIdOrderByDateDesc(branch.getId(), product.getId());
+                returnedTradeHelper(fifoList, contentProduct.getQuantity());
+                fifoRepository.saveAll(fifoList);
+            }
+        } else {
+            ProductTypePrice productTypePrice = contentProduct.getProductTypePrice();
+            fifoList = fifoRepository.findFirst20ByBranchIdAndProductTypePriceIdOrderByDateDesc(branch.getId(), productTypePrice.getId());
+            returnedTradeHelper(fifoList, contentProduct.getQuantity());
+            fifoRepository.saveAll(fifoList);
+        }
+    }
+
     public void returnedTrade(Branch branch, TradeProduct tradeProduct, double quantity) {
         List<FifoCalculation> fifoList;
         double totalBuyPrice = 0;
