@@ -22,6 +22,7 @@ public class ProductionService {
     private final TaskStatusRepository taskStatusRepository;
     private final SalaryCountService salaryCountService;
     private final PrizeService prizeService;
+    private final LostProductionRepository lostProductionRepository;
 
     public ApiResponse add(ProductionDto productionDto) {
 
@@ -284,5 +285,46 @@ public class ProductionService {
                 contentProductList
         );
         return new ApiResponse(true, getOneContentProductionDto);
+    }
+
+    public void editInvalid(Production production, TaskStatus taskStatus, double quantity) {
+        production.setInvalid(production.getInvalid() + quantity);
+        production.setQuantity(production.getTotalQuantity() - production.getInvalid());
+        productionRepository.save(production);
+        Optional<LostProduction> optionalLostProduction = lostProductionRepository.findByTaskStatusId(taskStatus.getId());
+        if (optionalLostProduction.isPresent()){
+            LostProduction lostProduction = optionalLostProduction.get();
+            lostProduction.setQuantity(lostProduction.getQuantity() + quantity);
+            lostProductionRepository.save(lostProduction);
+            return;
+        }
+        createLostProduction(taskStatus, quantity);
+        editInvalid(production, taskStatus, quantity);
+    }
+
+    private void createLostProduction(TaskStatus taskStatus, double quantity) {
+        lostProductionRepository.save(new LostProduction(
+                taskStatus,
+                quantity
+        ));
+    }
+
+    public ApiResponse getLossProduction(UUID branchId) {
+        List<LostProduction> lostProductionList = lostProductionRepository.findByTaskStatus_BranchId(branchId);
+        if (lostProductionList.isEmpty())
+            return new ApiResponse("NOT FOUND LOST PRODUCTION LIST", true);
+        return new ApiResponse("SUCCESS", true, lostProductionToDtoList(lostProductionList));
+    }
+
+    private List<LostProductionDto> lostProductionToDtoList(List<LostProduction> lostProductionList) {
+        List<LostProductionDto> lostProductionDtoList = new ArrayList<>();
+        for (LostProduction lostProduction : lostProductionList) {
+            lostProductionDtoList.add(new LostProductionDto(
+                    lostProduction.getId(),
+                    lostProduction.getTaskStatus().getName(),
+                    lostProduction.getQuantity()
+            ));
+        }
+        return lostProductionDtoList;
     }
 }

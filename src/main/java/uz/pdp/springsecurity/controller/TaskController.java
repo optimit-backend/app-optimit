@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
+import uz.pdp.springsecurity.entity.LostProduction;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.LostProductionDto;
 import uz.pdp.springsecurity.payload.TaskDto;
 import uz.pdp.springsecurity.service.TaskServise;
 
@@ -41,6 +43,14 @@ public class TaskController {
     public HttpEntity<?> updateTaskStatus(@PathVariable UUID id,
                                           @PathVariable  UUID statusId) {
         ApiResponse apiResponse = taskServise.updateTaskStatus(id,statusId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @PreAuthorize("hasAnyAuthority('GET_TASK', 'GET_OWN_TASK')")
+    @PutMapping("/edit-invalid-amount-production/{taskId}")
+    public HttpEntity<?> editInvalid(@PathVariable UUID taskId,
+                                          @RequestBody LostProductionDto lostProductionDto) {
+        ApiResponse apiResponse = taskServise.editInvalid(taskId, lostProductionDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

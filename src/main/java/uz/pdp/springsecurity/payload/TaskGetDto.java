@@ -24,6 +24,7 @@ public class TaskGetDto {
     private String projectName;
 
     private UUID contentId;
+    private UUID productionId;
 
     private Date deadLine;
 

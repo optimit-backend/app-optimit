@@ -45,4 +45,11 @@ public class ProductionController {
         ApiResponse apiResponse = productionService.getOne(productionId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("GET_PRODUCTION")
+    @GetMapping("loss-production/{branchId}")
+    public HttpEntity<?> getLossProduction(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = productionService.getLossProduction(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }
