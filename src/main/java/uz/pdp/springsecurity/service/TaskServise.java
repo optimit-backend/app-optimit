@@ -279,7 +279,7 @@ public class TaskServise {
             return new ApiResponse("Task Not Found", false);
         }
         Task task = optionalTask.get();
-        if (task.isProductions()) {
+        if (task.getProduction() != null) {
             if (!task.getProduction().isDone()) {
                 List<ContentProduct> contentProductList = contentProductRepository.findAllByProductionId(task.getProduction().getId());
                 for (ContentProduct contentProduct : contentProductList) {
@@ -517,5 +517,19 @@ public class TaskServise {
         }
 
         return new ApiResponse("Found", true, taskGetDtoList);
+    }
+
+    public ApiResponse editInvalid(UUID taskId, LostProductionDto lostProductionDto) {
+        Optional<TaskStatus> optionalTaskStatus = taskStatusRepository.findById(lostProductionDto.getTaskStatusId());
+        if (optionalTaskStatus.isEmpty())
+            return new ApiResponse("TASK STATUS NOT FOUND", false);
+        Optional<Task> optionalTask = taskRepository.findById(taskId);
+        if (optionalTask.isEmpty())
+            return new ApiResponse("TASK NOT FOUND", false);
+        Task task = optionalTask.get();
+        if (task.getProduction() == null)
+            return new ApiResponse("PRODUCTION NOT FOUND", false);
+        productionService.editInvalid(task.getProduction(), optionalTaskStatus.get(), lostProductionDto.getQuantity());
+        return new ApiResponse("SUCCESS", true);
     }
 }

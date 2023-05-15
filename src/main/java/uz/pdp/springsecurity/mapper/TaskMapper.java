@@ -21,6 +21,7 @@ public interface TaskMapper {
     @Mapping(source = "project.id", target = "projectId")
     @Mapping(target = "fileDataIdList", ignore = true)
     @Mapping(target = "contentId", source = "content.id")
+    @Mapping(target = "productionId", source = "production.id")
     @Mapping(target = "projectName", source = "project.name")
     @Mapping(target = "taskTypeId", source = "taskType.id")
     @Mapping(target = "taskPriceList", source = "taskPriceList")
