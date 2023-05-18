@@ -105,6 +105,13 @@ public class CustomerController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("VIEW_CUSTOMER")
+    @GetMapping("/get-by-group/{groupId}")
+    public HttpEntity<?> getAllByGroupId(@PathVariable UUID groupId) {
+        ApiResponse apiResponse = customerService.getAllByGroupId(groupId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
 
     /**
      * QARZNI TO'LASH

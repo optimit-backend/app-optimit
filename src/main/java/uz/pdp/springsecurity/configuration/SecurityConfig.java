@@ -19,7 +19,6 @@ import org.springframework.web.filter.CorsFilter;
 import uz.pdp.springsecurity.security.JwtFilter;
 import uz.pdp.springsecurity.service.AuthService;
 
-import java.util.Arrays;
 import java.util.List;
 
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -70,7 +69,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/form-lid/get-form/*",
                         "/api/lid",
                         "/api/files/*",
-                        "/api/customer/export/*"
+                        "/api/customer/export/*",
+                        "/app/topic/public",
+                        "/app/chat.send"
                 )
                 .permitAll()
                 .anyRequest()
