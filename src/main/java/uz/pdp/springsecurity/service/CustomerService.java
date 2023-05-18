@@ -93,7 +93,7 @@ public class CustomerService {
         customer.setPhoneNumber(customerDto.getPhoneNumber());
         customer.setTelegram(customerDto.getTelegram());
         customer.setDebt(customerDto.getDebt());
-        if (customerGroup!=null){
+        if (customerGroup != null) {
             customer.setCustomerGroup(customerGroup);
         }
         customer.setBusiness(optionalBusiness.get());
@@ -189,5 +189,13 @@ public class CustomerService {
             }
         }
         tradeRepository.saveAll(tradeList);
+    }
+
+    public ApiResponse getAllByGroupId(UUID groupId) {
+        List<Customer> allCustomer = customerRepository.findAllByCustomerGroupId(groupId);
+        if (allCustomer.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+        return new ApiResponse("all customers", true, mapper.toDtoList(allCustomer));
     }
 }

@@ -58,6 +58,9 @@ public class NotificationService {
         repository.save(notification);
         NotificationGetByIdDto notificationGetByIdDto = mapper.toDtoGetById(notification);
         notificationGetByIdDto.setType(notification.getType().name());
+        if (notification.getAttachment() != null) {
+            notificationGetByIdDto.setAttachmentId(notification.getAttachment().getId());
+        }
 
         return new ApiResponse("found", true, notificationGetByIdDto);
     }
@@ -104,7 +107,7 @@ public class NotificationService {
                     notification.setMessage(notificationDto.getMessage());
                 }
                 notification.setType(NotificationType.NOTIFICATION);
-                if (notificationDto.getUserFromId()!=null) {
+                if (notificationDto.getUserFromId() != null) {
                     userRepository.findById(notificationDto.getUserFromId()).ifPresent(notification::setUserFrom);
                 }
                 userRepository.findById(id).ifPresent(notification::setUserTo);
