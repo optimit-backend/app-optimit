@@ -20,6 +20,7 @@ public class WarehouseService {
     private final ProductTypeComboRepository productTypeComboRepository;
     private final ExchangeProductBranchRepository exchangeProductBranchRepository;
     private final FifoCalculationService fifoCalculationService;
+    private final NotificationService notificationService;
 
 
     public void createOrEditWareHouse(PurchaseProduct purchaseProduct, double quantity) {
@@ -103,7 +104,10 @@ public class WarehouseService {
             Warehouse warehouse = optionalWarehouse.get();
             warehouse.setAmount(warehouse.getAmount() + amount);
             warehouse.setLastSoldDate(new Date());
-            warehouseRepository.save(warehouse);
+            Warehouse save = warehouseRepository.save(warehouse);
+            if (warehouse.getAmount() <= warehouse.getProduct().getMinQuantity()) {
+                notificationService.lessProduct(warehouse.getProduct().getId(), true, save.getAmount());
+            }
             tradeProduct.setProduct(warehouse.getProduct());
         } else if (tradeProductDto.getType().equalsIgnoreCase("many")) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), tradeProductDto.getProductTypePriceId());
@@ -111,7 +115,10 @@ public class WarehouseService {
             Warehouse warehouse = optionalWarehouse.get();
             warehouse.setAmount(warehouse.getAmount() + amount);
             warehouse.setLastSoldDate(new Date());
-            warehouseRepository.save(warehouse);
+            Warehouse save = warehouseRepository.save(warehouse);
+            if (warehouse.getAmount() <= warehouse.getProductTypePrice().getProduct().getMinQuantity()) {
+                notificationService.lessProduct(warehouse.getProductTypePrice().getId(), false, save.getAmount());
+            }
             tradeProduct.setProductTypePrice(warehouse.getProductTypePrice());
         } else {
             Optional<Product> optionalProduct = productRepository.findById(tradeProductDto.getProductId());
@@ -124,7 +131,7 @@ public class WarehouseService {
                 warehouse.setAmount(warehouse.getAmount() + amount * combo.getAmount());
                 warehouse.setLastSoldDate(new Date());
                 warehouseRepository.save(warehouse);
-            }
+            } // TODO: 19.05.2023 add many type
             tradeProduct.setProduct(optionalProduct.get());
         }
         tradeProduct.setTotalSalePrice(tradeProductDto.getTotalSalePrice());
@@ -139,14 +146,20 @@ public class WarehouseService {
             if (optionalWarehouse.isEmpty()) return null;
             Warehouse warehouse = optionalWarehouse.get();
             warehouse.setAmount(warehouse.getAmount() - contentProductDto.getQuantity());
-            warehouseRepository.save(warehouse);
+            Warehouse save = warehouseRepository.save(warehouse);
+            if (warehouse.getAmount() <= warehouse.getProduct().getMinQuantity()) {
+                notificationService.lessProduct(warehouse.getProduct().getId(),true,save.getAmount());
+            }
             contentProduct.setProduct(warehouse.getProduct());
         } else {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(contentProduct.getProduction().getBranch().getId(), contentProductDto.getProductTypePriceId());
             if (optionalWarehouse.isEmpty()) return null;
             Warehouse warehouse = optionalWarehouse.get();
             warehouse.setAmount(warehouse.getAmount() - contentProductDto.getQuantity());
-            warehouseRepository.save(warehouse);
+            Warehouse save = warehouseRepository.save(warehouse);
+            if (warehouse.getAmount() <= warehouse.getProductTypePrice().getProduct().getMinQuantity()) {
+                notificationService.lessProduct(warehouse.getProductTypePrice().getId(), false, save.getAmount());
+            }
             contentProduct.setProductTypePrice(warehouse.getProductTypePrice());
         }
         return contentProduct;
@@ -197,7 +210,11 @@ public class WarehouseService {
                     Warehouse warehouse = optionalShippedBranchWarehouse.get();
                     if (warehouse.getAmount() >= exchangeProduct.getExchangeProductQuantity()) {
                         warehouse.setAmount(warehouse.getAmount() - exchangeProduct.getExchangeProductQuantity());
-                        warehouseRepository.save(warehouse);
+                        Warehouse save = warehouseRepository.save(warehouse);
+                        if (warehouse.getAmount() <= warehouse.getProduct().getMinQuantity()) {
+                            notificationService.lessProduct(warehouse.getProduct().getId(), true, save.getAmount());
+                        }
+
                     } else {
                         return new ApiResponse("Omborda mahsulot yetarli emas!");
                     }
@@ -237,7 +254,10 @@ public class WarehouseService {
                     Warehouse warehouse = optionalShippedBranchWarehouse.get();
                     if (warehouse.getAmount() >= exchangeProduct.getExchangeProductQuantity()) {
                         warehouse.setAmount(warehouse.getAmount() - exchangeProduct.getExchangeProductQuantity());
-                        warehouseRepository.save(warehouse);
+                        Warehouse save = warehouseRepository.save(warehouse);
+                        if (warehouse.getAmount() <= warehouse.getProductTypePrice().getProduct().getMinQuantity()) {
+                            notificationService.lessProduct(warehouse.getProductTypePrice().getId(), false, save.getAmount());
+                        }
                     } else {
                         return new ApiResponse("Omborda mahsulot yetarli emas!");
                     }
@@ -314,12 +334,12 @@ public class WarehouseService {
             GetLessProductDto getLessProductDto = new GetLessProductDto();
             if (warehouse.getProductTypePrice() != null) {
                 getLessProductDto.setName(warehouse.getProductTypePrice().getName());
-                if (warehouse.getProductTypePrice().getProduct().getPhoto()!=null){
+                if (warehouse.getProductTypePrice().getProduct().getPhoto() != null) {
                     getLessProductDto.setAttachmentId(warehouse.getProductTypePrice().getProduct().getPhoto().getId());
                 }
             } else {
                 getLessProductDto.setName(warehouse.getProduct().getName());
-                if (warehouse.getProduct().getPhoto()!=null){
+                if (warehouse.getProduct().getPhoto() != null) {
                     getLessProductDto.setAttachmentId(warehouse.getProduct().getPhoto().getId());
                 }
             }
