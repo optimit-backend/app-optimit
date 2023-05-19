@@ -5,5 +5,6 @@ public enum NotificationType {
     NEW_LID,
     NEW_TASK,
     NEW_PROJECT,
-    NOTIFICATION
+    NOTIFICATION,
+    LESS_PRODUCT
 }

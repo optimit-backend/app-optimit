@@ -148,6 +148,33 @@ public class DataLoader implements CommandLineRunner {
             lidStatusRepository.save(doneStatus);
 
 
+            List<Business> businessRepositoryAll = businessRepository.findAll();
+            for (Business business2 : businessRepositoryAll) {
+                List<Shablon> all1 = shablonRepository.findAllByBusiness_Id(business2.getId());
+                if (all1.isEmpty()) {
+                    Shablon shablon = new Shablon();
+                    shablon.setName("Tug'ilgan kun uchun");
+                    shablon.setOriginalName("bithday");
+                    shablon.setMessage("Hurmatli {ism} tugilgan kuningiz bilan");
+                    shablon.setBusiness(business2);
+                    shablonRepository.save(shablon);
+
+                    Shablon shablon2 = new Shablon();
+                    shablon2.setName("Mijozlar qarzi");
+                    shablon2.setOriginalName("debtCustomer");
+                    shablon2.setMessage("qarzingizni tulash vaqti keldi");
+                    shablon2.setBusiness(business2);
+                    shablonRepository.save(shablon2);
+
+                    Shablon shablon3 = new Shablon();
+                    shablon3.setName("Task qo'shilganda");
+                    shablon3.setOriginalName("newTask");
+                    shablon3.setMessage("yangi task qoshildi");
+                    shablon3.setBusiness(business2);
+                    shablonRepository.save(shablon3);
+                }
+            }
+
             measurementRepository.save(
                     new Measurement("dona",
                             business)
@@ -845,32 +872,30 @@ public class DataLoader implements CommandLineRunner {
                     QABUL_QILINGAN.name()
             ));
         } else if (initMode.equals("never")) {
-            List<Business> businessRepositoryAll = businessRepository.findAll();
-            for (Business business : businessRepositoryAll) {
-                List<Shablon> all = shablonRepository.findAllByBusiness_Id(business.getId());
-                if (all.isEmpty()) {
+            List<Business> businessRepositoryAll1 = businessRepository.findAll();
+            for (Business business2 : businessRepositoryAll1) {
+                List<Shablon> all1 = shablonRepository.findAllByBusiness_Id(business2.getId());
+                if (!all1.isEmpty()) {
+                    shablonRepository.deleteAll(all1);
                     Shablon shablon = new Shablon();
                     shablon.setName("Tug'ilgan kun uchun");
                     shablon.setOriginalName("bithday");
-                    shablon.setBusiness(business);
+                    shablon.setMessage("Hurmatli {ism} tugilgan kuningiz bilan");
+                    shablon.setBusiness(business2);
                     shablonRepository.save(shablon);
-
-                    Shablon shablon1 = new Shablon();
-                    shablon1.setName("Kam qolgan mahsulot");
-                    shablon1.setOriginalName("lessProduct");
-                    shablon1.setBusiness(business);
-                    shablonRepository.save(shablon1);
 
                     Shablon shablon2 = new Shablon();
                     shablon2.setName("Mijozlar qarzi");
                     shablon2.setOriginalName("debtCustomer");
-                    shablon2.setBusiness(business);
+                    shablon2.setMessage("Hurmatli mijoz qarzingiz bor");
+                    shablon2.setBusiness(business2);
                     shablonRepository.save(shablon2);
 
                     Shablon shablon3 = new Shablon();
                     shablon3.setName("Task qo'shilganda");
                     shablon3.setOriginalName("newTask");
-                    shablon3.setBusiness(business);
+                    shablon3.setMessage("yangi task qoshildi");
+                    shablon3.setBusiness(business2);
                     shablonRepository.save(shablon3);
                 }
             }

@@ -201,8 +201,12 @@ public class UserService {
             return new ApiResponse("NOT FOUND USER");
 
         if (!optionalUser.get().getUsername().equals(profileDto.getUsername())) {
-            boolean b = userRepository.existsByUsernameIgnoreCase(profileDto.getUsername());
-            if (b) return new ApiResponse("USERNAME ALREADY EXISTS", false);
+            Optional<User> optional = userRepository.findByUsername(profileDto.getUsername());
+            if (optional.isPresent()) {
+                if (!optional.get().getId().equals(optionalUser.get().getId())) {
+                     return new ApiResponse("USERNAME ALREADY EXISTS", false);
+                }
+            }
         }
 
         if (!profileDto.getPassword().equals(profileDto.getPrePassword()))
@@ -218,10 +222,12 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(profileDto.getPassword()));
         }
 
-        Optional<Attachment> optionalPhoto = attachmentRepository.findById(profileDto.getPhotoId());
-        if (optionalPhoto.isEmpty()) return new ApiResponse("PHOTO NOT FOUND", false);
+        if (profileDto.getPhotoId()!=null){
+            Optional<Attachment> optionalPhoto = attachmentRepository.findById(profileDto.getPhotoId());
+            if (optionalPhoto.isEmpty()) return new ApiResponse("PHOTO NOT FOUND", false);
+            user.setPhoto(optionalPhoto.get());
+        }
 
-        user.setPhoto(optionalPhoto.get());
 
         userRepository.save(user);
         return new ApiResponse("UPDATED", true);

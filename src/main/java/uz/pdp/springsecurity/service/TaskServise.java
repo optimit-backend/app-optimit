@@ -41,6 +41,8 @@ public class TaskServise {
     private final FifoCalculationService fifoCalculationService;
     private final ContentProductRepository contentProductRepository;
     private final WarehouseService warehouseService;
+    private final SmsService smsService;
+    private final ShablonRepository shablonRepository;
 
     public ApiResponse add(TaskDto taskDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(taskDto.getBranchId());
@@ -134,14 +136,21 @@ public class TaskServise {
         }
         for (User user : users) {
             Notification notification = new Notification();
+            SmsDto smsDto = new SmsDto();
             notification.setRead(false);
             notification.setName("You have been given a new task!");
             notification.setMessage("Your assignment is at this link!");
             notification.setType(NotificationType.NEW_TASK);
             notification.setObjectId(task.getId());
             notification.setUserTo(user);
+
+            smsDto.setIdList(Collections.singletonList(user.getId()));
+            Optional<Shablon> optionalShablon = shablonRepository.findByOriginalNameAndBusiness_Id("newTask", user.getBusiness().getId());
+            optionalShablon.ifPresent(shablon -> smsDto.setShablonId(shablon.getId()));
             notificationRepository.save(notification);
+            smsService.add(smsDto);
         }
+
 
         return new ApiResponse("Added", true);
     }
