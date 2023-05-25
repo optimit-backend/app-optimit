@@ -51,7 +51,6 @@ public interface UserMapper {
     @Mapping(target = "bonuses", ignore = true)
     @Mapping(target = "accountNonLocked", ignore = true)
     @Mapping(target = "accountNonExpired", ignore = true)
-    @Mapping(source = "roleId", target = "role.id")
     @Mapping(source = "businessId", target = "business.id")
     void update(UserDto userDto, @MappingTarget User user);
 }
