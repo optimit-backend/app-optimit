@@ -112,9 +112,7 @@ public class UserService {
         }
 
 
-        ApiResponse response = roleService.get(userDto.getRoleId());
-        if (!response.isSuccess())
-            return response;
+        Optional<Role> optionalRole = roleRepository.findById(userDto.getRoleId());
 
         User user = optionalUser.get();
         userMapper.update(userDto, user);
@@ -124,6 +122,8 @@ public class UserService {
                 user.setPassword(passwordEncoder.encode(userDto.getPassword()));
             }
         }
+
+        optionalRole.ifPresent(user::setRole);
 
         if (userDto.getJobId() != null) {
             Optional<Job> optionalJob = jobRepository.findById(userDto.getJobId());

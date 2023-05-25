@@ -75,7 +75,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/files/*",
                         "/api/customer/export/*",
                         "/app/topic/public",
-                        "/app/chat.send"
+                        "/app/chat.send",
+                        "/app/message",
+                        "/app/chatroom/public"
                 )
                 .permitAll()
                 .anyRequest()

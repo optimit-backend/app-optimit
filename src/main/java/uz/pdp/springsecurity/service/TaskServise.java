@@ -147,6 +147,7 @@ public class TaskServise {
             smsDto.setIdList(Collections.singletonList(user.getId()));
             Optional<Shablon> optionalShablon = shablonRepository.findByOriginalNameAndBusiness_Id("newTask", user.getBusiness().getId());
             optionalShablon.ifPresent(shablon -> smsDto.setShablonId(shablon.getId()));
+            smsDto.setKey("EMPLOYEE");
             notificationRepository.save(notification);
             smsService.add(smsDto);
         }
