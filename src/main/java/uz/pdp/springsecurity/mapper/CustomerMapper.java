@@ -10,7 +10,7 @@ import uz.pdp.springsecurity.payload.CustomerDto;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface CustomerMapper {//eff
+public interface CustomerMapper {
     @Mapping(target = "customerGroupId", source = "customerGroup.id")
     @Mapping(target = "customerGroupName", source = "customerGroup.name")
     @Mapping(target = "customerGroupPercent", source = "customerGroup.percent")
@@ -19,7 +19,6 @@ public interface CustomerMapper {//eff
     CustomerDto toDto(Customer customer);
 
     List<CustomerDto> toDtoList(List<Customer> customers);
-
 
     @InheritInverseConfiguration
     @Mapping(target = "id", ignore = true)
@@ -36,4 +35,5 @@ public interface CustomerMapper {//eff
     @Mapping(target = "business.id", source = "businessId")
     @Mapping(target = "branch.id", source = "branchId")
     Customer toEntity(CustomerDto customerDto);
+
 }

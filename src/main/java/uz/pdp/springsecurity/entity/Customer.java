@@ -46,6 +46,8 @@ public class Customer extends AbsEntity {
 
     private Date payDate = new Date(System.currentTimeMillis());
 
+    private Boolean lidCustomer;
+
     public Customer( String name, String phoneNumber, String telegram, Business business) {
         this.name = name;
         this.phoneNumber = phoneNumber;

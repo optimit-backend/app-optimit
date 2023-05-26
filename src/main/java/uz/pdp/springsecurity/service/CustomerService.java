@@ -6,16 +6,10 @@ import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.StatusName;
 import uz.pdp.springsecurity.mapper.CustomerMapper;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.BalanceHistoryDto;
-import uz.pdp.springsecurity.payload.CustomerDto;
-import uz.pdp.springsecurity.payload.RepaymentDto;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,9 +31,7 @@ public class CustomerService {
     private final TradeRepository tradeRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentStatusRepository paymentStatusRepository;
-    private final BalanceRepository balanceRepository;
     private final BalanceService balanceService;
-    private final PayMethodRepository payMethodRepository;
 
     public ApiResponse add(CustomerDto customerDto) {
 
@@ -58,6 +50,7 @@ public class CustomerService {
             Optional<CustomerGroup> customerGroupOptional = customerGroupRepository.findById(customerDto.getCustomerGroupId());
             customerGroupOptional.ifPresent(customer::setCustomerGroup);
         }
+        customer.setLidCustomer(customerDto.getLidCustomer());
         customerRepository.save(customer);
         return new ApiResponse("ADDED", true);
     }
@@ -197,5 +190,29 @@ public class CustomerService {
             return new ApiResponse("not found", false);
         }
         return new ApiResponse("all customers", true, mapper.toDtoList(allCustomer));
+    }
+
+    public ApiResponse getAllByLidCustomer(UUID branchId) {
+        List<Customer> all = customerRepository.findAllByBranchIdAndLidCustomerIsTrue(branchId);
+        if (all.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+        List<CustomerDto> customerDtoList = mapper.toDtoList(all);
+        List<Map<String, Object>> responses = new ArrayList<>();
+        Map<String, Object> response = new HashMap<>();
+
+        for (CustomerDto customerDto : customerDtoList) {
+            List<Trade> allByCustomerId = tradeRepository.findAllByCustomer_Id(customerDto.getId());
+            double totalSumma = 0;
+            for (Trade trade : allByCustomerId) {
+                totalSumma += trade.getTotalSum();
+            }
+            response.put("customer", customerDto);
+            response.put("totalSumma", totalSumma);
+            response.put("size", all.size());
+            responses.add(response);
+        }
+
+        return new ApiResponse("found", true, responses);
     }
 }

@@ -39,4 +39,6 @@ public class CustomerDto {
     private Date payDate;
 
     private Date birthday;
+
+    private Boolean lidCustomer;
 }

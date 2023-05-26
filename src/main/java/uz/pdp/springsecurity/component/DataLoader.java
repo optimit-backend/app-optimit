@@ -53,6 +53,7 @@ public class DataLoader implements CommandLineRunner {
     @Value("${spring.sql.init.mode}")
     private String initMode;
     private final ShablonRepository shablonRepository;
+    private final CustomerGroupRepository customerGroupRepository;
 
     @Override
     public void run(String... args) {
@@ -87,6 +88,7 @@ public class DataLoader implements CommandLineRunner {
             business.setActive(true);
             business.setDelete(false);
             business = businessRepository.save(business);
+
 
             LidField lidField = new LidField();
             lidField.setName("FIO");
