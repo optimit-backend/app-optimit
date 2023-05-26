@@ -15,6 +15,7 @@ import java.util.UUID;
 public interface TradeRepository extends JpaRepository<Trade, UUID> {
     List<Trade> findAllByTrader_Id(UUID trader_id);
 
+
     Page<Trade> findAllByBranch_Business_IdAndLidIsTrue(UUID branch_business_id, Pageable pageable);
     List<Trade> findAllByBranch_Id(UUID branch_id);
     List<Trade> findAllByCreatedAtBetweenAndBranchId(Timestamp start, Timestamp end, UUID branch_id);

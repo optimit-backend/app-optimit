@@ -7,9 +7,11 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.springsecurity.annotations.CheckPermission;
+import uz.pdp.springsecurity.entity.CustomerGroup;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.CustomerDto;
 import uz.pdp.springsecurity.payload.RepaymentDto;
+import uz.pdp.springsecurity.repository.CustomerGroupRepository;
 import uz.pdp.springsecurity.repository.CustomerRepository;
 import uz.pdp.springsecurity.service.CustomerExcelService;
 import uz.pdp.springsecurity.service.CustomerService;
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URLConnection;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -31,6 +34,8 @@ public class CustomerController {
 
     @Autowired
     CustomerExcelService customerExcelService;
+    @Autowired
+    private CustomerGroupRepository customerGroupRepository;
 
     /**
      * YANGI CUSTOMER QO'SHISH MIJOZ YANI
@@ -131,11 +136,18 @@ public class CustomerController {
     }
 
     @GetMapping("/export/{branchId}")
-    public void exportCustomersToExcel(@PathVariable  UUID branchId, HttpServletResponse response) throws IOException {
+    public void exportCustomersToExcel(@PathVariable UUID branchId, HttpServletResponse response) throws IOException {
         byte[] excelData = customerExcelService.exportCustomersToExcel(branchId);
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=customers.xlsx");
         response.getOutputStream().write(excelData);
+    }
+
+    @CheckPermission("VIEW_CUSTOMER")
+    @GetMapping("/get-by-lid-customer/{branchId}")
+    public HttpEntity<?> getAllByLidCustomer(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = customerService.getAllByLidCustomer(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
 }
