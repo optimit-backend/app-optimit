@@ -13,7 +13,7 @@ import java.util.Date;
 
 @Component
 public class JwtProvider {
-    static long expireTime = 1000 * 60 *60 *24;
+    static long expireTime = 1000 * 60 * 60 * 24;
     static String secretKey = "BuTokenniMaxfiySuziHechKimBilmasin1234567890";
 
     Logger logger = LoggerFactory.getLogger(JwtProvider.class);
