@@ -40,13 +40,13 @@ public class Production extends AbsEntity {
     private double totalQuantity;
 
     @Column(nullable = false)
-    private Double quantity;
+    private double quantity = 0;
 
     @Column(nullable = false)
     private double invalid = 0d;
 
     @Column(nullable = false)
-    private double totalPrice;
+    private double totalPrice = 0;
 
     @Column(nullable = false)
     private double contentPrice;

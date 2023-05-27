@@ -466,7 +466,11 @@ public class DataLoader implements CommandLineRunner {
                                     EDIT_BALANCE,
                                     ADD_BALANCE,
 
-                                    VIEW_DASHBOARD
+                                    VIEW_DASHBOARD,
+
+                                    VIEW_NAVIGATION,
+                                    DELETE_NAVIGATION,
+                                    ADD_NAVIGATION
 
                             ),
                             business));
@@ -670,7 +674,11 @@ public class DataLoader implements CommandLineRunner {
 
                             GET_OWN_TASK,
 
-                            VIEW_DASHBOARD
+                            VIEW_DASHBOARD,
+
+                            VIEW_NAVIGATION,
+                            DELETE_NAVIGATION,
+                            ADD_NAVIGATION
                     ),
                     business));
 

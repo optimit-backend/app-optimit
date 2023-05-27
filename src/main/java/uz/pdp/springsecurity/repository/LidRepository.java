@@ -29,4 +29,6 @@ public interface LidRepository extends JpaRepository<Lid, UUID> {
     Page<Lid> findAllByBusinessIdAndSourceIdAndCreatedAtBetweenAndDeleteIsFalse(UUID business_id, UUID source_id, Timestamp createdAt, Timestamp createdAt2, Pageable pageable);
 
     Page<Lid> findAllByBusinessIdAndCreatedAtBetweenAndDeleteIsFalse(UUID business_id, Timestamp startTime, Timestamp endTime, Pageable pageable);
+
+    int countAllByCreatedAtBetweenAndBusinessId(Timestamp from, Timestamp to, UUID businessId);
 }

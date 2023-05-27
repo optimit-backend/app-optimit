@@ -266,6 +266,11 @@ public enum Permissions {
     EDIT_BALANCE,
     ADD_BALANCE,
 
-    VIEW_DASHBOARD
+    VIEW_DASHBOARD,
+
+
+    VIEW_NAVIGATION,
+    DELETE_NAVIGATION,
+    ADD_NAVIGATION,
 
 }

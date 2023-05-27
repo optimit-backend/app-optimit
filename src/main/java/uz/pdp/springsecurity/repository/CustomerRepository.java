@@ -28,4 +28,5 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     List<Customer> findAllByPayDateBetweenAndBusinessId(Date payDate, Date payDate2, UUID business_id);
 
     List<Customer> findAllByBranchIdAndLidCustomerIsTrue(UUID branch_id);
+    int countAllByBranchId(UUID branchId);
 }

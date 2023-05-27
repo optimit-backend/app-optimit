@@ -42,8 +42,8 @@ public class Trade extends AbsEntity {
 
     private Date payDate;
 
-    private double totalSum;
-    private double totalSumDollar;
+    private double totalSum = 0;
+    private double totalSumDollar = 0;
 
     private double paidSum;
     private double paidSumDollar;
