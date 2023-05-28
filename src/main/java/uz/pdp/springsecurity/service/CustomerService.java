@@ -199,19 +199,23 @@ public class CustomerService {
         }
         List<CustomerDto> customerDtoList = mapper.toDtoList(all);
         List<Map<String, Object>> responses = new ArrayList<>();
-        Map<String, Object> response = new HashMap<>();
+        double totalTrade = 0;
 
         for (CustomerDto customerDto : customerDtoList) {
+            Map<String, Object> response = new HashMap<>();
             List<Trade> allByCustomerId = tradeRepository.findAllByCustomer_Id(customerDto.getId());
             double totalSumma = 0;
             for (Trade trade : allByCustomerId) {
                 totalSumma += trade.getTotalSum();
             }
+            totalTrade += totalSumma;
             response.put("customer", customerDto);
             response.put("totalSumma", totalSumma);
             response.put("size", all.size());
+            response.put("totalTrade", totalTrade);
             responses.add(response);
         }
+
 
         return new ApiResponse("found", true, responses);
     }
