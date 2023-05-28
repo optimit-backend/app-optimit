@@ -25,10 +25,12 @@ public class ProductGetForPurchaseDto {
 
     private double buyPrice;
     private double salePrice;
-    private double buyPriceDollar = 1;
-    private boolean buyDollar = false;
-    private double salePriceDollar = 1;
-    private boolean saleDollar = false;
+    private double buyPriceDollar;
+    private boolean buyDollar;
+    private double salePriceDollar;
+    private boolean saleDollar;
+    private double grossPrice;
+    private double grossPriceDollar;
 
     private double amount;
 

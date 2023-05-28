@@ -159,8 +159,8 @@ public class PurchaseService {
                 purchaseProduct.setPurchase(purchase);
                 purchaseProductRepository.save(purchaseProduct);
                 purchaseProductList.add(purchaseProduct);
-                fifoCalculationService.createPurchaseProduct(purchaseProduct);
-                warehouseService.createOrEditWareHouse(purchaseProduct, purchaseProduct.getPurchasedQuantity());
+                double minusAmount = warehouseService.createOrEditWareHouse(purchaseProduct, purchaseProduct.getPurchasedQuantity());
+                fifoCalculationService.createPurchaseProduct(purchaseProduct, minusAmount);
             } else if (purchaseProductDto.isDelete()) {
                 if (purchaseProductRepository.existsById(purchaseProductDto.getPurchaseProductId())) {
                     PurchaseProduct purchaseProduct = purchaseProductRepository.getById(purchaseProductDto.getPurchaseProductId());

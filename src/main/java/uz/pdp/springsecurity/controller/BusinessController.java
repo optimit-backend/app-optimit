@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -53,7 +54,8 @@ public class BusinessController {
      * @param id
      * @return ApiResponse(success - > true object - > value)
      */
-    @CheckPermission("VIEW_BUSINESS")
+//    @CheckPermission("VIEW_BUSINESS")
+    @PreAuthorize(value = "hasAnyAuthority('VIEW_BUSINESS', 'VIEW_MY_BUSINESS')")
     @GetMapping("/{id}")
     public HttpEntity<?> getOne(@PathVariable UUID id) {
         ApiResponse apiResponse = businessService.getOne(id);
@@ -96,6 +98,13 @@ public class BusinessController {
     @PutMapping("/de-active/{businessId}")
     public HttpEntity<?> deActive(@PathVariable UUID businessId) {
         ApiResponse apiResponse = businessService.deActive(businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("EDIT_MY_BUSINESS")
+    @PutMapping("/sale-minus/{businessId}")
+    public HttpEntity<?> saleMinus(@PathVariable UUID businessId) {
+        ApiResponse apiResponse = businessService.saleMinus(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

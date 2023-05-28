@@ -224,8 +224,10 @@ public class ProductService {
         product.setType(Type.SINGLE);
         product.setBuyPrice(productDto.getBuyPrice());
         product.setSalePrice(productDto.getSalePrice());
+        product.setGrossPrice(productDto.getGrossPrice());
         product.setBuyPriceDollar(Math.round(productDto.getBuyPrice() / currency.getCourse() * 100) / 100.);
         product.setSalePriceDollar(Math.round(productDto.getSalePrice() / currency.getCourse() * 100) / 100.);
+        product.setGrossPriceDollar(Math.round(productDto.getGrossPrice() / currency.getCourse() * 100) / 100.);
         product.setProfitPercent(productDto.getProfitPercent());
         if (productDto.getBarcode() != null && !productDto.getBarcode().isBlank()) {
             if (isUpdate) {
@@ -269,9 +271,11 @@ public class ProductService {
                 productTypePrice.setName(product.getName() + "( " + productTypeValue.getProductType().getName() + " - " + productTypeValue.getName() + " )");
                 productTypePrice.setProductTypeValue(optionalProductTypeValue.get());
                 productTypePrice.setBuyPrice(typePricePostDto.getBuyPrice());
-                productTypePrice.setSalePrice(typePricePostDto.getSalePrice());
                 productTypePrice.setBuyPriceDollar(Math.round(typePricePostDto.getBuyPrice() / currency.getCourse() * 100) / 100.);
+                productTypePrice.setSalePrice(typePricePostDto.getSalePrice());
                 productTypePrice.setSalePriceDollar(Math.round(typePricePostDto.getSalePrice() / currency.getCourse() * 100) / 100.);
+                productTypePrice.setGrossPrice(typePricePostDto.getGrossPrice());
+                productTypePrice.setGrossPriceDollar(Math.round(typePricePostDto.getGrossPrice() / currency.getCourse() * 100) / 100.);
                 productTypePrice.setProfitPercent(typePricePostDto.getProfitPercent());
                 if (typePricePostDto.getPhotoId() != null){
                     Optional<Attachment> optionalAttachment = attachmentRepository.findById(typePricePostDto.getPhotoId());
@@ -296,9 +300,11 @@ public class ProductService {
                 productTypePrice.setName(product.getName() + "( " + productTypeValue.getProductType().getName() + " - " + productTypeValue.getName() + " )");
                 productTypePrice.setProductTypeValue(optionalProductTypeValue.get());
                 productTypePrice.setBuyPrice(typePricePostDto.getBuyPrice());
-                productTypePrice.setSalePrice(typePricePostDto.getSalePrice());
                 productTypePrice.setBuyPriceDollar(Math.round(typePricePostDto.getBuyPrice() / currency.getCourse() * 100) / 100.);
+                productTypePrice.setSalePrice(typePricePostDto.getSalePrice());
                 productTypePrice.setSalePriceDollar(Math.round(typePricePostDto.getSalePrice() / currency.getCourse() * 100) / 100.);
+                productTypePrice.setGrossPrice(typePricePostDto.getGrossPrice());
+                productTypePrice.setGrossPriceDollar(Math.round(typePricePostDto.getGrossPrice() / currency.getCourse() * 100) / 100.);
                 productTypePrice.setProfitPercent(typePricePostDto.getProfitPercent());
                 if (typePricePostDto.getPhotoId() != null){
                     Optional<Attachment> optionalAttachment = attachmentRepository.findById(typePricePostDto.getPhotoId());
@@ -387,6 +393,8 @@ public class ProductService {
                 productTypePriceGetDto.setSalePrice(productTypePrice.getSalePrice());
                 productTypePriceGetDto.setBuyPriceDollar(productTypePrice.getBuyPriceDollar());
                 productTypePriceGetDto.setSalePriceDollar(productTypePrice.getSalePriceDollar());
+                productTypePriceGetDto.setGrossPrice(productTypePrice.getGrossPrice());
+                productTypePriceGetDto.setGrossPriceDollar(productTypePrice.getGrossPriceDollar());
                 productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getProductTypeValue().getId());
                 if (productTypePrice.getPhoto() != null)productTypePriceGetDto.setPhotoId(productTypePrice.getPhoto().getId());
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), productTypePrice.getId());
@@ -568,6 +576,8 @@ public class ProductService {
                         getForPurchaseDto.setSaleDollar(productTypePrice.getProduct().isSaleDollar());
                         getForPurchaseDto.setBuyPriceDollar(productTypePrice.getSalePriceDollar());
                         getForPurchaseDto.setSalePriceDollar(productTypePrice.getSalePriceDollar());
+                        getForPurchaseDto.setGrossPrice(productTypePrice.getGrossPrice());
+                        getForPurchaseDto.setGrossPriceDollar(productTypePrice.getGrossPriceDollar());
                         getForPurchaseDto.setProfitPercent(productTypePrice.getProfitPercent());
                         getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                         getForPurchaseDto.setExpiredDate(product.getExpireDate());
@@ -593,6 +603,8 @@ public class ProductService {
                     getForPurchaseDto.setSaleDollar(product.isSaleDollar());
                     getForPurchaseDto.setBuyPriceDollar(product.getSalePriceDollar());
                     getForPurchaseDto.setSalePriceDollar(product.getSalePriceDollar());
+                    getForPurchaseDto.setGrossPrice(product.getGrossPrice());
+                    getForPurchaseDto.setGrossPriceDollar(product.getGrossPriceDollar());
                     getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                     getForPurchaseDto.setExpiredDate(product.getExpireDate());
                     if (product.getMeasurement() != null)
@@ -738,6 +750,8 @@ public class ProductService {
                     productViewDto.setSalePrice(productTypePrice.getSalePrice());
                     productViewDto.setBuyPriceDollar(productTypePrice.getBuyPriceDollar());
                     productViewDto.setSalePriceDollar(productTypePrice.getSalePriceDollar());
+                    productViewDto.setGrossPrice(productTypePrice.getGrossPrice());
+                    productViewDto.setGrossPriceDollar(productTypePrice.getGrossPriceDollar());
                 }
                 productViewDto.setAmount(total);
             } else {
@@ -760,6 +774,8 @@ public class ProductService {
                 productViewDto.setSalePrice(product.getSalePrice());
                 productViewDto.setBuyPriceDollar(product.getBuyPriceDollar());
                 productViewDto.setSalePriceDollar(product.getSalePriceDollar());
+                productViewDto.setGrossPrice(product.getGrossPrice());
+                productViewDto.setGrossPriceDollar(product.getGrossPriceDollar());
                 if (product.getCategory()!=null){
                     productViewDto.setCategory(product.getCategory().getName());
                 }

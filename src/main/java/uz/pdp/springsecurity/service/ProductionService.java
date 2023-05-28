@@ -79,13 +79,13 @@ public class ProductionService {
 
         for (ContentProduct contentProduct : contentProductList) {
             if (contentProduct.isByProduct()){
-                warehouseService.createOrEditWareHouseHelper(branch, contentProduct.getProduct(), contentProduct.getProductTypePrice(), contentProduct.getQuantity());
-                fifoCalculationService.createByProduct(production, contentProduct);
+                double minusAmount = warehouseService.createOrEditWareHouseHelper(branch, contentProduct.getProduct(), contentProduct.getProductTypePrice(), contentProduct.getQuantity());
+                fifoCalculationService.createByProduct(production, contentProduct, minusAmount);
             }
         }
         productionRepository.save(production);
-        fifoCalculationService.createProduction(production);
-        warehouseService.createOrEditWareHouse(production);
+        double minusAmount = warehouseService.createOrEditWareHouse(production);
+        fifoCalculationService.createProduction(production, minusAmount);
 
         return new ApiResponse("SUCCESS", true);
     }
@@ -174,13 +174,13 @@ public class ProductionService {
 
         for (ContentProduct contentProduct : contentProductList) {
             if (contentProduct.isByProduct()){
-                warehouseService.createOrEditWareHouseHelper(branch, contentProduct.getProduct(), contentProduct.getProductTypePrice(), contentProduct.getQuantity());
-                fifoCalculationService.createByProduct(production, contentProduct);
+                double minusAmount = warehouseService.createOrEditWareHouseHelper(branch, contentProduct.getProduct(), contentProduct.getProductTypePrice(), contentProduct.getQuantity());
+                fifoCalculationService.createByProduct(production, contentProduct, minusAmount);
             }
         }
         productionRepository.save(production);
-        fifoCalculationService.createProduction(production);
-        warehouseService.createOrEditWareHouse(production);
+        double minusAmount = warehouseService.createOrEditWareHouse(production);
+        fifoCalculationService.createProduction(production, minusAmount);
 
         task.setTaskStatus(taskStatus);
         task.setProduction(production);
@@ -192,26 +192,26 @@ public class ProductionService {
 
     private ApiResponse checkBeforeProduction(Branch branch, List<ContentProductDto> contentProductDtoList) {
         if (contentProductDtoList.isEmpty()) return new ApiResponse("NOT FOUND PRODUCT_LIST", false);
-        if (!branch.getBusiness().getSaleMinus()) {
-            HashMap<UUID, Double> map = new HashMap<>();
-            for (ContentProductDto dto : contentProductDtoList) {
-                if (dto.getProductId() != null) {
-                    UUID productId = dto.getProductId();
-                    if (!productRepository.existsById(productId)) return new ApiResponse("PRODUCT NOT FOUND", false);
-                    if (!dto.isByProduct())
-                        map.put(productId, map.getOrDefault(productId, 0d) + dto.getQuantity());
-                } else if (dto.getProductTypePriceId() != null) {
-                    UUID productId = dto.getProductTypePriceId();
-                    if (!productTypePriceRepository.existsById(productId))
-                        return new ApiResponse("PRODUCT NOT FOUND", false);
-                    if (!dto.isByProduct())
-                        map.put(productId, map.getOrDefault(productId, 0d) + dto.getQuantity());
-                } else {
+//        if (!branch.getBusiness().isSaleMinus()) {
+        HashMap<UUID, Double> map = new HashMap<>();
+        for (ContentProductDto dto : contentProductDtoList) {
+            if (dto.getProductId() != null) {
+                UUID productId = dto.getProductId();
+                if (!productRepository.existsById(productId)) return new ApiResponse("PRODUCT NOT FOUND", false);
+                if (!dto.isByProduct())
+                    map.put(productId, map.getOrDefault(productId, 0d) + dto.getQuantity());
+            } else if (dto.getProductTypePriceId() != null) {
+                UUID productId = dto.getProductTypePriceId();
+                if (!productTypePriceRepository.existsById(productId))
                     return new ApiResponse("PRODUCT NOT FOUND", false);
-                }
+                if (!dto.isByProduct())
+                    map.put(productId, map.getOrDefault(productId, 0d) + dto.getQuantity());
+            } else {
+                return new ApiResponse("PRODUCT NOT FOUND", false);
             }
-            if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
         }
+        if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
+//        }
         return new ApiResponse("SUCCESS", true);
     }
 
@@ -257,9 +257,8 @@ public class ProductionService {
             contentProduct.setTotalPrice(contentProductDto.getTotalPrice());
             contentProduct.setByProduct(false);
             contentProduct.setLossProduct(true);
-            contentProduct = warehouseService.createByProduct(contentProduct, contentProductDto);
-            if (contentProduct == null) continue;
-            fifoCalculationService.createByProduct(production, contentProduct);
+            double minusAmount = warehouseService.createByProduct(contentProduct, contentProductDto);
+            fifoCalculationService.createByProduct(production, contentProduct, minusAmount);
             lossContentPrice += contentProduct.getTotalPrice();
             contentProductList.add(contentProduct);
         }
