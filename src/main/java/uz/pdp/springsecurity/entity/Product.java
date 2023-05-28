@@ -29,6 +29,8 @@ public class Product extends AbsEntity {
     private double tax = 1;
     private double buyPrice;
     private double salePrice;
+    private double grossPrice;
+    private double grossPriceDollar;
     private double buyPriceDollar = 1;
     private boolean buyDollar = false;
     private double salePriceDollar = 1;

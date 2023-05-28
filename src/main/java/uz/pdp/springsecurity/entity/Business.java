@@ -27,7 +27,7 @@ public class Business extends AbsEntity {
     private String description;
 
     // minusga sotish
-    private Boolean saleMinus = false;
+    private boolean saleMinus = false;
 
     private boolean isActive;
 

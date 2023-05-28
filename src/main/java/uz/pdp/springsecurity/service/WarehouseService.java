@@ -24,31 +24,34 @@ public class WarehouseService {
     private final NotificationService notificationService;
     private final ProductHistoryService productHistoryService;
 
-    public void createOrEditWareHouse(PurchaseProduct purchaseProduct, double quantity) {
+    public double createOrEditWareHouse(PurchaseProduct purchaseProduct, double quantity) {
         Branch branch = purchaseProduct.getPurchase().getBranch();
         Product product = purchaseProduct.getProduct();
         ProductTypePrice productTypePrice = purchaseProduct.getProductTypePrice();
-        createOrEditWareHouseHelper(branch, product, productTypePrice, quantity);
+        return createOrEditWareHouseHelper(branch, product, productTypePrice, quantity);
     }
 
-    public void createOrEditWareHouse(Production production) {
+    public double createOrEditWareHouse(Production production) {
         Branch branch = production.getBranch();
         Product product = production.getProduct();
         ProductTypePrice productTypePrice = production.getProductTypePrice();
-        createOrEditWareHouseHelper(branch, product, productTypePrice, production.getQuantity());
+        return createOrEditWareHouseHelper(branch, product, productTypePrice, production.getQuantity());
     }
 
-    public void createOrEditWareHouseHelper(Branch branch, Product product, ProductTypePrice productTypePrice, Double quantity) {
+
+
+    public double createOrEditWareHouseHelper(Branch branch, Product product, ProductTypePrice productTypePrice, Double quantity) {
         Warehouse warehouse;
+        double amount = 0;
         if (product != null) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), product.getId());
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
-                if (branch.getBusiness().getSaleMinus() && warehouse.getAmount() < 0) {
-                    TradeProduct tradeProduct = new TradeProduct();
-                    tradeProduct.setProduct(product);
-                    double amount = -warehouse.getAmount();
-                    fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, amount > quantity ? quantity : amount);
+                if (warehouse.getAmount() < 0) {
+//                    TradeProduct tradeProduct = new TradeProduct();
+//                    tradeProduct.setProduct(product);
+                    amount = -warehouse.getAmount();
+//                    fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, amount > quantity ? quantity : amount);
                 }
                 warehouse.setAmount(warehouse.getAmount() + quantity);
             } else {
@@ -61,11 +64,11 @@ public class WarehouseService {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), productTypePrice.getId());
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
-                if (branch.getBusiness().getSaleMinus() && warehouse.getAmount() < 0) {
-                    TradeProduct tradeProduct = new TradeProduct();
-                    tradeProduct.setProductTypePrice(productTypePrice);
-                    double amount = -warehouse.getAmount();
-                    fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, amount > quantity ? quantity : amount);
+                if (warehouse.getAmount() < 0) {
+//                    TradeProduct tradeProduct = new TradeProduct();
+//                    tradeProduct.setProductTypePrice(productTypePrice);
+                    amount = -warehouse.getAmount();
+//                    fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, amount > quantity ? quantity : amount);
                 }
                 warehouse.setAmount(warehouse.getAmount() + quantity);
             } else {
@@ -78,16 +81,18 @@ public class WarehouseService {
         warehouseRepository.save(warehouse);
         // DAILY PRODUCT HISTORY
         productHistoryService.create(branch, product, productTypePrice, true, quantity, warehouse.getAmount());
+
+        return amount;
     }
 
 
     public Boolean checkBeforeTrade(Branch branch, HashMap<UUID, Double> map) {
         for (Map.Entry<UUID, Double> entry : map.entrySet()) {
             Warehouse warehouse = null;
-            if (warehouseRepository.existsByBranchIdAndProductId(branch.getId(), entry.getKey())) {
+            if (productRepository.existsById(entry.getKey())) {
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), entry.getKey());
                 if (optionalWarehouse.isPresent()) warehouse = optionalWarehouse.get();
-            } else if (warehouseRepository.existsByBranchIdAndProductTypePriceId(branch.getId(), entry.getKey())) {
+            } else if (productTypePriceRepository.existsById(entry.getKey())) {
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), entry.getKey());
                 if (optionalWarehouse.isPresent()) warehouse = optionalWarehouse.get();
             } else return false;
@@ -101,8 +106,20 @@ public class WarehouseService {
         double amount = tradeProduct.getTradedQuantity() - tradeProductDto.getTradedQuantity();
         if (tradeProductDto.getType().equalsIgnoreCase("single")) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), tradeProductDto.getProductId());
-            if (optionalWarehouse.isEmpty()) return null;
-            Warehouse warehouse = optionalWarehouse.get();
+            Warehouse warehouse;
+            if (optionalWarehouse.isEmpty()) {
+                Optional<Product> optionalProduct = productRepository.findById(tradeProductDto.getProductId());
+                if (optionalProduct.isEmpty()) return null;
+                warehouse = new Warehouse(
+                        optionalProduct.get(),
+                        null,
+                        branch,
+                        0,
+                        new Date()
+                );
+            } else {
+                warehouse = optionalWarehouse.get();
+            }
             warehouse.setAmount(warehouse.getAmount() + amount);
             warehouse.setLastSoldDate(new Date());
             Warehouse save = warehouseRepository.save(warehouse);
@@ -114,8 +131,20 @@ public class WarehouseService {
             productHistoryService.create(branch, tradeProduct.getProduct(), tradeProduct.getProductTypePrice(), false, -amount, warehouse.getAmount());
         } else if (tradeProductDto.getType().equalsIgnoreCase("many")) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), tradeProductDto.getProductTypePriceId());
-            if (optionalWarehouse.isEmpty()) return null;
-            Warehouse warehouse = optionalWarehouse.get();
+            Warehouse warehouse;
+            if (optionalWarehouse.isEmpty()) {
+                Optional<ProductTypePrice> optionalProduct = productTypePriceRepository.findById(tradeProductDto.getProductTypePriceId());
+                if (optionalProduct.isEmpty()) return null;
+                warehouse = new Warehouse(
+                        null,
+                        optionalProduct.get(),
+                        branch,
+                        0,
+                        new Date()
+                );
+            } else {
+                warehouse = optionalWarehouse.get();
+            }
             warehouse.setAmount(warehouse.getAmount() + amount);
             warehouse.setLastSoldDate(new Date());
             Warehouse save = warehouseRepository.save(warehouse);
@@ -130,17 +159,54 @@ public class WarehouseService {
             if (optionalProduct.isEmpty()) return null;
             List<ProductTypeCombo> comboList = productTypeComboRepository.findAllByMainProductId(tradeProductDto.getProductId());
             for (ProductTypeCombo combo : comboList) {
-                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), combo.getContentProduct().getId());
-                if (optionalWarehouse.isEmpty()) continue;
-                Warehouse warehouse = optionalWarehouse.get();
-                warehouse.setAmount(warehouse.getAmount() + amount * combo.getAmount());
-                warehouse.setLastSoldDate(new Date());
-                warehouseRepository.save(warehouse);
-                // DAILY PRODUCT HISTORY
-                productHistoryService.create(branch, tradeProduct.getProduct(), tradeProduct.getProductTypePrice(), false, -amount, warehouse.getAmount());
-            } // TODO: 19.05.2023 add many type
+                if (combo.getContentProduct() != null) {
+                    Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch.getId(), combo.getContentProduct().getId());
+                    Warehouse warehouse;
+                    if (optionalWarehouse.isEmpty()) {
+                        Optional<Product> optionalProduct1 = productRepository.findById(tradeProductDto.getProductId());
+                        if (optionalProduct1.isEmpty()) continue;
+                        warehouse = new Warehouse(
+                                optionalProduct1.get(),
+                                null,
+                                branch,
+                                0,
+                                new Date()
+                        );
+                    } else {
+                        warehouse = optionalWarehouse.get();
+                    }
+                    warehouse.setAmount(warehouse.getAmount() + amount * combo.getAmount());
+                    warehouse.setLastSoldDate(new Date());
+                    warehouseRepository.save(warehouse);
+                    // DAILY PRODUCT HISTORY
+                    productHistoryService.create(branch, tradeProduct.getProduct(), tradeProduct.getProductTypePrice(), false, -amount, warehouse.getAmount());
+                }else {
+                    Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), tradeProductDto.getProductTypePriceId());
+                    Warehouse warehouse;
+                    if (optionalWarehouse.isEmpty()) {
+                        Optional<ProductTypePrice> optionalProduct1 = productTypePriceRepository.findById(tradeProductDto.getProductTypePriceId());
+                        if (optionalProduct1.isEmpty()) continue;
+                        warehouse = new Warehouse(
+                                null,
+                                optionalProduct1.get(),
+                                branch,
+                                0,
+                                new Date()
+                        );
+                    } else {
+                        warehouse = optionalWarehouse.get();
+                    }
+                    warehouse.setAmount(warehouse.getAmount() + amount * combo.getAmount());
+                    warehouse.setLastSoldDate(new Date());
+                    Warehouse save = warehouseRepository.save(warehouse);
+                    if (warehouse.getAmount() <= warehouse.getProductTypePrice().getProduct().getMinQuantity()) {
+                        notificationService.lessProduct(warehouse.getProductTypePrice().getId(), false, save.getAmount());
+                    }
+                    // DAILY PRODUCT HISTORY
+                    productHistoryService.create(branch, tradeProduct.getProduct(), tradeProduct.getProductTypePrice(), false, -amount, warehouse.getAmount());
+                }
+            }
             tradeProduct.setProduct(optionalProduct.get());
-
         }
         tradeProduct.setTotalSalePrice(tradeProductDto.getTotalSalePrice());
         tradeProduct.setTradedQuantity(tradeProductDto.getTradedQuantity());
@@ -176,18 +242,17 @@ public class WarehouseService {
         return contentProduct;
     }
 
-    public ContentProduct createByProduct(ContentProduct contentProduct, ContentProductDto contentProductDto) {
+    public double createByProduct(ContentProduct contentProduct, ContentProductDto contentProductDto) {
         if (contentProductDto.getProductId() != null) {
             Optional<Product> optional = productRepository.findById(contentProductDto.getProductId());
-            if (optional.isEmpty()) return null;
+            if (optional.isEmpty()) return 0;
             contentProduct.setProduct(optional.get());
         } else {
             Optional<ProductTypePrice> optional = productTypePriceRepository.findById(contentProductDto.getProductTypePriceId());
-            if (optional.isEmpty()) return null;
+            if (optional.isEmpty()) return 0;
             contentProduct.setProductTypePrice(optional.get());
         }
-        createOrEditWareHouseHelper(contentProduct.getProduction().getBranch(), contentProduct.getProduct(), contentProduct.getProductTypePrice(), contentProductDto.getQuantity());
-        return contentProduct;
+        return createOrEditWareHouseHelper(contentProduct.getProduction().getBranch(), contentProduct.getProduct(), contentProduct.getProductTypePrice(), contentProductDto.getQuantity());
     }
 
     public ApiResponse createOrUpdateExchangeProductBranch(ExchangeProductBranchDTO branchDTO, ExchangeProductBranch exchangeProductBranch, boolean update) {

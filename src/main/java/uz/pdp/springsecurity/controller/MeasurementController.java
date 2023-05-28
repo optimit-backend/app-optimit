@@ -87,5 +87,4 @@ public class MeasurementController {
         ApiResponse apiResponse = measurementService.getByBusiness(business_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
 }

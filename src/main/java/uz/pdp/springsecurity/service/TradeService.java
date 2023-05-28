@@ -132,7 +132,7 @@ public class TradeService {
         }
 
         List<TradeProductDto> tradeProductDtoList = tradeDTO.getProductTraderDto();
-        if (!branch.getBusiness().getSaleMinus()) {
+        if (!branch.getBusiness().isSaleMinus()) {
             HashMap<UUID, Double> map = new HashMap<>();
             for (TradeProductDto dto : tradeProductDtoList) {
                 double tradedQuantity = dto.getTradedQuantity();

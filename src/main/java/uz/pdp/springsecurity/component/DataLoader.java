@@ -470,7 +470,10 @@ public class DataLoader implements CommandLineRunner {
 
                                     VIEW_NAVIGATION,
                                     DELETE_NAVIGATION,
-                                    ADD_NAVIGATION
+                                    ADD_NAVIGATION,
+
+                                    EDIT_MY_BUSINESS,
+                                    VIEW_MY_BUSINESS
 
                             ),
                             business));
@@ -909,6 +912,27 @@ public class DataLoader implements CommandLineRunner {
                     shablonRepository.save(shablon3);
                 }
             }
+            Optional<Role> superAdmin = roleRepository.findByName(Constants.SUPERADMIN);
+            Optional<Role> admin = roleRepository.findByName(Constants.ADMIN);
+            updatePermission(superAdmin);
+            updatePermission(admin);
+        }
+    }
+
+    private void updatePermission(Optional<Role> optionalRole) {
+        List<Permissions> newPermissionList = Arrays.asList(VIEW_NAVIGATION,
+                DELETE_NAVIGATION,
+                ADD_NAVIGATION,
+                EDIT_MY_BUSINESS,
+                VIEW_MY_BUSINESS);
+        if (optionalRole.isPresent()) {
+            Role role = optionalRole.get();
+            List<Permissions> permissions = role.getPermissions();
+            for (Permissions newPermission : newPermissionList) {
+                if (!permissions.contains(newPermission))
+                    permissions.add(newPermission);
+            }
+            roleRepository.save(role);
         }
     }
 }

@@ -31,4 +31,6 @@ public class ProductViewDto {
     private boolean buyDollar;
     private double salePriceDollar;
     private boolean saleDollar;
+    private double grossPrice;
+    private double grossPriceDollar;
 }

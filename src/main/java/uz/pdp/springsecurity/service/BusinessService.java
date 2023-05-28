@@ -283,6 +283,15 @@ public class BusinessService {
         return new ApiResponse("SUCCESS", true);
     }
 
+    public ApiResponse saleMinus(UUID businessId) {
+        Optional<Business> optionalBusiness = businessRepository.findById(businessId);
+        if (optionalBusiness.isEmpty()) new ApiResponse("not found business", false);
+        Business business = optionalBusiness.get();
+        business.setSaleMinus(!business.isSaleMinus());
+        businessRepository.save(business);
+        return new ApiResponse("SUCCESS", true);
+    }
+
     public ApiResponse getInfo(String time) {
         // "day" ni doim qabul qiladi
         Timestamp startTime = Timestamp.valueOf(TODAY);

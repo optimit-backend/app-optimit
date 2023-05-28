@@ -35,8 +35,10 @@ public class ProductDto {
     private double buyPrice;
 
     private double salePrice;
+    private double grossPrice;
     private boolean buyDollar;
     private boolean saleDollar;
+    private boolean grossDollar;
 
 
     private double profitPercent;
