@@ -913,9 +913,11 @@ public class DataLoader implements CommandLineRunner {
                 }
             }
             Optional<Role> superAdmin = roleRepository.findByName(Constants.SUPERADMIN);
-            Optional<Role> admin = roleRepository.findByName(Constants.ADMIN);
+            List<Role> adminList = roleRepository.findAllByName(Constants.ADMIN);
             updatePermission(superAdmin);
-            updatePermission(admin);
+            for (Role role : adminList) {
+                updatePermission(Optional.of(role));
+            }
         }
     }
 
