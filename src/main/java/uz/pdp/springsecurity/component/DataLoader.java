@@ -920,7 +920,9 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void updatePermission(Optional<Role> optionalRole) {
-        List<Permissions> newPermissionList = Arrays.asList(VIEW_NAVIGATION,
+        List<Permissions> newPermissionList = Arrays.asList(
+                VIEW_DASHBOARD,
+                VIEW_NAVIGATION,
                 DELETE_NAVIGATION,
                 ADD_NAVIGATION,
                 EDIT_MY_BUSINESS,
