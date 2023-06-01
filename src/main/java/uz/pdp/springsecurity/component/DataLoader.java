@@ -912,23 +912,22 @@ public class DataLoader implements CommandLineRunner {
                     shablonRepository.save(shablon3);
                 }
             }
-            Optional<Role> superAdmin = roleRepository.findByName(Constants.SUPERADMIN);
-            List<Role> adminList = roleRepository.findAllByName(Constants.ADMIN);
-            updatePermission(superAdmin);
-            for (Role role : adminList) {
-                updatePermission(Optional.of(role));
-            }
+//            updatePermission(); // TODO: 5/29/2023 if you add new permission
         }
     }
 
-    private void updatePermission(Optional<Role> optionalRole) {
-        List<Permissions> newPermissionList = Arrays.asList(
-                VIEW_DASHBOARD,
-                VIEW_NAVIGATION,
-                DELETE_NAVIGATION,
-                ADD_NAVIGATION,
-                EDIT_MY_BUSINESS,
-                VIEW_MY_BUSINESS);
+    private void updatePermission() {
+        Optional<Role> superAdmin = roleRepository.findByName(Constants.SUPERADMIN);
+        List<Role> adminList = roleRepository.findAllByName(Constants.ADMIN);
+        updatePermissionHelper(superAdmin);
+        for (Role role : adminList) {
+            updatePermissionHelper(Optional.of(role));
+        }
+    }
+
+    private void updatePermissionHelper(Optional<Role> optionalRole) {
+        List<Permissions> newPermissionList = Arrays.asList( // TODO: 5/29/2023 write new permissions here
+                );
         if (optionalRole.isPresent()) {
             Role role = optionalRole.get();
             List<Permissions> permissions = role.getPermissions();

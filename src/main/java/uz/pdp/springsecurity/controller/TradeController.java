@@ -189,15 +189,6 @@ public class TradeController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-
-    // todo delete
-    /*@CheckPermission("DOWNLOAD_MEDIA")
-    @GetMapping("/get-pdf/{id}")
-    public HttpEntity<?> getPdf(@PathVariable UUID id, HttpServletResponse response) throws IOException {
-        ApiResponse apiResponse = tradeService.createPdf(id, response);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }*/
-
     /**
      * BUSINESS ID'SI ORQALI BARCHA SAVDOLARNI OLIB CHIQISH
      *
