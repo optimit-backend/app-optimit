@@ -17,6 +17,8 @@ import uz.pdp.springsecurity.repository.*;
 
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -542,4 +544,81 @@ public class TaskServise {
         productionService.editInvalid(task.getProduction(), optionalTaskStatus.get(), lostProductionDto.getQuantity());
         return new ApiResponse("SUCCESS", true);
     }
+
+    public ApiResponse duplicateTask(UUID taskId) {
+        Optional<Task> optionalTask = taskRepository.findById(taskId);
+        if (optionalTask.isEmpty()){
+            return new ApiResponse("Task Not Found",false);
+        }
+        try {
+            Task task = optionalTask.get();
+            Task newTask = new Task();
+            newTask.setName(getDuplicateTaskName(task.getName()));
+            if (task.getDescription() != null) {
+                newTask.setDescription(optionalTask.get().getDescription());
+            }
+            if (task.getDependTask() != null) {
+                newTask.setDependTask(task.getDependTask());
+            }
+            if (task.getTaskType() != null) {
+                newTask.setTaskType(task.getTaskType());
+            }
+            if (task.getProject() != null) {
+                newTask.setProject(task.getProject());
+            }
+            if (task.getStage() != null) {
+                newTask.setStage(task.getStage());
+            }
+            if (task.getStartDate() != null) {
+                newTask.setStartDate(task.getStartDate());
+            }
+            if (task.getEndDate() != null) {
+                newTask.setEndDate(task.getEndDate());
+            }
+            newTask.setExpired(task.isExpired());
+            if (task.getDeadLine() != null) {
+                newTask.setDeadLine(task.getDeadLine());
+            }
+            if (task.getTaskPriceList() != null) {
+                newTask.setTaskPrice(task.getTaskPrice());
+            }
+            newTask.setTaskStatus(task.getTaskStatus());
+            newTask.setImportance(task.getImportance());
+            if (task.getDependTask() != null) {
+                newTask.setDependTask(task.getDependTask());
+            }
+            newTask.setProductions(task.isProductions());
+            if (task.getProduction() != null) {
+                newTask.setProduction(task.getProduction());
+            }
+            if (task.getContent() != null) {
+                newTask.setContent(task.getContent());
+            }
+            newTask.setGoalAmount(task.getGoalAmount());
+            newTask.setTaskPrice(task.getTaskPrice());
+            newTask.setBranch(task.getBranch());
+            if (task.getFileDataList() != null) {
+                newTask.setFileDataList(task.getFileDataList());
+            }
+            taskRepository.save(newTask);
+            return new ApiResponse("SUCCESS", true);
+        }catch (Exception e){
+            return new ApiResponse("FAILED TO DUPLICATE");
+        }
+    }
+
+    private String getDuplicateTaskName(String originalName) {
+        String pattern = "(.*) (\\d+)";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(originalName);
+
+        if (m.matches()) {
+            int originalNumber = Integer.parseInt(m.group(2));
+            return m.group(1) + " " + (originalNumber + 1);
+        } else {
+            return originalName + " 2";
+        }
+    }
+
+
 }

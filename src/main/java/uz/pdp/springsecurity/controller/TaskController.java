@@ -136,4 +136,11 @@ public class TaskController {
         ApiResponse apiResponse = taskServise.getAllByBranchIdPageable(branchId,params,projectId,typeId,userId,expired);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("ADD_TASK")
+    @PostMapping("/duplicate-task/{taskId}")
+    public HttpEntity<?> duplicateTask(@PathVariable UUID taskId) {
+        ApiResponse apiResponse = taskServise.duplicateTask(taskId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }
