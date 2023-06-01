@@ -80,7 +80,7 @@ public class SmsService {
         if (!phoneNumberList.isEmpty()) {
             String sendMessage = "";
             for (String phoneNumber : phoneNumberList) {
-                if (smsDto.getKey().equals("CUSTOMERS")) {
+                if (smsDto.getKey().equals("CUSTOMERS") && phoneNumber != null) {
                     Optional<Customer> optionalCustomer = customerRepository.findByPhoneNumber(phoneNumber);
                     if (optionalCustomer.isPresent()) {
                         Customer customer = optionalCustomer.get();
@@ -92,11 +92,11 @@ public class SmsService {
                             String substring1 = message.substring(end + 1);
                             substring = substring + substring1;
                             sendMessage = substring;
-                        }else {
+                        } else {
                             sendMessage = message;
                         }
                     }
-                } else if (smsDto.getKey().equals("EMPLOYEE")) {
+                } else if (smsDto.getKey().equals("EMPLOYEE") && phoneNumber != null) {
                     Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
                     if (optionalUser.isPresent()) {
                         User user = optionalUser.get();
@@ -113,35 +113,36 @@ public class SmsService {
                         }
                     }
                 }
+                if (phoneNumber != null) {
+                    RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                            .addFormDataPart("mobile_phone", phoneNumber)
+                            .addFormDataPart("message", sendMessage)
+                            .addFormDataPart("from", "4546")
+                            .addFormDataPart("callback_url", "http://0000.uz/test.php")
+                            .build();
 
-                RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                        .addFormDataPart("mobile_phone", phoneNumber)
-                        .addFormDataPart("message", sendMessage)
-                        .addFormDataPart("from", "4546")
-                        .addFormDataPart("callback_url", "http://0000.uz/test.php")
-                        .build();
-
-                if (smsToken == null) {
-                    smsToken = getGetToken();
-                }
-
-                Request request = new Request.Builder()
-                        .url("https://notify.eskiz.uz/api/message/sms/send")
-                        .method("POST", body)
-                        .header("Authorization", "Bearer " + smsToken)
-                        .build();
-                try {
-                    Response response = client.newCall(request).execute();
-                    ResponseBody responseBody = response.body();
-                    assert responseBody != null;
-                    String string = responseBody.string();
-                    String ERROR_INVALID_TOKEN = "{\"status\":\"token-invalid\",";
-                    if (string.startsWith(ERROR_INVALID_TOKEN)) {
-                        getGetToken();
-                        add(smsDto);
+                    if (smsToken == null) {
+                        smsToken = getGetToken();
                     }
-                } catch (Exception e) {
-                    return new ApiResponse("Iltimos keyinroq qaytadan o'rinib ko'ring", false);
+
+                    Request request = new Request.Builder()
+                            .url("https://notify.eskiz.uz/api/message/sms/send")
+                            .method("POST", body)
+                            .header("Authorization", "Bearer " + smsToken)
+                            .build();
+                    try {
+                        Response response = client.newCall(request).execute();
+                        ResponseBody responseBody = response.body();
+                        assert responseBody != null;
+                        String string = responseBody.string();
+                        String ERROR_INVALID_TOKEN = "{\"status\":\"token-invalid\",";
+                        if (string.startsWith(ERROR_INVALID_TOKEN)) {
+                            getGetToken();
+                            add(smsDto);
+                        }
+                    } catch (Exception e) {
+                        return new ApiResponse("Iltimos keyinroq qaytadan o'rinib ko'ring", false);
+                    }
                 }
             }
         }
