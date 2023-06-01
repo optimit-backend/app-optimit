@@ -1,5 +1,6 @@
 package uz.pdp.springsecurity.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -7,24 +8,18 @@ import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TradeDTO;
-import uz.pdp.springsecurity.payload.TraderDto;
-import uz.pdp.springsecurity.repository.TradeRepository;
 import uz.pdp.springsecurity.service.TradeService;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/trade")
+@RequiredArgsConstructor
 public class TradeController {
-    @Autowired
-    TradeService tradeService;
+   private final TradeService tradeService;
 
-    @Autowired
-    TradeRepository tradeRepository;
 
     /**
      * YANGI SAVDO QOSHISH

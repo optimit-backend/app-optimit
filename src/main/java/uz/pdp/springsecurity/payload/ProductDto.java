@@ -39,6 +39,8 @@ public class ProductDto {
     private boolean buyDollar;
     private boolean saleDollar;
     private boolean grossDollar;
+    private boolean kpiPercent;
+    private double kpi;
 
 
     private double profitPercent;

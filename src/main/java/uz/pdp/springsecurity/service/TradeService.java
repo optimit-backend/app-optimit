@@ -271,19 +271,9 @@ public class TradeService {
         tradeRepository.save(trade);
         tradeProductRepository.saveAll(tradeProductList);
         if (!edit) {
-            Agreement agreementKpi = optionalAgreementKpi.get();
-            if (agreementKpi.getPrice() > 0) {
-                double salarySum = trade.getTotalSum() * agreementKpi.getPrice() / 100;
-                salaryCountService.add(new SalaryCountDto(
-                        1,
-                        salarySum,
-                        agreementKpi.getId(),
-                        branch.getId(),
-                        new Date(),
-                        "Savdo ulushi"
-                ));
-            }
+            countKPI(optionalAgreementKpi.get(), trade, tradeProductList);
         }
+
         List<UUID> paymentIdList = new ArrayList<>();
         for (PaymentDto paymentDto : tradeDTO.getPaymentDtoList()) {
             Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(paymentDto.getPaymentMethodId());
@@ -293,6 +283,46 @@ public class TradeService {
         balanceService.edit(branch.getId(), true, tradeDTO.getPaymentDtoList());
         return new ApiResponse("SAVED!", true);
     }
+
+    private void countKPI(Agreement agreementKpi, Trade trade, List<TradeProduct> tradeProductList) {
+        double kpiProduct = countKPIProduct(tradeProductList);
+        if (agreementKpi.getPrice() > 0 || kpiProduct > 0) {
+            double salarySum = trade.getTotalSum() * agreementKpi.getPrice() / 100;
+            salaryCountService.add(new SalaryCountDto(
+                    1,
+                    salarySum + kpiProduct,
+                    agreementKpi.getId(),
+                    trade.getBranch().getId(),
+                    new Date(),
+                    "Savdo ulushi"
+            ));
+        }
+    }
+
+    private double countKPIProduct(List<TradeProduct> tradeProductList){
+        double kpi = 0;
+        for (TradeProduct tradeProduct : tradeProductList) {
+            if (tradeProduct.getProduct() != null) {
+                kpi += countKPIProductHelper(tradeProduct.getProduct(), tradeProduct.getTradedQuantity(), tradeProduct.getTotalSalePrice());
+            }
+            else {
+                kpi += countKPIProductHelper(tradeProduct.getProductTypePrice().getProduct(), tradeProduct.getTradedQuantity(), tradeProduct.getTotalSalePrice());
+            }
+        }
+        return kpi;
+    }
+
+    private double countKPIProductHelper(Product product, double quantity, double totalPrice){
+        if (product.getKpi() != null & product.getKpiPercent() != null) {
+            if (product.getKpiPercent()){
+                return totalPrice * product.getKpi() / 100;
+            }else {
+                return product.getKpi() * quantity;
+            }
+        }
+        return 0;
+    }
+
 
     public ApiResponse getOne(UUID id) {
         Optional<Trade> optionalTrade = tradeRepository.findById(id);

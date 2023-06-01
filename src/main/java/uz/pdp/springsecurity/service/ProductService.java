@@ -43,7 +43,6 @@ public class ProductService {
     private final PurchaseProductRepository purchaseProductRepository;
     private final TradeProductRepository tradeProductRepository;
     private final ContentProductRepository contentProductRepository;
-    private final ProductionRepository productionRepository;
     private final CurrencyRepository currencyRepository;
     private final FifoCalculationRepository fifoCalculationRepository;
 
@@ -108,6 +107,8 @@ public class ProductService {
         product.setBuyDollar(productDto.isBuyDollar());
         product.setSaleDollar(productDto.isSaleDollar());
         product.setActive(true);
+        product.setKpi(productDto.getKpi());
+        product.setKpiPercent(productDto.isKpiPercent());
 
         if (productDto.getCategoryId() != null) {
             UUID categoryId = productDto.getCategoryId();
