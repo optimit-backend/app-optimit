@@ -122,21 +122,4 @@ public class PurchaseController {
         ApiResponse apiResponse = purchaseService.getByBranchId(branch_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-
-   /* @CheckPermission("VIEW_PURCHASE")
-    @GetMapping("get-purchase-by-date/{date}")
-    public HttpEntity<?> getByDate(@PathVariable Date date) {
-        ApiResponse apiResponse = purchaseService.getByDate(date);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }*/
-
-    // todo delete
-
-    /*@CheckPermission("VIEW_PURCHASE")
-    @GetMapping("/get-pdf/{id}")
-    public HttpEntity<?> getPdf(@PathVariable UUID id, HttpServletResponse response) throws IOException {
-        ApiResponse apiResponse = purchaseService.getPdfFile(id, response);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }*/
 }

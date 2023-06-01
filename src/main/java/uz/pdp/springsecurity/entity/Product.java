@@ -35,6 +35,9 @@ public class Product extends AbsEntity {
     private boolean buyDollar = false;
     private double salePriceDollar = 1;
     private boolean saleDollar = false;
+
+    private Boolean kpiPercent = true;
+    private Double kpi = 0d;
     private Date expireDate;
 
     @Column(nullable = false)

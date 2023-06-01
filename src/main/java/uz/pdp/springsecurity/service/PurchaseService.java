@@ -44,9 +44,6 @@ public class PurchaseService {
     CurrencyRepository currencyRepository;
 
     @Autowired
-    CurrentCourceRepository currentCourceRepository;
-
-    @Autowired
     FifoCalculationService fifoCalculationService;
 
     @Autowired
@@ -283,22 +280,4 @@ public class PurchaseService {
         if (allByBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, allByBranch_id);
     }
-
-    /*public ApiResponse getByDate(Date date) {
-        List<Purchase> allByDate = purchaseRepository.findAllByDate(date);
-        if (allByDate.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, allByDate);
-    }*/
-
-    // todo delete
-
-    /*public ApiResponse getPdfFile(UUID id, HttpServletResponse response) throws IOException {
-        Optional<Purchase> optionalPurchase = purchaseRepository.findById(id);
-        if (optionalPurchase.isEmpty()) {
-            return new ApiResponse("NOT FOUND PURCHASE", false);
-        }
-        PDFService pdfService = new PDFService();
-        pdfService.createPdfPurchase(optionalPurchase.get(), response);
-        return new ApiResponse("CREATED", true);
-    }*/
 }
