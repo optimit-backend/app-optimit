@@ -24,7 +24,6 @@ public class Product extends AbsEntity {
     private String name;
     private Date dueDate;
     private boolean active = true;
-
     private double profitPercent;
     private double tax = 1;
     private double buyPrice;

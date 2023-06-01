@@ -205,14 +205,17 @@ public class CustomerService {
             Map<String, Object> response = new HashMap<>();
             List<Trade> allByCustomerId = tradeRepository.findAllByCustomer_Id(customerDto.getId());
             double totalSumma = 0;
+            double profit = 0;
             for (Trade trade : allByCustomerId) {
                 totalSumma += trade.getTotalSum();
+                profit += trade.getTotalProfit();
             }
             totalTrade += totalSumma;
             response.put("customer", customerDto);
             response.put("totalSumma", totalSumma);
             response.put("size", all.size());
             response.put("totalTrade", totalTrade);
+            response.put("profit", profit);
             responses.add(response);
         }
 
