@@ -323,7 +323,6 @@ public class TradeService {
         return 0;
     }
 
-
     public ApiResponse getOne(UUID id) {
         Optional<Trade> optionalTrade = tradeRepository.findById(id);
         if (optionalTrade.isEmpty()) return new ApiResponse("NOT FOUND", false);

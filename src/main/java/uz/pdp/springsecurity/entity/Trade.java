@@ -10,7 +10,6 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -28,9 +27,11 @@ public class Trade extends AbsEntity {
     private User trader;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private PaymentStatus paymentStatus;
 
     /**
@@ -38,6 +39,7 @@ public class Trade extends AbsEntity {
      */
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private PaymentMethod payMethod;
 
     private Date payDate;
