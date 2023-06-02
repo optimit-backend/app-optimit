@@ -550,7 +550,7 @@ public class TaskServise {
         if (optionalTask.isEmpty()){
             return new ApiResponse("Task Not Found",false);
         }
-        try {
+//        try {
             Task task = optionalTask.get();
             Task newTask = new Task();
             newTask.setName(getDuplicateTaskName(task.getName()));
@@ -594,17 +594,20 @@ public class TaskServise {
             if (task.getContent() != null) {
                 newTask.setContent(task.getContent());
             }
+            List<TaskPrice> taskPriceList = new ArrayList<>(task.getTaskPriceList());
+            newTask.setTaskPriceList(taskPriceList);
             newTask.setGoalAmount(task.getGoalAmount());
             newTask.setTaskPrice(task.getTaskPrice());
             newTask.setBranch(task.getBranch());
             if (task.getFileDataList() != null) {
-                newTask.setFileDataList(task.getFileDataList());
+                List<FileData> fileDataList = new ArrayList<>(task.getFileDataList());
+                newTask.setFileDataList(fileDataList);
             }
             taskRepository.save(newTask);
             return new ApiResponse("SUCCESS", true);
-        }catch (Exception e){
-            return new ApiResponse("FAILED TO DUPLICATE");
-        }
+//        }catch (Exception e){
+//            return new ApiResponse("FAILED TO DUPLICATE");
+//        }
     }
 
     private String getDuplicateTaskName(String originalName) {
