@@ -74,6 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/lid",
                         "/api/files/*",
                         "/api/customer/export/*",
+                        "/api/customer/import/*",
                         "/app/topic/public",
                         "/app/chat.send",
                         "/app/message",
