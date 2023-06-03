@@ -136,7 +136,7 @@ public class ExchangeProductBranchService {
         List<ExchangeBranchGetOneDto> getOneDtoList = new ArrayList<>();
         for (ExchangeProduct exchangeProduct : exchangeProductBranch.getExchangeProductList()) {
             ExchangeBranchGetOneDto branchGetOneDto = new ExchangeBranchGetOneDto();
-            if(exchangeProduct.getProduct() != null) {
+            if (exchangeProduct.getProduct() != null) {
                 branchGetOneDto.setProductName(exchangeProduct.getProduct().getName());
             } else {
                 branchGetOneDto.setProductName(exchangeProduct.getProductTypePrice().getName());
@@ -154,37 +154,38 @@ public class ExchangeProductBranchService {
     }
 
     public ApiResponse getByDate(Date exchangeDate, UUID business_id) {
-        List<ExchangeProductBranch> allByExchangeDate = exchangeProductBranchRepository.findAllByExchangeDateAndBusiness_Id(exchangeDate, business_id);
+        List<ExchangeProductBranch> allByExchangeDate = exchangeProductBranchRepository.findAllByExchangeDateAndBusiness_IdAndDeleteIsFalse(exchangeDate, business_id);
         return new ApiResponse("FOUND", true, mapper.toDtoList(allByExchangeDate));
     }
 
     public ApiResponse getByStatusId(UUID exchangeStatusId, UUID branch_id) {
-        List<ExchangeProductBranch> allByExchangeStatus_id = exchangeProductBranchRepository.findAllByExchangeStatus_IdAndBusiness_Id(exchangeStatusId, branch_id);
+        List<ExchangeProductBranch> allByExchangeStatus_id = exchangeProductBranchRepository.findAllByExchangeStatus_IdAndBusiness_IdAndDeleteIsFalse(exchangeStatusId, branch_id);
         if (allByExchangeStatus_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         return new ApiResponse("FOUND", true, mapper.toDtoList(allByExchangeStatus_id));
     }
 
     public ApiResponse getByBusinessId(UUID businessId) {
-        List<ExchangeProductBranch> allByBusinessId = exchangeProductBranchRepository.findAllByBusiness_Id(businessId);
+        List<ExchangeProductBranch> allByBusinessId = exchangeProductBranchRepository.findAllByBusiness_IdAndDeleteIsFalse(businessId);
+        allByBusinessId.addAll(exchangeProductBranchRepository.findAllByBusiness_IdAndDeleteIsNull(businessId));
         if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, allByBusinessId);
     }
 
     public ApiResponse getByBranchId(UUID businessId) {
-        List<ExchangeProductBranch> allByBusinessId = exchangeProductBranchRepository.findAllByShippedBranch_Id(businessId);
+        List<ExchangeProductBranch> allByBusinessId = exchangeProductBranchRepository.findAllByShippedBranch_IdAndDeleteIsFalse(businessId);
         if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, allByBusinessId);
     }
 
     public ApiResponse getByShippedBranchId(UUID shippedBranch_id) {
-        List<ExchangeProductBranch> allByShippedBranch_id = exchangeProductBranchRepository.findAllByShippedBranch_Id(shippedBranch_id);
+        List<ExchangeProductBranch> allByShippedBranch_id = exchangeProductBranchRepository.findAllByShippedBranch_IdAndDeleteIsFalse(shippedBranch_id);
         if (allByShippedBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, allByShippedBranch_id);
     }
 
     public ApiResponse getByReceivedBranchId(UUID receivedBranch_id) {
-        List<ExchangeProductBranch> allByShippedBranch_id = exchangeProductBranchRepository.findAllByReceivedBranch_Id(receivedBranch_id);
+        List<ExchangeProductBranch> allByShippedBranch_id = exchangeProductBranchRepository.findAllByReceivedBranch_IdAndDeleteIsFalse(receivedBranch_id);
         if (allByShippedBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, allByShippedBranch_id);
     }

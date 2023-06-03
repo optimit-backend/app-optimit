@@ -274,5 +274,7 @@ public enum Permissions {
     ADD_NAVIGATION,
 
     EDIT_MY_BUSINESS,
-    VIEW_MY_BUSINESS
+    VIEW_MY_BUSINESS,
+
+    STOREKEEPER
 }

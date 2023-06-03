@@ -291,8 +291,10 @@ public class WarehouseService {
                             notificationService.lessProduct(warehouse.getProduct().getId(), true, save.getAmount());
                         }
                     } else {
-                        return new ApiResponse("Omborda mahsulot yetarli emas!");
+                        return new ApiResponse("Omborda mahsulot yetarli emas!",false);
                     }
+                }else {
+                    return new ApiResponse( exchangeProduct.getProduct().getName() + " ushbu mahsulotdan obmorda mavjud emas!",false);
                 }
                 if (optionalReceivedBranchWarehouse.isPresent()) {
                     Warehouse warehouse = optionalReceivedBranchWarehouse.get();

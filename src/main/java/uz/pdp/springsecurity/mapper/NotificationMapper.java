@@ -16,5 +16,6 @@ public interface NotificationMapper {
     List<NotificationGetAllDto> toDtoGetAll(List<Notification> notificationList);
 
 
+    @Mapping(target = "attachmentId", ignore = true)
     NotificationGetByIdDto toDtoGetById(Notification notification);
 }

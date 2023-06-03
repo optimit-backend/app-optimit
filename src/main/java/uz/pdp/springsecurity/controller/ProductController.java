@@ -28,6 +28,7 @@ public class ProductController {
 
     @Autowired
     ProductRepository productRepository;
+
     @CheckPermission("ADD_PRODUCT")
     @PostMapping()
     public HttpEntity<?> add(@Valid @RequestBody ProductDto productDto) throws ParseException {
@@ -83,9 +84,10 @@ public class ProductController {
         ApiResponse apiResponse = productService.getByCategory(category_id, user);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
     @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/get-by-brand/{brand_id}")
-    public HttpEntity<?> getByBrand(@PathVariable UUID brand_id)  {
+    public HttpEntity<?> getByBrand(@PathVariable UUID brand_id) {
         ApiResponse apiResponse = productService.getByBrand(brand_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
@@ -105,6 +107,21 @@ public class ProductController {
     }
 
     @CheckPermission("VIEW_PRODUCT")
+    @GetMapping("/search/{branch_id}")
+    public HttpEntity<?> search(@PathVariable UUID branch_id,
+                                @RequestParam String name) {
+        ApiResponse apiResponse = productService.search(branch_id,name);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_PRODUCT")
+    @GetMapping("/get-by-branch-for-trade/{branch_id}")
+    public HttpEntity<?> getByBranchForTrade(@PathVariable UUID branch_id, @RequestParam int page, @RequestParam int size) {
+        ApiResponse apiResponse = productService.getByBranchForTrade(branch_id, page, size);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/get-by-branch-for-purchase-trade/{branch_id}")
     public HttpEntity<?> getByBranchForSearch(@PathVariable UUID branch_id) {
         ApiResponse apiResponse = productService.getByBranchForSearch(branch_id);
@@ -118,7 +135,7 @@ public class ProductController {
                                        @RequestParam(required = false) UUID brand_id,
                                        @RequestParam(required = false) UUID categoryId
     ) {
-        ApiResponse apiResponse = productService.getByBusiness(business_id,branch_id,brand_id,categoryId);
+        ApiResponse apiResponse = productService.getByBusiness(business_id, branch_id, brand_id, categoryId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -135,7 +152,7 @@ public class ProductController {
                                             @RequestParam UUID productId,
                                             @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
                                             @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size
-                                          ) {
+    ) {
         ApiResponse apiResponse = productService.getPurchaseProduct(branchId, productId, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
@@ -143,10 +160,10 @@ public class ProductController {
     @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/get-production-product/{branchId}")
     public HttpEntity<?> getProductionProduct(@PathVariable UUID branchId,
-                                          @RequestParam UUID productId,
-                                          @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
-                                          @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size
-                                          ) {
+                                              @RequestParam UUID productId,
+                                              @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
+                                              @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size
+    ) {
         ApiResponse apiResponse = productService.getProductionProduct(branchId, productId, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
@@ -154,10 +171,10 @@ public class ProductController {
     @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/get-trade-product/{branchId}")
     public HttpEntity<?> getTradeProduct(@PathVariable UUID branchId,
-                                          @RequestParam UUID productId,
-                                          @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
-                                          @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size
-                                          ) {
+                                         @RequestParam UUID productId,
+                                         @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
+                                         @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size
+    ) {
         ApiResponse apiResponse = productService.getTradeProduct(branchId, productId, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
@@ -168,7 +185,7 @@ public class ProductController {
                                            @RequestParam UUID productId,
                                            @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
                                            @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size
-                                          ) {
+    ) {
         ApiResponse apiResponse = productService.getContentProduct(branchId, productId, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }

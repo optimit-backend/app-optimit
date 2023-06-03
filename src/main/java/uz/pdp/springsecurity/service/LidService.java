@@ -107,7 +107,7 @@ public class LidService {
         for (Map.Entry<UUID, String> uuidStringEntry : values.entrySet()) {
             lidFieldRepository.findById(uuidStringEntry.getKey()).ifPresent(lidField -> value.put(lidField, uuidStringEntry.getValue()));
         }
-        Optional<LidStatus> optional = lidStatusRepository.findBySortAndBusinessId(1,lidDto.getBusinessId());
+        Optional<LidStatus> optional = lidStatusRepository.findBySortAndBusinessId(1, lidDto.getBusinessId());
         optional.ifPresent(lidStatus -> lidDto.setLidStatusId(lidStatus.getId()));
 
         Lid lid = mapper.toEntity(lidDto);
@@ -144,7 +144,7 @@ public class LidService {
         return new ApiResponse("successfully saved", true);
     }
 
-    public ApiResponse editStatus(UUID id, UUID statusId) {
+    public ApiResponse editStatus(UUID id, UUID statusId, UUID userId) {
         Lid lid = repository.findById(id).orElse(null);
         if (lid == null) {
             return new ApiResponse("not found lid", false);
@@ -164,6 +164,11 @@ public class LidService {
         }
 
         lid.setLidStatus(lidStatus);
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            lid.setUserName(user.getFirstName() + " " + user.getLastName());
+        }
         repository.save(lid);
         return new ApiResponse("Successfully edited", true);
     }
@@ -192,6 +197,7 @@ public class LidService {
         lidGetDto.setLidStatusId(lidStatus != null ? lidStatus.getId() : null);
         lidGetDto.setLidStatusName(lidStatus != null ? lidStatus.getName() : null);
         lidGetDto.setBusinessId(business != null ? business.getId() : null);
+        lidGetDto.setUserName(lid.getUserName() != null ? lid.getUserName() : "");
 
         Map<LidField, String> lidValues = lid.getValues();
         Map<String, String> values = new HashMap<>();

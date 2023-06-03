@@ -33,4 +33,6 @@ public class Lid extends AbsEntity {
     private String description;
 
     private boolean delete;
+
+    private String userName;
 }

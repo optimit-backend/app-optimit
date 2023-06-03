@@ -39,4 +39,6 @@ public class ExchangeProductBranch extends AbsEntity {
 
     @ManyToOne
     private Business business;
+
+    private Boolean delete;
 }

@@ -19,4 +19,5 @@ public class LidGetDto {
     private UUID businessId;
     private Timestamp timestamp;
     private String description;
+    private String userName;
 }
