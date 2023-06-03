@@ -9,6 +9,10 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ExchangeProductMapper {
+    @Mapping(source = "productTypePrice.product.measurement.name", target = "measurementProductTypePriceName")
+    @Mapping(source = "product.measurement.name", target = "measurementProductName")
+    @Mapping(source = "productTypePrice.product.name", target = "productTypePriceName")
+    @Mapping(source = "product.name", target = "productName")
     @Mapping(target = "productTypePriceId", ignore = true)
     @Mapping(target = "productExchangeId", source = "product.id")
     ExchangeProductDTO toDto(ExchangeProduct exchangeProduct);

@@ -6,5 +6,6 @@ public enum NotificationType {
     NEW_TASK,
     NEW_PROJECT,
     NOTIFICATION,
-    LESS_PRODUCT
+    LESS_PRODUCT,
+    NEW_EXCHANGE_PRODUCT
 }

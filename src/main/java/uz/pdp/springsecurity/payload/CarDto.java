@@ -4,16 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NotificationGetAllDto {
+public class CarDto {
     private UUID id;
-    private String name;
-    private boolean read;
-    private Timestamp createdAt;
-    private UUID objectId;
+    private String driver;
+    private String model;
+    private String color;
+    private String carNumber;
+    private UUID businessId;
 }

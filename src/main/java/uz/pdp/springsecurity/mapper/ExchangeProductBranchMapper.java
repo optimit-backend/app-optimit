@@ -13,6 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ExchangeProductBranchMapper {
 
+    @Mapping(target = "delete", ignore = true)
     @Mapping(target = "exchangeProductList", ignore = true)
     @Mapping(target = "updateAt", ignore = true)
     @Mapping(target = "shippedBranch", ignore = true)

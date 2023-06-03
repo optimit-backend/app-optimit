@@ -32,4 +32,6 @@ public class Business extends AbsEntity {
     private boolean isActive;
 
     private boolean delete;
+
+    private Boolean exchangeProductByConfirmation;
 }

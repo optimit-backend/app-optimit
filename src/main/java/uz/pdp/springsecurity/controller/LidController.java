@@ -60,8 +60,9 @@ public class LidController {
     @CheckPermission("EDIT_LID")
     @PutMapping("/edit-status/{id}")
     HttpEntity<?> editStatus(@PathVariable UUID id,
-                             @RequestParam UUID statusId) {
-        ApiResponse apiResponse = lidService.editStatus(id, statusId);
+                             @RequestParam UUID statusId,
+                             @RequestParam UUID userId) {
+        ApiResponse apiResponse = lidService.editStatus(id, statusId,userId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

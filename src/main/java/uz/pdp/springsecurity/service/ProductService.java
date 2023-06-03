@@ -138,9 +138,9 @@ public class ProductService {
         Business business = allBranch.get(0).getBusiness();
         Optional<Currency> optionalCurrency = currencyRepository.findByBusinessId(business.getId());
         Currency currency;
-        if (optionalCurrency.isPresent()){
+        if (optionalCurrency.isPresent()) {
             currency = optionalCurrency.get();
-        }else {
+        } else {
             Optional<Currency> optional = currencyRepository.findFirstByCourseIsNotNullOrderByUpdateAtDesc();
             currency = optional.orElseGet(() -> currencyRepository.save(new Currency(
                     business,
@@ -237,7 +237,7 @@ public class ProductService {
                     return new ApiResponse("product with the barcode is already exist");
             } else {
                 if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId())
-                    || productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(productDto.getBarcode(), product.getBusiness().getId()))
+                        || productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(productDto.getBarcode(), product.getBusiness().getId()))
                     return new ApiResponse("product with the barcode is already exist");
             }
             product.setBarcode(productDto.getBarcode());
@@ -278,7 +278,7 @@ public class ProductService {
                 productTypePrice.setGrossPrice(typePricePostDto.getGrossPrice());
                 productTypePrice.setGrossPriceDollar(Math.round(typePricePostDto.getGrossPrice() / currency.getCourse() * 100) / 100.);
                 productTypePrice.setProfitPercent(typePricePostDto.getProfitPercent());
-                if (typePricePostDto.getPhotoId() != null){
+                if (typePricePostDto.getPhotoId() != null) {
                     Optional<Attachment> optionalAttachment = attachmentRepository.findById(typePricePostDto.getPhotoId());
                     optionalAttachment.ifPresent(productTypePrice::setPhoto);
                 }
@@ -286,7 +286,7 @@ public class ProductService {
                     if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndIdIsNot(typePricePostDto.getBarcode(), product.getBusiness().getId(), productTypePrice.getId())
                             || productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(typePricePostDto.getBarcode(), product.getBusiness().getId())) {
                         productTypePrice.setBarcode(generateBarcode(saveProduct.getBusiness().getId(), saveProduct.getName(), productTypePrice.getId(), false));
-                    }else {
+                    } else {
                         productTypePrice.setBarcode(typePricePostDto.getBarcode());
                     }
                 } else {
@@ -307,15 +307,15 @@ public class ProductService {
                 productTypePrice.setGrossPrice(typePricePostDto.getGrossPrice());
                 productTypePrice.setGrossPriceDollar(Math.round(typePricePostDto.getGrossPrice() / currency.getCourse() * 100) / 100.);
                 productTypePrice.setProfitPercent(typePricePostDto.getProfitPercent());
-                if (typePricePostDto.getPhotoId() != null){
+                if (typePricePostDto.getPhotoId() != null) {
                     Optional<Attachment> optionalAttachment = attachmentRepository.findById(typePricePostDto.getPhotoId());
                     optionalAttachment.ifPresent(productTypePrice::setPhoto);
                 }
                 if (typePricePostDto.getBarcode() != null && !typePricePostDto.getBarcode().isBlank()) {
                     if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(typePricePostDto.getBarcode(), product.getBusiness().getId())
-                        || productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(typePricePostDto.getBarcode(), product.getBusiness().getId())) {
+                            || productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(typePricePostDto.getBarcode(), product.getBusiness().getId())) {
                         productTypePrice.setBarcode(generateBarcode(saveProduct.getBusiness().getId(), saveProduct.getName(), productTypePrice.getId(), false));
-                    }else {
+                    } else {
                         productTypePrice.setBarcode(typePricePostDto.getBarcode());
                     }
                 } else {
@@ -397,7 +397,8 @@ public class ProductService {
                 productTypePriceGetDto.setGrossPrice(productTypePrice.getGrossPrice());
                 productTypePriceGetDto.setGrossPriceDollar(productTypePrice.getGrossPriceDollar());
                 productTypePriceGetDto.setProductTypeValueNameId(productTypePrice.getProductTypeValue().getId());
-                if (productTypePrice.getPhoto() != null)productTypePriceGetDto.setPhotoId(productTypePrice.getPhoto().getId());
+                if (productTypePrice.getPhoto() != null)
+                    productTypePriceGetDto.setPhotoId(productTypePrice.getPhoto().getId());
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), productTypePrice.getId());
                 productTypePriceGetDto.setQuantity(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
                 productTypePriceGetDtoList.add(productTypePriceGetDto);
@@ -562,66 +563,70 @@ public class ProductService {
         if (productList.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         } else {
-            for (Product product : productList) {
-                if (product.getType().equals(Type.MANY)) {
-                    List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductId(product.getId());
-                    for (ProductTypePrice productTypePrice : productTypePriceList) {
-                        ProductGetForPurchaseDto getForPurchaseDto = new ProductGetForPurchaseDto();
-                        getForPurchaseDto.setProductTypePriceId(productTypePrice.getId());
-                        getForPurchaseDto.setType(Type.MANY.name());
-                        getForPurchaseDto.setName(productTypePrice.getName());
-                        getForPurchaseDto.setBarcode(productTypePrice.getBarcode());
-                        getForPurchaseDto.setBuyPrice(productTypePrice.getBuyPrice());
-                        getForPurchaseDto.setSalePrice(productTypePrice.getSalePrice());
-                        getForPurchaseDto.setBuyDollar(productTypePrice.getProduct().isBuyDollar());
-                        getForPurchaseDto.setSaleDollar(productTypePrice.getProduct().isSaleDollar());
-                        getForPurchaseDto.setBuyPriceDollar(productTypePrice.getSalePriceDollar());
-                        getForPurchaseDto.setSalePriceDollar(productTypePrice.getSalePriceDollar());
-                        getForPurchaseDto.setGrossPrice(productTypePrice.getGrossPrice());
-                        getForPurchaseDto.setGrossPriceDollar(productTypePrice.getGrossPriceDollar());
-                        getForPurchaseDto.setProfitPercent(productTypePrice.getProfitPercent());
-                        getForPurchaseDto.setMinQuantity(product.getMinQuantity());
-                        getForPurchaseDto.setExpiredDate(product.getExpireDate());
-                        getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
-                        if (product.getMeasurement() != null)
-                            getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
-                        if (product.getBrand() != null) getForPurchaseDto.setBrandName(product.getBrand().getName());
-                        if (productTypePrice.getPhoto() != null)
-                            getForPurchaseDto.setPhotoId(productTypePrice.getPhoto().getId());
-                        Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch_id, productTypePrice.getId());
-                        getForPurchaseDto.setAmount(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
-                        getForPurchaseDtoList.add(getForPurchaseDto);
-                    }
-                } else {
-                    ProductGetForPurchaseDto getForPurchaseDto = new ProductGetForPurchaseDto();
-                    getForPurchaseDto.setProductId(product.getId());
-                    getForPurchaseDto.setType(product.getType().name());
-                    getForPurchaseDto.setName(product.getName());
-                    getForPurchaseDto.setBarcode(product.getBarcode());
-                    getForPurchaseDto.setBuyPrice(product.getBuyPrice());
-                    getForPurchaseDto.setSalePrice(product.getSalePrice());
-                    getForPurchaseDto.setBuyDollar(product.isBuyDollar());
-                    getForPurchaseDto.setSaleDollar(product.isSaleDollar());
-                    getForPurchaseDto.setBuyPriceDollar(product.getSalePriceDollar());
-                    getForPurchaseDto.setSalePriceDollar(product.getSalePriceDollar());
-                    getForPurchaseDto.setGrossPrice(product.getGrossPrice());
-                    getForPurchaseDto.setGrossPriceDollar(product.getGrossPriceDollar());
-                    getForPurchaseDto.setMinQuantity(product.getMinQuantity());
-                    getForPurchaseDto.setExpiredDate(product.getExpireDate());
-                    if (product.getMeasurement() != null)
-                        getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
-                    if (product.getBrand() != null) getForPurchaseDto.setBrandName(product.getBrand().getName());
-                    if (product.getPhoto() != null) getForPurchaseDto.setPhotoId(product.getPhoto().getId());
-                    Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch_id, product.getId());
-                    getForPurchaseDto.setAmount(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
-                    getForPurchaseDtoList.add(getForPurchaseDto);
-                }
-            }
+            toViewDtoMto(branch_id, getForPurchaseDtoList, productList);
             return new ApiResponse("FOUND", true, getForPurchaseDtoList);
         }
     }
 
-    public ApiResponse getByBusiness(UUID businessId, UUID branch_id, UUID brand_id,UUID categoryId) {
+    private void toViewDtoMto(UUID branch_id, List<ProductGetForPurchaseDto> getForPurchaseDtoList, List<Product> productList) {
+        for (Product product : productList) {
+            if (product.getType().equals(Type.MANY)) {
+                List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductId(product.getId());
+                for (ProductTypePrice productTypePrice : productTypePriceList) {
+                    ProductGetForPurchaseDto getForPurchaseDto = new ProductGetForPurchaseDto();
+                    getForPurchaseDto.setProductTypePriceId(productTypePrice.getId());
+                    getForPurchaseDto.setType(Type.MANY.name());
+                    getForPurchaseDto.setName(productTypePrice.getName());
+                    getForPurchaseDto.setBarcode(productTypePrice.getBarcode());
+                    getForPurchaseDto.setBuyPrice(productTypePrice.getBuyPrice());
+                    getForPurchaseDto.setSalePrice(productTypePrice.getSalePrice());
+                    getForPurchaseDto.setBuyDollar(productTypePrice.getProduct().isBuyDollar());
+                    getForPurchaseDto.setSaleDollar(productTypePrice.getProduct().isSaleDollar());
+                    getForPurchaseDto.setBuyPriceDollar(productTypePrice.getSalePriceDollar());
+                    getForPurchaseDto.setSalePriceDollar(productTypePrice.getSalePriceDollar());
+                    getForPurchaseDto.setGrossPrice(productTypePrice.getGrossPrice());
+                    getForPurchaseDto.setGrossPriceDollar(productTypePrice.getGrossPriceDollar());
+                    getForPurchaseDto.setProfitPercent(productTypePrice.getProfitPercent());
+                    getForPurchaseDto.setMinQuantity(product.getMinQuantity());
+                    getForPurchaseDto.setExpiredDate(product.getExpireDate());
+                    getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
+                    if (product.getMeasurement() != null)
+                        getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
+                    if (product.getBrand() != null) getForPurchaseDto.setBrandName(product.getBrand().getName());
+                    if (productTypePrice.getPhoto() != null)
+                        getForPurchaseDto.setPhotoId(productTypePrice.getPhoto().getId());
+                    Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch_id, productTypePrice.getId());
+                    getForPurchaseDto.setAmount(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
+                    getForPurchaseDtoList.add(getForPurchaseDto);
+                }
+            } else {
+                ProductGetForPurchaseDto getForPurchaseDto = new ProductGetForPurchaseDto();
+                getForPurchaseDto.setProductId(product.getId());
+                getForPurchaseDto.setType(product.getType().name());
+                getForPurchaseDto.setName(product.getName());
+                getForPurchaseDto.setBarcode(product.getBarcode());
+                getForPurchaseDto.setBuyPrice(product.getBuyPrice());
+                getForPurchaseDto.setSalePrice(product.getSalePrice());
+                getForPurchaseDto.setBuyDollar(product.isBuyDollar());
+                getForPurchaseDto.setSaleDollar(product.isSaleDollar());
+                getForPurchaseDto.setBuyPriceDollar(product.getSalePriceDollar());
+                getForPurchaseDto.setSalePriceDollar(product.getSalePriceDollar());
+                getForPurchaseDto.setGrossPrice(product.getGrossPrice());
+                getForPurchaseDto.setGrossPriceDollar(product.getGrossPriceDollar());
+                getForPurchaseDto.setMinQuantity(product.getMinQuantity());
+                getForPurchaseDto.setExpiredDate(product.getExpireDate());
+                if (product.getMeasurement() != null)
+                    getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
+                if (product.getBrand() != null) getForPurchaseDto.setBrandName(product.getBrand().getName());
+                if (product.getPhoto() != null) getForPurchaseDto.setPhotoId(product.getPhoto().getId());
+                Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch_id, product.getId());
+                getForPurchaseDto.setAmount(optionalWarehouse.map(Warehouse::getAmount).orElse(0d));
+                getForPurchaseDtoList.add(getForPurchaseDto);
+            }
+        }
+    }
+
+    public ApiResponse getByBusiness(UUID businessId, UUID branch_id, UUID brand_id, UUID categoryId) {
         List<ProductViewDto> productViewDtoList = new ArrayList<>();
         List<Product> productList = new ArrayList<>();
 
@@ -630,43 +635,43 @@ public class ProductService {
         boolean checkingCategory = false;
         boolean checkingBusiness = false;
 
-        if (categoryId!=null){
+        if (categoryId != null) {
             checkingCategory = true;
         }
-        if (brand_id!=null){
+        if (brand_id != null) {
             checkingBrand = true;
         }
-        if (branch_id!=null){
+        if (branch_id != null) {
             checkingBranch = true;
         }
-        if (businessId!=null){
+        if (businessId != null) {
             checkingBusiness = true;
         }
-        if (checkingBranch){
+        if (checkingBranch) {
             checkingBusiness = false;
         }
 
-        if (checkingCategory && checkingBrand && checkingBranch){
-            productList = productRepository.findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(brand_id,categoryId,branch_id);
+        if (checkingCategory && checkingBrand && checkingBranch) {
+            productList = productRepository.findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(brand_id, categoryId, branch_id);
         } else if (checkingBrand && checkingBranch) {
-            productList = productRepository.findAllByBrandIdAndBranchIdAndActiveTrue(brand_id,branch_id);
+            productList = productRepository.findAllByBrandIdAndBranchIdAndActiveTrue(brand_id, branch_id);
         } else if (checkingCategory && checkingBranch) {
-            productList = productRepository.findAllByCategoryIdAndBranchIdAndActiveTrue(categoryId,branch_id);
+            productList = productRepository.findAllByCategoryIdAndBranchIdAndActiveTrue(categoryId, branch_id);
         } else if (checkingCategory && checkingBrand && checkingBusiness) {
-            productList = productRepository.findAllByBrandIdAndCategoryIdAndBusinessIdAndActiveTrue(brand_id,categoryId,businessId);
+            productList = productRepository.findAllByBrandIdAndCategoryIdAndBusinessIdAndActiveTrue(brand_id, categoryId, businessId);
         } else if (checkingBrand && checkingBusiness) {
-            productList = productRepository.findAllByBrandIdAndBusinessIdAndActiveTrue(brand_id,businessId);
+            productList = productRepository.findAllByBrandIdAndBusinessIdAndActiveTrue(brand_id, businessId);
         } else if (checkingCategory && checkingBusiness) {
-            productList = productRepository.findAllByCategoryIdAndBusinessIdAndActiveTrue(categoryId,businessId);
+            productList = productRepository.findAllByCategoryIdAndBusinessIdAndActiveTrue(categoryId, businessId);
         } else if (checkingBusiness) {
             productList = productRepository.findAllByBusiness_IdAndActiveTrue(businessId);
         } else if (checkingBranch) {
             productList = productRepository.findAllByBranchIdAndActiveTrue(branch_id);
         }
-        if (checkingBranch){
+        if (checkingBranch) {
 
             getProductMethod(productViewDtoList, productList, branch_id);
-        }else {
+        } else {
             getProductMethod(productViewDtoList, productList, null);
         }
 
@@ -777,7 +782,7 @@ public class ProductService {
                 productViewDto.setSalePriceDollar(product.getSalePriceDollar());
                 productViewDto.setGrossPrice(product.getGrossPrice());
                 productViewDto.setGrossPriceDollar(product.getGrossPriceDollar());
-                if (product.getCategory()!=null){
+                if (product.getCategory() != null) {
                     productViewDto.setCategory(product.getCategory().getName());
                 }
             }
@@ -794,7 +799,7 @@ public class ProductService {
             purchaseProductPage = purchaseProductRepository.findAllByPurchase_BranchIdAndProductIdOrderByCreatedAtDesc(branchId, productId, pageable);
         } else if (productTypePriceRepository.existsById(productId)) {
             purchaseProductPage = purchaseProductRepository.findAllByPurchase_BranchIdAndProductTypePriceIdOrderByCreatedAtDesc(branchId, productId, pageable);
-        }else {
+        } else {
             return new ApiResponse("PRODUCT NOT FOUND", false);
         }
         if (purchaseProductPage.isEmpty()) return new ApiResponse("LIST EMPTY", false);
@@ -802,7 +807,7 @@ public class ProductService {
         List<ProductHistoryDto> productHistoryDtoList = new ArrayList<>();
         for (PurchaseProduct purchaseProduct : purchaseProductPage.getContent()) {
             productHistoryDtoList.add(new ProductHistoryDto(
-                    purchaseProduct.getProduct() != null? purchaseProduct.getProduct().getName():purchaseProduct.getProductTypePrice().getName(),
+                    purchaseProduct.getProduct() != null ? purchaseProduct.getProduct().getName() : purchaseProduct.getProductTypePrice().getName(),
                     purchaseProduct.getPurchasedQuantity(),
                     purchaseProduct.getTotalSum(),
                     purchaseProduct.getCreatedAt(),
@@ -829,7 +834,7 @@ public class ProductService {
         } else if (productTypePriceRepository.existsById(productId)) {
             fifoCalculationPage = fifoCalculationRepository.findAllByBranchIdAndProductTypePriceIdAndProductionIsNotNullOrderByCreatedAtDesc(branchId, productId, pageable);
 //            fifoCalculationPage = productionRepository.findAllByBranchIdAndProductTypePriceIdOrderByCreatedAtDesc(branchId, productId, pageable);
-        }else {
+        } else {
             return new ApiResponse("PRODUCT NOT FOUND", false);
         }
         if (fifoCalculationPage.isEmpty()) return new ApiResponse("LIST EMPTY", false);
@@ -871,7 +876,7 @@ public class ProductService {
             tradeProductPage = tradeProductRepository.findAllByTrade_BranchIdAndProductIdOrderByCreatedAtDesc(branchId, productId, pageable);
         } else if (productTypePriceRepository.existsById(productId)) {
             tradeProductPage = tradeProductRepository.findAllByTrade_BranchIdAndProductTypePriceIdOrderByCreatedAtDesc(branchId, productId, pageable);
-        }else {
+        } else {
             return new ApiResponse("PRODUCT NOT FOUND", false);
         }
         if (tradeProductPage.isEmpty()) return new ApiResponse("LIST EMPTY", false);
@@ -879,13 +884,13 @@ public class ProductService {
         List<ProductHistoryDto> productHistoryDtoList = new ArrayList<>();
         for (TradeProduct tradeProduct : tradeProductPage.getContent()) {
             productHistoryDtoList.add(new ProductHistoryDto(
-                    tradeProduct.getProduct() != null? tradeProduct.getProduct().getName():tradeProduct.getProductTypePrice().getName(),
+                    tradeProduct.getProduct() != null ? tradeProduct.getProduct().getName() : tradeProduct.getProductTypePrice().getName(),
                     tradeProduct.getTradedQuantity(),
                     tradeProduct.getTotalSalePrice(),
                     tradeProduct.getCreatedAt(),
                     tradeProduct.getTrade().getTrader().getFirstName(),
                     tradeProduct.getTrade().getTrader().getLastName(),
-                    tradeProduct.getTrade().getCustomer()==null?"":tradeProduct.getTrade().getCustomer().getName()
+                    tradeProduct.getTrade().getCustomer() == null ? "" : tradeProduct.getTrade().getCustomer().getName()
             ));
         }
         Map<String, Object> response = new HashMap<>();
@@ -904,7 +909,7 @@ public class ProductService {
             contentProductPage = contentProductRepository.findAllByProduction_BranchIdAndProductIdAndProductionIsNotNullAndByProductIsFalseAndLossProductIsFalseOrderByCreatedAtDesc(branchId, productId, pageable);
         } else if (productTypePriceRepository.existsById(productId)) {
             contentProductPage = contentProductRepository.findAllByProduction_BranchIdAndProductTypePriceIdAndProductionIsNotNullAndByProductIsFalseAndLossProductIsFalseOrderByCreatedAtDesc(branchId, productId, pageable);
-        }else {
+        } else {
             return new ApiResponse("PRODUCT NOT FOUND", false);
         }
         if (contentProductPage.isEmpty()) return new ApiResponse("LIST EMPTY", false);
@@ -912,7 +917,7 @@ public class ProductService {
         List<ProductHistoryDto> productHistoryDtoList = new ArrayList<>();
         for (ContentProduct contentProduct : contentProductPage.getContent()) {
             productHistoryDtoList.add(new ProductHistoryDto(
-                    contentProduct.getProduct() != null? contentProduct.getProduct().getName():contentProduct.getProductTypePrice().getName(),
+                    contentProduct.getProduct() != null ? contentProduct.getProduct().getName() : contentProduct.getProductTypePrice().getName(),
                     contentProduct.getQuantity(),
                     contentProduct.getTotalPrice(),
                     contentProduct.getCreatedAt()
@@ -933,9 +938,9 @@ public class ProductService {
 
     private void editPriceHelper(List<Product> productList, double course) {
         for (Product product : productList) {
-            if (product.getType().equals(Type.MANY)){
+            if (product.getType().equals(Type.MANY)) {
                 editSalePriceManyHelper(productTypePriceRepository.findAllByProductId(product.getId()), course);
-            }else {
+            } else {
                 product.setSalePrice(course * product.getSalePriceDollar());
             }
         }
@@ -947,6 +952,30 @@ public class ProductService {
             productTypePrice.setSalePrice(course * productTypePrice.getSalePriceDollar());
         }
         productTypePriceRepository.saveAll(productTypePriceList);
+    }
+
+    public ApiResponse getByBranchForTrade(UUID branchId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> all = productRepository.findAllByActiveIsTrueAndBranchId(branchId, pageable);
+
+        if (all.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+        List<ProductGetForPurchaseDto> getForPurchaseDtoList = new ArrayList<>();
+        toViewDtoMto(branchId, getForPurchaseDtoList, all.toList());
+
+        return new ApiResponse("all", true, getForPurchaseDtoList);
+    }
+
+    public ApiResponse search(UUID branchId, String name) {
+
+        List<Product> all = productRepository.findAllByBranchIdAndActiveIsTrueAndNameContainingIgnoreCase(branchId, name);
+        List<Product> allByBarcode = productRepository.findAllByBranchIdAndActiveIsTrueAndBarcodeContainingIgnoreCase(branchId, name);
+        all.addAll(allByBarcode);
+        List<ProductGetForPurchaseDto> getForPurchaseDtoList = new ArrayList<>();
+        toViewDtoMto(branchId, getForPurchaseDtoList, all);
+
+        return new ApiResponse("all", true, getForPurchaseDtoList);
     }
 }
 
