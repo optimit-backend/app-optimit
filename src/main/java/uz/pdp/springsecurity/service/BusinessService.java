@@ -333,4 +333,16 @@ public class BusinessService {
         if (exists) return new ApiResponse("EXIST", false);
         return new ApiResponse("NOT FOUND FOUND", true);
     }
+
+    public ApiResponse turnExchangeProduct(UUID businessId, boolean isTurn) {
+        Optional<Business> optionalBusiness = businessRepository.findById(businessId);
+        if (optionalBusiness.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+
+        Business business = optionalBusiness.get();
+        business.setExchangeProductByConfirmation(isTurn);
+        businessRepository.save(business);
+        return new ApiResponse("successfully", true);
+    }
 }
