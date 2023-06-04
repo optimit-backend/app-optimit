@@ -108,6 +108,14 @@ public class BusinessController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+    @CheckPermission("EDIT_MY_BUSINESS")
+    @PutMapping("/turn-exchange-product/{businessId}")
+    public HttpEntity<?> turnExchangeProduct(@PathVariable UUID businessId,
+                                             @RequestParam boolean isTurn) {
+        ApiResponse apiResponse = businessService.turnExchangeProduct(businessId,isTurn);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
     @CheckPermission("VIEW_BUSINESS")
     @GetMapping("/info")
     public HttpEntity<?> getInfo(@RequestParam String time) {
