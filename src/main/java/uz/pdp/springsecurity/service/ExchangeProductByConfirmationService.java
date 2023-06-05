@@ -24,7 +24,6 @@ public class ExchangeProductByConfirmationService {
     private final ExchangeProductBranchMapper mapper;
     private final ExchangeProductMapper exchangeProductMapper;
     private final CarRepository carRepository;
-    private final NotificationService notificationService;
     private final ExchangeProductRepository exchangeProductRepository;
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
@@ -69,7 +68,7 @@ public class ExchangeProductByConfirmationService {
         for (User allUser : allUsers) {
             List<Permissions> permissions = allUser.getRole().getPermissions();
             for (Permissions permission : permissions) {
-                if (permission.name().equals(Permissions.STOREKEEPER.name())) {
+                if (permission.name().equals(Permissions.ADD_EXCHANGE.name())) {
                     all.add(allUser);
                 }
             }
