@@ -125,6 +125,34 @@ public class ExchangeProductByConfirmationService {
         confirmation.setMessage(byConfirmationDto.getMessage() != null ? byConfirmationDto.getMessage() : "");
         repository.save(confirmation);
 
+        List<User> allUsers = userRepository.findAllByBranches_Id(confirmation.
+                getExchangeProductBranch().getReceivedBranch().getId());
+
+        List<User> all = new ArrayList<>();
+        for (User allUser : allUsers) {
+            List<Permissions> permissions = allUser.getRole().getPermissions();
+            for (Permissions permission : permissions) {
+                if (permission.name().equals(Permissions.ADD_EXCHANGE.name())) {
+                    all.add(allUser);
+                }
+            }
+        }
+
+        if (confirmation.getConfirmation() != null) {
+            if (!confirmation.getConfirmation()) {
+                for (User user : all) {
+                    Notification notification = new Notification();
+                    notification.setRead(false);
+                    notification.setName("Mahsulotlar o'tqazmasi bekor qilindi!");
+                    notification.setMessage(confirmation.getExchangeProductBranch().getShippedBranch().getName() + " filliali so'ralgan maxsulotlarni rad etdi! " +
+                            confirmation.getMessage());
+                    notification.setUserTo(user);
+                    notification.setType(NotificationType.NEW_EXCHANGE_PRODUCT);
+                    notificationRepository.save(notification);
+                }
+            }
+        }
+
         return new ApiResponse("edited", true);
     }
 
@@ -138,7 +166,7 @@ public class ExchangeProductByConfirmationService {
         confirmationDto.setId(confirmation.getId());
         confirmationDto.setExchangeProductBranchDTO(productBranchDTO);
         confirmationDto.setCarId(confirmation.getCar() != null ? confirmation.getCar().getId() : null);
-        confirmationDto.setMessage(confirmationDto.getMessage() != null ? confirmationDto.getMessage() : "");
+        confirmationDto.setMessage(confirmation.getMessage() != null ? confirmation.getMessage() : "");
         confirmationDto.setConfirmation(confirmation.getConfirmation() != null ? confirmation.getConfirmation() : null);
 
         confirmationDto.setReceivedBranchName(confirmation.getExchangeProductBranch().getReceivedBranch().getName() != null ?
