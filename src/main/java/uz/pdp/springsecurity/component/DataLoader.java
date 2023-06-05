@@ -912,7 +912,7 @@ public class DataLoader implements CommandLineRunner {
                     shablonRepository.save(shablon3);
                 }
             }
-//            updatePermission(); // TODO: 5/29/2023 if you add new permission
+            updatePermission(); // TODO: 5/29/2023 if you add new permission
         }
     }
 
