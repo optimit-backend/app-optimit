@@ -17,5 +17,5 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     List<Payment> findAllByPayMethodId(UUID businessId);
     List<Payment> findAllByTradeId(UUID tradeId);
     boolean existsByTradeId(UUID tradeId);
-
+    void deleteAllByTradeId(UUID tradeId);
 }
