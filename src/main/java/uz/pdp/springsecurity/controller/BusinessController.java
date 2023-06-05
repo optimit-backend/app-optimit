@@ -22,25 +22,12 @@ public class BusinessController {
 
     private final BusinessService businessService;
 
-    /**
-     * YANGI BUSINESS QO'SHISH
-     *
-     * @param businessDto
-     * @return ApiResponse(success - > true message - > ADDED)
-     */
     @PostMapping("/create")
     public HttpEntity<?> add(@RequestBody BusinessDto businessDto) {
         ApiResponse apiResponse = businessService.add(businessDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * BUSINESSNI IDSI ORQALI EDIT QILISH
-     *
-     * @param id
-     * @param businessEditDto
-     * @return ApiResponse(success - > true message - > EDITED)
-     */
     @CheckPermission("EDIT_BUSINESS")
     @PutMapping("/{id}")
     public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody BusinessEditDto businessEditDto) {
@@ -48,24 +35,13 @@ public class BusinessController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * BITTA ID ORQALI BUSINESSNI OLIB CHIQISH
-     *
-     * @param id
-     * @return ApiResponse(success - > true object - > value)
-     */
 //    @CheckPermission("VIEW_BUSINESS")
-    @PreAuthorize(value = "hasAnyAuthority('VIEW_BUSINESS', 'VIEW_MY_BUSINESS')")
+//    @PreAuthorize(value = "hasAnyAuthority('VIEW_BUSINESS', 'ADD_TRADE')")
     @GetMapping("/{id}")
     public HttpEntity<?> getOne(@PathVariable UUID id) {
         ApiResponse apiResponse = businessService.getOne(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-    /**
-     * @return
-     */
-
 
     @CheckPermission("VIEW_BUSINESS")
     @GetMapping("/partners")
@@ -74,12 +50,6 @@ public class BusinessController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * ID ORQALI O'CHIRISH
-     *
-     * @param id
-     * @return ApiResponse(success - > true object - > value)
-     */
     @CheckPermission("DELETE_BUSINESS")
     @DeleteMapping("/{id}")
     public HttpEntity<?> deleteOne(@PathVariable UUID id) {
