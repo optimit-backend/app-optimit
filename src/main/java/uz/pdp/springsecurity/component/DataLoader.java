@@ -912,7 +912,7 @@ public class DataLoader implements CommandLineRunner {
                     shablonRepository.save(shablon3);
                 }
             }
-            updatePermission(); // TODO: 5/29/2023 if you add new permission
+//            updatePermission(); // TODO: 5/29/2023 if you add new permission
         }
     }
 
@@ -926,7 +926,7 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void updatePermissionHelper(Optional<Role> optionalRole) {
-        List<Permissions> newPermissionList = Arrays.asList( STOREKEEPER// TODO: 5/29/2023 write new permissions here
+        List<Permissions> newPermissionList = Arrays.asList( // TODO: 5/29/2023 write new permissions here
                 );
         if (optionalRole.isPresent()) {
             Role role = optionalRole.get();
