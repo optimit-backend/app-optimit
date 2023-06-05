@@ -917,25 +917,34 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void updatePermission() {
+        List<Permissions> newPermissionList = Arrays.asList(// TODO: 5/29/2023 write new permissions here
+                EDIT_MY_BUSINESS,
+                VIEW_MY_BUSINESS);
         Optional<Role> superAdmin = roleRepository.findByName(Constants.SUPERADMIN);
         List<Role> adminList = roleRepository.findAllByName(Constants.ADMIN);
-        updatePermissionHelper(superAdmin);
-        for (Role role : adminList) {
-            updatePermissionHelper(Optional.of(role));
-        }
+        superAdmin.ifPresent(adminList::add);
+        updatePermissionHelperRole(adminList, newPermissionList);
+        updatePermissionHelperTariff(tariffRepository.findAll(), newPermissionList);
     }
 
-    private void updatePermissionHelper(Optional<Role> optionalRole) {
-        List<Permissions> newPermissionList = Arrays.asList( // TODO: 5/29/2023 write new permissions here
-                );
-        if (optionalRole.isPresent()) {
-            Role role = optionalRole.get();
+    private void updatePermissionHelperRole(List<Role> roleList, List<Permissions> newPermissionList) {
+        for (Role role : roleList) {
             List<Permissions> permissions = role.getPermissions();
             for (Permissions newPermission : newPermissionList) {
                 if (!permissions.contains(newPermission))
                     permissions.add(newPermission);
             }
-            roleRepository.save(role);
         }
+        roleRepository.saveAll(roleList);
+    }
+
+    private void updatePermissionHelperTariff(List<Tariff> tariffList, List<Permissions> newPermissionList) {
+        for (Permissions newPermission : newPermissionList) {
+            for (Tariff tariff : tariffList) {
+                if (!tariff.getPermissions().contains(newPermission))
+                    tariff.getPermissions().add(newPermission);
+            }
+        }
+        tariffRepository.saveAll(tariffList);
     }
 }
