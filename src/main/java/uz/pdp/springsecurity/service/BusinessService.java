@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.*;
@@ -24,7 +23,6 @@ public class BusinessService {
     private final BusinessRepository businessRepository;
     private final ProjectStatusRepository projectStatusRepository;
     private final TaskStatusRepository taskStatusRepository;
-    private final TaskRepository taskRepository;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final TariffRepository tariffRepository;
@@ -46,7 +44,6 @@ public class BusinessService {
     private final static LocalDateTime THIS_WEEK = TODAY.minusDays(TODAY.getDayOfWeek().ordinal());
     private final static LocalDateTime THIS_MONTH = LocalDateTime.of(TODAY.getYear(), TODAY.getMonth(), 1, 0, 0, 0);
     private final static LocalDateTime THIS_YEAR = LocalDateTime.of(TODAY.getYear(), 1, 1, 0, 0, 0);
-    private final CustomerGroupRepository customerGroupRepository;
 
     @Transactional
     public ApiResponse add(BusinessDto businessDto) {
