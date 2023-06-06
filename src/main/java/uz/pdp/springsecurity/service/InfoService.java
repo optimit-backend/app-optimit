@@ -128,7 +128,7 @@ public class InfoService {
                     outlayRepository.findAllByBranch_Id(branchId),
                     paymentRepository.findAllByTrade_BranchId(branchId),
                     outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), branchId),
-                    customerRepository.findAllByBranchIdAndDebtIsNotOrderByPayDateAsc(branchId, 0d)
+                    customerRepository.findAllByBranchesIdAndDebtIsNotOrderByPayDateAsc(branchId, 0d)
             );
         }
 
@@ -139,7 +139,7 @@ public class InfoService {
                 outlayRepository.findAllByCreatedAtBetweenAndBranchId(from, to, branchId),
                 paymentRepository.findAllByCreatedAtBetweenAndTrade_BranchId(from, to, branchId),
                 outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), branchId),
-                customerRepository.findAllByBranchIdAndDebtIsNotOrderByPayDateAsc(branchId, 0d)
+                customerRepository.findAllByBranchesIdAndDebtIsNotOrderByPayDateAsc(branchId, 0d)
         );
 
     }
@@ -196,7 +196,7 @@ public class InfoService {
                     outlayRepository.findAllByBusinessId(businessId),
                     paymentRepository.findAllByTrade_Branch_BusinessId(businessId),
                     outlayRepository.findAllByCreatedAtBetweenAndBranch_BusinessId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), businessId),
-                    customerRepository.findAllByBranch_BusinessIdAndDebtIsNotOrderByPayDateAsc(businessId, 0d)
+                    customerRepository.findAllByBusinessIdAndDebtIsNotOrderByPayDateAsc(businessId, 0d)
             );
         }
 
@@ -207,7 +207,7 @@ public class InfoService {
                 outlayRepository.findAllByCreatedAtBetweenAndBranch_BusinessId(from, to, businessId),
                 paymentRepository.findAllByCreatedAtBetweenAndTrade_Branch_BusinessId(from, to, businessId),
                 outlayRepository.findAllByCreatedAtBetweenAndBranch_BusinessId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), businessId),
-                customerRepository.findAllByBranch_BusinessIdAndDebtIsNotOrderByPayDateAsc(businessId, 0d)
+                customerRepository.findAllByBusinessIdAndDebtIsNotOrderByPayDateAsc(businessId, 0d)
         );
 
     }

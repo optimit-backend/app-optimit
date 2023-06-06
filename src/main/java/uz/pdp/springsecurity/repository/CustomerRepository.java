@@ -17,16 +17,17 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     List<Customer> findAllByBusiness_IdAndDebtIsNotOrderByPayDateAsc(UUID business_id, Double debt);
 
-    List<Customer> findAllByBranchId(UUID branchId);
+    List<Customer> findAllByBranchesId(UUID branchId);
 
-    List<Customer> findAllByBranchIdAndDebtIsNotOrderByPayDateAsc(UUID branchId, Double debt);
+    List<Customer> findAllByBranchesIdAndDebtIsNotOrderByPayDateAsc(UUID branchId, Double debt);
 
-    List<Customer> findAllByBranch_BusinessIdAndDebtIsNotOrderByPayDateAsc(UUID branchId, Double debt);
+    List<Customer> findAllByBusinessIdAndDebtIsNotOrderByPayDateAsc(UUID businessId, Double debt);
 
     Optional<Customer> findByPhoneNumber(String phoneNumber);
 
     List<Customer> findAllByPayDateBetweenAndBusinessId(Date payDate, Date payDate2, UUID business_id);
 
-    List<Customer> findAllByBranchIdAndLidCustomerIsTrue(UUID branch_id);
-    int countAllByBranchId(UUID branchId);
+    List<Customer> findAllByBranchesIdAndLidCustomerIsTrue(UUID branch_id);
+
+    int countAllByBranchesId(UUID branchId);
 }
