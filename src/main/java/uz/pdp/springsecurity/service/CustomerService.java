@@ -83,7 +83,6 @@ public class CustomerService {
         return new ApiResponse("FOUND", true, toCustomerDtoList(customerList));
     }
 
-
     private List<CustomerDto> toCustomerDtoList(List<Customer> customerList) {
         List<CustomerDto> customerDtoList = new ArrayList<>();
         for (Customer customer : customerList) {
@@ -110,15 +109,7 @@ public class CustomerService {
         if (repaymentDto.getPayDate() == null) return new ApiResponse("PAY_DATE NOT FOUND", false);
         Customer customer = optionalCustomer.get();
         if (repaymentDto.getRepayment() != null) {
-            if (repaymentDto.getRepayment() < 0) {
-                customer.setDebt(customer.getDebt() + repaymentDto.getRepayment());
-            } else {
-                if (customer.getDebt() < 0) {
-                    customer.setDebt(customer.getDebt() + repaymentDto.getRepayment());
-                } else {
-                    customer.setDebt(customer.getDebt() - repaymentDto.getRepayment());
-                }
-            }
+            customer.setDebt(customer.getDebt() - repaymentDto.getRepayment());
             customer.setPayDate(repaymentDto.getPayDate());
             customerRepository.save(customer);
             try {

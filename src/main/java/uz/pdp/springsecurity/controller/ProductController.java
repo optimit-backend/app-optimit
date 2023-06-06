@@ -1,6 +1,6 @@
 package uz.pdp.springsecurity.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +10,6 @@ import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductBarcodeDto;
 import uz.pdp.springsecurity.payload.ProductDto;
-import uz.pdp.springsecurity.repository.ProductRepository;
 import uz.pdp.springsecurity.service.ProductService;
 import uz.pdp.springsecurity.utils.AppConstant;
 
@@ -21,13 +20,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/product")
+@RequiredArgsConstructor
 public class ProductController {
-
-    @Autowired
-    ProductService productService;
-
-    @Autowired
-    ProductRepository productRepository;
+    private final ProductService productService;
 
     @CheckPermission("ADD_PRODUCT")
     @PostMapping()

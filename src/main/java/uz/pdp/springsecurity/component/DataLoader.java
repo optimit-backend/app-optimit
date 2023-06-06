@@ -53,7 +53,6 @@ public class DataLoader implements CommandLineRunner {
     @Value("${spring.sql.init.mode}")
     private String initMode;
     private final ShablonRepository shablonRepository;
-    private final CustomerGroupRepository customerGroupRepository;
 
     @Override
     public void run(String... args) {
