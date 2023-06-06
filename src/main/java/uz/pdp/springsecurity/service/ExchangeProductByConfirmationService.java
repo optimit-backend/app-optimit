@@ -147,7 +147,7 @@ public class ExchangeProductByConfirmationService {
                     notification.setMessage(confirmation.getExchangeProductBranch().getShippedBranch().getName() + " filliali so'ralgan maxsulotlarni rad etdi! " +
                             confirmation.getMessage());
                     notification.setUserTo(user);
-                    notification.setType(NotificationType.NEW_EXCHANGE_PRODUCT);
+                    notification.setType(NotificationType.REJECTION);
                     notificationRepository.save(notification);
                 }
             }
