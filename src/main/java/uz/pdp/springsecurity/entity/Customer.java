@@ -48,7 +48,7 @@ public class Customer extends AbsEntity {
 
     private Date birthday;
 
-    private double debt;
+    private double debt = 0;
 
     private Date payDate = new Date();
 

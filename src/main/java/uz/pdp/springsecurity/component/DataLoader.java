@@ -53,7 +53,6 @@ public class DataLoader implements CommandLineRunner {
     @Value("${spring.sql.init.mode}")
     private String initMode;
     private final ShablonRepository shablonRepository;
-    private final CustomerGroupRepository customerGroupRepository;
 
     @Override
     public void run(String... args) {
@@ -912,14 +911,13 @@ public class DataLoader implements CommandLineRunner {
                     shablonRepository.save(shablon3);
                 }
             }
-            updatePermission(); // TODO: 5/29/2023 if you add new permission
+//            updatePermission(); // TODO: 5/29/2023 if you add new permission
         }
     }
 
     private void updatePermission() {
         List<Permissions> newPermissionList = Arrays.asList(// TODO: 5/29/2023 write new permissions here
-                EDIT_MY_BUSINESS,
-                VIEW_MY_BUSINESS);
+                );
         Optional<Role> superAdmin = roleRepository.findByName(Constants.SUPERADMIN);
         List<Role> adminList = roleRepository.findAllByName(Constants.ADMIN);
         superAdmin.ifPresent(adminList::add);

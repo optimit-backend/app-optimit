@@ -42,7 +42,7 @@ public class TradeDTO {
     /**
      * qarz
      */
-    private double debtSum = 0d;
+    private double debtSum;
 
     /**
      * product idlari
