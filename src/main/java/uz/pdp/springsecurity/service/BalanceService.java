@@ -33,7 +33,7 @@ public class BalanceService {
                 newBalanceHistory.setAccountSumma(balance.getAccountSumma());
 
                 double totalSumma;
-                if (isPlus) {
+                if (Boolean.TRUE.equals(isPlus)) {
                     totalSumma = balance.getAccountSumma() + summa;
                 } else {
                     totalSumma = balance.getAccountSumma() - summa;
