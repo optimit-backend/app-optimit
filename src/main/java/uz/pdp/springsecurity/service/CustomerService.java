@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.StatusName;
@@ -14,19 +13,9 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
-
-    @Autowired
-    CustomerGroupRepository customerGroupRepository;
-
-    @Autowired
-    CustomerRepository customerRepository;
-
-    @Autowired
-    BusinessRepository businessRepository;
-
-    @Autowired
-    BranchRepository branchRepository;
-
+    private final CustomerGroupRepository customerGroupRepository;
+    private final CustomerRepository customerRepository;
+    private final BranchRepository branchRepository;
     private final CustomerMapper mapper;
     private final TradeRepository tradeRepository;
     private final PaymentRepository paymentRepository;
@@ -34,67 +23,38 @@ public class CustomerService {
     private final BalanceService balanceService;
 
     public ApiResponse add(CustomerDto customerDto) {
-
-        Optional<Business> optionalBusiness = businessRepository.findById(customerDto.getBusinessId());
-        if (optionalBusiness.isEmpty()) {
-            return new ApiResponse("BUSINESS NOT FOUND", false);
-        }
-
-        Optional<Branch> optionalBranch = branchRepository.findById(customerDto.getBranchId());
-        if (optionalBranch.isEmpty()) {
-            return new ApiResponse("BRANCH NOT FOUND", false);
-        }
-
-        Customer customer = mapper.toEntity(customerDto);
-        if (customerDto.getCustomerGroupId() != null) {
-            Optional<CustomerGroup> customerGroupOptional = customerGroupRepository.findById(customerDto.getCustomerGroupId());
-            customerGroupOptional.ifPresent(customer::setCustomerGroup);
-        }
-        customer.setLidCustomer(customerDto.getLidCustomer());
-        customerRepository.save(customer);
-        return new ApiResponse("ADDED", true);
+        return createEdit(new Customer(), customerDto);
     }
 
     public ApiResponse edit(UUID id, CustomerDto customerDto) {
-
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
-        if (optionalCustomer.isEmpty()) {
-            return new ApiResponse("NOT FOUND ", false);
-        }
+        return optionalCustomer.map(customer -> createEdit(customer, customerDto)).orElseGet(() -> new ApiResponse("CUSTOMER NOT FOUND ", false));
+    }
 
-        Optional<Business> optionalBusiness = businessRepository.findById(customerDto.getBusinessId());
-        if (optionalBusiness.isEmpty()) {
+    private ApiResponse createEdit(Customer customer, CustomerDto customerDto) {
+        List<Branch> branches = branchRepository.findAllById(customerDto.getBranches());
+        if (branches.isEmpty())
             return new ApiResponse("BRANCH NOT FOUND", false);
-        }
+        customer.setBranches(branches);
 
-        Optional<Branch> optionalBranch = branchRepository.findById(customerDto.getBranchId());
-        if (optionalBranch.isEmpty()) {
-            return new ApiResponse("BRANCH NOT FOUND", false);
-        }
-        CustomerGroup customerGroup = null;
         if (customerDto.getCustomerGroupId() != null) {
             Optional<CustomerGroup> optionalCustomerGroup = customerGroupRepository.findById(customerDto.getCustomerGroupId());
-            if (optionalCustomerGroup.isPresent()) {
-                customerGroup = optionalCustomerGroup.get();
-            }
-
+            optionalCustomerGroup.ifPresent(customer::setCustomerGroup);
         }
-        Customer customer = optionalCustomer.get();
 
         customer.setName(customerDto.getName());
-        customer.setPayDate(customerDto.getPayDate());
         customer.setPhoneNumber(customerDto.getPhoneNumber());
         customer.setTelegram(customerDto.getTelegram());
+        customer.setBirthday(customerDto.getBirthday());
         customer.setDebt(customerDto.getDebt());
-        if (customerGroup != null) {
-            customer.setCustomerGroup(customerGroup);
-        }
-        customer.setBusiness(optionalBusiness.get());
-        customer.setBranch(optionalBranch.get());
+        customer.setPayDate(customerDto.getPayDate());
+        customer.setLidCustomer(customerDto.getLidCustomer());
+
+        customer.setBusiness(branches.get(0).getBusiness()); // TODO: 6/6/2023  delete
+        customer.setBranch(branches.get(0)); // TODO: 6/6/2023  delete
 
         customerRepository.save(customer);
-
-        return new ApiResponse("EDITED", true);
+        return new ApiResponse("SUCCESS", true);
     }
 
     public ApiResponse get(UUID id) {
@@ -102,11 +62,12 @@ public class CustomerService {
         if (optional.isEmpty()) {
             return new ApiResponse("NOT FOUND", true);
         }
-        Customer customer = optional.get();
-        CustomerDto customerDto = mapper.toDto(customer);
-        if (customer.getCustomerGroup() != null) {
-            customerDto.setCustomerGroupId(customer.getCustomerGroup().getId());
+        CustomerDto customerDto = mapper.toDto(optional.get());
+        List<UUID> branches = new ArrayList<>();
+        for (Branch branch : optional.get().getBranches()) {
+            branches.add(branch.getId());
         }
+        customerDto.setBranches(branches);
         return new ApiResponse("FOUND", true, customerDto);
     }
 
@@ -117,13 +78,28 @@ public class CustomerService {
     }
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Customer> allByBusinessId = customerRepository.findAllByBusiness_Id(businessId);
-        if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, mapper.toDtoList(allByBusinessId));
+        List<Customer> customerList = customerRepository.findAllByBusiness_Id(businessId);
+        if (customerList.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        return new ApiResponse("FOUND", true, toCustomerDtoList(customerList));
+    }
+
+
+    private List<CustomerDto> toCustomerDtoList(List<Customer> customerList) {
+        List<CustomerDto> customerDtoList = new ArrayList<>();
+        for (Customer customer : customerList) {
+            CustomerDto customerDto = mapper.toDto(customer);
+            List<UUID> branches = new ArrayList<>();
+            for (Branch branch : customer.getBranches()) {
+                branches.add(branch.getId());
+            }
+            customerDto.setBranches(branches);
+            customerDtoList.add(customerDto);
+        }
+        return customerDtoList;
     }
 
     public ApiResponse getAllByBranchId(UUID branchId) {
-        List<Customer> allByBranchId = customerRepository.findAllByBranchId(branchId);
+        List<Customer> allByBranchId = customerRepository.findAllByBranchesId(branchId);
         if (allByBranchId.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, mapper.toDtoList(allByBranchId));
     }
@@ -200,7 +176,7 @@ public class CustomerService {
     }
 
     public ApiResponse getAllByLidCustomer(UUID branchId) {
-        List<Customer> all = customerRepository.findAllByBranchIdAndLidCustomerIsTrue(branchId);
+        List<Customer> all = customerRepository.findAllByBranchesIdAndLidCustomerIsTrue(branchId);
         if (all.isEmpty()) {
             return new ApiResponse("not found", false);
         }
@@ -225,8 +201,6 @@ public class CustomerService {
             response.put("profit", profit);
             responses.add(response);
         }
-
-
         return new ApiResponse("found", true, responses);
     }
 }

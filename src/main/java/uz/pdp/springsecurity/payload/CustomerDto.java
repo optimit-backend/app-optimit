@@ -3,10 +3,10 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uz.pdp.springsecurity.entity.CustomerGroup;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -28,11 +28,14 @@ public class CustomerDto {
 
     private String customerGroupName;
 
-    private double customerGroupPercent = 0;
+    private double customerGroupPercent;
 
-    private UUID businessId;
+    /*private UUID businessId;
 
-    private UUID branchId;
+    private UUID branchId;*/
+
+    @NotNull(message = "required line")
+    private List<UUID> branches;
 
     private double debt;
 
@@ -40,5 +43,6 @@ public class CustomerDto {
 
     private Date birthday;
 
+    @NotNull(message = "required line")
     private Boolean lidCustomer;
 }

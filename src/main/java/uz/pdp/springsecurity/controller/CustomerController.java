@@ -1,48 +1,29 @@
 package uz.pdp.springsecurity.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.springsecurity.annotations.CheckPermission;
-import uz.pdp.springsecurity.entity.CustomerGroup;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.CustomerDto;
 import uz.pdp.springsecurity.payload.RepaymentDto;
-import uz.pdp.springsecurity.repository.CustomerGroupRepository;
-import uz.pdp.springsecurity.repository.CustomerRepository;
 import uz.pdp.springsecurity.service.CustomerExcelService;
 import uz.pdp.springsecurity.service.CustomerService;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.net.URLConnection;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/customer")
+@RequiredArgsConstructor
 public class CustomerController {
-    @Autowired
-    CustomerRepository customerRepository;
+    private final CustomerService customerService;
 
-    @Autowired
-    CustomerService customerService;
+    private final CustomerExcelService customerExcelService;
 
-    @Autowired
-    CustomerExcelService customerExcelService;
-    @Autowired
-    private CustomerGroupRepository customerGroupRepository;
-
-    /**
-     * YANGI CUSTOMER QO'SHISH MIJOZ YANI
-     *
-     * @param customerDto
-     * @return ApiResponse(success - > true message - > ADDED)
-     */
     @CheckPermission("ADD_CUSTOMER")
     @PostMapping
     public HttpEntity<?> addCustomer(@Valid @RequestBody CustomerDto customerDto) {
@@ -50,13 +31,6 @@ public class CustomerController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * CUSTOMERNI EDIT QILSIH ID ORQALI
-     *
-     * @param id
-     * @param customerDto
-     * @return ApiResponse(success - > true message - > EDITED)
-     */
     @CheckPermission("EDIT_CUSTOMER")
     @PutMapping("/{id}")
     public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody CustomerDto customerDto) {
@@ -64,12 +38,6 @@ public class CustomerController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * ID ORQALI BITTA MIJOZNI CUSTOMERNI OLIB CIQISH
-     *
-     * @param id
-     * @return ApiResponse(success - > true object - > value)
-     */
     @CheckPermission("VIEW_CUSTOMER")
     @GetMapping("/{id}")
     public HttpEntity<?> get(@PathVariable UUID id) {
@@ -77,12 +45,6 @@ public class CustomerController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * CUSTOMERNI MIJOZNI DELETE QILSIH
-     *
-     * @param id
-     * @return ApiResponse(success - > true message - > DELETED)
-     */
     @CheckPermission("DELETE_CUSTOMER")
     @DeleteMapping("/{id}")
     public HttpEntity<?> delete(@PathVariable UUID id) {
@@ -90,12 +52,6 @@ public class CustomerController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /**
-     * BUSINESSGA TEGISHLI BARCHA CUSTOMERLARNI OLIB CHIQISH
-     *
-     * @param businessId
-     * @return ApiResponse(success - > true object - > value)
-     */
     @CheckPermission("VIEW_CUSTOMER")
     @GetMapping("/get-by-businessId/{businessId}")
     public HttpEntity<?> getAllByBusinessId(@PathVariable UUID businessId) {
@@ -117,17 +73,12 @@ public class CustomerController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-
-    /**
-     * QARZNI TO'LASH
-     */
     @CheckPermission("ADD_CUSTOMER")
     @PostMapping("/repayment/{id}")
     public HttpEntity<?> addRepayment(@PathVariable UUID id, @RequestBody RepaymentDto repaymentDto) {
         ApiResponse response = customerService.repayment(id, repaymentDto);
         return ResponseEntity.status(response.isSuccess() ? 201 : 409).body(response);
     }
-
 
     @PostMapping("/import/{branchId}")
     public ResponseEntity<?> importCustomersFromExcel(@PathVariable UUID branchId, @RequestParam("file") MultipartFile file) throws IOException {
@@ -149,5 +100,4 @@ public class CustomerController {
         ApiResponse apiResponse = customerService.getAllByLidCustomer(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
 }

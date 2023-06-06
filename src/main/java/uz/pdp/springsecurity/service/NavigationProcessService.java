@@ -100,7 +100,7 @@ public class NavigationProcessService {
         double producedProductAmount = producedProductAmountNull == null ? 0 : producedProductAmountNull;
         Double producedProductPriceNull = productionRepository.priceByCreatedAtBetweenAndBranchId(Timestamp.valueOf(dateStart.minusDays(1)), Timestamp.valueOf(dateStart), branch.getId());
         double producedProductPrice = producedProductPriceNull == null ? 0 : producedProductPriceNull;
-        double customer = customerRepository.countAllByBranchId(branch.getId());
+        double customer = customerRepository.countAllByBranchesId(branch.getId());
         double lid = lidRepository.countAllByCreatedAtBetweenAndBusinessId(Timestamp.valueOf(dateStart.minusDays(1)), Timestamp.valueOf(dateStart), branch.getBusiness().getId());
 
         Double lidPriceNull = formLidHistoryRepository.lidPriceByCreatedAtBetweenAndBusinessId(Timestamp.valueOf(TODAY_START.minusDays(30)), Timestamp.valueOf(TODAY_START), branch.getId());
@@ -181,7 +181,7 @@ public class NavigationProcessService {
         double producedProductPriceGoal = Math.round(producedProductPrice * times / 100) * 100;
         double producedProductPriceStep = (producedProductPriceGoal - producedProductPrice) / day;
 
-        double customer = customerRepository.countAllByBranchId(branch.getId());
+        double customer = customerRepository.countAllByBranchesId(branch.getId());
         double customerGoal = Math.ceil(customer * times);
         double customerStep = (customerGoal - customer) / day;
 
