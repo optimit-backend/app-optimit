@@ -40,6 +40,8 @@ public class CustomerService {
         if (customerDto.getCustomerGroupId() != null) {
             Optional<CustomerGroup> optionalCustomerGroup = customerGroupRepository.findById(customerDto.getCustomerGroupId());
             optionalCustomerGroup.ifPresent(customer::setCustomerGroup);
+        }else{
+            customer.setCustomerGroup(null);
         }
 
         customer.setName(customerDto.getName());
