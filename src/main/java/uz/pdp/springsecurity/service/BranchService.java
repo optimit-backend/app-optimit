@@ -1,11 +1,9 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.enums.BalanceType;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.BranchDto;
 import uz.pdp.springsecurity.repository.*;
@@ -17,20 +15,12 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BranchService {
-    @Autowired
-    BranchRepository branchRepository;
 
-    @Autowired
-    AddressRepository addressRepository;
-
-    @Autowired
-    TaskStatusRepository taskStatusRepository;
-
-    @Autowired
-    ProjectStatusRepository projectStatusRepository;
-
-    @Autowired
-    BusinessRepository businessRepository;
+    private final BranchRepository branchRepository;
+    private final AddressRepository addressRepository;
+    private final TaskStatusRepository taskStatusRepository;
+    private final ProjectStatusRepository projectStatusRepository;
+    private final BusinessRepository businessRepository;
     private final InvoiceService invoiceService;
     private final UserRepository userRepository;
     private final BalanceRepository balanceRepository;
@@ -61,7 +51,7 @@ public class BranchService {
 
         createProjectStatus(branch);
 
-        return new ApiResponse("Added",true);
+        return new ApiResponse("Added", true);
     }
 
     private void createProjectStatus(Branch branch) {
