@@ -48,10 +48,7 @@ public class WarehouseService {
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
                 if (warehouse.getAmount() < 0) {
-//                    TradeProduct tradeProduct = new TradeProduct();
-//                    tradeProduct.setProduct(product);
                     amount = -warehouse.getAmount();
-//                    fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, amount > quantity ? quantity : amount);
                 }
                 warehouse.setAmount(warehouse.getAmount() + quantity);
             } else {
@@ -65,10 +62,7 @@ public class WarehouseService {
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
                 if (warehouse.getAmount() < 0) {
-//                    TradeProduct tradeProduct = new TradeProduct();
-//                    tradeProduct.setProductTypePrice(productTypePrice);
                     amount = -warehouse.getAmount();
-//                    fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, amount > quantity ? quantity : amount);
                 }
                 warehouse.setAmount(warehouse.getAmount() + quantity);
             } else {

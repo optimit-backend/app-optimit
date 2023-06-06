@@ -98,9 +98,9 @@ public class CustomerService {
     }
 
     public ApiResponse getAllByBranchId(UUID branchId) {
-        List<Customer> allByBranchId = customerRepository.findAllByBranchesId(branchId);
-        if (allByBranchId.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, mapper.toDtoList(allByBranchId));
+        List<Customer> customerList = customerRepository.findAllByBranchesId(branchId);
+        if (customerList.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        return new ApiResponse("FOUND", true, toCustomerDtoList(customerList));
     }
 
     public ApiResponse repayment(UUID id, RepaymentDto repaymentDto) {
@@ -159,19 +159,19 @@ public class CustomerService {
     }
 
     public ApiResponse getAllByGroupId(UUID groupId) {
-        List<Customer> allCustomer = customerRepository.findAllByCustomerGroupId(groupId);
-        if (allCustomer.isEmpty()) {
+        List<Customer> customerList = customerRepository.findAllByCustomerGroupId(groupId);
+        if (customerList.isEmpty()) {
             return new ApiResponse("not found", false);
         }
-        return new ApiResponse("all customers", true, mapper.toDtoList(allCustomer));
+        return new ApiResponse("all customers", true, toCustomerDtoList(customerList));
     }
 
     public ApiResponse getAllByLidCustomer(UUID branchId) {
-        List<Customer> all = customerRepository.findAllByBranchesIdAndLidCustomerIsTrue(branchId);
-        if (all.isEmpty()) {
+        List<Customer> customerList = customerRepository.findAllByBranchesIdAndLidCustomerIsTrue(branchId);
+        if (customerList.isEmpty()) {
             return new ApiResponse("not found", false);
         }
-        List<CustomerDto> customerDtoList = mapper.toDtoList(all);
+        List<CustomerDto> customerDtoList = toCustomerDtoList(customerList);
         List<Map<String, Object>> responses = new ArrayList<>();
         double totalTrade = 0;
 
@@ -187,7 +187,7 @@ public class CustomerService {
             totalTrade += totalSumma;
             response.put("customer", customerDto);
             response.put("totalSumma", totalSumma);
-            response.put("size", all.size());
+            response.put("size", customerList.size());
             response.put("totalTrade", totalTrade);
             response.put("profit", profit);
             responses.add(response);

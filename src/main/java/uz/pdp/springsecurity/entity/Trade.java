@@ -61,4 +61,8 @@ public class Trade extends AbsEntity {
     private Address address;
 
     private boolean lid ;
+
+    private String dollar;
+
+    private String gross;
 }

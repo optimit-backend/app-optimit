@@ -37,7 +37,7 @@ public class TradeDTO {
     /**
      * to'langan summa
      */
-    private Double paidSum;
+    private double paidSum;
 
     /**
      * qarz
@@ -50,4 +50,8 @@ public class TradeDTO {
     private List<TradeProductDto> productTraderDto;
 
     private boolean lid;
+
+    private String dollar;
+
+    private String gross;
 }
