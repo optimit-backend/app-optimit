@@ -366,7 +366,7 @@ public class TradeService {
 
         if (trade.getCustomer() != null) {
             Customer customer = trade.getCustomer();
-            customer.setDebt(customer.getDebt() - trade.getPaidSum());
+            customer.setDebt(customer.getDebt() - (trade.getPaidSum() + trade.getDebtSum()));
         }
 
         for (Payment payment : paymentRepository.findAllByTradeId(tradeId)) {
