@@ -67,7 +67,7 @@ public class InfoService {
         List<Outlay> outlayList = new ArrayList<>();
         return getInfoHelper(businessId,
                 purchaseRepository.findAllByBranch_BusinessId(businessId),
-                tradeRepository.findAllByBranch_BusinessId(businessId),
+                tradeRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(businessId),
                 outlayRepository.findAllByBusinessId(businessId),
                 paymentRepository.findAllByPayMethod_BusinessId(businessId),
                 outlayList,// doing nothing
@@ -124,7 +124,7 @@ public class InfoService {
             return getInfoHelper(
                     businessId,
                     purchaseRepository.findAllByBranch_Id(branchId),
-                    tradeRepository.findAllByBranch_Id(branchId),
+                    tradeRepository.findAllByBranch_IdOrderByCreatedAtDesc(branchId),
                     outlayRepository.findAllByBranch_Id(branchId),
                     paymentRepository.findAllByTrade_BranchId(branchId),
                     outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), branchId),
@@ -192,7 +192,7 @@ public class InfoService {
             return getInfoHelper(
                     businessId,
                     purchaseRepository.findAllByBranch_BusinessId(businessId),
-                    tradeRepository.findAllByBranch_BusinessId(businessId),
+                    tradeRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(businessId),
                     outlayRepository.findAllByBusinessId(businessId),
                     paymentRepository.findAllByTrade_Branch_BusinessId(businessId),
                     outlayRepository.findAllByCreatedAtBetweenAndBranch_BusinessId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), businessId),

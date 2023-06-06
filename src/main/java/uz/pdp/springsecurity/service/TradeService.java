@@ -67,7 +67,7 @@ public class TradeService {
         return createOrEditTrade(trade, tradeDTO, false);
 
 
-        /*List<Trade> allTrade = tradeRepository.findAllByBranch_BusinessId(businessId);
+        /*List<Trade> allTrade = tradeRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(businessId);
         int size = allTrade.size();
 
 
@@ -164,15 +164,20 @@ public class TradeService {
 
             if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
         }
-
+        double unFrontPayment = 0;
         double debtSum = trade.getDebtSum();
         if (tradeDTO.getDebtSum() > 0 || debtSum != tradeDTO.getDebtSum()) {
             if (tradeDTO.getCustomerId() == null) return new ApiResponse("CUSTOMER NOT FOUND", false);
             Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
             if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
+            double newDebt = tradeDTO.getDebtSum() - debtSum;
             Customer customer = optionalCustomer.get();
+            double debt = -customer.getDebt() + trade.getPaidSum();
+            if (customer.getDebt() < 0 && newDebt > 0) {
+                unFrontPayment = Math.min(debt, newDebt);
+            }
             trade.setCustomer(customer);
-            customer.setDebt(customer.getDebt() - debtSum + tradeDTO.getDebtSum());
+            customer.setDebt(newDebt - debt);
             customer.setPayDate(tradeDTO.getPayDate());
             customerRepository.save(customer);
         } else if (tradeDTO.getCustomerId() != null) {
@@ -182,16 +187,19 @@ public class TradeService {
             trade.setCustomer(customer);
         }
 
-        Optional<Currency> optionalCurrency = currencyRepository.findByBusinessId(branch.getBusiness().getId());
-        if (optionalCurrency.isPresent()) {
-            trade.setDebtSumDollar(Math.round(tradeDTO.getDebtSum()/optionalCurrency.get().getCourse()*100)/100.);
-            trade.setPaidSumDollar(Math.round(tradeDTO.getPaidSum()/optionalCurrency.get().getCourse()*100)/100.);
-            trade.setTotalSumDollar(Math.round(tradeDTO.getTotalSum()/optionalCurrency.get().getCourse()*100)/100.);
-        }
+
+        trade.setDollar(tradeDTO.getDollar());
+        trade.setGross(tradeDTO.getGross());
         trade.setPayDate(tradeDTO.getPayDate());
         trade.setTotalSum(tradeDTO.getTotalSum());
-        trade.setPaidSum(tradeDTO.getPaidSum());
-        trade.setDebtSum(tradeDTO.getDebtSum());
+        trade.setPaidSum(tradeDTO.getPaidSum() + unFrontPayment);
+        trade.setDebtSum(tradeDTO.getDebtSum() - unFrontPayment);
+        Optional<Currency> optionalCurrency = currencyRepository.findByBusinessId(branch.getBusiness().getId());
+        if (optionalCurrency.isPresent()) {
+            trade.setDebtSumDollar(Math.round(trade.getDebtSum()/optionalCurrency.get().getCourse()*100)/100.);
+            trade.setPaidSumDollar(Math.round(trade.getPaidSum()/optionalCurrency.get().getCourse()*100)/100.);
+            trade.setTotalSumDollar(Math.round(trade.getTotalSum()/optionalCurrency.get().getCourse()*100)/100.);
+        }
         tradeRepository.save(trade);
 
         if (paymentRepository.existsByTradeId(trade.getId())) {
@@ -217,6 +225,7 @@ public class TradeService {
         if (paymentList.isEmpty()) {
             return new ApiResponse("PAYMENT METHOD NOT FOUND", false);
         }
+        paymentList.get(0).setPaidSum(paymentList.get(0).getPaidSum() + unFrontPayment);
         paymentRepository.saveAll(paymentList);
         trade.setPayMethod(paymentList.get(0).getPayMethod());
 
@@ -318,9 +327,9 @@ public class TradeService {
         Optional<Trade> optionalTrade = tradeRepository.findById(id);
         if (optionalTrade.isEmpty()) return new ApiResponse("NOT FOUND", false);
         Trade trade = optionalTrade.get();
-        List<TradeProduct> allByTradeId = tradeProductRepository.findAllByTradeId(trade.getId());
-        if (allByTradeId.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        for (TradeProduct tradeProduct : allByTradeId) {
+        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByTradeId(trade.getId());
+        if (tradeProductList.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        for (TradeProduct tradeProduct : tradeProductList) {
             Optional<Warehouse> optionalWarehouse;
             if (tradeProduct.getProduct() != null)
                 optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(trade.getBranch().getId(), tradeProduct.getProduct().getId());
@@ -333,29 +342,54 @@ public class TradeService {
         List<PaymentDto> paymentDtoList = paymentMapper.toDtoList(paymentList);
         TradeGetOneDto tradeGetOneDto = new TradeGetOneDto();
         tradeGetOneDto.setTrade(trade);
-        tradeGetOneDto.setTradeProductList(allByTradeId);
+        tradeGetOneDto.setTradeProductList(tradeProductList);
         tradeGetOneDto.setPaymentDtoList(paymentDtoList);
         return new ApiResponse(true, tradeGetOneDto);
     }
 
-    public ApiResponse deleteTrade(UUID id) {
-        Optional<Trade> byId = tradeRepository.findById(id);
-        if (byId.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        tradeRepository.deleteById(id);
+    public ApiResponse delete(UUID tradeId) {
+        Optional<Trade> optionalTrade = tradeRepository.findById(tradeId);
+        if (optionalTrade.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        Trade trade = optionalTrade.get();
+        if (!trade.isEditable()) return new ApiResponse("YOU CAN NOT DELETE AFTER 30 DAYS", false);
+        int days = LocalDateTime.now().getDayOfYear() - trade.getCreatedAt().toLocalDateTime().getDayOfYear();
+        if (days > 30) {
+            trade.setEditable(false);
+            return new ApiResponse("YOU CAN NOT DELETE AFTER 30 DAYS", false);
+        }
+
+        for (TradeProduct tradeProduct : tradeProductRepository.findAllByTradeId(tradeId)) {
+            double amount = warehouseService.createOrEditWareHouseHelper(trade.getBranch(), tradeProduct.getProduct(), tradeProduct.getProductTypePrice(), tradeProduct.getTradedQuantity());
+            if (amount < tradeProduct.getTradedQuantity())
+                fifoCalculationService.returnedTrade(trade.getBranch(), tradeProduct, tradeProduct.getTradedQuantity() - amount);
+        }
+
+        if (trade.getCustomer() != null) {
+            Customer customer = trade.getCustomer();
+            customer.setDebt(customer.getDebt() - trade.getPaidSum());
+        }
+
+        for (Payment payment : paymentRepository.findAllByTradeId(tradeId)) {
+            balanceService.edit(trade.getBranch().getId(), payment.getPaidSum(), Boolean.FALSE, payment.getPayMethod().getId());
+        }
+
+        tradeRepository.deleteById(tradeId);
         return new ApiResponse("DELETED", true);
     }
 
-    public ApiResponse deleteByTraderId(UUID trader_id) {
+
+
+    /*public ApiResponse deleteByTraderId(UUID trader_id) {
         if (!tradeRepository.existsByTraderId(trader_id)) return new ApiResponse("TRADER NOT FOUND", false);
         tradeRepository.deleteByTrader_Id(trader_id);
         return new ApiResponse("DELETED", true);
-    }
+    }*/
 
-    public ApiResponse deleteAllByTraderId(UUID trader_id) {
+    /*public ApiResponse deleteAllByTraderId(UUID trader_id) {
         if (!tradeRepository.existsByTraderId(trader_id)) return new ApiResponse("TRADER NOT FOUND", false);
         tradeRepository.deleteAllByTrader_Id(trader_id);
         return new ApiResponse("DELETED", true);
-    }
+    }*/
 
     public ApiResponse getAllByTraderId(UUID trader_id) {
         List<Trade> allByTrader_id = tradeRepository.findAllByTrader_Id(trader_id);
@@ -404,13 +438,13 @@ public class TradeService {
     }
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Trade> allByBusinessId = tradeRepository.findAllByBranch_BusinessId(businessId);
+        List<Trade> allByBusinessId = tradeRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(businessId);
         if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, allByBusinessId);
     }
 
     public ApiResponse getAllByBranchId(UUID branchId) {
-        List<Trade> allByBranchId = tradeRepository.findAllByBranch_Id(branchId);
+        List<Trade> allByBranchId = tradeRepository.findAllByBranch_IdOrderByCreatedAtDesc(branchId);
         if (allByBranchId.isEmpty()) {
             return new ApiResponse("not found", false);
         }

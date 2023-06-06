@@ -16,11 +16,13 @@ public interface TradeRepository extends JpaRepository<Trade, UUID> {
 
 
     Page<Trade> findAllByBranch_Business_IdAndLidIsTrue(UUID branch_business_id, Pageable pageable);
-    List<Trade> findAllByBranch_Id(UUID branch_id);
+
+    List<Trade> findAllByBranch_IdOrderByCreatedAtDesc(UUID branch_id);
+
     List<Trade> findAllByCreatedAtBetweenAndBranchId(Timestamp start, Timestamp end, UUID branch_id);
     List<Trade> findAllByCreatedAtBetweenAndBranch_BusinessId(Timestamp start, Timestamp end, UUID businessId);
 
-    List<Trade> findAllByBranch_BusinessId(UUID businessId);
+    List<Trade> findAllByBranch_BusinessIdOrderByCreatedAtDesc(UUID businessId);
 
     List<Trade> findAllByCustomer_Id(UUID customer_id);
     List<Trade> findAllByCustomerIdAndDebtSumIsNotOrderByCreatedAtAsc(UUID customerId, Double amount);
@@ -28,12 +30,6 @@ public interface TradeRepository extends JpaRepository<Trade, UUID> {
     List<Trade> findAllByPaymentStatus_Id(UUID paymentStatus_id);
 
     List<Trade> findAllByAddress_Id(UUID address_id);
-
-    void deleteByTrader_Id(UUID trader_id);
-
-    boolean existsByTraderId(UUID traderId);
-
-    void deleteAllByTrader_Id(UUID trader_id);
 
     @Query(value = "SELECT * FROM Trade t WHERE DATE(t.pay_date) = ?1", nativeQuery = true)
     List<Trade> findTradeByOneDate(Timestamp date);
