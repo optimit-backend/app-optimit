@@ -7,5 +7,6 @@ public enum NotificationType {
     NEW_PROJECT,
     NOTIFICATION,
     LESS_PRODUCT,
-    NEW_EXCHANGE_PRODUCT
+    NEW_EXCHANGE_PRODUCT,
+    REJECTION
 }
