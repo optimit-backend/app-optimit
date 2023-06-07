@@ -385,6 +385,10 @@ public class ProjectService {
             Date endDate = new Date();
             project.setExpired(!deadline.after(endDate));
             project.setEndDate(endDate);
+        } else if (projectStatus.getName().equals("Uncompleted")) {
+            project.setEndDate(null);
+        }else if (projectStatus.getName().equals("process")){
+            project.setEndDate(null);
         }
         project.setProjectStatus(projectStatus);
         projectRepository.save(project);
