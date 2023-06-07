@@ -53,20 +53,6 @@ public class TradeController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /*@CheckPermission("DELETE_MY_TRADE")
-    @DeleteMapping("/delete-by-traderId/{trader_id}")
-    public HttpEntity<?> deleteByTraderId(@PathVariable UUID trader_id) {
-        ApiResponse apiResponse = tradeService.deleteByTraderId(trader_id);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }*/
-
-    /*@CheckPermission("DELETE_MY_TRADE")
-    @DeleteMapping("/deleteAll-by-tradeId/{trader_id}")
-    public HttpEntity<?> deleteAllByTraderId(@PathVariable UUID trader_id) {
-        ApiResponse apiResponse = tradeService.deleteAllByTraderId(trader_id);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }*/
-
     @CheckPermission("VIEW_MY_TRADE")
     @GetMapping("/get-by-traderId/{trader_id}")
     public HttpEntity<?> getAllByTrader(@PathVariable UUID trader_id) {

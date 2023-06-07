@@ -65,4 +65,6 @@ public class Trade extends AbsEntity {
     private String dollar;
 
     private String gross;
+
+    private Double kpi;
 }

@@ -25,10 +25,10 @@ public class SalaryCount extends AbsEntity {
     private Branch branch;
 
     @Column(nullable = false)
-    private double count = 0;
+    private double count;
 
     @Column(nullable = false)
-    private double salary = 0;
+    private double salary;
 
     @ManyToOne(optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

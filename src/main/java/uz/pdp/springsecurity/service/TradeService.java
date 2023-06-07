@@ -64,26 +64,7 @@ public class TradeService {
         Trade trade = new Trade();
         trade.setBranch(optionalBranch.get());
         trade.setLid(tradeDTO.isLid());
-        return createOrEditTrade(trade, tradeDTO, false);
-
-
-        /*List<Trade> allTrade = tradeRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(businessId);
-        int size = allTrade.size();
-
-
-        Optional<Subscription> optionalSubscription = subscriptionRepository.findByBusinessIdAndActiveTrue(businessId);
-        if (optionalSubscription.isEmpty()) {
-            return new ApiResponse("tariff aktiv emas", false);
-        }
-
-        Subscription subscription = optionalSubscription.get();
-
-        if (subscription.getTariff().getTradeAmount() >= size || subscription.getTariff().getTradeAmount() == 0) {
-            Trade trade = new Trade();
-            trade.setLid(tradeDTO.isLid());
-            return createOrEditTrade(trade, tradeDTO, false);
-        }
-        return new ApiResponse("You have opened a sufficient branch according to the trade", false);*/
+        return createOrEditTrade(trade, tradeDTO);
     }
 
     public ApiResponse edit(UUID id, TradeDTO tradeDTO) {
@@ -98,11 +79,11 @@ public class TradeService {
             trade.setEditable(false);
             return new ApiResponse("YOU CAN NOT EDIT AFTER 7 DAYS", false);
         }
-        return createOrEditTrade(trade, tradeDTO, true);
+        return createOrEditTrade(trade, tradeDTO);
     }
 
     @Transactional
-    public ApiResponse createOrEditTrade(Trade trade, TradeDTO tradeDTO, boolean edit) {
+    public ApiResponse createOrEditTrade(Trade trade, TradeDTO tradeDTO) {
         Branch branch = trade.getBranch();
 
         Optional<User> optionalUser = userRepository.findById(tradeDTO.getUserId());
@@ -274,11 +255,9 @@ public class TradeService {
             }
         }
         trade.setTotalProfit(profit);
+        countKPI(optionalAgreementKpi.get(), trade, tradeProductList);
         tradeRepository.save(trade);
         tradeProductRepository.saveAll(tradeProductList);
-        if (!edit) {
-            countKPI(optionalAgreementKpi.get(), trade, tradeProductList);
-        }
 
         balanceService.edit(branch.getId(), true, tradeDTO.getPaymentDtoList());
         return new ApiResponse("SAVED!", true);
@@ -287,15 +266,18 @@ public class TradeService {
     private void countKPI(Agreement agreementKpi, Trade trade, List<TradeProduct> tradeProductList) {
         double kpiProduct = countKPIProduct(tradeProductList);
         if (agreementKpi.getPrice() > 0 || kpiProduct > 0) {
+            Double kpiD = trade.getKpi();
+            double kpi = kpiD == null ? 0 : kpiD;
             double salarySum = trade.getTotalSum() * agreementKpi.getPrice() / 100;
             salaryCountService.add(new SalaryCountDto(
                     1,
-                    salarySum + kpiProduct,
+                    salarySum + kpiProduct - kpi,
                     agreementKpi.getId(),
                     trade.getBranch().getId(),
                     new Date(),
                     "Savdo ulushi"
             ));
+            trade.setKpi(salarySum + kpiProduct);
         }
     }
 
@@ -369,6 +351,22 @@ public class TradeService {
             customer.setDebt(customer.getDebt() - (trade.getPaidSum() + trade.getDebtSum()));
         }
 
+        if (trade.getKpi() != null){
+            Optional<Agreement> optionalAgreementKpi = agreementRepository.findByUserIdAndSalaryStatus(trade.getTrader().getId(), SalaryStatus.KPI);
+            if (optionalAgreementKpi.isPresent()) {
+                double kpi = trade.getKpi();
+                salaryCountService.add(new SalaryCountDto(
+                        1,
+                        -kpi,
+                        optionalAgreementKpi.get().getId(),
+                        trade.getBranch().getId(),
+                        new Date(),
+                        "deleted trade"
+                ));
+            }
+        }
+
+
         for (Payment payment : paymentRepository.findAllByTradeId(tradeId)) {
             balanceService.edit(trade.getBranch().getId(), payment.getPaidSum(), Boolean.FALSE, payment.getPayMethod().getId());
         }
@@ -376,20 +374,6 @@ public class TradeService {
         tradeRepository.deleteById(tradeId);
         return new ApiResponse("DELETED", true);
     }
-
-
-
-    /*public ApiResponse deleteByTraderId(UUID trader_id) {
-        if (!tradeRepository.existsByTraderId(trader_id)) return new ApiResponse("TRADER NOT FOUND", false);
-        tradeRepository.deleteByTrader_Id(trader_id);
-        return new ApiResponse("DELETED", true);
-    }*/
-
-    /*public ApiResponse deleteAllByTraderId(UUID trader_id) {
-        if (!tradeRepository.existsByTraderId(trader_id)) return new ApiResponse("TRADER NOT FOUND", false);
-        tradeRepository.deleteAllByTrader_Id(trader_id);
-        return new ApiResponse("DELETED", true);
-    }*/
 
     public ApiResponse getAllByTraderId(UUID trader_id) {
         List<Trade> allByTrader_id = tradeRepository.findAllByTrader_Id(trader_id);
