@@ -2067,4 +2067,36 @@ public class ReportsService {
 
         return new ApiResponse("all trade lid", true, response);
     }
+
+
+    public ApiResponse top10Supplier(UUID branchId,Date startDate,Date endDate) {
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()){
+            return new ApiResponse("Branch not found",false);
+        }
+        List<Object[]> results;
+        if (startDate != null && endDate != null){
+            Timestamp startTimestamp = new Timestamp(startDate.getTime());
+            Timestamp endTimestamp = new Timestamp(endDate.getTime());
+            results = purchaseRepository.findTop10SuppliersByPurchaseAndDate(branchId,startTimestamp,endTimestamp);
+        }else {
+            results = purchaseRepository.findTop10SuppliersByPurchase(branchId);
+        }
+        if (results.isEmpty()){
+            return new ApiResponse("Not found",false);
+        }
+        List<Map<String, Object>> responses = new ArrayList<>();
+        for (Object[] result : results) {
+            Map<String, Object> response = new HashMap<>();
+            String supplierName = (String) result[0];
+            String supplierPhoneNumber = (String) result[1];
+            Double amount = (Double) result[2];
+            response.put("name = ", supplierName);
+            response.put("number = ", supplierPhoneNumber);
+            response.put("amount = ", amount);
+            responses.add(response);
+        }
+
+        return new ApiResponse("Found",true,responses);
+    }
 }
