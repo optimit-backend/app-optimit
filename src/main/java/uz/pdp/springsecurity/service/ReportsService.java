@@ -2091,9 +2091,9 @@ public class ReportsService {
             String supplierName = (String) result[0];
             String supplierPhoneNumber = (String) result[1];
             Double amount = (Double) result[2];
-            response.put("name = ", supplierName);
-            response.put("number = ", supplierPhoneNumber);
-            response.put("amount = ", amount);
+            response.put("name", supplierName);
+            response.put("number", supplierPhoneNumber);
+            response.put("amount", amount);
             responses.add(response);
         }
 
