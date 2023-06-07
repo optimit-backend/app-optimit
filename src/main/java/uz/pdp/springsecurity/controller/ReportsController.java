@@ -183,6 +183,15 @@ public class ReportsController {
     }
 
     @CheckPermission("VIEW_REPORT")
+    @GetMapping("/get-top-supplier/{branchId}")
+    public HttpEntity<?> top10Supplier(@PathVariable UUID branchId,
+                                       @RequestParam(required = false) Date startDate,
+                                       @RequestParam(required = false) Date endDate) {
+        ApiResponse apiResponse = reportsService.top10Supplier(branchId,startDate,endDate);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_REPORT")
     @GetMapping("/get-trade-by-lid/{businessId}")
     public HttpEntity<?> getLidTradeReport(@PathVariable UUID businessId,
                                             @RequestParam(defaultValue = "10") int size,
