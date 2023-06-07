@@ -1,7 +1,9 @@
 package uz.pdp.springsecurity.mapper;
 
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import uz.pdp.springsecurity.entity.ExchangeProduct;
 import uz.pdp.springsecurity.payload.ExchangeProductDTO;
 
@@ -26,5 +28,16 @@ public interface ExchangeProductMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "product.id", source = "productExchangeId")
     ExchangeProduct toEntity(ExchangeProductDTO exchangeProductDTO);
+
+    @InheritInverseConfiguration
+    @Mapping(target = "productTypePrice", ignore = true)
+    @Mapping(target = "updateAt", ignore = true)
+    @Mapping(target = "product", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "product.id", source = "productExchangeId")
+    void update(ExchangeProductDTO exchangeProductDTO, @MappingTarget ExchangeProduct exchangeProduct);
+
+    void update(List<ExchangeProductDTO> exchangeProductDTOList, @MappingTarget List<ExchangeProduct> exchangeProductList);
 
 }

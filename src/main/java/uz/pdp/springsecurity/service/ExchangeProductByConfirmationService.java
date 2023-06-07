@@ -1,6 +1,7 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.NotificationType;
@@ -52,6 +53,7 @@ public class ExchangeProductByConfirmationService {
 
         ExchangeProductBranch entity = mapper.toEntity(byConfirmationDto.getExchangeProductBranchDTO());
         entity.setExchangeProductList(exchangeProductList);
+
         ExchangeProductBranch save = exchangeProductBranchRepository.save(entity);
         for (ExchangeProductDTO exchangeProductDTO : byConfirmationDto.getExchangeProductBranchDTO().getExchangeProductDTOS()) {
             exchangeProductRepository.save(exchangeProductMapper.toEntity(exchangeProductDTO));
@@ -64,15 +66,7 @@ public class ExchangeProductByConfirmationService {
                 getExchangeProductBranchDTO().
                 getShippedBranchId());
 
-        List<User> all = new ArrayList<>();
-        for (User allUser : allUsers) {
-            List<Permissions> permissions = allUser.getRole().getPermissions();
-            for (Permissions permission : permissions) {
-                if (permission.name().equals(Permissions.ADD_EXCHANGE.name())) {
-                    all.add(allUser);
-                }
-            }
-        }
+        List<User> all = getUsers(allUsers);
 
         for (User user : all) {
             Notification notification = new Notification();
@@ -115,19 +109,81 @@ public class ExchangeProductByConfirmationService {
         ExchangeProductByConfirmation confirmation = optional.get();
 
         mapper.update(byConfirmationDto.getExchangeProductBranchDTO(), confirmation.getExchangeProductBranch());
-
+        exchangeProductMapper.update(byConfirmationDto.getExchangeProductBranchDTO().getExchangeProductDTOS(), confirmation.getExchangeProductBranch().getExchangeProductList());
         if (byConfirmationDto.getCarId() != null) {
             Optional<Car> optionalCar = carRepository.findById(byConfirmationDto.getCarId());
             optionalCar.ifPresent(confirmation::setCar);
         }
-
         confirmation.setConfirmation(byConfirmationDto.getConfirmation() != null ? byConfirmationDto.getConfirmation() : null);
         confirmation.setMessage(byConfirmationDto.getMessage() != null ? byConfirmationDto.getMessage() : "");
+        exchangeProductRepository.saveAll(confirmation.getExchangeProductBranch().getExchangeProductList());
         repository.save(confirmation);
 
-        List<User> allUsers = userRepository.findAllByBranches_Id(confirmation.
-                getExchangeProductBranch().getReceivedBranch().getId());
 
+        UUID userBranchId = byConfirmationDto.getUserBranchId();
+        if (confirmation.getExchangeProductBranch().getShippedBranch().getId().equals(userBranchId)) {
+            List<User> allUsers = userRepository.findAllByBranches_Id(confirmation.
+                    getExchangeProductBranch().getReceivedBranch().getId());
+            List<User> all = getUsers(allUsers);
+            if (confirmation.getConfirmation() != null && (Boolean.FALSE.equals(confirmation.getConfirmation()))) {
+                for (User user : all) {
+                    Notification notification = new Notification();
+                    notification.setRead(false);
+                    notification.setName("Mahsulotlar o'tqazmasi bekor qilindi!");
+                    notification.setMessage(confirmation.getExchangeProductBranch().getShippedBranch().getName() + " filliali so'ralgan maxsulotlarni rad etdi! " +
+                            confirmation.getMessage());
+                    notification.setUserTo(user);
+                    notification.setType(NotificationType.REJECTION);
+                    notification.setObjectId(confirmation.getId());
+                    notificationRepository.save(notification);
+                }
+            } else {
+                for (User user : all) {
+                    Notification notification = new Notification();
+                    notification.setRead(false);
+                    notification.setName("Mahsulotlar o'tqazmasi tasdiqlandi!");
+                    notification.setMessage(confirmation.getExchangeProductBranch().getShippedBranch().getName() + " filliali so'ralgan maxsulotlarni tasdiqlandi! " +
+                            confirmation.getMessage());
+                    notification.setUserTo(user);
+                    notification.setType(NotificationType.CONFIRMED);
+                    notification.setObjectId(confirmation.getId());
+                    notificationRepository.save(notification);
+                }
+            }
+        } else {
+            List<User> allUsers = userRepository.findAllByBranches_Id(confirmation.
+                    getExchangeProductBranch().getShippedBranch().getId());
+            List<User> all = getUsers(allUsers);
+            if (confirmation.getConfirmation() != null && (Boolean.FALSE.equals(confirmation.getConfirmation()))) {
+                for (User user : all) {
+                    Notification notification = new Notification();
+                    notification.setRead(false);
+                    notification.setName("Mahsulotlar o'tqazmasi bekor qilindi!");
+                    notification.setMessage(confirmation.getExchangeProductBranch().getReceivedBranch().getName() + " filliali maxsulotlarni rad etdi! " +
+                            confirmation.getMessage());
+                    notification.setUserTo(user);
+                    notification.setType(NotificationType.REJECTION);
+                    notificationRepository.save(notification);
+                }
+            } else {
+                for (User user : all) {
+                    Notification notification = new Notification();
+                    notification.setRead(false);
+                    notification.setName("Mahsulotlar o'tqazmasi tasdiqlandi!");
+                    notification.setMessage(confirmation.getExchangeProductBranch().getReceivedBranch().getName() + " filliali maxsulotlarni tasdiqladi! " +
+                            confirmation.getMessage());
+                    notification.setUserTo(user);
+                    notification.setType(NotificationType.CONFIRMED);
+                    notificationRepository.save(notification);
+                }
+            }
+        }
+
+        return new ApiResponse("edited", true);
+    }
+
+    @NotNull
+    private static List<User> getUsers(List<User> allUsers) {
         List<User> all = new ArrayList<>();
         for (User allUser : allUsers) {
             List<Permissions> permissions = allUser.getRole().getPermissions();
@@ -137,23 +193,7 @@ public class ExchangeProductByConfirmationService {
                 }
             }
         }
-
-        if (confirmation.getConfirmation() != null) {
-            if (!confirmation.getConfirmation()) {
-                for (User user : all) {
-                    Notification notification = new Notification();
-                    notification.setRead(false);
-                    notification.setName("Mahsulotlar o'tqazmasi bekor qilindi!");
-                    notification.setMessage(confirmation.getExchangeProductBranch().getShippedBranch().getName() + " filliali so'ralgan maxsulotlarni rad etdi! " +
-                            confirmation.getMessage());
-                    notification.setUserTo(user);
-                    notification.setType(NotificationType.REJECTION);
-                    notificationRepository.save(notification);
-                }
-            }
-        }
-
-        return new ApiResponse("edited", true);
+        return all;
     }
 
 

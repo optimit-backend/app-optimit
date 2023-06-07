@@ -20,7 +20,7 @@ public class CarService {
     private final CarMapper mapper;
 
     public ApiResponse add(CarDto carDto) {
-        Car save = repository.save(mapper.toEntity(carDto));
+        repository.save(mapper.toEntity(carDto));
         return new ApiResponse("saved", true);
     }
 
