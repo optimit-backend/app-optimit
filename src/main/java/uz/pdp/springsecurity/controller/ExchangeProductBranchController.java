@@ -68,7 +68,7 @@ public class ExchangeProductBranchController {
      */
     @CheckPermission("DELETE_EXCHANGE")
     @DeleteMapping("/{id}")
-    public HttpEntity<?> deleteOne(@PathVariable UUID id) {
+    public HttpEntity<ApiResponse> deleteOne(@PathVariable UUID id) {
         ApiResponse apiResponse = exchangeProductBranchService.deleteOne(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
@@ -103,8 +103,9 @@ public class ExchangeProductBranchController {
 
     /**
      * BUSINESS ID ORQALI BUSINESSGA TEGISHLI O'TKAZMALARNI KO'RIB CHIQISH
+     *
+     * @return ApiResponse(success - > true object - > value)
      * @Id businessId
-     * @return  ApiResponse(success - > true object - > value)
      */
     @CheckPermission("VIEW_EXCHANGE_ADMIN")
     @GetMapping("/get-by-businessId/{businessId}")
@@ -115,6 +116,7 @@ public class ExchangeProductBranchController {
 
     /**
      * O'TKAZUVCHI BRANCHGA TEGISHLI BARCHA O'TKAZMLARNI OLIB CHIQISH
+     *
      * @param shippedBranch_id
      * @return ApiResponse(success - > true object - > value)
      */
@@ -128,6 +130,7 @@ public class ExchangeProductBranchController {
 
     /**
      * QABUL QILUVCHI BRAANCHGA TEGISHLI MALUMOTLARNI OLIB CHIQISH
+     *
      * @param receivedBranch_id
      * @return ApiResponse(success - > true object - > value)
      */

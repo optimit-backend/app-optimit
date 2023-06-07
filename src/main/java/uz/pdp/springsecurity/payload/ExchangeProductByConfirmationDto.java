@@ -12,7 +12,7 @@ import java.util.UUID;
 public class ExchangeProductByConfirmationDto {
     private UUID id;
 
-    private ExchangeProductBranchDTO ExchangeProductBranchDTO;
+    private ExchangeProductBranchDTO exchangeProductBranchDTO;
 
     private UUID carId;
 
@@ -23,4 +23,6 @@ public class ExchangeProductByConfirmationDto {
     private String shippedBranchName;
 
     private String receivedBranchName;
+
+    private UUID userBranchId;
 }
