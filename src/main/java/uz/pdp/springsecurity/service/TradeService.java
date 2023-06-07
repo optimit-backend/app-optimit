@@ -2,6 +2,9 @@ package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.entity.Customer;
@@ -12,7 +15,6 @@ import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
 import javax.transaction.Transactional;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -48,6 +50,7 @@ public class TradeService {
     private final SalaryCountService salaryCountService;
     private final AgreementRepository agreementRepository;
     private final BalanceService balanceService;
+    private final BusinessRepository businessRepository;
 
     @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
@@ -61,9 +64,17 @@ public class TradeService {
             return new ApiResponse("NOT FOUND ACTIVE TARIFF", false);
         }
 
+        Optional<Trade> optionalTrade = tradeRepository.findFirstByBranchIdOrderByCreatedAtDesc(tradeDTO.getBranchId());
+        int invoice = 0;
+        if (optionalTrade.isPresent()){
+            String invoiceStr = optionalTrade.get().getInvoice();
+            invoice = invoiceStr != null ? Integer.parseInt(invoiceStr) : 0;
+        }
+
         Trade trade = new Trade();
         trade.setBranch(optionalBranch.get());
         trade.setLid(tradeDTO.isLid());
+        trade.setInvoice(String.valueOf(++invoice));
         return createOrEditTrade(trade, tradeDTO);
     }
 
@@ -168,7 +179,6 @@ public class TradeService {
             trade.setCustomer(customer);
         }
 
-
         trade.setDollar(tradeDTO.getDollar());
         trade.setGross(tradeDTO.getGross());
         trade.setPayDate(tradeDTO.getPayDate());
@@ -260,7 +270,7 @@ public class TradeService {
         tradeProductRepository.saveAll(tradeProductList);
 
         balanceService.edit(branch.getId(), true, tradeDTO.getPaymentDtoList());
-        return new ApiResponse("SAVED!", true);
+        return new ApiResponse("SAVED!", true, trade.getInvoice());
     }
 
     private void countKPI(Agreement agreementKpi, Trade trade, List<TradeProduct> tradeProductList) {
@@ -375,35 +385,35 @@ public class TradeService {
         return new ApiResponse("DELETED", true);
     }
 
-    public ApiResponse getAllByTraderId(UUID trader_id) {
+   /* public ApiResponse getAllByTraderId(UUID trader_id) {
         List<Trade> allByTrader_id = tradeRepository.findAllByTrader_Id(trader_id);
         if (allByTrader_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         return new ApiResponse("FOUND", true, allByTrader_id);
-    }
+    }*/
 
-    public ApiResponse getByCustomerId(UUID customer_id) {
+    /*public ApiResponse getByCustomerId(UUID customer_id) {
         List<Trade> allByCustomer_id = tradeRepository.findAllByCustomer_Id(customer_id);
         if (allByCustomer_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         return new ApiResponse("FOUND", true, allByCustomer_id);
-    }
+    }*/
 
-    public ApiResponse getByPayDate(Timestamp payDate) {
+    /*public ApiResponse getByPayDate(Timestamp payDate) {
         List<Trade> allByPayDate = tradeRepository.findTradeByOneDate(payDate);
         if (allByPayDate.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         return new ApiResponse("FOUND", true, allByPayDate);
-    }
+    }*/
 
-    public ApiResponse getByPayStatus(UUID paymentStatus_id) {
+    /*public ApiResponse getByPayStatus(UUID paymentStatus_id) {
         List<Trade> allByPaymentStatus_id = tradeRepository.findAllByPaymentStatus_Id(paymentStatus_id);
         if (allByPaymentStatus_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         return new ApiResponse("FOUND", true, allByPaymentStatus_id);
-    }
+    }*/
 
-    public ApiResponse getByPayMethod(UUID payMethod_id) {
+    /*public ApiResponse getByPayMethod(UUID payMethod_id) {
         List<Trade> allByPaymentMethod_id = new ArrayList<>();
         List<Payment> paymentList = paymentRepository.findAllByPayMethodId(payMethod_id);
         for (Payment payment : paymentList) {
@@ -412,17 +422,38 @@ public class TradeService {
         if (allByPaymentMethod_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         return new ApiResponse("FOUND", true, allByPaymentMethod_id);
-    }
+    }*/
 
-    public ApiResponse getByAddress(UUID address_id) {
+    /*public ApiResponse getByAddress(UUID address_id) {
         List<Trade> allByAddress_id = tradeRepository.findAllByAddress_Id(address_id);
         if (allByAddress_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         return new ApiResponse("FOUND", true, allByAddress_id);
+    }*/
+
+    public ApiResponse getAllByFilter(UUID id, String invoice, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Trade> tradePage;
+        if (businessRepository.existsById(id)){
+            if (invoice != null) {
+                tradePage = tradeRepository.findAllByBranch_BusinessIdAndInvoiceContainingOrderByCreatedAtDesc(id, invoice, pageable);
+            }else {
+                tradePage = tradeRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(id, pageable);
+            }
+        } else if (branchRepository.existsById(id)) {
+            if (invoice != null) {
+                tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingOrderByCreatedAtDesc(id, invoice, pageable);
+            }else {
+                tradePage = tradeRepository.findAllByBranchIdOrderByCreatedAtDesc(id, pageable);
+            }
+        }else {
+            return new ApiResponse("ID ERROR", false);
+        }
+        return new ApiResponse("SUCCESS", true, tradePage);
     }
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Trade> allByBusinessId = tradeRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(businessId);
+        List<Trade> allByBusinessId = tradeRepository.findAllByBranch_Business_IdOrderByCreatedAtDesc(businessId);
         if (allByBusinessId.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, allByBusinessId);
     }
