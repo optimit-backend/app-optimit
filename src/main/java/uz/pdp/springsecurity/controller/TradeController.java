@@ -3,13 +3,14 @@ package uz.pdp.springsecurity.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TradeDTO;
 import uz.pdp.springsecurity.service.TradeService;
+import uz.pdp.springsecurity.utils.AppConstant;
 
-import java.sql.Timestamp;
 import java.util.UUID;
 
 @RestController
@@ -53,59 +54,55 @@ public class TradeController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    /*@CheckPermission("DELETE_MY_TRADE")
-    @DeleteMapping("/delete-by-traderId/{trader_id}")
-    public HttpEntity<?> deleteByTraderId(@PathVariable UUID trader_id) {
-        ApiResponse apiResponse = tradeService.deleteByTraderId(trader_id);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }*/
-
-    /*@CheckPermission("DELETE_MY_TRADE")
-    @DeleteMapping("/deleteAll-by-tradeId/{trader_id}")
-    public HttpEntity<?> deleteAllByTraderId(@PathVariable UUID trader_id) {
-        ApiResponse apiResponse = tradeService.deleteAllByTraderId(trader_id);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }*/
-
-    @CheckPermission("VIEW_MY_TRADE")
+    /*@CheckPermission("VIEW_MY_TRADE")
     @GetMapping("/get-by-traderId/{trader_id}")
     public HttpEntity<?> getAllByTrader(@PathVariable UUID trader_id) {
         ApiResponse apiResponse = tradeService.getAllByTraderId(trader_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+    }*/
 
-    @CheckPermission("VIEW_TRADE")
+    /*@CheckPermission("VIEW_TRADE")
     @GetMapping("/get-by-customerId/{customer_id}")
     public HttpEntity<?> getByCustomer(@PathVariable UUID customer_id) {
         ApiResponse apiResponse = tradeService.getByCustomerId(customer_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+    }*/
 
-    @CheckPermission("VIEW_TRADE")
+    /*@CheckPermission("VIEW_TRADE")
     @GetMapping("/get-by-PayDate/{payDate}")
     public HttpEntity<?> getByPayDate(@PathVariable Timestamp payDate){
         ApiResponse apiResponse = tradeService.getByPayDate(payDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+    }*/
 
-    @CheckPermission("VIEW_TRADE")
+    /*@CheckPermission("VIEW_TRADE")
     @GetMapping("/get-by-PayStatusId/{paymentStatus_id}")
     public HttpEntity<?> getByPayStatus(@PathVariable UUID paymentStatus_id) {
         ApiResponse apiResponse = tradeService.getByPayStatus(paymentStatus_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+    }*/
 
-    @CheckPermission("VIEW_TRADE")
+    /*@CheckPermission("VIEW_TRADE")
     @GetMapping("/get-by-PayMethodId/{payMethod_id}")
     public HttpEntity<?> getByPayMethod(@PathVariable UUID payMethod_id) {
         ApiResponse apiResponse = tradeService.getByPayMethod(payMethod_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
+    }*/
 
-    @CheckPermission("VIEW_TRADE")
+    /*@CheckPermission("VIEW_TRADE")
     @GetMapping("/get-by-AddressId/{address_id}")
     public HttpEntity<?> getByAddress(@PathVariable UUID address_id) {
         ApiResponse apiResponse = tradeService.getByAddress(address_id);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }*/
+
+    @PreAuthorize(value = "hasAnyAuthority('VIEW_TRADE', 'VIEW_TRADE_ADMIN')")
+    @GetMapping("/get-by-filter/{id}")
+    public HttpEntity<?> getAllByFilter(@PathVariable UUID id,
+                                        @RequestParam(required = false) String invoice,
+                                        @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
+                                        @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size) {
+        ApiResponse apiResponse = tradeService.getAllByFilter(id, invoice, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -122,5 +119,4 @@ public class TradeController {
         ApiResponse apiResponse = tradeService.getAllByBusinessId(businessId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
 }

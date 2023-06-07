@@ -24,39 +24,26 @@ public class SalaryCountService {
 
     public ApiResponse add(SalaryCountDto salaryCountDto) {
         Optional<SalaryCount> optionalSalaryCount = salaryCountRepository.findByAgreementIdAndBranchId(salaryCountDto.getAgreementId(), salaryCountDto.getBranchId());
-        if (optionalSalaryCount.isEmpty())
-            return addEdit(new SalaryCount(), salaryCountDto);
-        SalaryCount salaryCount = optionalSalaryCount.get();
-        salaryCount.setCount(salaryCount.getCount()+ salaryCountDto.getCount());
-        salaryCount.setSalary(salaryCount.getSalary()+ salaryCountDto.getSalary());
+        SalaryCount salaryCount;
+        if (optionalSalaryCount.isEmpty()){
+            Optional<Branch> optionalBranch = branchRepository.findById(salaryCountDto.getBranchId());
+            if (optionalBranch.isEmpty())
+                return new ApiResponse("NOT FOUND BRANCH");
+            Optional<Agreement> optionalAgreement = agreementRepository.findById(salaryCountDto.getAgreementId());
+            if (optionalAgreement.isEmpty())
+                return new ApiResponse("AGREEMENT NOT FOUND", false);
+             salaryCount = new SalaryCount();
+             salaryCount.setBranch(optionalBranch.get());
+             salaryCount.setAgreement(optionalAgreement.get());
+        } else {
+            salaryCount = optionalSalaryCount.get();
+        }
+        salaryCount.setCount(salaryCount.getCount() + salaryCountDto.getCount());
+        salaryCount.setSalary(salaryCount.getSalary() + salaryCountDto.getSalary());
         salaryCount.setDate(salaryCountDto.getDate());
         salaryCount.setDescription(salaryCountDto.getDescription());
         salaryCountRepository.save(salaryCount);
         salaryService.add(salaryCount.getAgreement().getUser(), salaryCount.getBranch(), salaryCountDto.getSalary());
-        return new ApiResponse("SUCCESS", true);
-    }
-
-    /*public ApiResponse edit(UUID salaryCountId, SalaryCountDto salaryCountDto) {
-        Optional<SalaryCount> optionalSalaryCount = salaryCountRepository.findById(salaryCountId);
-        return optionalSalaryCount.map(salaryCount -> addEdit(salaryCount, salaryCountDto)).orElseGet(() -> new ApiResponse("SALARY COUNT NOT FOUND", false));
-    }*/
-
-    private ApiResponse addEdit(SalaryCount salaryCount, SalaryCountDto salaryCountDto) {
-        Optional<Branch> optionalBranch = branchRepository.findById(salaryCountDto.getBranchId());
-        if (optionalBranch.isEmpty())return new ApiResponse("NOT FOUND BRANCH");
-        Optional<Agreement> optionalAgreement = agreementRepository.findById(salaryCountDto.getAgreementId());
-        if (optionalAgreement.isEmpty())return new ApiResponse("AGREEMENT NOT FOUND", false);
-        Agreement agreement = optionalAgreement.get();
-        Branch branch = optionalBranch.get();
-        double salarySum = salaryCountDto.getSalary() - salaryCount.getSalary();
-        salaryCount.setCount(salaryCountDto.getCount());
-        salaryCount.setSalary(salaryCountDto.getSalary());
-        salaryCount.setDate(salaryCountDto.getDate());
-        salaryCount.setDescription(salaryCountDto.getDescription());
-        salaryCount.setAgreement(agreement);
-        salaryCount.setBranch(branch);
-        salaryCountRepository.save(salaryCount);
-        salaryService.add(agreement.getUser(), branch, salarySum);
         return new ApiResponse("SUCCESS", true);
     }
 

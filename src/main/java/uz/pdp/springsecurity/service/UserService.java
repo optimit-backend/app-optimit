@@ -21,7 +21,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RoleService roleService;
     private final BranchRepository branchRepository;
     private final BusinessRepository businessRepository;
     private final AttachmentRepository attachmentRepository;
