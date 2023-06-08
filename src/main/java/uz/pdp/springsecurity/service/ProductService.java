@@ -973,6 +973,8 @@ public class ProductService {
         List<Product> allByBarcode = productRepository.findAllByBranchIdAndActiveIsTrueAndBarcodeContainingIgnoreCase(branchId, name);
         all.addAll(allByBarcode);
         List<ProductGetForPurchaseDto> getForPurchaseDtoList = new ArrayList<>();
+        Set<Product> allProduct = new HashSet<>(all);
+        all = new ArrayList<>(allProduct);
         toViewDtoMto(branchId, getForPurchaseDtoList, all);
 
         return new ApiResponse("all", true, getForPurchaseDtoList);
