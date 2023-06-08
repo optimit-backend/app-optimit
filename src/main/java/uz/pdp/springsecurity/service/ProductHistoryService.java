@@ -34,7 +34,7 @@ public class ProductHistoryService {
         if (optionalProductHistory.isPresent()) {
             edit(optionalProductHistory.get(), plus, plusAmount, amount);
         } else {
-            if (productHistoryRepository.existsAllByCreatedAtBetween(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_START.plusDays(1)))) {
+            if (productHistoryRepository.existsAllByBranchIdAndCreatedAtBetween(branch.getId(), Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_START.plusDays(1)))) {
                 productHistoryRepository.save(new ProductHistory(
                         product,
                         productTypePrice,
@@ -44,7 +44,8 @@ public class ProductHistoryService {
                         0
                 ));
             } else {
-                createAll(branch);
+                boolean check = createAll(branch);
+                if (!check) return;
             }
             create(branch, product, productTypePrice, plus, plusAmount, amount);
         }

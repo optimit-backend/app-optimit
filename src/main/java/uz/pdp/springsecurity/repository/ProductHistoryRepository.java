@@ -14,5 +14,5 @@ public interface ProductHistoryRepository extends JpaRepository<ProductHistory, 
     Optional<ProductHistory> findByBranchIdAndProductIdAndCreatedAtBetween(UUID branchId, UUID productId,  Date from, Date to);
     Optional<ProductHistory> findByBranchIdAndProductTypePriceIdAndCreatedAtBetween(UUID branchId, UUID productTypePriceId, Date from, Date to);
 
-    boolean existsAllByCreatedAtBetween( Date from, Date to);
+    boolean existsAllByBranchIdAndCreatedAtBetween(UUID branchId, Date from, Date to);
 }

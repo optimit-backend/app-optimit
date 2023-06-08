@@ -6,12 +6,12 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.annotation.Transient;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 import uz.pdp.springsecurity.enums.Type;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -42,7 +42,8 @@ public class TradeProduct extends AbsEntity {
     private double totalSalePrice;
 
     //TOTAL PROFIT OF PRODUCT
-    private double profit = 0;
+    private double profit;
+    private Boolean subMeasurement;
 
     @Transient
     private Double remainQuantity;

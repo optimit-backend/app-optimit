@@ -27,4 +27,6 @@ public class TradeProductDto {
     private double totalSalePrice;
 
     private boolean delete = false;
+
+    boolean subMeasurement;
 }
