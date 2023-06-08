@@ -20,6 +20,8 @@ public class ProductViewDto {
     private double buyPrice;
     private double salePrice;
     private String measurementId;
+    private String subMeasurementName;
+    private double subMeasurementValue;
     private String barcode;
     private UUID photoId;
     private double amount;
