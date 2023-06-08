@@ -21,6 +21,7 @@ public class CustomerService {
     private final PaymentRepository paymentRepository;
     private final PaymentStatusRepository paymentStatusRepository;
     private final BalanceService balanceService;
+    private final RepaymentDebtRepository repaymentDebtRepository;
 
     public ApiResponse add(CustomerDto customerDto) {
         return createEdit(new Customer(), customerDto);
@@ -40,7 +41,7 @@ public class CustomerService {
         if (customerDto.getCustomerGroupId() != null) {
             Optional<CustomerGroup> optionalCustomerGroup = customerGroupRepository.findById(customerDto.getCustomerGroupId());
             optionalCustomerGroup.ifPresent(customer::setCustomerGroup);
-        }else{
+        } else {
             customer.setCustomerGroup(null);
         }
 
@@ -117,6 +118,7 @@ public class CustomerService {
             try {
                 repaymentHelper(repaymentDto.getRepayment(), customer);
                 balanceService.edit(customer.getBranch().getId(), repaymentDto.getRepayment(), true, repaymentDto.getPaymentMethodId());
+                repaymentDebtRepository.save(new RepaymentDebt(customer, repaymentDto.getRepayment()));
                 return new ApiResponse("Repayment Customer !", true);
             } catch (Exception e) {
                 return new ApiResponse("ERROR", false);

@@ -219,7 +219,7 @@ public class ReportsController {
     @CheckPermission("VIEW_REPORT")
     @GetMapping("/get-checkout/{branchId}")
     public HttpEntity<?> getCheckout(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = reportsService.getCheckout( branchId);
+        ApiResponse apiResponse = reportsService.getCheckout(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
