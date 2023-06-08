@@ -69,7 +69,7 @@ public class TradeService {
         if (optionalTrade.isPresent()){
             String invoiceStr = optionalTrade.get().getInvoice();
             invoice = invoiceStr != null ? Integer.parseInt(invoiceStr) : 0;
-        }
+        } // TODO: 6/8/2023
 
         Trade trade = new Trade();
         trade.setBranch(optionalBranch.get());
@@ -122,40 +122,46 @@ public class TradeService {
             return new ApiResponse("PRODUCT LIST NOT FOUND", false);
         }
 
-        if (!branch.getBusiness().isSaleMinus()) {
-            HashMap<UUID, Double> map = new HashMap<>();
-            for (TradeProductDto dto : tradeDTO.getProductTraderDto()) {
-                double tradedQuantity = dto.getTradedQuantity();
-                if (dto.getTradeProductId() != null) {
-                    Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(dto.getTradeProductId());
-                    if (optionalTradeProduct.isPresent()) {
-                        tradedQuantity -= optionalTradeProduct.get().getTradedQuantity();
-                        if (tradedQuantity < 0) tradedQuantity = 0d;
+        try {
+            if (!branch.getBusiness().isSaleMinus()) {
+                HashMap<UUID, Double> map = new HashMap<>();
+                for (TradeProductDto dto : tradeDTO.getProductTraderDto()) {
+                    double tradedQuantity = dto.getTradedQuantity();
+                    if (dto.getTradeProductId() != null) {
+                        Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(dto.getTradeProductId());
+                        if (optionalTradeProduct.isPresent()) {
+                            tradedQuantity -= optionalTradeProduct.get().getTradedQuantity();
+                            if (tradedQuantity < 0) tradedQuantity = 0d;
+                        }
                     }
-                }
-                if (dto.getType().equalsIgnoreCase("single")) {
-                    UUID productId = dto.getProductId();
+                    if (dto.getType().equalsIgnoreCase("single")) {
+                        UUID productId = dto.getProductId();
 //                    if (!productRepository.existsById(productId)) return new ApiResponse("PRODUCT NOT FOUND", false);
-                    map.put(productId, map.getOrDefault(productId, 0d) + tradedQuantity);
-                } else if (dto.getType().equalsIgnoreCase("many")) {
-                    UUID productId = dto.getProductTypePriceId();
+                        map.put(productId, map.getOrDefault(productId, 0d) + tradedQuantity);
+                    } else if (dto.getType().equalsIgnoreCase("many")) {
+                        UUID productId = dto.getProductTypePriceId();
 //                    if (!productTypePriceRepository.existsById(productId)) return new ApiResponse("PRODUCT NOT FOUND", false);
-                    map.put(productId, map.getOrDefault(productId, 0d) + tradedQuantity);
-                } else if (dto.getType().equalsIgnoreCase("combo")) {
-                    UUID productId = dto.getProductId();
-                    List<ProductTypeCombo> comboList = productTypeComboRepository.findAllByMainProductId(productId);
-                    if (comboList.isEmpty()) return new ApiResponse("PRODUCT NOT FOUND", false);
-                    for (ProductTypeCombo combo : comboList) {
-                        UUID contentProduct = combo.getContentProduct().getId();
-                        map.put(contentProduct, map.getOrDefault(contentProduct, 0d) + tradedQuantity * combo.getAmount());
+                        map.put(productId, map.getOrDefault(productId, 0d) + tradedQuantity);
+                    } else if (dto.getType().equalsIgnoreCase("combo")) {
+                        UUID productId = dto.getProductId();
+                        List<ProductTypeCombo> comboList = productTypeComboRepository.findAllByMainProductId(productId);
+                        if (comboList.isEmpty()) return new ApiResponse("PRODUCT NOT FOUND", false);
+                        for (ProductTypeCombo combo : comboList) {
+                            UUID contentProduct = combo.getContentProduct().getId();
+                            map.put(contentProduct, map.getOrDefault(contentProduct, 0d) + tradedQuantity * combo.getAmount());
+                        }
+                    } else {
+                        return new ApiResponse("PRODUCT TYPE NOT FOUND", false);
                     }
-                } else {
-                    return new ApiResponse("PRODUCT TYPE NOT FOUND", false);
                 }
-            }
 
-            if (!warehouseService.checkBeforeTrade(branch, map)) return new ApiResponse("NOT ENOUGH PRODUCT", false);
+                if (!warehouseService.checkBeforeTrade(branch, map))
+                    return new ApiResponse("NOT ENOUGH PRODUCT", false);
+            }
+        } catch (Exception e){
+            return new ApiResponse("CHECKING ERROR", false);
         }
+
         double unFrontPayment = 0;
         double debtSum = trade.getDebtSum();
         if (tradeDTO.getDebtSum() > 0 || debtSum != tradeDTO.getDebtSum()) {
@@ -221,55 +227,66 @@ public class TradeService {
         trade.setPayMethod(paymentList.get(0).getPayMethod());
 
         List<TradeProduct> tradeProductList = new ArrayList<>();
-
-        double profit = 0;
-
-        for (TradeProductDto tradeProductDto : tradeDTO.getProductTraderDto()) {
-            if (tradeProductDto.isDelete()) {
-                Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
-                if (optionalTradeProduct.isPresent()) {
-                    TradeProduct tradeProduct = optionalTradeProduct.get();
-                    double tradedQuantity = tradeProductDto.getTradedQuantity(); // to send fifo calculation
-                    tradeProductDto.setTradedQuantity(0);//  to make sold quantity 0
-                    TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(tradeProduct.getTrade().getBranch(), tradeProduct, tradeProductDto);
-                    fifoCalculationService.returnedTrade(branch, savedTradeProduct, tradedQuantity);
-                    tradeProductRepository.deleteById(tradeProductDto.getTradeProductId());
-                }
-            } else if (tradeProductDto.getTradeProductId() == null) {
-                TradeProduct tradeProduct = warehouseService.createOrEditTrade(branch, new TradeProduct(), tradeProductDto);
-                if (tradeProduct != null) {
-                    tradeProduct.setTrade(trade);
-                    TradeProduct savedTradeProduct = fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, tradeProduct.getTradedQuantity());
-                    tradeProductList.add(savedTradeProduct);
-                    profit += savedTradeProduct.getProfit();
-                }
-            } else {
-                Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
-                if (optionalTradeProduct.isEmpty()) continue;
-                TradeProduct tradeProduct = optionalTradeProduct.get();
-                if (tradeProduct.getTradedQuantity() == tradeProductDto.getTradedQuantity()) {
-                    profit += tradeProduct.getProfit();
-                    continue;
-                }
-                double difference = tradeProductDto.getTradedQuantity() - tradeProduct.getTradedQuantity();
-                tradeProduct = warehouseService.createOrEditTrade(branch, tradeProduct, tradeProductDto);
-                if (tradeProduct != null) {
-                    if (difference > 0) {
-                        fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, difference);
-                    } else if (difference < 0) {
-                        fifoCalculationService.returnedTrade(branch, tradeProduct, -difference);
+        try {
+            double profit = 0;
+            for (TradeProductDto tradeProductDto : tradeDTO.getProductTraderDto()) {
+                if (tradeProductDto.isDelete()) {
+                    Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
+                    if (optionalTradeProduct.isPresent()) {
+                        TradeProduct tradeProduct = optionalTradeProduct.get();
+                        double tradedQuantity = tradeProductDto.getTradedQuantity(); // to send fifo calculation
+                        tradeProductDto.setTradedQuantity(0);//  to make sold quantity 0
+                        TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(tradeProduct.getTrade().getBranch(), tradeProduct, tradeProductDto);
+                        fifoCalculationService.returnedTrade(branch, savedTradeProduct, tradedQuantity);
+                        tradeProductRepository.deleteById(tradeProductDto.getTradeProductId());
                     }
-                    tradeProductList.add(tradeProduct);
-                    profit += tradeProduct.getProfit();
+                } else if (tradeProductDto.getTradeProductId() == null) {
+                    TradeProduct tradeProduct = warehouseService.createOrEditTrade(branch, new TradeProduct(), tradeProductDto);
+                    if (tradeProduct != null) {
+                        tradeProduct.setTrade(trade);
+                        TradeProduct savedTradeProduct = fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, tradeProduct.getTradedQuantity());
+                        tradeProductList.add(savedTradeProduct);
+                        profit += savedTradeProduct.getProfit();
+                    }
+                } else {
+                    Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
+                    if (optionalTradeProduct.isEmpty()) continue;
+                    TradeProduct tradeProduct = optionalTradeProduct.get();
+                    if (tradeProduct.getTradedQuantity() == tradeProductDto.getTradedQuantity()) {
+                        profit += tradeProduct.getProfit();
+                        continue;
+                    }
+                    double difference = tradeProductDto.getTradedQuantity() - tradeProduct.getTradedQuantity();
+                    tradeProduct = warehouseService.createOrEditTrade(branch, tradeProduct, tradeProductDto);
+                    if (tradeProduct != null) {
+                        if (difference > 0) {
+                            fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, difference);
+                        } else if (difference < 0) {
+                            fifoCalculationService.returnedTrade(branch, tradeProduct, -difference);
+                        }
+                        tradeProductList.add(tradeProduct);
+                        profit += tradeProduct.getProfit();
+                    }
                 }
             }
+            trade.setTotalProfit(profit);
+        } catch (Exception e){
+            return new ApiResponse("TRADE PRODUCT ERROR", false);
         }
-        trade.setTotalProfit(profit);
-        countKPI(optionalAgreementKpi.get(), trade, tradeProductList);
+
+        try {
+            countKPI(optionalAgreementKpi.get(), trade, tradeProductList);
+        } catch (Exception e){
+            return new ApiResponse("COUNT KPI ERROR", false);
+        }
         tradeRepository.save(trade);
         tradeProductRepository.saveAll(tradeProductList);
 
-        balanceService.edit(branch.getId(), true, tradeDTO.getPaymentDtoList());
+        try {
+            balanceService.edit(branch.getId(), true, tradeDTO.getPaymentDtoList());
+        } catch (Exception e){
+            return new ApiResponse("BALANCE SERVICE ERROR", false);
+        }
         return new ApiResponse("SAVED!", true, trade.getInvoice());
     }
 
@@ -296,8 +313,7 @@ public class TradeService {
         for (TradeProduct tradeProduct : tradeProductList) {
             if (tradeProduct.getProduct() != null) {
                 kpi += countKPIProductHelper(tradeProduct.getProduct(), tradeProduct.getTradedQuantity(), tradeProduct.getTotalSalePrice());
-            }
-            else {
+            } else {
                 kpi += countKPIProductHelper(tradeProduct.getProductTypePrice().getProduct(), tradeProduct.getTradedQuantity(), tradeProduct.getTotalSalePrice());
             }
         }
