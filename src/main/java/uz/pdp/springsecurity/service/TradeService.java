@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.entity.Customer;
 import uz.pdp.springsecurity.entity.*;
@@ -14,7 +15,6 @@ import uz.pdp.springsecurity.mapper.PaymentMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -69,7 +69,7 @@ public class TradeService {
         if (optionalTrade.isPresent()){
             String invoiceStr = optionalTrade.get().getInvoice();
             invoice = invoiceStr != null ? Integer.parseInt(invoiceStr) : 0;
-        } // TODO: 6/8/2023
+        }
 
         Trade trade = new Trade();
         trade.setBranch(optionalBranch.get());
@@ -230,7 +230,7 @@ public class TradeService {
         try {
             double profit = 0;
             for (TradeProductDto tradeProductDto : tradeDTO.getProductTraderDto()) {
-                if (tradeProductDto.isDelete()) {
+                if (tradeProductDto.isDelete() & tradeProductDto.getTradeProductId() != null) {
                     Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
                     if (optionalTradeProduct.isPresent()) {
                         TradeProduct tradeProduct = optionalTradeProduct.get();
@@ -241,12 +241,21 @@ public class TradeService {
                         tradeProductRepository.deleteById(tradeProductDto.getTradeProductId());
                     }
                 } else if (tradeProductDto.getTradeProductId() == null) {
-                    TradeProduct tradeProduct = warehouseService.createOrEditTrade(branch, new TradeProduct(), tradeProductDto);
+                    TradeProduct tradeProduct;
+                    try {
+                        tradeProduct = warehouseService.createOrEditTrade(branch, new TradeProduct(), tradeProductDto);
+                    }catch (Exception e){
+                        return new ApiResponse("WAREHOUSE ERROR", false);
+                    }
                     if (tradeProduct != null) {
                         tradeProduct.setTrade(trade);
-                        TradeProduct savedTradeProduct = fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, tradeProduct.getTradedQuantity());
-                        tradeProductList.add(savedTradeProduct);
-                        profit += savedTradeProduct.getProfit();
+                        try {
+                            fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, tradeProduct.getTradedQuantity());
+                        }catch (Exception e){
+                            return new ApiResponse("FIFO ERROR", false);
+                        }
+                        tradeProductList.add(tradeProduct);
+                        profit += tradeProduct.getProfit();
                     }
                 } else {
                     Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
@@ -271,6 +280,7 @@ public class TradeService {
             }
             trade.setTotalProfit(profit);
         } catch (Exception e){
+//            throw e;
             return new ApiResponse("TRADE PRODUCT ERROR", false);
         }
 

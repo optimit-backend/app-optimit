@@ -114,14 +114,13 @@ public class WarehouseService {
             } else {
                 warehouse = optionalWarehouse.get();
             }
-            warehouse.setAmount(warehouse.getAmount() + amount);
+            warehouse.setAmount(Math.round((warehouse.getAmount() + amount) * 100) / 100.);
             warehouse.setLastSoldDate(new Date());
             Warehouse save = warehouseRepository.save(warehouse);
             if (warehouse.getAmount() <= warehouse.getProduct().getMinQuantity()) {
                 notificationService.lessProduct(warehouse.getProduct().getId(), true, save.getAmount());
             }
             tradeProduct.setProduct(warehouse.getProduct());
-            // DAILY PRODUCT HISTORY
             productHistoryService.create(branch, tradeProduct.getProduct(), tradeProduct.getProductTypePrice(), false, -amount, warehouse.getAmount());
         } else if (tradeProductDto.getType().equalsIgnoreCase("many")) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), tradeProductDto.getProductTypePriceId());
@@ -139,7 +138,7 @@ public class WarehouseService {
             } else {
                 warehouse = optionalWarehouse.get();
             }
-            warehouse.setAmount(warehouse.getAmount() + amount);
+            warehouse.setAmount((Math.round((warehouse.getAmount() + amount) * 100) / 100.));
             warehouse.setLastSoldDate(new Date());
             Warehouse save = warehouseRepository.save(warehouse);
             if (warehouse.getAmount() <= warehouse.getProductTypePrice().getProduct().getMinQuantity()) {
@@ -169,7 +168,7 @@ public class WarehouseService {
                     } else {
                         warehouse = optionalWarehouse.get();
                     }
-                    warehouse.setAmount(warehouse.getAmount() + amount * combo.getAmount());
+                    warehouse.setAmount(Math.round((warehouse.getAmount() + amount * combo.getAmount()) * 100) / 100.);
                     warehouse.setLastSoldDate(new Date());
                     warehouseRepository.save(warehouse);
                     // DAILY PRODUCT HISTORY
@@ -190,7 +189,7 @@ public class WarehouseService {
                     } else {
                         warehouse = optionalWarehouse.get();
                     }
-                    warehouse.setAmount(warehouse.getAmount() + amount * combo.getAmount());
+                    warehouse.setAmount(Math.round((warehouse.getAmount() + amount * combo.getAmount()) * 100) / 100.);
                     warehouse.setLastSoldDate(new Date());
                     Warehouse save = warehouseRepository.save(warehouse);
                     if (warehouse.getAmount() <= warehouse.getProductTypePrice().getProduct().getMinQuantity()) {
@@ -204,6 +203,7 @@ public class WarehouseService {
         }
         tradeProduct.setTotalSalePrice(tradeProductDto.getTotalSalePrice());
         tradeProduct.setTradedQuantity(tradeProductDto.getTradedQuantity());
+        tradeProduct.setSubMeasurement(tradeProductDto.isSubMeasurement());
         return tradeProduct;
     }
 

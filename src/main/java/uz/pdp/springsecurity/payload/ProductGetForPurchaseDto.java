@@ -37,6 +37,8 @@ public class ProductGetForPurchaseDto {
     private double profitPercent;
 
     private String measurementName;
+    private String subMeasurementName;
+    private double subMeasurementValue;
 
     private String brandName;
 

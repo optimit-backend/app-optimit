@@ -590,8 +590,13 @@ public class ProductService {
                     getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                     getForPurchaseDto.setExpiredDate(product.getExpireDate());
                     getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
-                    if (product.getMeasurement() != null)
+                    if (product.getMeasurement() != null) {
                         getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
+                        if (product.getMeasurement().getSubMeasurement() != null){
+                            getForPurchaseDto.setSubMeasurementName(product.getMeasurement().getSubMeasurement().getName());
+                            getForPurchaseDto.setSubMeasurementValue(product.getMeasurement().getValue());
+                        }
+                    }
                     if (product.getBrand() != null) getForPurchaseDto.setBrandName(product.getBrand().getName());
                     if (productTypePrice.getPhoto() != null)
                         getForPurchaseDto.setPhotoId(productTypePrice.getPhoto().getId());
@@ -615,8 +620,13 @@ public class ProductService {
                 getForPurchaseDto.setGrossPriceDollar(product.getGrossPriceDollar());
                 getForPurchaseDto.setMinQuantity(product.getMinQuantity());
                 getForPurchaseDto.setExpiredDate(product.getExpireDate());
-                if (product.getMeasurement() != null)
+                if (product.getMeasurement() != null) {
                     getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
+                    if (product.getMeasurement().getSubMeasurement() != null){
+                        getForPurchaseDto.setSubMeasurementName(product.getMeasurement().getSubMeasurement().getName());
+                        getForPurchaseDto.setSubMeasurementValue(product.getMeasurement().getValue());
+                    }
+                }
                 if (product.getBrand() != null) getForPurchaseDto.setBrandName(product.getBrand().getName());
                 if (product.getPhoto() != null) getForPurchaseDto.setPhotoId(product.getPhoto().getId());
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branch_id, product.getId());
@@ -963,7 +973,6 @@ public class ProductService {
         }
         List<ProductGetForPurchaseDto> getForPurchaseDtoList = new ArrayList<>();
         toViewDtoMto(branchId, getForPurchaseDtoList, all.toList());
-
         return new ApiResponse("all", true, getForPurchaseDtoList);
     }
 
