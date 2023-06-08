@@ -688,15 +688,15 @@ public class ProductService {
         return getProductByBranch(branchId);
     }
 
-    public ApiResponse deleteProducts(List<UUID> ids) {
+    public ApiResponse deleteProducts(ProductIdsDto productIdsDto) {
+        List<UUID> ids = productIdsDto.getIds();
         for (UUID id : ids) {
             Optional<Product> optional = productRepository.findById(id);
-            if (optional.isEmpty()) {
-                return new ApiResponse("not found", false);
+            if (optional.isPresent()) {
+                Product product = optional.get();
+                product.setActive(false);
+                productRepository.save(product);
             }
-            Product product = optional.get();
-            product.setActive(false);
-            productRepository.save(product);
         }
         return new ApiResponse("DELETED", true);
     }

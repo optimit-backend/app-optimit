@@ -110,6 +110,8 @@ public class ReportsService {
     private UserRepository userRepository;
 
     private final TradeLidMapper tradeLidMapper;
+    @Autowired
+    private RepaymentDebtRepository repaymentDebtRepository;
 
     public ApiResponse allProductAmount(UUID branchId, UUID brandId, UUID categoryId, String production) {
 
@@ -2103,20 +2105,20 @@ public class ReportsService {
 
     public ApiResponse getCheckout(UUID branchId) {
         Date end = new Date();
-        double totalTradeSum = 0;
-        double totalOutlaySum = 0;
-        double totalDebtSum = 0;
         LocalDate start = LocalDate.now().atStartOfDay().toLocalDate();
         Timestamp from = new Timestamp(start.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000);
         Timestamp to = new Timestamp(end.getTime());
 
-        if (branchId != null) {
-            totalTradeSum = tradeRepository.totalSum(branchId, from, to);
-            totalDebtSum = tradeRepository.totalDebtSum(branchId, from, to);
-            totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBranchId(from, to, branchId);
+        double totalTradeSum = tradeRepository.totalSum(branchId, from, to);
+        double totalDebtSum = tradeRepository.totalDebtSum(branchId, from, to);
+        double totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBranchId(from, to, branchId);
+        double totalRepaymentDebtSum = repaymentDebtRepository.getTotalSum(branchId, from, to);
 
+        if (totalTradeSum == 0) {
+            return new ApiResponse("savdo qilinmadi", false);
+        } else {
+            double totalSumma = totalTradeSum - totalDebtSum - totalOutlaySum + totalRepaymentDebtSum;
+            return new ApiResponse("kassadi pul", true, totalSumma);
         }
-
-        return null;
     }
 }

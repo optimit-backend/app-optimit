@@ -10,6 +10,7 @@ import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductBarcodeDto;
 import uz.pdp.springsecurity.payload.ProductDto;
+import uz.pdp.springsecurity.payload.ProductIdsDto;
 import uz.pdp.springsecurity.service.ProductService;
 import uz.pdp.springsecurity.utils.AppConstant;
 
@@ -23,6 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+
 
     @CheckPermission("ADD_PRODUCT")
     @PostMapping()
@@ -62,8 +64,8 @@ public class ProductController {
 
     @CheckPermission("DELETE_PRODUCT")
     @DeleteMapping("/delete-few")
-    public HttpEntity<?> deleteFew(@RequestBody List<UUID> ids) {
-        ApiResponse apiResponse = productService.deleteProducts(ids);
+    public HttpEntity<?> deleteFew(@RequestBody ProductIdsDto productIdsDto) {
+        ApiResponse apiResponse = productService.deleteProducts(productIdsDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
