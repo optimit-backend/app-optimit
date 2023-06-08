@@ -740,8 +740,13 @@ public class ProductService {
             if (product.getPhoto() != null) {
                 productViewDto.setPhotoId(product.getPhoto().getId());
             }
-            Optional<Measurement> optionalMeasurement = measurementRepository.findById(product.getMeasurement().getId());
-            optionalMeasurement.ifPresent(measurement -> productViewDto.setMeasurementId(measurement.getName()));
+            if (product.getMeasurement() != null){
+                productViewDto.setMeasurementId(product.getMeasurement().getName());
+                if (product.getMeasurement().getSubMeasurement() != null){
+                    productViewDto.setSubMeasurementName(product.getMeasurement().getSubMeasurement().getName());
+                    productViewDto.setSubMeasurementValue(product.getMeasurement().getValue());
+                }
+            }
 
             if (product.getType().equals(Type.MANY)) {
                 double total = 0;

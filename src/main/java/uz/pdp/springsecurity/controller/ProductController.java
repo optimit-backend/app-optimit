@@ -16,7 +16,6 @@ import uz.pdp.springsecurity.utils.AppConstant;
 
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
