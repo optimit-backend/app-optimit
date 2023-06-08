@@ -14,6 +14,7 @@ import uz.pdp.springsecurity.repository.*;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -1043,7 +1044,7 @@ public class ReportsService {
                 mostSaleProductsDto.setBarcode(product.get().getBarcode());
                 mostSaleProductsDto.setMeasurement(product.get().getMeasurement().getName());
                 mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
-                if (product.get().getPhoto()!=null) {
+                if (product.get().getPhoto() != null) {
                     mostSaleProductsDto.setAttachmentId(product.get().getPhoto().getId());
                 }
                 mostSaleProductsDtoList.add(mostSaleProductsDto);
@@ -1057,7 +1058,7 @@ public class ReportsService {
                 mostSaleProductsDto.setBarcode(productTypePrice.get().getBarcode());
                 mostSaleProductsDto.setMeasurement(productTypePrice.get().getProduct().getMeasurement().getName());
                 mostSaleProductsDto.setBranchName(optionalBranch.get().getName());
-                if (productTypePrice.get().getProduct().getPhoto()!=null){
+                if (productTypePrice.get().getProduct().getPhoto() != null) {
                     mostSaleProductsDto.setAttachmentId(productTypePrice.get().getProduct().getPhoto().getId());
                 }
                 mostSaleProductsDtoList.add(mostSaleProductsDto);
@@ -2069,21 +2070,21 @@ public class ReportsService {
     }
 
 
-    public ApiResponse top10Supplier(UUID branchId,Date startDate,Date endDate) {
+    public ApiResponse top10Supplier(UUID branchId, Date startDate, Date endDate) {
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isEmpty()){
-            return new ApiResponse("Branch not found",false);
+        if (optionalBranch.isEmpty()) {
+            return new ApiResponse("Branch not found", false);
         }
         List<Object[]> results;
-        if (startDate != null && endDate != null){
+        if (startDate != null && endDate != null) {
             Timestamp startTimestamp = new Timestamp(startDate.getTime());
             Timestamp endTimestamp = new Timestamp(endDate.getTime());
-            results = purchaseRepository.findTop10SuppliersByPurchaseAndDate(branchId,startTimestamp,endTimestamp);
-        }else {
+            results = purchaseRepository.findTop10SuppliersByPurchaseAndDate(branchId, startTimestamp, endTimestamp);
+        } else {
             results = purchaseRepository.findTop10SuppliersByPurchase(branchId);
         }
-        if (results.isEmpty()){
-            return new ApiResponse("Not found",false);
+        if (results.isEmpty()) {
+            return new ApiResponse("Not found", false);
         }
         List<Map<String, Object>> responses = new ArrayList<>();
         for (Object[] result : results) {
@@ -2097,6 +2098,25 @@ public class ReportsService {
             responses.add(response);
         }
 
-        return new ApiResponse("Found",true,responses);
+        return new ApiResponse("Found", true, responses);
+    }
+
+    public ApiResponse getCheckout(UUID branchId) {
+        Date end = new Date();
+        double totalTradeSum = 0;
+        double totalOutlaySum = 0;
+        double totalDebtSum = 0;
+        LocalDate start = LocalDate.now().atStartOfDay().toLocalDate();
+        Timestamp from = new Timestamp(start.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000);
+        Timestamp to = new Timestamp(end.getTime());
+
+        if (branchId != null) {
+            totalTradeSum = tradeRepository.totalSum(branchId, from, to);
+            totalDebtSum = tradeRepository.totalDebtSum(branchId, from, to);
+            totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBranchId(from, to, branchId);
+
+        }
+
+        return null;
     }
 }

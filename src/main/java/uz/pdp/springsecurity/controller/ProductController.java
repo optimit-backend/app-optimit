@@ -59,6 +59,7 @@ public class ProductController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+
     @CheckPermission("DELETE_PRODUCT")
     @DeleteMapping("/delete-few")
     public HttpEntity<?> deleteFew(@RequestBody List<UUID> ids) {
