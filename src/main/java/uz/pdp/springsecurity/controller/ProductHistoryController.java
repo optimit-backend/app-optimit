@@ -28,4 +28,12 @@ public class ProductHistoryController {
         ApiResponse apiResponse = productHistoryService.get(branchId, date, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("VIEW_REPORT")
+    @GetMapping("amount/{branchId}")
+    public HttpEntity<?> amount(@PathVariable UUID branchId) {
+
+        ApiResponse apiResponse = productHistoryService.amount(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }
