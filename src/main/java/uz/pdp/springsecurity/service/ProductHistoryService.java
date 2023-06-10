@@ -10,6 +10,7 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.ProductHistoryGetDto;
 import uz.pdp.springsecurity.repository.BranchRepository;
 import uz.pdp.springsecurity.repository.ProductHistoryRepository;
+import uz.pdp.springsecurity.repository.TradeProductRepository;
 import uz.pdp.springsecurity.repository.WarehouseRepository;
 
 import java.sql.Timestamp;
@@ -24,6 +25,7 @@ public class ProductHistoryService {
     private final ProductHistoryRepository productHistoryRepository;
     private final BranchRepository branchRepository;
     private final WarehouseRepository warehouseRepository;
+    private final TradeProductRepository tradeProductRepository;
     LocalDateTime TODAY_START = LocalDate.now().atStartOfDay();
     public void create(Branch branch, Product product, ProductTypePrice productTypePrice, boolean plus, double plusAmount, double amount) {
         Optional<ProductHistory> optionalProductHistory;
@@ -115,5 +117,23 @@ public class ProductHistoryService {
         response.put("totalItem", historyPage.getTotalElements());
         response.put("totalPage", historyPage.getTotalPages());
         return new ApiResponse("SUCCESS", true, response);
+    }
+
+    public ApiResponse amount(UUID branchId) {
+        List<Warehouse> warehouseList = warehouseRepository.findAllByBranchId(branchId);
+        List<Double> doubleList = new ArrayList<>();
+        for (Warehouse warehouse : warehouseList) {
+            LocalDateTime createdAtLocal = warehouse.getCreatedAt().toLocalDateTime();
+            int days = TODAY_START.getDayOfYear() - createdAtLocal.getDayOfYear();
+            if (days > 30) days = 30;
+            Double quantityD;
+            if (warehouse.getProduct() != null) {
+                quantityD = tradeProductRepository.quantityByBranchIdAndProductIdAndCreatedAtBetween(Timestamp.valueOf(TODAY_START.minusDays(days)), Timestamp.valueOf(TODAY_START), warehouse.getProduct().getId() ,branchId);
+            } else {
+                quantityD = tradeProductRepository.quantityByBranchIdAndProductTypePriceIdAndCreatedAtBetween(Timestamp.valueOf(TODAY_START.minusDays(days)), Timestamp.valueOf(TODAY_START), warehouse.getProductTypePrice().getId() ,branchId);
+            }
+            doubleList.add(quantityD);
+        }
+        return new ApiResponse("SUCCESS", true, doubleList);
     }
 }
