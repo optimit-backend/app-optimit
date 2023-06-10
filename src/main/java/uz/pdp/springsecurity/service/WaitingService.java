@@ -63,7 +63,8 @@ public class WaitingService {
             WaitingProduct waitingProduct = new WaitingProduct(
                     dto.getQuantity(),
                     dto.getTotalPrice(),
-                    dto.getSalePrice()
+                    dto.getSalePrice(),
+                    dto.isSubMeasurement()
             );
             Optional<Product> optionalProduct = productRepository.findById(dto.getProductId());
             Optional<ProductTypePrice> optionalProductTypePrice = productTypePriceRepository.findById(dto.getProductId());
@@ -121,19 +122,28 @@ public class WaitingService {
         dto.setQuantity(waitingProduct.getQuantity());
         dto.setTotalPrice(waitingProduct.getTotalPrice());
         dto.setSalePrice(waitingProduct.getSalePrice());
+        dto.setSubMeasurement(waitingProduct.getSubMeasurement());
 
-        Optional<Warehouse> optionalWarehouse;
+        Optional<Warehouse> optionalWarehouse = Optional.empty();
         if (waitingProduct.getProduct() != null) {
             dto.setProductId(waitingProduct.getProduct().getId());
             dto.setProductName(waitingProduct.getProduct().getName());
             dto.setType(waitingProduct.getProduct().getType().name());
             dto.setMeasurement(waitingProduct.getProduct().getMeasurement().getName());
+            if (waitingProduct.getProduct().getMeasurement().getSubMeasurement() != null){
+                dto.setSubMeasurementName(waitingProduct.getProduct().getMeasurement().getSubMeasurement().getName());
+                dto.setSubMeasurementValue(waitingProduct.getProduct().getMeasurement().getValue());
+            }
             optionalWarehouse = warehouseRepository.findByBranchIdAndProductId(branchId, waitingProduct.getProduct().getId());
-        } else {
+        } else if (waitingProduct.getProductTypePrice() != null) {
             dto.setProductTypePriceId(waitingProduct.getProductTypePrice().getId());
             dto.setProductName(waitingProduct.getProductTypePrice().getName());
             dto.setType(Type.MANY.name());
             dto.setMeasurement(waitingProduct.getProductTypePrice().getProduct().getMeasurement().getName());
+            if (waitingProduct.getProductTypePrice().getProduct().getMeasurement().getSubMeasurement() != null){
+                dto.setSubMeasurementName(waitingProduct.getProductTypePrice().getProduct().getMeasurement().getSubMeasurement().getName());
+                dto.setSubMeasurementValue(waitingProduct.getProductTypePrice().getProduct().getMeasurement().getValue());
+            }
             optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branchId, waitingProduct.getProductTypePrice().getId());
         }
         dto.setAmount(optionalWarehouse.map(Warehouse::getAmount).orElse(0.0));

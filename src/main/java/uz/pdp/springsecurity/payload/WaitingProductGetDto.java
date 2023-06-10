@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Data
@@ -20,6 +19,12 @@ public class WaitingProductGetDto {
     private String productName;
 
     private String measurement;
+
+    private String subMeasurementName;
+
+    private double subMeasurementValue;
+
+    private boolean subMeasurement;
 
     private double salePrice;
 

@@ -28,5 +28,5 @@ public class TradeProductDto {
 
     private boolean delete = false;
 
-    boolean subMeasurement;
+    private boolean subMeasurement;
 }
