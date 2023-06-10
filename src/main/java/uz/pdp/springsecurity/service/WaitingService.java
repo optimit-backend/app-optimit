@@ -122,7 +122,7 @@ public class WaitingService {
         dto.setQuantity(waitingProduct.getQuantity());
         dto.setTotalPrice(waitingProduct.getTotalPrice());
         dto.setSalePrice(waitingProduct.getSalePrice());
-        dto.setSubMeasurement(waitingProduct.getSubMeasurement());
+        dto.setSubMeasurement(waitingProduct.getSubMeasurement() != null && waitingProduct.getSubMeasurement());
 
         Optional<Warehouse> optionalWarehouse = Optional.empty();
         if (waitingProduct.getProduct() != null) {
