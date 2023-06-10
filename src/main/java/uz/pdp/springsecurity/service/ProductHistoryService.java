@@ -7,11 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.ProductAmountDto;
 import uz.pdp.springsecurity.payload.ProductHistoryGetDto;
-import uz.pdp.springsecurity.repository.BranchRepository;
-import uz.pdp.springsecurity.repository.ProductHistoryRepository;
-import uz.pdp.springsecurity.repository.TradeProductRepository;
-import uz.pdp.springsecurity.repository.WarehouseRepository;
+import uz.pdp.springsecurity.repository.*;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -26,6 +24,7 @@ public class ProductHistoryService {
     private final BranchRepository branchRepository;
     private final WarehouseRepository warehouseRepository;
     private final TradeProductRepository tradeProductRepository;
+    private final ContentProductRepository contentProductRepository;
     LocalDateTime TODAY_START = LocalDate.now().atStartOfDay();
     public void create(Branch branch, Product product, ProductTypePrice productTypePrice, boolean plus, double plusAmount, double amount) {
         Optional<ProductHistory> optionalProductHistory;
@@ -119,21 +118,42 @@ public class ProductHistoryService {
         return new ApiResponse("SUCCESS", true, response);
     }
 
-    public ApiResponse amount(UUID branchId) {
-        List<Warehouse> warehouseList = warehouseRepository.findAllByBranchId(branchId);
-        List<Double> doubleList = new ArrayList<>();
-        for (Warehouse warehouse : warehouseList) {
+    public ApiResponse amount(UUID branchId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Warehouse> warehousePage = warehouseRepository.findAllByBranch_Id(branchId, pageable);
+        List<ProductAmountDto> productAmountDtoList = new ArrayList<>();
+        for (Warehouse warehouse : warehousePage.getContent()) {
             LocalDateTime createdAtLocal = warehouse.getCreatedAt().toLocalDateTime();
-            int days = TODAY_START.getDayOfYear() - createdAtLocal.getDayOfYear();
+            int days = TODAY_START.getDayOfYear() - createdAtLocal.getDayOfYear() + 1;
             if (days > 30) days = 30;
             Double quantityD;
+            Double quantityD2;
+            ProductAmountDto dto = new ProductAmountDto();
             if (warehouse.getProduct() != null) {
-                quantityD = tradeProductRepository.quantityByBranchIdAndProductIdAndCreatedAtBetween(Timestamp.valueOf(TODAY_START.minusDays(days)), Timestamp.valueOf(TODAY_START), warehouse.getProduct().getId() ,branchId);
+                dto.setName(warehouse.getProduct().getName());
+                dto.setMeasurement(warehouse.getProduct().getMeasurement().getName());
+                quantityD = tradeProductRepository.quantityByBranchIdAndProductIdAndCreatedAtBetween(Timestamp.valueOf(TODAY_START.minusDays(days)), Timestamp.valueOf(TODAY_START.plusDays(1)), warehouse.getProduct().getId() ,branchId);
+                quantityD2 = contentProductRepository.quantityByBranchIdAndProductIdAndCreatedAtBetween(Timestamp.valueOf(TODAY_START.minusDays(days)), Timestamp.valueOf(TODAY_START.plusDays(1)), warehouse.getProduct().getId() ,branchId);
             } else {
-                quantityD = tradeProductRepository.quantityByBranchIdAndProductTypePriceIdAndCreatedAtBetween(Timestamp.valueOf(TODAY_START.minusDays(days)), Timestamp.valueOf(TODAY_START), warehouse.getProductTypePrice().getId() ,branchId);
+                dto.setName(warehouse.getProductTypePrice().getName());
+                dto.setMeasurement(warehouse.getProductTypePrice().getProduct().getMeasurement().getName());
+                quantityD = tradeProductRepository.quantityByBranchIdAndProductTypePriceIdAndCreatedAtBetween(Timestamp.valueOf(TODAY_START.minusDays(days)), Timestamp.valueOf(TODAY_START.plusDays(1)), warehouse.getProductTypePrice().getId() ,branchId);
+                quantityD2 = contentProductRepository.quantityByBranchIdAndProductTypePriceIdAndCreatedAtBetween(Timestamp.valueOf(TODAY_START.minusDays(days)), Timestamp.valueOf(TODAY_START.plusDays(1)), warehouse.getProductTypePrice().getId() ,branchId);
             }
-            doubleList.add(quantityD);
+            double quantity = quantityD == null? 0: quantityD;
+            quantity += quantityD2 == null? 0: quantityD2;
+            double average = quantity / days;
+            dto.setAverage(Math.round(average * 10) / 10.);
+            dto.setDay(average == 0 ? 0 : Math.round(warehouse.getAmount() / average));
+            dto.setMonth(Math.round(average * (30 - TODAY_START.getDayOfMonth()) * 10) / 10.);
+            dto.setAmount(Math.round(warehouse.getAmount() * 10) / 10.);
+            productAmountDtoList.add(dto);
         }
-        return new ApiResponse("SUCCESS", true, doubleList);
+        Map<String, Object> response = new HashMap<>();
+        response.put("getProductAmountList", productAmountDtoList);
+        response.put("currentPage", warehousePage.getNumber());
+        response.put("totalItems", warehousePage.getTotalElements());
+        response.put("totalPages", warehousePage.getTotalPages());
+        return new ApiResponse("SUCCESS", true, response);
     }
 }
