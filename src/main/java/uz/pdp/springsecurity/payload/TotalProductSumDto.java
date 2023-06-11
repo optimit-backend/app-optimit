@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TotalProductSumDto{
-    double summa;
-    double percentage;
+    private double summa;
+    private double percentage;
+    private String message;
+    private boolean success;
 }
