@@ -14,7 +14,6 @@ import uz.pdp.springsecurity.repository.*;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -2105,11 +2104,6 @@ public class ReportsService {
     }
 
     public ApiResponse getCheckout(UUID branchId, UUID businessId) {
-        Date end = new Date();
-        LocalDate start = LocalDate.now().atStartOfDay().toLocalDate();
-//        Timestamp from = new Timestamp(start.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000);
-//        Timestamp to = new Timestamp(end.getTime());
-
         List<GetCheckoutDto> getCheckoutDtoList = new ArrayList<>();
         Map<String, Object> response = new HashMap<>();
 
@@ -2146,17 +2140,17 @@ public class ReportsService {
 
             GetCheckoutDto getCheckoutDto = new GetCheckoutDto();
             if (totalTradeSumma != 0) {
-                getCheckoutDto.setTimestamp(from);
                 getCheckoutDto.setTotalDebt(totalRepaymentDebtSum1);
                 getCheckoutDto.setTotalOutlay(totalOutlaySum1);
                 getCheckoutDto.setTotalTradeSum(totalTradeSumma);
                 getCheckoutDto.setTotalCash(totalTradeSumma - totalDebtSum1 - totalOutlaySum1 + totalRepaymentDebtSum1);
                 totalSumma += totalTradeSumma - totalDebtSum1 - totalOutlaySum1 + totalRepaymentDebtSum1;
             }
+            getCheckoutDto.setTimestamp(to);
             getCheckoutDtoList.add(getCheckoutDto);
         }
-        response.put("data",getCheckoutDtoList);
-        response.put("totalSumma",totalSumma);
+        response.put("data", getCheckoutDtoList);
+        response.put("totalSumma", totalSumma);
 
         return new ApiResponse("kassadagi pul", true, response);
 
@@ -2365,5 +2359,70 @@ public class ReportsService {
         getStaticDto.setTotalProfitSumDto(totalProfitSumDto);
 
         return new ApiResponse("found", true, getStaticDto);
+    }
+
+    public ApiResponse getChart(UUID branchId, UUID businessId) {
+        List<GetChartDto> getChartDtoList = new ArrayList<>();
+        Map<String, Object> response = new HashMap<>();
+
+        Double totalSum = null;
+        Double totalDebtSum = null;
+        Double totalPurchase = null;
+        Double totalMyDebt = null;
+
+
+        double totalTradeSumma = 0;
+        double totalDebtSum1 = 0;
+        double totalPurchase1 = 0;
+        double totalMyDebt1 = 0;
+
+        double totalTradeSumma1 = 0;
+        double totalDebtSum2 = 0;
+        double totalPurchase2 = 0;
+        double totalMyDebt2 = 0;
+
+        for (int i = 0; i < 15; i++) {
+            Timestamp from = Timestamp.valueOf(TODAY_END.minusDays(i + 1));
+            Timestamp to = Timestamp.valueOf(TODAY_END.minusDays(i));
+
+            if (businessId != null) {
+                totalSum = tradeRepository.totalSumByBusiness(businessId, from, to);
+                totalDebtSum = tradeRepository.totalDebtSumByBusiness(businessId, from, to);
+//                totalPurchase = purchaseRepository.totalPurchaseByBusiness(businessId, from, to);
+//                totalMyDebt = purchaseRepository.totalMyDebtByBusiness(businessId, from, to);
+
+            } else {
+                totalSum = tradeRepository.totalSum(branchId, from, to);
+                totalDebtSum = tradeRepository.totalDebtSum(branchId, from, to);
+                totalPurchase = purchaseRepository.totalPurchase(branchId, from, to);
+                totalMyDebt = purchaseRepository.totalMyDebt(branchId, from, to);
+            }
+            totalTradeSumma = totalSum != null ? totalSum : 0;
+            totalDebtSum1 = totalDebtSum != null ? totalDebtSum : 0;
+            totalPurchase1 = totalPurchase != null ? totalPurchase : 0;
+            totalMyDebt1 = totalMyDebt != null ? totalMyDebt : 0;
+
+
+            GetChartDto getChartDto = new GetChartDto();
+            getChartDto.setTimestamp(from);
+            getChartDto.setTotalTrade(totalTradeSumma);
+            getChartDto.setTotalDebt(totalDebtSum1);
+            getChartDto.setTotalPurchase(totalPurchase1);
+            getChartDto.setTotalMyDebt(totalMyDebt1);
+
+            totalTradeSumma1 += totalTradeSumma;
+            totalDebtSum2 += totalDebtSum1;
+            totalPurchase2 += totalPurchase1;
+            totalMyDebt2 += totalMyDebt1;
+
+            getChartDtoList.add(getChartDto);
+        }
+        response.put("data", getChartDtoList);
+        response.put("totalPurchase", totalPurchase2);
+        response.put("totalTrade", totalTradeSumma1);
+        response.put("totalMyDebt", totalMyDebt2);
+        response.put("totalDebt", totalDebtSum2);
+
+        return new ApiResponse("kassadagi pul", true, response);
     }
 }
