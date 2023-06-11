@@ -51,6 +51,7 @@ public class TradeService {
     private final AgreementRepository agreementRepository;
     private final BalanceService balanceService;
     private final BusinessRepository businessRepository;
+    private final ProductRepository productRepository;
 
     @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
@@ -78,8 +79,8 @@ public class TradeService {
         return createOrEditTrade(trade, tradeDTO);
     }
 
-    public ApiResponse edit(UUID id, TradeDTO tradeDTO) {
-        Optional<Trade> optionalTrade = tradeRepository.findById(id);
+    public ApiResponse edit(UUID tradeId, TradeDTO tradeDTO) {
+        Optional<Trade> optionalTrade = tradeRepository.findById(tradeId);
         if (optionalTrade.isEmpty()) {
             return new ApiResponse("NOT FOUND TRADE", false);
         }
@@ -230,7 +231,7 @@ public class TradeService {
         try {
             double profit = 0;
             for (TradeProductDto tradeProductDto : tradeDTO.getProductTraderDto()) {
-                if (tradeProductDto.isDelete() & tradeProductDto.getTradeProductId() != null) {
+                if (tradeProductDto.isDelete() && tradeProductDto.getTradeProductId() != null) {
                     Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
                     if (optionalTradeProduct.isPresent()) {
                         TradeProduct tradeProduct = optionalTradeProduct.get();
@@ -272,6 +273,13 @@ public class TradeService {
                             fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, difference);
                         } else if (difference < 0) {
                             fifoCalculationService.returnedTrade(branch, tradeProduct, -difference);
+                            if (tradeDTO.isBacking()){
+                                if (tradeProduct.getBacking() != null){
+                                    tradeProduct.setBacking(tradeProduct.getBacking() - difference);
+                                } else {
+                                    tradeProduct.setBacking(-difference);
+                                }
+                            }
                         }
                         tradeProductList.add(tradeProduct);
                         profit += tradeProduct.getProfit();
@@ -297,7 +305,7 @@ public class TradeService {
         } catch (Exception e){
             return new ApiResponse("BALANCE SERVICE ERROR", false);
         }
-        return new ApiResponse("SAVED!", true, trade.getInvoice());
+        return new ApiResponse("SUCCESS", true, trade.getInvoice());
     }
 
     private void countKPI(Agreement agreementKpi, Trade trade, List<TradeProduct> tradeProductList) {
@@ -531,5 +539,78 @@ public class TradeService {
                 .toList();
 
         return new ApiResponse("Found", true, sortedTraders);
+    }
+
+    public ApiResponse getBacking(UUID branchId) {
+        if (!branchRepository.existsById(branchId))
+            return new ApiResponse("BRANCH NOT FOUND", false);
+        List<TradeProduct> tradeProductList = tradeProductRepository.findAllByTrade_BranchIdAndBackingIsNotNull(branchId);
+        if (tradeProductList.isEmpty())
+            return new ApiResponse("BACKING PRODUCT NOT FOUND", false);
+        return new ApiResponse("SUCCESS", true, toProductBackingDtoMap(tradeProductList));
+    }
+
+    private Collection<ProductBackingDto> toProductBackingDtoMap(List<TradeProduct> tradeProductList) {
+        Map<UUID, ProductBackingDto> map = new HashMap<>();
+        UUID id;
+        String name;
+        String measurement;
+        double quantity;
+        for (TradeProduct t : tradeProductList) {
+            if (t.getProduct() != null) {
+                id = t.getProduct().getId();
+                name = t.getProduct().getName();
+                measurement = t.getProduct().getMeasurement().getName();
+            } else {
+                id = t.getProductTypePrice().getId();
+                name = t.getProductTypePrice().getName();
+                measurement = t.getProductTypePrice().getProduct().getMeasurement().getName();
+            }
+            quantity = t.getBacking();
+            ProductBackingDto dto = map.getOrDefault(id, new ProductBackingDto(
+                    id,
+                    name,
+                    measurement,
+                    0
+            ));
+            dto.setQuantity(dto.getQuantity() + quantity);
+            map.put(id, dto);
+        }
+        return map.values();
+    }
+
+    public ApiResponse getBackingByProduct(UUID branchId, UUID productId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<TradeProduct> tradeProductPage;
+        if (productRepository.existsById(productId)) {
+            tradeProductPage = tradeProductRepository.findAllByTrade_BranchIdAndProductIdAndBackingIsNotNullOrderByCreatedAtDesc(branchId, productId, pageable);
+        } else {
+
+            tradeProductPage = tradeProductRepository.findAllByTrade_BranchIdAndProductTypePriceIdAndBackingIsNotNullOrderByCreatedAtDesc(branchId, productId, pageable);
+        }
+        if (tradeProductPage.isEmpty())
+            return new ApiResponse("BACKING PRODUCT NOT FOUND", false);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("getLessProduct", toGroductBackingGetDtoList(tradeProductPage.getContent()));
+        response.put("currentPage", tradeProductPage.getNumber());
+        response.put("totalItem", tradeProductPage.getTotalElements());
+        response.put("totalPage", tradeProductPage.getTotalPages());
+        return new ApiResponse("SUCCESS", true, response);
+    }
+
+
+    private List<ProductBackingGetDto> toGroductBackingGetDtoList(List<TradeProduct> tradeProductList) {
+        List<ProductBackingGetDto> list = new ArrayList<>();
+        for (TradeProduct t : tradeProductList) {
+            ProductBackingGetDto dto = new ProductBackingGetDto(
+                    t.getCreatedAt(),
+                    t.getBacking()
+            );
+            if (t.getTrade().getCustomer() != null)
+                dto.setCustomerName(t.getTrade().getCustomer().getName());
+            list.add(dto);
+        }
+        return list;
     }
 }

@@ -103,5 +103,9 @@ public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID
   @Query(value = "SELECT SUM(traded_Quantity) FROM trade_product WHERE created_at BETWEEN ?1 AND ?2 AND product_type_price_id = ?3 AND trade_id IN (SELECT id FROM trade WHERE branch_id = ?4)", nativeQuery = true)
   Double quantityByBranchIdAndProductTypePriceIdAndCreatedAtBetween(Date from, Date to, UUID productTypePriceId, UUID branchId);
 
+  List<TradeProduct> findAllByTrade_BranchIdAndBackingIsNotNull(UUID branchId);
+
+  Page<TradeProduct> findAllByTrade_BranchIdAndProductIdAndBackingIsNotNullOrderByCreatedAtDesc(UUID branchId, UUID productId, Pageable pageable);
+  Page<TradeProduct> findAllByTrade_BranchIdAndProductTypePriceIdAndBackingIsNotNullOrderByCreatedAtDesc(UUID branchId, UUID productTypePriceId, Pageable pageable);
 }
 
