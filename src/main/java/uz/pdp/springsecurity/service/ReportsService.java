@@ -2111,7 +2111,7 @@ public class ReportsService {
 //        Timestamp to = new Timestamp(end.getTime());
 
         List<GetCheckoutDto> getCheckoutDtoList = new ArrayList<>();
-
+        Map<String, Object> response = new HashMap<>();
 
         Double totalSum = null;
         Double totalDebtSum = null;
@@ -2144,14 +2144,22 @@ public class ReportsService {
             totalRepaymentDebtSum1 = totalRepaymentDebtSum != null ? totalRepaymentDebtSum : 0;
             totalTradeSumma = totalSum != null ? totalSum : 0;
 
+            GetCheckoutDto getCheckoutDto = new GetCheckoutDto();
+            if (totalTradeSumma != 0) {
+                getCheckoutDto.setTimestamp(from);
+                getCheckoutDto.setTotalDebt(totalRepaymentDebtSum1);
+                getCheckoutDto.setTotalOutlay(totalOutlaySum1);
+                getCheckoutDto.setTotalTradeSum(totalTradeSumma);
+                getCheckoutDto.setTotalCash(totalTradeSumma - totalDebtSum1 - totalOutlaySum1 + totalRepaymentDebtSum1);
+                totalSumma += totalTradeSumma - totalDebtSum1 - totalOutlaySum1 + totalRepaymentDebtSum1;
+            }
+            getCheckoutDtoList.add(getCheckoutDto);
         }
+        response.put("data",getCheckoutDtoList);
+        response.put("totalSumma",totalSumma);
 
-        if (totalTradeSumma == 0) {
-            return new ApiResponse("savdo qilinmadi", false);
-        } else {
-            totalSumma = totalTradeSumma - totalDebtSum1 - totalOutlaySum1 + totalRepaymentDebtSum1;
-            return new ApiResponse("kassadagi pul", true, totalSumma);
-        }
+        return new ApiResponse("kassadagi pul", true, response);
+
     }
 
 
