@@ -112,6 +112,7 @@ public class ReportsService {
     private UserRepository userRepository;
 
     private final TradeLidMapper tradeLidMapper;
+
     @Autowired
     private RepaymentDebtRepository repaymentDebtRepository;
 
@@ -912,8 +913,7 @@ public class ReportsService {
         for (TradeProduct tradeProduct : tradeProductList) {
             if (tradeProduct.getProduct() != null) {
                 CustomerReportsDto customerReportsDto = new CustomerReportsDto();
-                if (tradeProduct.getTrade().getCustomer() == null)
-                    continue;
+                if (tradeProduct.getTrade().getCustomer() == null) continue;
                 customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
                 customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
                 customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
@@ -927,8 +927,7 @@ public class ReportsService {
                 customerReportsDtoList.add(customerReportsDto);
             } else {
                 CustomerReportsDto customerReportsDto = new CustomerReportsDto();
-                if (tradeProduct.getTrade().getCustomer() == null)
-                    continue;
+                if (tradeProduct.getTrade().getCustomer() == null) continue;
                 customerReportsDto.setCustomerName(tradeProduct.getTrade().getCustomer().getName());
                 customerReportsDto.setDate(tradeProduct.getTrade().getPayDate());
                 customerReportsDto.setDebt(tradeProduct.getTrade().getDebtSum());
@@ -1328,11 +1327,10 @@ public class ReportsService {
             } else if (Objects.equals(date, "LAST_MONTH")) {
                 List<TradeProduct> tradeProductList;
                 tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_CategoryId(Timestamp.valueOf(START_OF_MONTH), Timestamp.valueOf(END_OF_MONTH), category.getId());
-                if (!tradeProductList.isEmpty())
-                    for (TradeProduct product : tradeProductList) {
-                        amount += product.getProfit();
-                        productAmount.put(category.getId(), amount);
-                    }
+                if (!tradeProductList.isEmpty()) for (TradeProduct product : tradeProductList) {
+                    amount += product.getProfit();
+                    productAmount.put(category.getId(), amount);
+                }
                 tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndProductTypePrice_Product_CategoryId(Timestamp.valueOf(START_OF_MONTH), Timestamp.valueOf(END_OF_MONTH), category.getId());
                 if (!tradeProductList.isEmpty()) {
                     for (TradeProduct product : tradeProductList) {
@@ -1375,11 +1373,10 @@ public class ReportsService {
             } else if (Objects.equals(date, "THIS_YEAR")) {
                 List<TradeProduct> tradeProductList;
                 tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_CategoryId(Timestamp.valueOf(START_OF_YEAR_FOR_THIS), currentDay, category.getId());
-                if (!tradeProductList.isEmpty())
-                    for (TradeProduct product : tradeProductList) {
-                        amount += product.getProfit();
-                        productAmount.put(category.getId(), amount);
-                    }
+                if (!tradeProductList.isEmpty()) for (TradeProduct product : tradeProductList) {
+                    amount += product.getProfit();
+                    productAmount.put(category.getId(), amount);
+                }
                 tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndProductTypePrice_Product_CategoryId(Timestamp.valueOf(START_OF_YEAR_FOR_THIS), currentDay, category.getId());
                 if (!tradeProductList.isEmpty()) {
                     for (TradeProduct product : tradeProductList) {
@@ -1477,11 +1474,10 @@ public class ReportsService {
             } else if (Objects.equals(date, "LAST_WEEK")) {
                 List<TradeProduct> tradeProductList;
                 tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndProduct_BrandId(Timestamp.valueOf(WEEK_START_DAY.atStartOfDay()), Timestamp.valueOf(WEEK_END_DAY.atStartOfDay()), brand.getId());
-                if (!tradeProductList.isEmpty())
-                    for (TradeProduct product : tradeProductList) {
-                        amount += product.getProfit();
-                        productAmount.put(brand.getId(), amount);
-                    }
+                if (!tradeProductList.isEmpty()) for (TradeProduct product : tradeProductList) {
+                    amount += product.getProfit();
+                    productAmount.put(brand.getId(), amount);
+                }
                 tradeProductList = tradeProductRepository.findAllByCreatedAtBetweenAndProductTypePrice_Product_BrandId(Timestamp.valueOf(WEEK_START_DAY.atStartOfDay()), Timestamp.valueOf(WEEK_END_DAY.atStartOfDay()), brand.getId());
                 if (!tradeProductList.isEmpty()) {
                     for (TradeProduct product : tradeProductList) {
@@ -2303,20 +2299,44 @@ public class ReportsService {
         GetStaticDto getStaticDto = new GetStaticDto();
 
         TotalCustomerDto totalCustomerDto = new TotalCustomerDto();
-        totalCustomerDto.setAmount(nowTotalCustomerInt - lastTotalCustomerInt);
-        totalCustomerDto.setPercentage((double) (nowTotalCustomerInt * 100) / lastTotalCustomerInt);
+        if (nowTotalCustomerInt != 0 || lastTotalCustomerInt != 0) {
+            totalCustomerDto.setAmount(nowTotalCustomerInt - lastTotalCustomerInt);
+            totalCustomerDto.setPercentage((double) ((nowTotalCustomerInt - lastTotalCustomerInt) * 100) / lastTotalCustomerInt);
+            totalCustomerDto.setSuccess(true);
+        } else {
+            totalCustomerDto.setMessage("O'tgan yoki hozirgi davr mobaynida yangi mijozlar mavjud emas");
+            totalCustomerDto.setSuccess(false);
+        }
 
         TotalSumDto totalSumDto = new TotalSumDto();
-        totalSumDto.setSumma(nowTotalSumDouble - lastTotalSumDouble);
-        totalSumDto.setPercentage((nowTotalSumDouble * 100) / lastTotalSumDouble);
+        if (nowTotalSumDouble != 0 || lastTotalSumDouble != 0) {
+            totalSumDto.setSumma(nowTotalSumDouble - lastTotalSumDouble);
+            totalSumDto.setPercentage(((nowTotalSumDouble - lastTotalSumDouble) * 100) / lastTotalSumDouble);
+            totalSumDto.setSuccess(true);
+        } else {
+            totalSumDto.setSuccess(false);
+            totalSumDto.setMessage("O'tgan yoki hozirgi davr mobaynida yangi savdolar mavjud emas!");
+        }
 
         TotalProfitSumDto totalProfitSumDto = new TotalProfitSumDto();
-        totalProfitSumDto.setSumma(nowTotalProfitDouble - lastTotalProfitDouble);
-        totalProfitSumDto.setPercentage((nowTotalProfitDouble * 100) / lastTotalProfitDouble);
+        if (nowTotalProfitDouble != 0 || lastTotalProfitDouble != 0) {
+            totalProfitSumDto.setSumma(nowTotalProfitDouble - lastTotalProfitDouble);
+            totalProfitSumDto.setPercentage(((nowTotalProfitDouble - lastTotalProfitDouble) * 100) / lastTotalProfitDouble);
+            totalProfitSumDto.setSuccess(true);
+        } else {
+            totalProfitSumDto.setMessage("O'tgan yoki hozirgi davr mobaynida yangi savdolar mavjud emas!");
+            totalProfitSumDto.setSuccess(false);
+        }
 
         TotalProductSumDto totalProductSumDto = new TotalProductSumDto();
-        totalProductSumDto.setSumma(nowTotalProductSum - lastTotalProductSum);
-        totalProductSumDto.setPercentage((nowTotalProductSum * 100) / lastTotalProductSum);
+        if (nowTotalProductSum != 0 || lastTotalProductSum != 0) {
+            totalProductSumDto.setSumma(nowTotalProductSum - lastTotalProductSum);
+            totalProductSumDto.setPercentage(((nowTotalProductSum - lastTotalProductSum) * 100) / lastTotalProductSum);
+            totalProductSumDto.setSuccess(true);
+        } else {
+            totalProductSumDto.setMessage("O'tgan yoki hozirgi davr mobaynida yangi mahsulotlar mavjud emas!");
+            totalProductSumDto.setSuccess(false);
+        }
 
         getStaticDto.setTotalCustomerDto(totalCustomerDto);
         getStaticDto.setTotalProductSumDto(totalProductSumDto);
