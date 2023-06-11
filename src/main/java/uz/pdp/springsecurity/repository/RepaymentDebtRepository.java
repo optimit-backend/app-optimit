@@ -11,4 +11,7 @@ import java.util.UUID;
 public interface RepaymentDebtRepository extends JpaRepository<RepaymentDebt, UUID> {
     @Query("select sum(r.debtSum) from RepaymentDebt r where r.customer.branch.id= :branchId and r.createdAt >= :startDate AND r.createdAt <= :endDate")
     Double getTotalSum(@Param("branchId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
+
+    @Query("select sum(r.debtSum) from RepaymentDebt r where r.customer.branch.business.id= :businessId and r.createdAt >= :startDate AND r.createdAt <= :endDate")
+    Double getTotalSumByBusiness(@Param("businessId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
 }

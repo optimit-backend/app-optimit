@@ -83,8 +83,10 @@ public class ReportsService {
     private final static LocalDateTime LAST_MONTH = dateTime.minusMonths(1);
     private final static LocalDate localDate = LocalDate.now();
     private final static LocalDateTime THIS_MONTH = localDate.withDayOfMonth(1).atStartOfDay();
+
     private final static LocalDate WEEK_START_DAY = localDate.minusDays(7 + localDate.getDayOfWeek().getValue() - 1);
     private final static LocalDate WEEK_END_DAY = localDate.minusDays(7 + localDate.getDayOfWeek().getValue() - 7);
+
     private final static LocalDate TEMP_START_OF_YEAR = LocalDate.of(localDate.getYear() - 1, 1, 1);
     private final static LocalDate TEMP_FOR_THIS_START_OF_YEAR = LocalDate.of(localDate.getYear(), 1, 1);
     private final static LocalDate TEMP_START_OF_DAY = localDate.minusDays(1);
@@ -2103,22 +2105,224 @@ public class ReportsService {
         return new ApiResponse("Found", true, responses);
     }
 
-    public ApiResponse getCheckout(UUID branchId) {
+    public ApiResponse getCheckout(UUID branchId, UUID businessId) {
         Date end = new Date();
         LocalDate start = LocalDate.now().atStartOfDay().toLocalDate();
         Timestamp from = new Timestamp(start.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000);
         Timestamp to = new Timestamp(end.getTime());
 
-        double totalTradeSum = tradeRepository.totalSum(branchId, from, to);
-        double totalDebtSum = tradeRepository.totalDebtSum(branchId, from, to);
-        double totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBranchId(from, to, branchId);
-        double totalRepaymentDebtSum = repaymentDebtRepository.getTotalSum(branchId, from, to);
+        Double totalSum = null;
+        Double totalDebtSum = null;
+        Double totalOutlaySum = null;
+        Double totalRepaymentDebtSum = null;
+        double totalDebtSum1 = 0;
+        double totalOutlaySum1 = 0;
+        double totalRepaymentDebtSum1 = 0;
+        double totalTradeSumma = 0;
 
-        if (totalTradeSum == 0) {
+        if (businessId != null) {
+            totalSum = tradeRepository.totalSumByBusiness(businessId, from, to);
+            totalDebtSum = tradeRepository.totalDebtSumByBusiness(businessId, from, to);
+            totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBusinessId(businessId, from, to);
+            totalRepaymentDebtSum = repaymentDebtRepository.getTotalSumByBusiness(businessId, from, to);
+        } else {
+            totalSum = tradeRepository.totalSum(branchId, from, to);
+            totalDebtSum = tradeRepository.totalDebtSum(branchId, from, to);
+            totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBranchId(from, to, branchId);
+            totalRepaymentDebtSum = repaymentDebtRepository.getTotalSum(branchId, from, to);
+        }
+
+        totalDebtSum1 = totalDebtSum != null ? totalDebtSum : 0;
+        totalOutlaySum1 = totalOutlaySum != null ? totalOutlaySum : 0;
+        totalRepaymentDebtSum1 = totalRepaymentDebtSum != null ? totalRepaymentDebtSum : 0;
+        totalTradeSumma = totalSum != null ? totalSum : 0;
+
+        if (totalTradeSumma == 0) {
             return new ApiResponse("savdo qilinmadi", false);
         } else {
-            double totalSumma = totalTradeSum - totalDebtSum - totalOutlaySum + totalRepaymentDebtSum;
-            return new ApiResponse("kassadi pul", true, totalSumma);
+            double totalSumma = totalTradeSumma - totalDebtSum1 - totalOutlaySum1 + totalRepaymentDebtSum1;
+            return new ApiResponse("kassadagi pul", true, totalSumma);
         }
+    }
+
+
+    public ApiResponse getIncrease(UUID businessId, UUID branchId, String date, Date startDate, Date endDate) {
+
+        Timestamp startTimestamp = null;
+        Timestamp endTimestamp = null;
+
+        Timestamp startTimestamp1 = null;
+        Timestamp endTimestamp1 = null;
+
+        double nowTotalProductSum = 0;
+        double lastTotalProductSum = 0;
+
+        double nowTotalSumDouble = 0;
+        double lastTotalSumDouble = 0;
+
+        double nowTotalProfitDouble = 0;
+        double lastTotalProfitDouble = 0;
+
+        Integer nowTotalCustomer = null;
+        Integer lastTotalCustomer = null;
+
+        int nowTotalCustomerInt = 0;
+        int lastTotalCustomerInt = 0;
+
+        if (startDate != null && endDate != null) {
+            startTimestamp = new Timestamp(startDate.getTime());
+            endTimestamp = new Timestamp(endDate.getTime());
+        }
+
+        if (date != null) {
+            switch (date) {
+                case "LAST_WEEK" -> {
+                    LocalDate today = LocalDate.now();
+                    LocalDate sevenDaysAgo = today.minusDays(7);
+
+                    startTimestamp = Timestamp.valueOf(today.atStartOfDay());
+                    endTimestamp = Timestamp.valueOf(sevenDaysAgo.atStartOfDay());
+
+                    LocalDate eightDaysAgo = today.minusDays(8);
+                    LocalDate fifteenDaysAgo = today.minusDays(15);
+
+                    startTimestamp1 = Timestamp.valueOf(eightDaysAgo.atStartOfDay());
+                    endTimestamp1 = Timestamp.valueOf(fifteenDaysAgo.atStartOfDay());
+                }
+                case "LAST_MONTH" -> {
+
+                    LocalDate today = LocalDate.now();
+                    LocalDate sevenDaysAgo = today.minusDays(30);
+
+                    startTimestamp = Timestamp.valueOf(today.atStartOfDay());
+                    endTimestamp = Timestamp.valueOf(sevenDaysAgo.atStartOfDay());
+
+                    LocalDate eightDaysAgo = today.minusDays(31);
+                    LocalDate fifteenDaysAgo = today.minusDays(61);
+
+                    startTimestamp1 = Timestamp.valueOf(eightDaysAgo.atStartOfDay());
+                    endTimestamp1 = Timestamp.valueOf(fifteenDaysAgo.atStartOfDay());
+
+                }
+                case "LAST_YEAR" -> {
+                    LocalDate today = LocalDate.now();
+                    LocalDate sevenDaysAgo = today.minusDays(365);
+
+                    startTimestamp = Timestamp.valueOf(today.atStartOfDay());
+                    endTimestamp = Timestamp.valueOf(sevenDaysAgo.atStartOfDay());
+
+                    LocalDate eightDaysAgo = today.minusDays(366);
+                    LocalDate fifteenDaysAgo = today.minusDays(731);
+
+                    startTimestamp1 = Timestamp.valueOf(eightDaysAgo.atStartOfDay());
+                    endTimestamp1 = Timestamp.valueOf(fifteenDaysAgo.atStartOfDay());
+                }
+                default -> {
+                    startTimestamp = Timestamp.valueOf(START_OF_DAY);
+                    endTimestamp = Timestamp.valueOf(END_OF_DAY);
+
+                    LocalDate lastDay = START_OF_DAY.minusDays(1).toLocalDate();
+                    LocalDate lastDayMinusOne = END_OF_DAY.minusDays(1).toLocalDate();
+
+                    startTimestamp1 = Timestamp.valueOf(lastDay.atStartOfDay());
+                    endTimestamp1 = Timestamp.valueOf(lastDayMinusOne.atStartOfDay());
+                }
+            }
+        }
+
+        if (branchId != null) {
+
+            Double nowTotalSum = tradeRepository.totalSum(branchId, startTimestamp, endTimestamp);
+            Double lastTotalSum = tradeRepository.totalSum(branchId, startTimestamp1, endTimestamp1);
+
+            nowTotalSumDouble += nowTotalSum != null ? nowTotalSum : 0;
+            lastTotalSumDouble += lastTotalSum != null ? lastTotalSum : 0;
+
+            Double nowTotalProfit = tradeRepository.totalProfit(branchId, startTimestamp, endTimestamp);
+            Double lastTotalProfit = tradeRepository.totalProfit(branchId, startTimestamp1, endTimestamp1);
+
+            nowTotalProfitDouble += nowTotalProfit != null ? nowTotalProfit : 0;
+            lastTotalProfitDouble += lastTotalProfit != null ? lastTotalProfit : 0;
+
+            nowTotalCustomer = customerRepository.countAllByBranch_IdAndCreatedAtBetween(branchId, startTimestamp, endTimestamp);
+            lastTotalCustomer = customerRepository.countAllByBranch_IdAndCreatedAtBetween(branchId, startTimestamp1, endTimestamp1);
+
+            List<Warehouse> all = warehouseRepository.findAllByBranchId(branchId);
+            for (Warehouse warehouse : all) {
+                if (warehouse.getProductTypePrice() != null) {
+                    Double nowTotalProductPriceSum = warehouseRepository.totalSumProductTypePrice(warehouse.getProductTypePrice().getId(), startTimestamp, endTimestamp);
+                    Double lastTotalProductPriceSum = warehouseRepository.totalSumProductTypePrice(warehouse.getProductTypePrice().getId(), startTimestamp1, endTimestamp1);
+
+                    nowTotalProductSum += nowTotalProductPriceSum != null ? nowTotalProductPriceSum : 0;
+                    lastTotalProductSum += lastTotalProductPriceSum != null ? lastTotalProductPriceSum : 0;
+                } else {
+                    Double nowTotalProductPriceSum = warehouseRepository.totalSumProduct(warehouse.getProduct().getId(), startTimestamp, endTimestamp);
+                    Double lastTotalProductPriceSum = warehouseRepository.totalSumProduct(warehouse.getProduct().getId(), startTimestamp1, endTimestamp1);
+
+                    nowTotalProductSum += nowTotalProductPriceSum != null ? nowTotalProductPriceSum : 0;
+                    lastTotalProductSum += lastTotalProductPriceSum != null ? lastTotalProductPriceSum : 0;
+                }
+            }
+        } else {
+            Double nowTotalSum = tradeRepository.totalSumByBusiness(businessId, startTimestamp, endTimestamp);
+            Double lastTotalSum = tradeRepository.totalSumByBusiness(businessId, startTimestamp1, endTimestamp1);
+
+            nowTotalSumDouble += nowTotalSum != null ? nowTotalSum : 0;
+            lastTotalSumDouble += lastTotalSum != null ? lastTotalSum : 0;
+
+            Double nowTotalProfit = tradeRepository.totalProfitByBusinessId(businessId, startTimestamp, endTimestamp);
+            Double lastTotalProfit = tradeRepository.totalProfitByBusinessId(businessId, startTimestamp1, endTimestamp1);
+
+            nowTotalProfitDouble += nowTotalProfit != null ? nowTotalProfit : 0;
+            lastTotalProfitDouble += lastTotalProfit != null ? lastTotalProfit : 0;
+
+            nowTotalCustomer = customerRepository.countAllByBusiness_IdAndCreatedAtBetween(businessId, startTimestamp, endTimestamp);
+            lastTotalCustomer = customerRepository.countAllByBusiness_IdAndCreatedAtBetween(businessId, startTimestamp1, endTimestamp1);
+
+            nowTotalCustomerInt += nowTotalCustomer != null ? nowTotalCustomer : 0;
+            lastTotalCustomerInt += lastTotalCustomer != null ? lastTotalCustomer : 0;
+
+            List<Warehouse> all = warehouseRepository.findAllByBranch_Business_Id(businessId);
+            for (Warehouse warehouse : all) {
+                if (warehouse.getProductTypePrice() != null) {
+                    Double nowTotalProductPriceSum = warehouseRepository.totalSumProductTypePrice(warehouse.getProductTypePrice().getId(), startTimestamp, endTimestamp);
+                    Double lastTotalProductPriceSum = warehouseRepository.totalSumProductTypePrice(warehouse.getProductTypePrice().getId(), startTimestamp1, endTimestamp1);
+
+                    nowTotalProductSum += nowTotalProductPriceSum != null ? nowTotalProductPriceSum : 0;
+                    lastTotalProductSum += lastTotalProductPriceSum != null ? lastTotalProductPriceSum : 0;
+                } else {
+                    Double nowTotalProductPriceSum = warehouseRepository.totalSumProduct(warehouse.getProduct().getId(), startTimestamp, endTimestamp);
+                    Double lastTotalProductPriceSum = warehouseRepository.totalSumProduct(warehouse.getProduct().getId(), startTimestamp1, endTimestamp1);
+
+                    nowTotalProductSum += nowTotalProductPriceSum != null ? nowTotalProductPriceSum : 0;
+                    lastTotalProductSum += lastTotalProductPriceSum != null ? lastTotalProductPriceSum : 0;
+                }
+            }
+        }
+
+        GetStaticDto getStaticDto = new GetStaticDto();
+
+        TotalCustomerDto totalCustomerDto = new TotalCustomerDto();
+        totalCustomerDto.setAmount(nowTotalCustomerInt - lastTotalCustomerInt);
+        totalCustomerDto.setPercentage((double) (nowTotalCustomerInt * 100) / lastTotalCustomerInt);
+
+        TotalSumDto totalSumDto = new TotalSumDto();
+        totalSumDto.setSumma(nowTotalSumDouble - lastTotalSumDouble);
+        totalSumDto.setPercentage((nowTotalSumDouble * 100) / lastTotalSumDouble);
+
+        TotalProfitSumDto totalProfitSumDto = new TotalProfitSumDto();
+        totalProfitSumDto.setSumma(nowTotalProfitDouble - lastTotalProfitDouble);
+        totalProfitSumDto.setPercentage((nowTotalProfitDouble * 100) / lastTotalProfitDouble);
+
+        TotalProductSumDto totalProductSumDto = new TotalProductSumDto();
+        totalProductSumDto.setSumma(nowTotalProductSum - lastTotalProductSum);
+        totalProductSumDto.setPercentage((nowTotalProductSum * 100) / lastTotalProductSum);
+
+        getStaticDto.setTotalCustomerDto(totalCustomerDto);
+        getStaticDto.setTotalProductSumDto(totalProductSumDto);
+        getStaticDto.setTotalSumDto(totalSumDto);
+        getStaticDto.setTotalProfitSumDto(totalProfitSumDto);
+
+        return new ApiResponse("found", true, getStaticDto);
     }
 }

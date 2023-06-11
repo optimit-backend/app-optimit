@@ -25,9 +25,22 @@ public class BranchService {
     private final UserRepository userRepository;
     private final BalanceRepository balanceRepository;
     private final PayMethodRepository payMethodRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     public ApiResponse addBranch(BranchDto branchDto) {
         Branch branch = new Branch();
+
+        UUID businessId = branchDto.getBusinessId();
+
+        Optional<Subscription> optionalSubscription = subscriptionRepository.findByBusinessIdAndActiveTrue(businessId);
+        if (optionalSubscription.isPresent()) {
+            Subscription subscription = optionalSubscription.get();
+            int branchAmount = subscription.getTariff().getBranchAmount();
+            int count = branchRepository.countAllByBusiness_Id(businessId);
+            if (branchAmount <= count) {
+                return new ApiResponse("Tarif bo'yicha fillial qo'shish limiti cheklangan!", false);
+            }
+        }
 
         branch.setName(branchDto.getName());
 

@@ -2,6 +2,7 @@ package uz.pdp.springsecurity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import uz.pdp.springsecurity.entity.Outlay;
 
 import java.sql.Timestamp;
@@ -42,4 +43,7 @@ public interface OutlayRepository extends JpaRepository<Outlay, UUID> {
 
     @Query(value = "SELECT SUM(total_sum) FROM outlay WHERE created_at BETWEEN ?1 AND  ?2 AND branch_id = ?3", nativeQuery = true)
     Double outlayByCreatedAtBetweenAndBranchId(Timestamp from, Timestamp to, UUID branchId);
+
+    @Query(value = "SELECT SUM(o.totalSum) FROM Outlay o WHERE o.branch.business.id = :businessId AND o.createdAt >= :startDate AND o.createdAt <= :endDate")
+    Double outlayByCreatedAtBetweenAndBusinessId(@Param("businessId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
 }
