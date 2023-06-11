@@ -11,4 +11,8 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class GetCheckoutDto {
     private Timestamp timestamp;
+    private double totalTradeSum;
+    private double totalOutlay;
+    private double totalCash;
+    private double totalDebt;
 }
