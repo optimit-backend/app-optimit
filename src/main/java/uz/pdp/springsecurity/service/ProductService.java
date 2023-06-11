@@ -1005,6 +1005,9 @@ public class ProductService {
         all = new ArrayList<>(allProduct);
         toViewDtoMto(branchId, getForPurchaseDtoList, all);
 
+        if (getForPurchaseDtoList.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
         return new ApiResponse("all", true, getForPurchaseDtoList);
     }
 }
