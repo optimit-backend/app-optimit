@@ -102,6 +102,9 @@ public class ReportsService {
     private final static LocalDateTime END_OF_MONTH = TEMP_END_OF_MONTH.atStartOfDay();
     private final static LocalDateTime START_OF_DAY = TEMP_START_OF_DAY.atStartOfDay();
     private final static LocalDateTime END_OF_DAY = TEMP_END_OF_DAY.atStartOfDay();
+    private final static LocalDateTime TODAY_START = LocalDate.now().atStartOfDay();
+    private final static LocalDateTime TODAY_END = LocalDateTime.of(TODAY_START.getYear(), TODAY_START.getMonth(), TODAY_START.getDayOfMonth(), 23, 59, 59);
+
     @Autowired
     private LidRepository lidRepository;
     @Autowired
@@ -2104,8 +2107,11 @@ public class ReportsService {
     public ApiResponse getCheckout(UUID branchId, UUID businessId) {
         Date end = new Date();
         LocalDate start = LocalDate.now().atStartOfDay().toLocalDate();
-        Timestamp from = new Timestamp(start.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000);
-        Timestamp to = new Timestamp(end.getTime());
+//        Timestamp from = new Timestamp(start.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000);
+//        Timestamp to = new Timestamp(end.getTime());
+
+        List<GetCheckoutDto> getCheckoutDtoList = new ArrayList<>();
+
 
         Double totalSum = null;
         Double totalDebtSum = null;
@@ -2116,27 +2122,34 @@ public class ReportsService {
         double totalRepaymentDebtSum1 = 0;
         double totalTradeSumma = 0;
 
-        if (businessId != null) {
-            totalSum = tradeRepository.totalSumByBusiness(businessId, from, to);
-            totalDebtSum = tradeRepository.totalDebtSumByBusiness(businessId, from, to);
-            totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBusinessId(businessId, from, to);
-            totalRepaymentDebtSum = repaymentDebtRepository.getTotalSumByBusiness(businessId, from, to);
-        } else {
-            totalSum = tradeRepository.totalSum(branchId, from, to);
-            totalDebtSum = tradeRepository.totalDebtSum(branchId, from, to);
-            totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBranchId(from, to, branchId);
-            totalRepaymentDebtSum = repaymentDebtRepository.getTotalSum(branchId, from, to);
-        }
+        double totalSumma = 0;
 
-        totalDebtSum1 = totalDebtSum != null ? totalDebtSum : 0;
-        totalOutlaySum1 = totalOutlaySum != null ? totalOutlaySum : 0;
-        totalRepaymentDebtSum1 = totalRepaymentDebtSum != null ? totalRepaymentDebtSum : 0;
-        totalTradeSumma = totalSum != null ? totalSum : 0;
+        for (int i = 0; i < 15; i++) {
+            Timestamp from = Timestamp.valueOf(TODAY_END.minusDays(i + 1));
+            Timestamp to = Timestamp.valueOf(TODAY_END.minusDays(i));
+
+            if (businessId != null) {
+                totalSum = tradeRepository.totalSumByBusiness(businessId, from, to);
+                totalDebtSum = tradeRepository.totalDebtSumByBusiness(businessId, from, to);
+                totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBusinessId(businessId, from, to);
+                totalRepaymentDebtSum = repaymentDebtRepository.getTotalSumByBusiness(businessId, from, to);
+            } else {
+                totalSum = tradeRepository.totalSum(branchId, from, to);
+                totalDebtSum = tradeRepository.totalDebtSum(branchId, from, to);
+                totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBranchId(from, to, branchId);
+                totalRepaymentDebtSum = repaymentDebtRepository.getTotalSum(branchId, from, to);
+            }
+            totalDebtSum1 = totalDebtSum != null ? totalDebtSum : 0;
+            totalOutlaySum1 = totalOutlaySum != null ? totalOutlaySum : 0;
+            totalRepaymentDebtSum1 = totalRepaymentDebtSum != null ? totalRepaymentDebtSum : 0;
+            totalTradeSumma = totalSum != null ? totalSum : 0;
+
+        }
 
         if (totalTradeSumma == 0) {
             return new ApiResponse("savdo qilinmadi", false);
         } else {
-            double totalSumma = totalTradeSumma - totalDebtSum1 - totalOutlaySum1 + totalRepaymentDebtSum1;
+            totalSumma = totalTradeSumma - totalDebtSum1 - totalOutlaySum1 + totalRepaymentDebtSum1;
             return new ApiResponse("kassadagi pul", true, totalSumma);
         }
     }
