@@ -38,6 +38,8 @@ public class TradeProduct extends AbsEntity {
 
     private double tradedQuantity;
 
+    private Double backing;
+
 //    private double buyPrice;
     private double totalSalePrice;
 

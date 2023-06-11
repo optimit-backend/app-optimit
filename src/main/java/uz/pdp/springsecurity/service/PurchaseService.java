@@ -1,61 +1,46 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class PurchaseService {
-    @Autowired
-    PurchaseRepository purchaseRepository;
+    private final PurchaseRepository purchaseRepository;
 
-    @Autowired
-    PurchaseProductRepository purchaseProductRepository;
+    private final PurchaseProductRepository purchaseProductRepository;
 
-    @Autowired
-    ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    SupplierRepository supplierRepository;
+    private final SupplierRepository supplierRepository;
 
-    @Autowired
-    ExchangeStatusRepository exchangeStatusRepository;
+    private final ExchangeStatusRepository exchangeStatusRepository;
 
-    @Autowired
-    PaymentStatusRepository paymentStatusRepository;
+    private final PaymentStatusRepository paymentStatusRepository;
 
-    @Autowired
-    BranchRepository branchRepository;
+    private final BranchRepository branchRepository;
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    CurrencyRepository currencyRepository;
+    private final CurrencyRepository currencyRepository;
 
-    @Autowired
-    FifoCalculationService fifoCalculationService;
+    private final FifoCalculationService fifoCalculationService;
 
-    @Autowired
-    ProductTypePriceRepository productTypePriceRepository;
+    private final ProductTypePriceRepository productTypePriceRepository;
 
-    @Autowired
-    WarehouseRepository warehouseRepository;
+    private final WarehouseService warehouseService;
 
-    @Autowired
-    WarehouseService warehouseService;
     private final BalanceService balanceService;
+
     private final PayMethodRepository payMethodRepository;
+    private final FifoCalculationRepository fifoCalculationRepository;
 
 
     public ApiResponse add(PurchaseDto purchaseDto) {
@@ -69,10 +54,9 @@ public class PurchaseService {
 
         Purchase purchase = optionalPurchase.get();
         if (!purchase.isEditable()) return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
-        Timestamp createdAt = purchase.getCreatedAt();
-        long difference = System.currentTimeMillis() - createdAt.getTime();
-        long oneDay = 1000 * 60 * 60 * 24;
-        if (difference > oneDay) {
+        LocalDateTime createdAt = purchase.getCreatedAt().toLocalDateTime();
+        int day = LocalDateTime.now().getDayOfYear() - createdAt.getDayOfYear();
+        if (day > 1) {
             purchase.setEditable(false);
             return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
         }
@@ -241,14 +225,52 @@ public class PurchaseService {
 
     public ApiResponse getOne(UUID id) {
         Optional<Purchase> optionalPurchase = purchaseRepository.findById(id);
-        if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND PURCHASE", false);
         Purchase purchase = optionalPurchase.get();
         List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
         if (purchaseProductList.isEmpty()) return new ApiResponse("NOT FOUND PRODUCTS", false);
-        PurchaseGetOneDto purchaseGetOneDto = new PurchaseGetOneDto();
-        purchaseGetOneDto.setPurchase(purchase);
-        purchaseGetOneDto.setPurchaseProductList(purchaseProductList);
+        PurchaseGetOneDto purchaseGetOneDto = new PurchaseGetOneDto(
+                purchase,
+                purchaseProductList
+        );
         return new ApiResponse("FOUND", true, purchaseGetOneDto);
+    }
+
+    public ApiResponse view(UUID purchaseId) {
+        Optional<Purchase> optionalPurchase = purchaseRepository.findById(purchaseId);
+        if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND PURCHASE", false);
+        Purchase purchase = optionalPurchase.get();
+        List<PurchaseProduct> purchaseProductList = purchaseProductRepository.findAllByPurchaseId(purchase.getId());
+        if (purchaseProductList.isEmpty()) return new ApiResponse("NOT FOUND PRODUCTS", false);
+        Map<String, Object> response = new HashMap<>();
+        response.put("purchase", purchase);
+        response.put("purchaseProductGetDtoList", toPurchaseProductGetDtoList(purchaseProductList));
+        return new ApiResponse("FOUND", true, response);
+    }
+
+    private List<PurchaseProductGetDto> toPurchaseProductGetDtoList(List<PurchaseProduct> purchaseProductList) {
+        List<PurchaseProductGetDto> purchaseProductGetDtoList = new ArrayList<>();
+        for (PurchaseProduct purchaseProduct : purchaseProductList) {
+            PurchaseProductGetDto dto = new PurchaseProductGetDto(
+                    purchaseProduct.getPurchasedQuantity(),
+                    purchaseProduct.getBuyPrice(),
+                    purchaseProduct.getSalePrice(),
+                    purchaseProduct.getTotalSum()
+            );
+            if (purchaseProduct.getProduct() != null) {
+                dto.setName(purchaseProduct.getProduct().getName());
+                dto.setMeasurement(purchaseProduct.getProduct().getMeasurement().getName());
+            } else {
+                dto.setName(purchaseProduct.getProductTypePrice().getName());
+                dto.setMeasurement(purchaseProduct.getProductTypePrice().getProduct().getMeasurement().getName());
+            }
+            double remainQuantity= fifoCalculationRepository.remainQuantityByPurchaseProductId(purchaseProduct.getId());
+            remainQuantity = Math.round(remainQuantity * 100) / 100.;
+            dto.setSoldQuantity(dto.getQuantity() - remainQuantity);
+            dto.setProfit((dto.getSalePrice() - dto.getBuyPrice()) * dto.getSoldQuantity());
+            purchaseProductGetDtoList.add(dto);
+        }
+        return purchaseProductGetDtoList;
     }
 
     public ApiResponse delete(UUID id) {

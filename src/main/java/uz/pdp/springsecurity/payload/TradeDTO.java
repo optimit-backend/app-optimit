@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -13,40 +14,34 @@ import java.util.UUID;
 @NoArgsConstructor
 
 public class TradeDTO {
+    @NotNull
+    private boolean backing;
 
     private UUID customerId;
 
-    /**
-     * savdogar id
-     */
+    @NotNull
     private UUID userId;
 
+    @NotNull
     private UUID branchId;
 
     private UUID paymentStatusId;
 
+    @NotNull
     private List<PaymentDto> paymentDtoList;
 
     private Date payDate;
 
-    /**
-     * umumiy summa
-     */
+    @NotNull
     private double totalSum;
 
-    /**
-     * to'langan summa
-     */
+    @NotNull
     private double paidSum;
 
-    /**
-     * qarz
-     */
+    @NotNull
     private double debtSum;
 
-    /**
-     * product idlari
-     */
+    @NotNull
     private List<TradeProductDto> productTraderDto;
 
     private boolean lid;

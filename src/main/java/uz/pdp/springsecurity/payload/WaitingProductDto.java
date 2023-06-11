@@ -22,4 +22,7 @@ public class WaitingProductDto {
 
     @NotNull
     private double salePrice;
+
+    @NotNull
+    private boolean subMeasurement;
 }
