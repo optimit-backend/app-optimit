@@ -34,9 +34,9 @@ public class TradeController {
     }
 
     @CheckPermission("EDIT_TRADE")
-    @PutMapping("/{trade_id}")
-    public HttpEntity<?> edit(@PathVariable UUID trade_id, @RequestBody TradeDTO tradeDTO) {
-        ApiResponse apiResponse = tradeService.edit(trade_id, tradeDTO);
+    @PutMapping("/{tradeId}")
+    public HttpEntity<?> edit(@PathVariable UUID tradeId, @RequestBody TradeDTO tradeDTO) {
+        ApiResponse apiResponse = tradeService.edit(tradeId, tradeDTO);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -117,6 +117,23 @@ public class TradeController {
     @GetMapping("/get-by-business/{businessId}")
     public HttpEntity<?> getAllByBusinessId(@PathVariable UUID businessId) {
         ApiResponse apiResponse = tradeService.getAllByBusinessId(businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_REPORT")
+    @GetMapping("/backing/{branchId}")
+    public HttpEntity<?> getBacking(@PathVariable UUID branchId) {
+        ApiResponse apiResponse = tradeService.getBacking(branchId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_REPORT")
+    @GetMapping("/backing-by-product/{branchId}")
+    public HttpEntity<?> getBackingByProduct(@PathVariable UUID branchId,
+                                             @RequestParam UUID productId,
+                                             @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
+                                             @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size) {
+        ApiResponse apiResponse = tradeService.getBackingByProduct(branchId, productId, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 }
