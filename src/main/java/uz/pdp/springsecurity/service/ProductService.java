@@ -259,17 +259,26 @@ public class ProductService {
 
         for (ProductTypePricePostDto typePricePostDto : productDto.getProductTypePricePostDtoList()) {
             Optional<ProductTypeValue> optionalProductTypeValue = productTypeValueRepository.findById(typePricePostDto.getProductTypeValueId());
+            Optional<ProductTypeValue> optionalSubProductTypeValue = productTypeValueRepository.findById(typePricePostDto.getSubProductTypeValueId());
             if (optionalProductTypeValue.isEmpty()) return new ApiResponse("not found product type value", false);
             if (typePricePostDto.getProductTypePriceId() != null) {
                 Optional<ProductTypePrice> typePriceOptional = productTypePriceRepository.findById(typePricePostDto.getProductTypePriceId());
                 if (typePriceOptional.isEmpty()) {
                     return new ApiResponse("not found product type many id", false);
                 }
+                if (typePricePostDto.getSubProductTypeValueId() != null) {
+                    productTypePriceRepository.findById(typePricePostDto.getSubProductTypeValueId());
+                }
 
                 ProductTypeValue productTypeValue = optionalProductTypeValue.get();
                 ProductTypePrice productTypePrice = typePriceOptional.get();
                 productTypePrice.setProduct(saveProduct);
-                productTypePrice.setName(product.getName() + "( " + productTypeValue.getProductType().getName() + " - " + productTypeValue.getName() + " )");
+                if (optionalSubProductTypeValue.isPresent()) {
+                    productTypePrice.setName(product.getName() + "( " + productTypeValue.getProductType().getName() + " - " + productTypeValue.getName() + " " + optionalSubProductTypeValue.get().getName() + " )");
+                    productTypePrice.setSubProductTypeValue(optionalSubProductTypeValue.get());
+                } else {
+                    productTypePrice.setName(product.getName() + "( " + productTypeValue.getProductType().getName() + " - " + productTypeValue.getName() + " )");
+                }
                 productTypePrice.setProductTypeValue(optionalProductTypeValue.get());
                 productTypePrice.setBuyPrice(typePricePostDto.getBuyPrice());
                 productTypePrice.setBuyPriceDollar(Math.round(typePricePostDto.getBuyPrice() / currency.getCourse() * 100) / 100.);
@@ -298,7 +307,12 @@ public class ProductService {
                 ProductTypeValue productTypeValue = optionalProductTypeValue.get();
                 ProductTypePrice productTypePrice = new ProductTypePrice();
                 productTypePrice.setProduct(saveProduct);
-                productTypePrice.setName(product.getName() + "( " + productTypeValue.getProductType().getName() + " - " + productTypeValue.getName() + " )");
+                if (optionalSubProductTypeValue.isPresent()) {
+                    productTypePrice.setName(product.getName() + "( " + productTypeValue.getProductType().getName() + " - " + productTypeValue.getName() + " " + optionalSubProductTypeValue.get().getName() + " )");
+                    productTypePrice.setSubProductTypeValue(optionalSubProductTypeValue.get());
+                } else {
+                    productTypePrice.setName(product.getName() + "( " + productTypeValue.getProductType().getName() + " - " + productTypeValue.getName() + " )");
+                }
                 productTypePrice.setProductTypeValue(optionalProductTypeValue.get());
                 productTypePrice.setBuyPrice(typePricePostDto.getBuyPrice());
                 productTypePrice.setBuyPriceDollar(Math.round(typePricePostDto.getBuyPrice() / currency.getCourse() * 100) / 100.);
@@ -592,7 +606,7 @@ public class ProductService {
                     getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
                     if (product.getMeasurement() != null) {
                         getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
-                        if (product.getMeasurement().getSubMeasurement() != null){
+                        if (product.getMeasurement().getSubMeasurement() != null) {
                             getForPurchaseDto.setSubMeasurementName(product.getMeasurement().getSubMeasurement().getName());
                             getForPurchaseDto.setSubMeasurementValue(product.getMeasurement().getValue());
                         }
@@ -622,7 +636,7 @@ public class ProductService {
                 getForPurchaseDto.setExpiredDate(product.getExpireDate());
                 if (product.getMeasurement() != null) {
                     getForPurchaseDto.setMeasurementName(product.getMeasurement().getName());
-                    if (product.getMeasurement().getSubMeasurement() != null){
+                    if (product.getMeasurement().getSubMeasurement() != null) {
                         getForPurchaseDto.setSubMeasurementName(product.getMeasurement().getSubMeasurement().getName());
                         getForPurchaseDto.setSubMeasurementValue(product.getMeasurement().getValue());
                     }
@@ -740,9 +754,9 @@ public class ProductService {
             if (product.getPhoto() != null) {
                 productViewDto.setPhotoId(product.getPhoto().getId());
             }
-            if (product.getMeasurement() != null){
+            if (product.getMeasurement() != null) {
                 productViewDto.setMeasurementId(product.getMeasurement().getName());
-                if (product.getMeasurement().getSubMeasurement() != null){
+                if (product.getMeasurement().getSubMeasurement() != null) {
                     productViewDto.setSubMeasurementName(product.getMeasurement().getSubMeasurement().getName());
                     productViewDto.setSubMeasurementValue(product.getMeasurement().getValue());
                 }

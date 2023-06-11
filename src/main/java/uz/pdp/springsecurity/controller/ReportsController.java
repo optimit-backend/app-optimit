@@ -218,8 +218,20 @@ public class ReportsController {
 
     @CheckPermission("VIEW_REPORT")
     @GetMapping("/get-checkout/{branchId}")
-    public HttpEntity<?> getCheckout(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = reportsService.getCheckout(branchId);
+    public HttpEntity<?> getCheckout(@PathVariable UUID branchId,
+                                     @RequestParam(required = false) UUID businessId) {
+        ApiResponse apiResponse = reportsService.getCheckout(branchId, businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_REPORT")
+    @GetMapping("/get-increase/{businessId}")
+    public HttpEntity<?> getIncrease(@PathVariable UUID businessId,
+                                     @RequestParam(required = false) UUID branchId,
+                                     @RequestParam(required = false) String date,
+                                     @RequestParam(required = false) Date startDate,
+                                     @RequestParam(required = false) Date endDate) {
+        ApiResponse apiResponse = reportsService.getIncrease(businessId, branchId, date, startDate, endDate);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

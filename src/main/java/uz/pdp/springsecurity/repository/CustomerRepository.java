@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import uz.pdp.springsecurity.entity.Customer;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -30,4 +31,7 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     List<Customer> findAllByBranchesIdAndLidCustomerIsTrue(UUID branch_id);
 
     int countAllByBranchesId(UUID branchId);
+
+    Integer countAllByBranch_IdAndCreatedAtBetween(UUID branch_id, Timestamp createdAt, Timestamp createdAt2);
+    Integer countAllByBusiness_IdAndCreatedAtBetween(UUID businessId, Timestamp createdAt, Timestamp createdAt2);
 }

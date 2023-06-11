@@ -19,7 +19,10 @@ public class ProductTypePrice extends AbsEntity {
     private Product product;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    private ProductTypeValue productTypeValue;
+    private ProductTypeValue productTypeValue; //oq
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private ProductTypeValue subProductTypeValue;//32,64,128,256
 
     @OneToOne(cascade = CascadeType.ALL)
     private Attachment photo;
