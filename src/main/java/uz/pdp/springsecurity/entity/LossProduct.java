@@ -32,6 +32,11 @@ public class LossProduct extends AbsEntity {
     private double quantity;
 
     private double price;
+
+    public LossProduct(Loss loss, double quantity) {
+        this.loss = loss;
+        this.quantity = quantity;
+    }
 }
 
 

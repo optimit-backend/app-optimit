@@ -74,7 +74,11 @@ public class WarehouseService {
         }
         warehouseRepository.save(warehouse);
         // DAILY PRODUCT HISTORY
-        productHistoryService.create(branch, product, productTypePrice, true, quantity, warehouse.getAmount());
+        if (quantity > 0){
+            productHistoryService.create(branch, product, productTypePrice, true, quantity, warehouse.getAmount());
+        } else {
+            productHistoryService.create(branch, product, productTypePrice, false, -quantity, warehouse.getAmount());
+        }
 
         return amount;
     }

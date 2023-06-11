@@ -33,4 +33,10 @@ public class Loss extends AbsEntity {
     private double price;
 
     private boolean editable;
+
+    public Loss(User user, Branch branch, Date date) {
+        this.user = user;
+        this.branch = branch;
+        this.date = date;
+    }
 }
