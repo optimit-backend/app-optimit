@@ -2118,6 +2118,11 @@ public class ReportsService {
 
         double totalSumma = 0;
 
+        Timestamp fromToday = Timestamp.valueOf(TODAY_END.minusDays(1));
+        Timestamp toToday = Timestamp.valueOf(TODAY_END);
+        double todayOutlay = 0;
+        double todayProfit = 0;
+
         for (int i = 0; i < 15; i++) {
             Timestamp from = Timestamp.valueOf(TODAY_END.minusDays(i + 1));
             Timestamp to = Timestamp.valueOf(TODAY_END.minusDays(i));
@@ -2149,8 +2154,23 @@ public class ReportsService {
             getCheckoutDto.setTimestamp(to);
             getCheckoutDtoList.add(getCheckoutDto);
         }
+        if (businessId != null) {
+            Double aDouble = tradeRepository.totalProfitByBusinessId(businessId, fromToday, toToday);
+            Double aDouble1 = outlayRepository.outlayByCreatedAtBetweenAndBusinessId(businessId, fromToday, toToday);
+            todayOutlay = aDouble1 != null ? aDouble1 : 0;
+            todayProfit = aDouble != null ? aDouble : 0;
+        } else {
+            Double aDouble = tradeRepository.totalProfit(branchId, fromToday, toToday);
+            todayProfit = aDouble != null ? aDouble : 0;
+
+            Double aDouble1 = outlayRepository.outlayByCreatedAtBetweenAndBranchId(fromToday, toToday, branchId);
+            todayOutlay = aDouble1 != null ? aDouble1 : 0;
+        }
+
         response.put("data", getCheckoutDtoList);
         response.put("totalSumma", totalSumma);
+        response.put("totalOutlay", todayOutlay);
+        response.put("totalProfit", todayProfit);
 
         return new ApiResponse("kassadagi pul", true, response);
 
@@ -2380,42 +2400,48 @@ public class ReportsService {
         double totalDebtSum2 = 0;
         double totalPurchase2 = 0;
         double totalMyDebt2 = 0;
+        List<Branch> branchIds = new ArrayList<>();
+
+        if (businessId != null) {
+            List<Branch> allByBusinessId = branchRepository.findAllByBusiness_Id(businessId);
+            branchIds.addAll(allByBusinessId);
+        } else {
+            Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+            if (optionalBranch.isEmpty()) {
+                return new ApiResponse("not found", false);
+            }
+            Branch branch = optionalBranch.get();
+            branchIds.add(branch);
+        }
 
         for (int i = 0; i < 15; i++) {
             Timestamp from = Timestamp.valueOf(TODAY_END.minusDays(i + 1));
             Timestamp to = Timestamp.valueOf(TODAY_END.minusDays(i));
+            for (Branch branch : branchIds) {
+                totalSum = tradeRepository.totalSum(branch.getId(), from, to);
+                totalDebtSum = tradeRepository.totalDebtSum(branch.getId(), from, to);
+                totalPurchase = purchaseRepository.totalPurchase(branch.getId(), from, to);
+                totalMyDebt = purchaseRepository.totalMyDebt(branch.getId(), from, to);
+                totalTradeSumma = totalSum != null ? totalSum : 0;
+                totalDebtSum1 = totalDebtSum != null ? totalDebtSum : 0;
+                totalPurchase1 = totalPurchase != null ? totalPurchase : 0;
+                totalMyDebt1 = totalMyDebt != null ? totalMyDebt : 0;
 
-            if (businessId != null) {
-                totalSum = tradeRepository.totalSumByBusiness(businessId, from, to);
-                totalDebtSum = tradeRepository.totalDebtSumByBusiness(businessId, from, to);
-//                totalPurchase = purchaseRepository.totalPurchaseByBusiness(businessId, from, to);
-//                totalMyDebt = purchaseRepository.totalMyDebtByBusiness(businessId, from, to);
 
-            } else {
-                totalSum = tradeRepository.totalSum(branchId, from, to);
-                totalDebtSum = tradeRepository.totalDebtSum(branchId, from, to);
-                totalPurchase = purchaseRepository.totalPurchase(branchId, from, to);
-                totalMyDebt = purchaseRepository.totalMyDebt(branchId, from, to);
+                GetChartDto getChartDto = new GetChartDto();
+                getChartDto.setTimestamp(from);
+                getChartDto.setTotalTrade(totalTradeSumma);
+                getChartDto.setTotalDebt(totalDebtSum1);
+                getChartDto.setTotalPurchase(totalPurchase1);
+                getChartDto.setTotalMyDebt(totalMyDebt1);
+
+                totalTradeSumma1 += totalTradeSumma;
+                totalDebtSum2 += totalDebtSum1;
+                totalPurchase2 += totalPurchase1;
+                totalMyDebt2 += totalMyDebt1;
+
+                getChartDtoList.add(getChartDto);
             }
-            totalTradeSumma = totalSum != null ? totalSum : 0;
-            totalDebtSum1 = totalDebtSum != null ? totalDebtSum : 0;
-            totalPurchase1 = totalPurchase != null ? totalPurchase : 0;
-            totalMyDebt1 = totalMyDebt != null ? totalMyDebt : 0;
-
-
-            GetChartDto getChartDto = new GetChartDto();
-            getChartDto.setTimestamp(from);
-            getChartDto.setTotalTrade(totalTradeSumma);
-            getChartDto.setTotalDebt(totalDebtSum1);
-            getChartDto.setTotalPurchase(totalPurchase1);
-            getChartDto.setTotalMyDebt(totalMyDebt1);
-
-            totalTradeSumma1 += totalTradeSumma;
-            totalDebtSum2 += totalDebtSum1;
-            totalPurchase2 += totalPurchase1;
-            totalMyDebt2 += totalMyDebt1;
-
-            getChartDtoList.add(getChartDto);
         }
         response.put("data", getChartDtoList);
         response.put("totalPurchase", totalPurchase2);
