@@ -669,7 +669,6 @@ public class ProductService {
             productList = productRepository.findAllByBranchIdAndActiveTrue(branch_id);
         }
         if (checkingBranch) {
-
             getProductMethod(productViewDtoList, productList, branch_id);
         } else {
             getProductMethod(productViewDtoList, productList, null);
@@ -677,6 +676,82 @@ public class ProductService {
 
 
         if (productList.isEmpty()) {
+            return new ApiResponse("NOT FOUND", false);
+        }
+
+        return new ApiResponse("FOUND", true, productViewDtoList);
+    }
+
+    public ApiResponse getByBusinessPageable(UUID businessId, UUID branch_id, UUID brand_id, UUID categoryId, String search, int page,int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<ProductViewDto> productViewDtoList = new ArrayList<>();
+        Page<Product> productList = null;
+        List<Product> products;
+
+
+        boolean checkingBranch = false;
+        boolean checkingBrand = false;
+        boolean checkingCategory = false;
+        boolean checkingBusiness = false;
+
+        if (categoryId != null) {
+            checkingCategory = true;
+        }
+        if (brand_id != null) {
+            checkingBrand = true;
+        }
+        if (branch_id != null) {
+            checkingBranch = true;
+        }
+        if (businessId != null) {
+            checkingBusiness = true;
+        }
+        if (checkingBranch) {
+            checkingBusiness = false;
+        }
+
+        assert search != null;
+        String[] words = search.split("\\s+");
+        if (!search.equals("null")) {
+            for (String word : words) {
+                if (branch_id != null) {
+                    productList = productRepository.findAllByBranchIdAndNameContainingIgnoreCaseOrBarcodeContainingIgnoreCase(branch_id, word, word, pageable);
+                } else {
+                    productList = productRepository.findAllByBranch_BusinessIdAndNameContainingIgnoreCaseOrBarcodeContainingIgnoreCase(businessId, word, word, pageable);
+                }
+            }
+        }else {
+            if (checkingCategory && checkingBrand && checkingBranch) {
+                productList = productRepository.findAllByBrand_IdAndCategoryIdAndBranchIdAndActiveTrue(brand_id, categoryId, branch_id, pageable);
+            } else if (checkingBrand && checkingBranch) {
+                productList = productRepository.findAllByBrand_IdAndBranchIdAndActiveTrue(brand_id, branch_id, pageable);
+            } else if (checkingCategory && checkingBranch) {
+                productList = productRepository.findAllByCategoryIdAndBranch_IdAndActiveTrue(categoryId, branch_id, pageable);
+            } else if (checkingCategory && checkingBrand && checkingBusiness) {
+                productList = productRepository.findAllByBrandIdAndCategoryIdAndBusiness_IdAndActiveTrue(brand_id, categoryId, businessId, pageable);
+            } else if (checkingBrand && checkingBusiness) {
+                productList = productRepository.findAllByBrand_IdAndBusinessIdAndActiveTrue(brand_id, businessId, pageable);
+            } else if (checkingCategory && checkingBusiness) {
+                productList = productRepository.findAllByCategoryIdAndBusiness_IdAndActiveTrue(categoryId, businessId, pageable);
+            } else if (checkingBusiness) {
+                productList = productRepository.findAllByBusinessIdAndActiveTrue(businessId, pageable);
+            } else if (checkingBranch) {
+                productList = productRepository.findAllByBranch_IdAndActiveTrue(branch_id, pageable);
+            }
+        }
+
+        if (productList != null && !productList.isEmpty()) {
+            products = productList.getContent();
+            if (checkingBranch) {
+                getProductMethod(productViewDtoList, products, branch_id);
+            } else {
+                getProductMethod(productViewDtoList, products, null);
+            }
+        }
+
+        if (productViewDtoList.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         }
 
