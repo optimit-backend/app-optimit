@@ -915,23 +915,13 @@ public class DataLoader implements CommandLineRunner {
                     shablonRepository.save(shablon3);
                 }
             }
-            updatePermission(); // TODO: 5/29/2023 if you add new permission
+//            updatePermission(); // TODO: 5/29/2023 if you add new permission
         }
     }
 
     private void updatePermission() {
         List<Permissions> newPermissionList = Arrays.asList(// TODO: 5/29/2023 write new permissions here
-                VIEW_NAVIGATION,
-                DELETE_NAVIGATION,
-                ADD_NAVIGATION,
-
-                EDIT_MY_BUSINESS,
-                VIEW_MY_BUSINESS,
-
-                ADD_LOSS,
-                GET_LOSS,
-                EDIT_LOSS,
-                DELETE_LOSS);
+                );
         Optional<Role> superAdmin = roleRepository.findByName(Constants.SUPERADMIN);
         List<Role> adminList = roleRepository.findAllByName(Constants.ADMIN);
         superAdmin.ifPresent(adminList::add);
