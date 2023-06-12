@@ -2114,6 +2114,7 @@ public class ReportsService {
         Map<String, Object> response = new HashMap<>();
 
         double totalSumma = 0;
+        double totalSumma1 = 0;
 
         Timestamp fromToday = Timestamp.valueOf(TODAY_END.minusDays(1));
         Timestamp toToday = Timestamp.valueOf(TODAY_END);
@@ -2179,7 +2180,9 @@ public class ReportsService {
                 getCheckoutDto.setTotalOutlay(totalOutlaySum1);
                 getCheckoutDto.setTotalTradeSum(totalTradeSumma);
                 getCheckoutDto.setTotalCash((totalTradeSumma - totalDebtSum1 - totalOutlaySum1 - totalPayType) + totalRepaymentDebtSum1);
-                totalSumma += (totalTradeSumma - totalDebtSum1 - totalOutlaySum1 - totalPayType) + totalRepaymentDebtSum1;
+                if (i == 0) {
+                    totalSumma += (totalTradeSumma - totalDebtSum1 - totalOutlaySum1 - totalPayType) + totalRepaymentDebtSum1;
+                }
             }
             getCheckoutDto.setTimestamp(to);
             getCheckoutDtoList.add(getCheckoutDto);
@@ -2189,12 +2192,15 @@ public class ReportsService {
             Double aDouble1 = outlayRepository.outlayByCreatedAtBetweenAndBusinessId(businessId, fromToday, toToday);
             todayOutlay = aDouble1 != null ? aDouble1 : 0;
             todayProfit = aDouble != null ? aDouble : 0;
+
+
         } else {
             Double aDouble = tradeRepository.totalProfit(branchId, fromToday, toToday);
             todayProfit = aDouble != null ? aDouble : 0;
 
             Double aDouble1 = outlayRepository.outlayByCreatedAtBetweenAndBranchId(fromToday, toToday, branchId);
             todayOutlay = aDouble1 != null ? aDouble1 : 0;
+
         }
 
         response.put("data", getCheckoutDtoList);
