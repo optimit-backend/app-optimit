@@ -276,5 +276,8 @@ public enum Permissions {
     EDIT_MY_BUSINESS,
     VIEW_MY_BUSINESS,
 
-    STOREKEEPER
+    ADD_LOSS,
+    GET_LOSS,
+    EDIT_LOSS,
+    DELETE_LOSS
 }
