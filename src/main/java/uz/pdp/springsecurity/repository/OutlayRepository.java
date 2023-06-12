@@ -46,4 +46,12 @@ public interface OutlayRepository extends JpaRepository<Outlay, UUID> {
 
     @Query(value = "SELECT SUM(o.totalSum) FROM Outlay o WHERE o.branch.business.id = :businessId AND o.createdAt >= :startDate AND o.createdAt <= :endDate")
     Double outlayByCreatedAtBetweenAndBusinessId(@Param("businessId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
+
+    @Query(value = "SELECT SUM(o.totalSum) FROM Outlay o WHERE o.branch.business.id = :businessId AND o.paymentMethod.id = :paymethodId AND o.createdAt >= :startDate AND o.createdAt <= :endDate")
+    Double outlayByCreatedAtBetweenAndBusinessIdAndPaymentMethod(@Param("businessId") UUID businessId, @Param("paymethodId") UUID paymethodId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
+
+    @Query(value = "SELECT SUM(o.totalSum) FROM Outlay o WHERE o.branch.id = :branchId AND o.paymentMethod.id = :paymethodId AND o.createdAt >= :startDate AND o.createdAt <= :endDate")
+    Double outlayByCreatedAtBetweenAndPaymentMethodByBranch(@Param("branchId") UUID businessId, @Param("paymethodId") UUID paymethodId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
+
+
 }

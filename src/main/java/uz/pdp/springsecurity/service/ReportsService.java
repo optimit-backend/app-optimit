@@ -77,6 +77,8 @@ public class ReportsService {
     @Autowired
     FifoCalculationService fifoCalculationService;
 
+    private final PayMethodRepository payMethodRepository;
+
     private final static Date date = new Date();
     private final static Timestamp currentDay = new Timestamp(System.currentTimeMillis());
     private final static Timestamp enDate = new Timestamp(date.getTime());
@@ -2113,6 +2115,18 @@ public class ReportsService {
 
         Timestamp fromToday = Timestamp.valueOf(TODAY_END.minusDays(1));
         Timestamp toToday = Timestamp.valueOf(TODAY_END);
+
+        Optional<PaymentMethod> plastikKartaOptional = payMethodRepository.findByType("PlastikKarta");
+        Optional<PaymentMethod> bankOrqaliOptional = payMethodRepository.findByType("BankOrqali");
+        Optional<PaymentMethod> naqtOptional = payMethodRepository.findByType("Naqd");
+        List<PaymentMethod> paymentMethodList = new ArrayList<>();
+        plastikKartaOptional.ifPresent(paymentMethodList::add);
+        bankOrqaliOptional.ifPresent(paymentMethodList::add);
+        if (naqtOptional.isEmpty()) {
+            return new ApiResponse("tulov turidagi naqd belgisi topilmayapdi", false);
+        }
+        PaymentMethod naqd = naqtOptional.get();
+
         double todayOutlay = 0;
         double todayProfit = 0;
 
@@ -2121,10 +2135,12 @@ public class ReportsService {
             Double totalDebtSum = null;
             Double totalOutlaySum = null;
             Double totalRepaymentDebtSum = null;
+            Double payType = null;
             double totalDebtSum1 = 0;
             double totalOutlaySum1 = 0;
             double totalRepaymentDebtSum1 = 0;
             double totalTradeSumma = 0;
+            double totalPayType = 0;
 
 
             Timestamp from = Timestamp.valueOf(TODAY_END.minusDays(i + 1));
@@ -2133,14 +2149,22 @@ public class ReportsService {
             if (businessId != null) {
                 totalSum = tradeRepository.totalSumByBusiness(businessId, from, to);
                 totalDebtSum = customerDebtRepository.totalCustomerDebtSumByBusiness(businessId, from, to);
-                totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBusinessId(businessId, from, to);
-                totalRepaymentDebtSum = repaymentDebtRepository.getTotalSumByBusiness(businessId, from, to);
+                totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBusinessIdAndPaymentMethod(businessId, naqd.getId(), from, to);
+                totalRepaymentDebtSum = repaymentDebtRepository.getTotalSumByBusiness(businessId, "Naqd", from, to);
+                for (PaymentMethod paymentMethod : paymentMethodList) {
+                    payType = tradeRepository.totalPaymentByBusiness(paymentMethod.getId(), businessId, from, to);
+                    totalPayType += payType != null ? payType : 0;
+                }
 
             } else {
                 totalSum = tradeRepository.totalSum(branchId, from, to);
                 totalDebtSum = customerDebtRepository.totalCustomerDebtSum(branchId, from, to);
-                totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBranchId(from, to, branchId);
-                totalRepaymentDebtSum = repaymentDebtRepository.getTotalSum(branchId, from, to);
+                totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndPaymentMethodByBranch(branchId, naqd.getId(), from, to);
+                totalRepaymentDebtSum = repaymentDebtRepository.getTotalSum(branchId, "Naqd", from, to);
+                for (PaymentMethod paymentMethod : paymentMethodList) {
+                    payType = tradeRepository.totalPayment(paymentMethod.getId(), branchId, from, to);
+                    totalPayType += payType != null ? payType : 0;
+                }
             }
             totalDebtSum1 = totalDebtSum != null ? totalDebtSum : 0;
             totalOutlaySum1 = totalOutlaySum != null ? totalOutlaySum : 0;
@@ -2152,8 +2176,8 @@ public class ReportsService {
                 getCheckoutDto.setTotalDebt(totalRepaymentDebtSum1);
                 getCheckoutDto.setTotalOutlay(totalOutlaySum1);
                 getCheckoutDto.setTotalTradeSum(totalTradeSumma);
-                getCheckoutDto.setTotalCash((totalTradeSumma - totalDebtSum1 - totalOutlaySum1) + totalRepaymentDebtSum1);
-                totalSumma += (totalTradeSumma - totalDebtSum1 - totalOutlaySum1) + totalRepaymentDebtSum1;
+                getCheckoutDto.setTotalCash((totalTradeSumma - totalDebtSum1 - totalOutlaySum1 - totalPayType) + totalRepaymentDebtSum1);
+                totalSumma += (totalTradeSumma - totalDebtSum1 - totalOutlaySum1 - totalPayType) + totalRepaymentDebtSum1;
             }
             getCheckoutDto.setTimestamp(to);
             getCheckoutDtoList.add(getCheckoutDto);

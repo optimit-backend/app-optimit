@@ -22,6 +22,8 @@ public class CustomerService {
     private final PaymentStatusRepository paymentStatusRepository;
     private final BalanceService balanceService;
     private final RepaymentDebtRepository repaymentDebtRepository;
+    private final CustomerDebtRepository customerDebtRepository;
+    private final PayMethodRepository payMethodRepository;
 
     public ApiResponse add(CustomerDto customerDto) {
         return createEdit(new Customer(), customerDto);
@@ -56,7 +58,7 @@ public class CustomerService {
         customer.setBusiness(branches.get(0).getBusiness()); // TODO: 6/6/2023  delete
         customer.setBranch(branches.get(0)); // TODO: 6/6/2023  delete
 
-        customerRepository.save(customer);
+        Customer save = customerRepository.save(customer);
         return new ApiResponse("SUCCESS", true);
     }
 
@@ -75,8 +77,28 @@ public class CustomerService {
     }
 
     public ApiResponse delete(UUID id) {
-        if (!customerRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
-        customerRepository.deleteById(id);
+        Optional<Customer> optionalCustomer = customerRepository.findById(id);
+        if (optionalCustomer.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+        Customer customer = optionalCustomer.get();
+        try {
+            List<CustomerDebt> all = customerDebtRepository.findByCustomer_Id(id);
+            for (CustomerDebt customerDebt : all) {
+                customerDebt.setDelete(true);
+                customerDebt.setCustomer(new Customer());
+                customerDebtRepository.save(customerDebt);
+            }
+            List<RepaymentDebt> allByCustomerId = repaymentDebtRepository.findAllByCustomer_Id(id);
+            for (RepaymentDebt repaymentDebt : allByCustomerId) {
+                repaymentDebt.setDelete(true);
+                repaymentDebt.setCustomer(new Customer());
+                repaymentDebtRepository.save(repaymentDebt);
+            }
+            customerRepository.deleteById(id);
+        } catch (Exception e) {
+            return new ApiResponse("Qarzi bor yoki savdo qilgan mijozni o'chirib bo'lmaydi!", false);
+        }
         return new ApiResponse("DELETED", true);
     }
 
@@ -118,7 +140,9 @@ public class CustomerService {
             try {
                 repaymentHelper(repaymentDto.getRepayment(), customer);
                 balanceService.edit(customer.getBranch().getId(), repaymentDto.getRepayment(), true, repaymentDto.getPaymentMethodId());
-                repaymentDebtRepository.save(new RepaymentDebt(customer, repaymentDto.getRepayment()));
+                UUID paymentMethodId = repaymentDto.getPaymentMethodId();
+                Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(paymentMethodId);
+                optionalPaymentMethod.ifPresent(paymentMethod -> repaymentDebtRepository.save(new RepaymentDebt(customer, repaymentDto.getRepayment(), paymentMethod, false)));
                 return new ApiResponse("Repayment Customer !", true);
             } catch (Exception e) {
                 return new ApiResponse("ERROR", false);
