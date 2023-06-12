@@ -12,5 +12,5 @@ public interface PayMethodRepository extends JpaRepository<PaymentMethod, UUID> 
 
     List<PaymentMethod> findAllByBusiness_Id(UUID business_id);
 
-    Optional<PaymentMethod> findByType(String type);
+    Optional<PaymentMethod> findByTypeAndBusiness_id(String type, UUID business_id);
 }

@@ -2109,19 +2109,23 @@ public class ReportsService {
 
     public ApiResponse getCheckout(UUID branchId, UUID businessId) {
 
-
+        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        if (optionalBranch.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
         List<GetCheckoutDto> getCheckoutDtoList = new ArrayList<>();
         Map<String, Object> response = new HashMap<>();
 
         double totalSumma = 0;
         double totalSumma1 = 0;
+        Branch branch = optionalBranch.get();
 
         Timestamp fromToday = Timestamp.valueOf(TODAY_END.minusDays(1));
         Timestamp toToday = Timestamp.valueOf(TODAY_END);
 
-        Optional<PaymentMethod> plastikKartaOptional = payMethodRepository.findByType("PlastikKarta");
-        Optional<PaymentMethod> bankOrqaliOptional = payMethodRepository.findByType("BankOrqali");
-        Optional<PaymentMethod> naqtOptional = payMethodRepository.findByType("Naqd");
+        Optional<PaymentMethod> plastikKartaOptional = payMethodRepository.findByTypeAndBusiness_id("PlastikKarta", branch.getBusiness().getId());
+        Optional<PaymentMethod> bankOrqaliOptional = payMethodRepository.findByTypeAndBusiness_id("BankOrqali", branch.getBusiness().getId());
+        Optional<PaymentMethod> naqtOptional = payMethodRepository.findByTypeAndBusiness_id("Naqd", branch.getBusiness().getId());
         List<PaymentMethod> paymentMethodList = new ArrayList<>();
         plastikKartaOptional.ifPresent(paymentMethodList::add);
         bankOrqaliOptional.ifPresent(paymentMethodList::add);
