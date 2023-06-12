@@ -428,52 +428,6 @@ public class TradeService {
         return new ApiResponse("DELETED", true);
     }
 
-   /* public ApiResponse getAllByTraderId(UUID trader_id) {
-        List<Trade> allByTrader_id = tradeRepository.findAllByTrader_Id(trader_id);
-        if (allByTrader_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-
-        return new ApiResponse("FOUND", true, allByTrader_id);
-    }*/
-
-    /*public ApiResponse getByCustomerId(UUID customer_id) {
-        List<Trade> allByCustomer_id = tradeRepository.findAllByCustomer_Id(customer_id);
-        if (allByCustomer_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-
-        return new ApiResponse("FOUND", true, allByCustomer_id);
-    }*/
-
-    /*public ApiResponse getByPayDate(Timestamp payDate) {
-        List<Trade> allByPayDate = tradeRepository.findTradeByOneDate(payDate);
-        if (allByPayDate.isEmpty()) return new ApiResponse("NOT FOUND", false);
-
-        return new ApiResponse("FOUND", true, allByPayDate);
-    }*/
-
-    /*public ApiResponse getByPayStatus(UUID paymentStatus_id) {
-        List<Trade> allByPaymentStatus_id = tradeRepository.findAllByPaymentStatus_Id(paymentStatus_id);
-        if (allByPaymentStatus_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-
-        return new ApiResponse("FOUND", true, allByPaymentStatus_id);
-    }*/
-
-    /*public ApiResponse getByPayMethod(UUID payMethod_id) {
-        List<Trade> allByPaymentMethod_id = new ArrayList<>();
-        List<Payment> paymentList = paymentRepository.findAllByPayMethodId(payMethod_id);
-        for (Payment payment : paymentList) {
-            allByPaymentMethod_id.add(payment.getTrade());
-        }
-        if (allByPaymentMethod_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-
-        return new ApiResponse("FOUND", true, allByPaymentMethod_id);
-    }*/
-
-    /*public ApiResponse getByAddress(UUID address_id) {
-        List<Trade> allByAddress_id = tradeRepository.findAllByAddress_Id(address_id);
-        if (allByAddress_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-
-        return new ApiResponse("FOUND", true, allByAddress_id);
-    }*/
-
     public ApiResponse getAllByFilter(UUID id, String invoice, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Trade> tradePage;

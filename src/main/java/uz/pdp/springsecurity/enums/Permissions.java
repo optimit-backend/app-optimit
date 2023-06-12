@@ -267,8 +267,7 @@ public enum Permissions {
     ADD_BALANCE,
 
     VIEW_DASHBOARD,
-
-
+    STOREKEEPER,
     VIEW_NAVIGATION,
     DELETE_NAVIGATION,
     ADD_NAVIGATION,
