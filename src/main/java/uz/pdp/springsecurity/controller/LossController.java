@@ -17,14 +17,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LossController {
    private final LossService lossService;
-    @CheckPermission("ADD_TRADE")
+    @CheckPermission("ADD_LOSS")
     @PostMapping
     public HttpEntity<?> create(@RequestBody LossDTO lossDTO) {
         ApiResponse apiResponse = lossService.create(lossDTO);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("ADD_TRADE")
+    @CheckPermission("GET_LOSS")
     @GetMapping("/by-branch/{branchId}")
     public HttpEntity<?> get(@PathVariable UUID branchId,
                              @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
@@ -33,7 +33,7 @@ public class LossController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("ADD_TRADE")
+    @CheckPermission("GET_LOSS")
     @GetMapping("/{lossId}")
     public HttpEntity<?> getOne(@PathVariable UUID lossId) {
         ApiResponse apiResponse = lossService.getOne(lossId);
