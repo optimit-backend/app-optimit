@@ -15,6 +15,11 @@ import javax.persistence.ManyToOne;
 public class CustomerDebt extends AbsEntity {
     @ManyToOne
     private Customer customer;
+    @ManyToOne
+    private Trade trade;
 
     private Double debtSum;
+
+
+    private Boolean delete;
 }

@@ -78,7 +78,7 @@ public class TradeService {
         trade.setBranch(optionalBranch.get());
         trade.setLid(tradeDTO.isLid());
         trade.setInvoice(String.valueOf(++invoice));
-        return createOrEditTrade(trade, tradeDTO);
+        return createOrEditTrade(trade, tradeDTO, false);
     }
 
     public ApiResponse edit(UUID tradeId, TradeDTO tradeDTO) {
@@ -93,12 +93,13 @@ public class TradeService {
             trade.setEditable(false);
             return new ApiResponse("YOU CAN NOT EDIT AFTER 7 DAYS", false);
         }
-        return createOrEditTrade(trade, tradeDTO);
+        return createOrEditTrade(trade, tradeDTO, true);
     }
 
     @Transactional
-    public ApiResponse createOrEditTrade(Trade trade, TradeDTO tradeDTO) {
+    public ApiResponse createOrEditTrade(Trade trade, TradeDTO tradeDTO, boolean isEdit) {
         Branch branch = trade.getBranch();
+        CustomerDebt customerDebt = new CustomerDebt();
 
         Optional<User> optionalUser = userRepository.findById(tradeDTO.getUserId());
         if (optionalUser.isEmpty()) {
@@ -182,10 +183,17 @@ public class TradeService {
             customer.setPayDate(tradeDTO.getPayDate());
             customerRepository.save(customer);
 
-            CustomerDebt customerDebt = new CustomerDebt();
-            customerDebt.setCustomer(customer);
-            customerDebt.setDebtSum(newDebt - debt);
-            customerDebtRepository.save(customerDebt);
+            if (isEdit) {
+                Optional<CustomerDebt> optionalCustomerDebt = customerDebtRepository.findByTrade_Id(trade.getId());
+                if (optionalCustomerDebt.isPresent()) {
+                    customerDebt = optionalCustomerDebt.get();
+                    customerDebt.setCustomer(customer);
+                    customerDebt.setDebtSum(newDebt - debt);
+                }
+            } else {
+                customerDebt.setCustomer(customer);
+                customerDebt.setDebtSum(newDebt - debt);
+            }
 
 
         } else if (tradeDTO.getCustomerId() != null) {
@@ -309,6 +317,11 @@ public class TradeService {
         tradeRepository.save(trade);
         tradeProductRepository.saveAll(tradeProductList);
 
+        if (customerDebt.getDebtSum() != null) {
+            customerDebt.setTrade(trade);
+            customerDebtRepository.save(customerDebt);
+        }
+
         try {
             balanceService.edit(branch.getId(), true, tradeDTO.getPaymentDtoList());
         } catch (Exception e) {
@@ -425,6 +438,13 @@ public class TradeService {
         }
 
         tradeRepository.deleteById(tradeId);
+        Optional<CustomerDebt> optionalCustomerDebt = customerDebtRepository.findByTrade_Id(tradeId);
+        if (optionalCustomerDebt.isPresent()) {
+            CustomerDebt customerDebt = optionalCustomerDebt.get();
+            customerDebt.setDelete(true);
+            customerDebtRepository.save(customerDebt);
+        }
+
         return new ApiResponse("DELETED", true);
     }
 

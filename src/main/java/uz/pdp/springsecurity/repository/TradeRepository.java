@@ -35,6 +35,12 @@ public interface TradeRepository extends JpaRepository<Trade, UUID>, JpaSpecific
     @Query(value = "select sum (t.totalSum) from Trade t where t.branch.id = :branchId AND t.createdAt >= :startDate AND t.createdAt <= :endDate")
     Double totalSum(@Param("branchId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
 
+    @Query(value = "select sum (t.totalSum) from Trade t where t.payMethod.id = :payMethodId and t.branch.id = :branchId AND t.createdAt >= :startDate AND t.createdAt <= :endDate")
+    Double totalPayment(@Param("payMethodId") UUID payMethodId, @Param("branchId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
+
+    @Query(value = "select sum (t.totalSum) from Trade t where t.payMethod.id = :payMethodId and t.branch.business.id = :businessId AND t.createdAt >= :startDate AND t.createdAt <= :endDate")
+    Double totalPaymentByBusiness(@Param("payMethodId") UUID payMethodId, @Param("businessId") UUID businessId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
+
     @Query(value = "select sum (t.totalSum) from Trade t where t.branch.business.id = :businessId AND t.createdAt >= :startDate AND t.createdAt <= :endDate")
     Double totalSumByBusiness(@Param("businessId") UUID businessId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
 

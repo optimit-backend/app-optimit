@@ -18,4 +18,9 @@ public class RepaymentDebt extends AbsEntity {
     private Customer customer;
 
     private Double debtSum;
+
+    @ManyToOne
+    private PaymentMethod paymentMethod;
+
+    private Boolean delete;
 }
