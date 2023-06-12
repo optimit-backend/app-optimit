@@ -64,7 +64,7 @@ public class FileController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-            @GetMapping("/files/download/{fileId}")
+        @GetMapping("/files/download/{fileId}")
         public ResponseEntity<byte[]> getFile(@PathVariable UUID fileId) {
             FileData fileData = fileService.getFileFromDatabase(fileId);
             if (fileData != null) {
