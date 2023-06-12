@@ -25,6 +25,8 @@ public class TradeService {
 
     private final CustomerRepository customerRepository;
 
+    private final CustomerDebtRepository customerDebtRepository;
+
     private final BranchRepository branchRepository;
 
     private final PaymentStatusRepository paymentStatusRepository;
@@ -67,7 +69,7 @@ public class TradeService {
 
         Optional<Trade> optionalTrade = tradeRepository.findFirstByBranchIdOrderByCreatedAtDesc(tradeDTO.getBranchId());
         int invoice = 0;
-        if (optionalTrade.isPresent()){
+        if (optionalTrade.isPresent()) {
             String invoiceStr = optionalTrade.get().getInvoice();
             invoice = invoiceStr != null ? Integer.parseInt(invoiceStr) : 0;
         }
@@ -159,7 +161,7 @@ public class TradeService {
                 if (!warehouseService.checkBeforeTrade(branch, map))
                     return new ApiResponse("NOT ENOUGH PRODUCT", false);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             return new ApiResponse("CHECKING ERROR", false);
         }
 
@@ -179,6 +181,13 @@ public class TradeService {
             customer.setDebt(newDebt - debt);
             customer.setPayDate(tradeDTO.getPayDate());
             customerRepository.save(customer);
+
+            CustomerDebt customerDebt = new CustomerDebt();
+            customerDebt.setCustomer(customer);
+            customerDebt.setDebtSum(newDebt - debt);
+            customerDebtRepository.save(customerDebt);
+
+
         } else if (tradeDTO.getCustomerId() != null) {
             Optional<Customer> optionalCustomer = customerRepository.findById(tradeDTO.getCustomerId());
             if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
@@ -194,9 +203,9 @@ public class TradeService {
         trade.setDebtSum(tradeDTO.getDebtSum() - unFrontPayment);
         Optional<Currency> optionalCurrency = currencyRepository.findByBusinessId(branch.getBusiness().getId());
         if (optionalCurrency.isPresent()) {
-            trade.setDebtSumDollar(Math.round(trade.getDebtSum()/optionalCurrency.get().getCourse()*100)/100.);
-            trade.setPaidSumDollar(Math.round(trade.getPaidSum()/optionalCurrency.get().getCourse()*100)/100.);
-            trade.setTotalSumDollar(Math.round(trade.getTotalSum()/optionalCurrency.get().getCourse()*100)/100.);
+            trade.setDebtSumDollar(Math.round(trade.getDebtSum() / optionalCurrency.get().getCourse() * 100) / 100.);
+            trade.setPaidSumDollar(Math.round(trade.getPaidSum() / optionalCurrency.get().getCourse() * 100) / 100.);
+            trade.setTotalSumDollar(Math.round(trade.getTotalSum() / optionalCurrency.get().getCourse() * 100) / 100.);
         }
         tradeRepository.save(trade);
 
@@ -245,14 +254,14 @@ public class TradeService {
                     TradeProduct tradeProduct;
                     try {
                         tradeProduct = warehouseService.createOrEditTrade(branch, new TradeProduct(), tradeProductDto);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         return new ApiResponse("WAREHOUSE ERROR", false);
                     }
                     if (tradeProduct != null) {
                         tradeProduct.setTrade(trade);
                         try {
                             fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, tradeProduct.getTradedQuantity());
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             return new ApiResponse("FIFO ERROR", false);
                         }
                         tradeProductList.add(tradeProduct);
@@ -273,8 +282,8 @@ public class TradeService {
                             fifoCalculationService.createOrEditTradeProduct(branch, tradeProduct, difference);
                         } else if (difference < 0) {
                             fifoCalculationService.returnedTrade(branch, tradeProduct, -difference);
-                            if (tradeDTO.isBacking()){
-                                if (tradeProduct.getBacking() != null){
+                            if (tradeDTO.isBacking()) {
+                                if (tradeProduct.getBacking() != null) {
                                     tradeProduct.setBacking(tradeProduct.getBacking() - difference);
                                 } else {
                                     tradeProduct.setBacking(-difference);
@@ -287,14 +296,14 @@ public class TradeService {
                 }
             }
             trade.setTotalProfit(profit);
-        } catch (Exception e){
+        } catch (Exception e) {
 //            throw e;
             return new ApiResponse("TRADE PRODUCT ERROR", false);
         }
 
         try {
             countKPI(optionalAgreementKpi.get(), trade, tradeProductList);
-        } catch (Exception e){
+        } catch (Exception e) {
             return new ApiResponse("COUNT KPI ERROR", false);
         }
         tradeRepository.save(trade);
@@ -302,7 +311,7 @@ public class TradeService {
 
         try {
             balanceService.edit(branch.getId(), true, tradeDTO.getPaymentDtoList());
-        } catch (Exception e){
+        } catch (Exception e) {
             return new ApiResponse("BALANCE SERVICE ERROR", false);
         }
         return new ApiResponse("SUCCESS", true, trade.getInvoice());
@@ -326,7 +335,7 @@ public class TradeService {
         }
     }
 
-    private double countKPIProduct(List<TradeProduct> tradeProductList){
+    private double countKPIProduct(List<TradeProduct> tradeProductList) {
         double kpi = 0;
         for (TradeProduct tradeProduct : tradeProductList) {
             if (tradeProduct.getProduct() != null) {
@@ -338,11 +347,11 @@ public class TradeService {
         return kpi;
     }
 
-    private double countKPIProductHelper(Product product, double quantity, double totalPrice){
+    private double countKPIProductHelper(Product product, double quantity, double totalPrice) {
         if (product.getKpi() != null & product.getKpiPercent() != null) {
-            if (product.getKpiPercent()){
+            if (product.getKpiPercent()) {
                 return totalPrice * product.getKpi() / 100;
-            }else {
+            } else {
                 return product.getKpi() * quantity;
             }
         }
@@ -395,7 +404,7 @@ public class TradeService {
             customer.setDebt(customer.getDebt() - (trade.getPaidSum() + trade.getDebtSum()));
         }
 
-        if (trade.getKpi() != null){
+        if (trade.getKpi() != null) {
             Optional<Agreement> optionalAgreementKpi = agreementRepository.findByUserIdAndSalaryStatus(trade.getTrader().getId(), SalaryStatus.KPI);
             if (optionalAgreementKpi.isPresent()) {
                 double kpi = trade.getKpi();
@@ -468,19 +477,19 @@ public class TradeService {
     public ApiResponse getAllByFilter(UUID id, String invoice, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Trade> tradePage;
-        if (businessRepository.existsById(id)){
+        if (businessRepository.existsById(id)) {
             if (invoice != null) {
                 tradePage = tradeRepository.findAllByBranch_BusinessIdAndInvoiceContainingOrderByCreatedAtDesc(id, invoice, pageable);
-            }else {
+            } else {
                 tradePage = tradeRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(id, pageable);
             }
         } else if (branchRepository.existsById(id)) {
             if (invoice != null) {
                 tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingOrderByCreatedAtDesc(id, invoice, pageable);
-            }else {
+            } else {
                 tradePage = tradeRepository.findAllByBranchIdOrderByCreatedAtDesc(id, pageable);
             }
-        }else {
+        } else {
             return new ApiResponse("ID ERROR", false);
         }
         return new ApiResponse("SUCCESS", true, tradePage);

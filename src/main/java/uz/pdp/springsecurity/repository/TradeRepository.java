@@ -36,7 +36,7 @@ public interface TradeRepository extends JpaRepository<Trade, UUID>, JpaSpecific
     Double totalSum(@Param("branchId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
 
     @Query(value = "select sum (t.totalSum) from Trade t where t.branch.business.id = :businessId AND t.createdAt >= :startDate AND t.createdAt <= :endDate")
-    Double totalSumByBusiness(@Param("businessId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
+    Double totalSumByBusiness(@Param("businessId") UUID businessId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
 
     @Query(value = "select sum (t.totalProfit) from Trade t where t.branch.id = :branchId AND t.createdAt >= :startDate AND t.createdAt <= :endDate")
     Double totalProfit(@Param("branchId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
@@ -48,7 +48,7 @@ public interface TradeRepository extends JpaRepository<Trade, UUID>, JpaSpecific
     Double totalDebtSum(@Param("branchId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
 
     @Query(value = "SELECT SUM(t.debtSum) FROM Trade t WHERE t.branch.business.id = :businessId AND t.createdAt >= :startDate AND t.createdAt <= :endDate")
-    Double totalDebtSumByBusiness(@Param("businessId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
+    Double totalDebtSumByBusiness(@Param("businessId") UUID businessId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
 
 
     List<Trade> findAllByCustomer_Id(UUID customer_id);

@@ -49,6 +49,8 @@ public class ReportsService {
     @Autowired
     CategoryRepository categoryRepository;
 
+    private final CustomerDebtRepository customerDebtRepository;
+
     @Autowired
     BrandRepository brandRepository;
 
@@ -2107,15 +2109,6 @@ public class ReportsService {
         List<GetCheckoutDto> getCheckoutDtoList = new ArrayList<>();
         Map<String, Object> response = new HashMap<>();
 
-        Double totalSum = null;
-        Double totalDebtSum = null;
-        Double totalOutlaySum = null;
-        Double totalRepaymentDebtSum = null;
-        double totalDebtSum1 = 0;
-        double totalOutlaySum1 = 0;
-        double totalRepaymentDebtSum1 = 0;
-        double totalTradeSumma = 0;
-
         double totalSumma = 0;
 
         Timestamp fromToday = Timestamp.valueOf(TODAY_END.minusDays(1));
@@ -2124,17 +2117,28 @@ public class ReportsService {
         double todayProfit = 0;
 
         for (int i = 0; i < 15; i++) {
+            Double totalSum = null;
+            Double totalDebtSum = null;
+            Double totalOutlaySum = null;
+            Double totalRepaymentDebtSum = null;
+            double totalDebtSum1 = 0;
+            double totalOutlaySum1 = 0;
+            double totalRepaymentDebtSum1 = 0;
+            double totalTradeSumma = 0;
+
+
             Timestamp from = Timestamp.valueOf(TODAY_END.minusDays(i + 1));
             Timestamp to = Timestamp.valueOf(TODAY_END.minusDays(i));
 
             if (businessId != null) {
                 totalSum = tradeRepository.totalSumByBusiness(businessId, from, to);
-                totalDebtSum = tradeRepository.totalDebtSumByBusiness(businessId, from, to);
+                totalDebtSum = customerDebtRepository.totalCustomerDebtSumByBusiness(businessId, from, to);
                 totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBusinessId(businessId, from, to);
                 totalRepaymentDebtSum = repaymentDebtRepository.getTotalSumByBusiness(businessId, from, to);
+
             } else {
                 totalSum = tradeRepository.totalSum(branchId, from, to);
-                totalDebtSum = tradeRepository.totalDebtSum(branchId, from, to);
+                totalDebtSum = customerDebtRepository.totalCustomerDebtSum(branchId, from, to);
                 totalOutlaySum = outlayRepository.outlayByCreatedAtBetweenAndBranchId(from, to, branchId);
                 totalRepaymentDebtSum = repaymentDebtRepository.getTotalSum(branchId, from, to);
             }
@@ -2148,8 +2152,8 @@ public class ReportsService {
                 getCheckoutDto.setTotalDebt(totalRepaymentDebtSum1);
                 getCheckoutDto.setTotalOutlay(totalOutlaySum1);
                 getCheckoutDto.setTotalTradeSum(totalTradeSumma);
-                getCheckoutDto.setTotalCash(totalTradeSumma - totalDebtSum1 - totalOutlaySum1 + totalRepaymentDebtSum1);
-                totalSumma += totalTradeSumma - totalDebtSum1 - totalOutlaySum1 + totalRepaymentDebtSum1;
+                getCheckoutDto.setTotalCash((totalTradeSumma - totalDebtSum1 - totalOutlaySum1) + totalRepaymentDebtSum1);
+                totalSumma += (totalTradeSumma - totalDebtSum1 - totalOutlaySum1) + totalRepaymentDebtSum1;
             }
             getCheckoutDto.setTimestamp(to);
             getCheckoutDtoList.add(getCheckoutDto);
@@ -2382,24 +2386,15 @@ public class ReportsService {
     }
 
     public ApiResponse getChart(UUID branchId, UUID businessId) {
-        List<GetChartDto> getChartDtoList = new ArrayList<>();
-        Map<String, Object> response = new HashMap<>();
-
-        Double totalSum = null;
-        Double totalDebtSum = null;
-        Double totalPurchase = null;
-        Double totalMyDebt = null;
-
-
-        double totalTradeSumma = 0;
-        double totalDebtSum1 = 0;
-        double totalPurchase1 = 0;
-        double totalMyDebt1 = 0;
 
         double totalTradeSumma1 = 0;
         double totalDebtSum2 = 0;
         double totalPurchase2 = 0;
         double totalMyDebt2 = 0;
+
+        List<GetChartDto> getChartDtoList = new ArrayList<>();
+        Map<String, Object> response = new HashMap<>();
+
         List<Branch> branchIds = new ArrayList<>();
 
         if (businessId != null) {
@@ -2415,6 +2410,17 @@ public class ReportsService {
         }
 
         for (int i = 0; i < 15; i++) {
+            Double totalSum = null;
+            Double totalDebtSum = null;
+            Double totalPurchase = null;
+            Double totalMyDebt = null;
+
+
+            double totalTradeSumma = 0;
+            double totalDebtSum1 = 0;
+            double totalPurchase1 = 0;
+            double totalMyDebt1 = 0;
+
             Timestamp from = Timestamp.valueOf(TODAY_END.minusDays(i + 1));
             Timestamp to = Timestamp.valueOf(TODAY_END.minusDays(i));
             for (Branch branch : branchIds) {
