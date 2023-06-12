@@ -2108,6 +2108,8 @@ public class ReportsService {
     }
 
     public ApiResponse getCheckout(UUID branchId, UUID businessId) {
+
+
         List<GetCheckoutDto> getCheckoutDtoList = new ArrayList<>();
         Map<String, Object> response = new HashMap<>();
 
@@ -2200,7 +2202,7 @@ public class ReportsService {
         response.put("totalOutlay", todayOutlay);
         response.put("totalProfit", todayProfit);
 
-        return new ApiResponse("kassadagi pul", true, response);
+        return new ApiResponse("Kassadagi pul", true, response);
 
     }
 
