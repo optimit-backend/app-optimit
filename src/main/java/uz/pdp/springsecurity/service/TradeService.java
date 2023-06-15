@@ -453,13 +453,13 @@ public class TradeService {
         Page<Trade> tradePage;
         if (businessRepository.existsById(id)) {
             if (invoice != null) {
-                tradePage = tradeRepository.findAllByBranch_BusinessIdAndInvoiceContainingOrderByCreatedAtDesc(id, invoice, pageable);
+                tradePage = tradeRepository.findAllByBranch_BusinessIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(id, invoice, invoice, pageable);
             } else {
                 tradePage = tradeRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(id, pageable);
             }
         } else if (branchRepository.existsById(id)) {
             if (invoice != null) {
-                tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingOrderByCreatedAtDesc(id, invoice, pageable);
+                tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(id, invoice, invoice, pageable);
             } else {
                 tradePage = tradeRepository.findAllByBranchIdOrderByCreatedAtDesc(id, pageable);
             }
@@ -581,7 +581,6 @@ public class TradeService {
         response.put("totalPage", tradeProductPage.getTotalPages());
         return new ApiResponse("SUCCESS", true, response);
     }
-
 
     private List<ProductBackingGetDto> toGroductBackingGetDtoList(List<TradeProduct> tradeProductList) {
         List<ProductBackingGetDto> list = new ArrayList<>();
