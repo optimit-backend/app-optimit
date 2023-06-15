@@ -61,12 +61,6 @@ public interface TradeRepository extends JpaRepository<Trade, UUID>, JpaSpecific
 
     List<Trade> findAllByCustomerIdAndDebtSumIsNotOrderByCreatedAtAsc(UUID customerId, Double amount);
 
-    /*List<Trade> findAllByPaymentStatus_Id(UUID paymentStatus_id);
-
-    List<Trade> findAllByAddress_Id(UUID address_id);
-
-    @Query(value = "SELECT * FROM Trade t WHERE DATE(t.pay_date) = ?1", nativeQuery = true)
-    List<Trade> findTradeByOneDate(Timestamp date);*/
 
     List<Trade> findAllByCreatedAtBetweenAndCustomer_Id(Timestamp startTimestamp, Timestamp endTimestamp, UUID customer_id);
 
@@ -79,11 +73,8 @@ public interface TradeRepository extends JpaRepository<Trade, UUID>, JpaSpecific
 
     Page<Trade> findAllByBranchIdOrderByCreatedAtDesc(UUID branchId, Pageable pageable);
 
-    Page<Trade> findAllByBranchIdAndInvoiceContainingOrderByCreatedAtDesc(UUID branchId, String invoice, Pageable pageable);
-
     Page<Trade> findAllByBranch_BusinessIdOrderByCreatedAtDesc(UUID businessId, Pageable pageable);
 
-    Page<Trade> findAllByBranch_BusinessIdAndInvoiceContainingOrderByCreatedAtDesc(UUID businessId, String invoice, Pageable pageable);
-
-
+    Page<Trade> findAllByBranch_BusinessIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(UUID businessId, String invoice, String name, Pageable pageable);
+    Page<Trade> findAllByBranchIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(UUID branchId, String invoice, String name, Pageable pageable);
 }
