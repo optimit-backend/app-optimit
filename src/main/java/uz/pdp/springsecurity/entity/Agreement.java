@@ -27,7 +27,7 @@ public class Agreement extends AbsEntity {
     private SalaryStatus salaryStatus;
 
     @Column(nullable = false)
-    private double price = 0;
+    private double price;
 
     private boolean active;
 
