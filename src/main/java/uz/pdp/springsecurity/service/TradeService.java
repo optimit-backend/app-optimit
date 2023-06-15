@@ -329,7 +329,11 @@ public class TradeService {
         } catch (Exception e) {
             return new ApiResponse("BALANCE SERVICE ERROR", false);
         }
-        return new ApiResponse("SUCCESS", true, trade.getInvoice());
+        Map<String, Object> response = new HashMap<>();
+        response.put("invoice", trade.getInvoice());
+        if (trade.getCustomer() != null)
+            response.put("customerDebt", trade.getCustomer().getDebt());
+        return new ApiResponse("SUCCESS", true, response);
     }
 
     private void countKPI(Agreement agreementKpi, Trade trade, List<TradeProduct> tradeProductList) {
