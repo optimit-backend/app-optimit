@@ -68,7 +68,6 @@ public class LessonService {
         Optional<Lesson> optionalLesson = lessonRepository.findById(lessonId);
         return optionalLesson.map(lesson -> new ApiResponse(true, lessonMapper.toGetDto(lesson))).orElseGet(() -> new ApiResponse("LESSON NOT FOUND", false));
     }
-
     public ApiResponse delete(UUID lessonId) {
         if (!lessonRepository.existsById(lessonId)) return new ApiResponse("LESSON NOT FOUND", false);
         try {

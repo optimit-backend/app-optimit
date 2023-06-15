@@ -34,7 +34,7 @@ public class Salary extends AbsEntity {
 
     private double payedSum = 0;
 
-    private boolean active = true;
+    private boolean active;
 
     @Column(nullable = false)
     private Date startDate;
