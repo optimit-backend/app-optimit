@@ -28,8 +28,8 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     Page<Task> findAllByBranch_IdAndTaskPriceList_UserList_Id(UUID branch_id, UUID taskPriceList_userList_id, Pageable pageable);
     List<Task> findAllByBranchId(UUID branch_id);
     List<Task> findAllByBranch_BusinessId(UUID branch_id);
-    Page<Task> findByNameContainingIgnoreCase(String name, Pageable pageable);
-    Page<Task> findByNameContainingIgnoreCaseAndTaskPriceList_UserList_Id(String name, UUID user_id, Pageable pageable);
+    Page<Task> findByNameContainingIgnoreCaseAndBranchId(String name, UUID branch_id, Pageable pageable);
+    Page<Task> findByNameContainingIgnoreCaseAndBranchIdAndTaskPriceList_UserList_Id(String name, UUID branch_id, UUID taskPriceList_userList_id, Pageable pageable);
     Page<Task> findAllByTaskStatus_Id(UUID project_id, Pageable pageable);
     Page<Task> findAllByTaskStatusIdAndProjectIdAndTaskTypeIdAndExpiredTrue(UUID taskStatus_id, UUID project_id, UUID taskType_id, Pageable pageable);
     Page<Task> findAllByTaskStatusIdAndProjectIdAndTaskTypeIdAndExpiredTrueAndTaskPriceList_UserList_Id(UUID taskStatus_id, UUID project_id, UUID taskType_id, UUID taskPriceList_userList_id, Pageable pageable);

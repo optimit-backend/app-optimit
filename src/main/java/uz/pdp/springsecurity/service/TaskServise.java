@@ -480,17 +480,17 @@ public class TaskServise {
         return new ApiResponse("Found", true, taskGetDtoList);
     }
 
-    public ApiResponse searchByName(String name, int page, int size, UUID userId) {
+    public ApiResponse searchByName(UUID branchId,String name, int page, int size, UUID userId) {
         Pageable pageable = PageRequest.of(page, size);
         String[] words = name.split("\\s+");
         Page<Task> taskPage = null;
         if (userId == null) {
             for (String word : words) {
-                taskPage = taskRepository.findByNameContainingIgnoreCase(word, pageable);
+                taskPage = taskRepository.findByNameContainingIgnoreCaseAndBranchId(word,branchId,pageable);
             }
         } else {
             for (String word : words) {
-                taskPage = taskRepository.findByNameContainingIgnoreCaseAndTaskPriceList_UserList_Id(word, userId, pageable);
+                taskPage = taskRepository.findByNameContainingIgnoreCaseAndBranchIdAndTaskPriceList_UserList_Id(word,branchId, userId, pageable);
             }
         }
         if (taskPage == null) {
