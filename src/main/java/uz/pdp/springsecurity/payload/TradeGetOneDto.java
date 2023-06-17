@@ -13,6 +13,5 @@ import java.util.List;
 public class TradeGetOneDto {
     private Trade trade;
     private List<TradeProduct> tradeProductList;
-
     private List<PaymentDto> paymentDtoList;
 }
