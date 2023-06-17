@@ -281,6 +281,9 @@ public class CustomerService {
             customerTradeInfo.add(customerTradeInfo1);
         }
 
+        if (customerTradeInfo.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
         return new ApiResponse("all", true, customerTradeInfo);
     }
 }
