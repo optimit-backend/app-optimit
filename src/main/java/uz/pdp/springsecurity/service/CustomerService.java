@@ -24,6 +24,7 @@ public class CustomerService {
     private final RepaymentDebtRepository repaymentDebtRepository;
     private final CustomerDebtRepository customerDebtRepository;
     private final PayMethodRepository payMethodRepository;
+    private final TradeProductRepository tradeProductRepository;
 
     public ApiResponse add(CustomerDto customerDto) {
         return createEdit(new Customer(), customerDto);
@@ -241,5 +242,48 @@ public class CustomerService {
         customerInfoDto.setTotalProfitSum(totalProfitByCustomer != null ? totalProfitByCustomer : 0);
 
         return new ApiResponse("data", true, customerInfoDto);
+    }
+
+    public ApiResponse getCustomerTradeInfo(UUID customerId) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
+        if (optionalCustomer.isEmpty()) {
+            return new ApiResponse("not found customer", false);
+        }
+
+        List<CustomerTradeInfo> customerTradeInfo = new ArrayList<>();
+        List<Trade> all = tradeRepository.findAllByCustomer_Id(customerId);
+        for (Trade trade : all) {
+            CustomerTradeInfo customerTradeInfo1 = new CustomerTradeInfo();
+            List<TradeProductCustomerDto> tradeProductCustomerDtoList = new ArrayList<>();
+
+            List<TradeProduct> allByTradeId = tradeProductRepository.findAllByTradeId(trade.getId());
+
+            for (TradeProduct tradeProduct : allByTradeId) {
+                TradeProductCustomerDto productCustomerDto = new TradeProductCustomerDto();
+                if (tradeProduct.getBacking() != null) {
+                    customerTradeInfo1.setTrade(false);
+                    customerTradeInfo1.setTotalSumma(tradeProduct.getBacking());
+                } else {
+                    customerTradeInfo1.setTrade(true);
+                    customerTradeInfo1.setTotalSumma(tradeProduct.getTrade().getTotalSum());
+                }
+                if (tradeProduct.getProduct().getPhoto() != null) {
+                    productCustomerDto.setAttachmentId(tradeProduct.getProduct().getPhoto().getId());
+                }
+                productCustomerDto.setProductName(tradeProduct.getProductTypePrice() != null ?
+                        tradeProduct.getProductTypePrice().getName() : tradeProduct.getProduct().getName());
+
+                tradeProductCustomerDtoList.add(productCustomerDto);
+            }
+
+            customerTradeInfo1.setCreateAt(trade.getCreatedAt());
+            customerTradeInfo1.setProductCutomerDtoList(tradeProductCustomerDtoList);
+            customerTradeInfo.add(customerTradeInfo1);
+        }
+
+        if (customerTradeInfo.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+        return new ApiResponse("all", true, customerTradeInfo);
     }
 }
