@@ -24,6 +24,8 @@ public class CustomerDto {
     @NotNull(message = "enter your telegram username")
     private String telegram;
 
+    private String description;
+
     private UUID customerGroupId;
 
     private String customerGroupName;

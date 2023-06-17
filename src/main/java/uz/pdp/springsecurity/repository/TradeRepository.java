@@ -56,6 +56,12 @@ public interface TradeRepository extends JpaRepository<Trade, UUID>, JpaSpecific
     @Query(value = "SELECT SUM(t.debtSum) FROM Trade t WHERE t.branch.business.id = :businessId AND t.createdAt >= :startDate AND t.createdAt <= :endDate")
     Double totalDebtSumByBusiness(@Param("businessId") UUID businessId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
 
+    @Query(value = "SELECT SUM(t.totalSum) FROM Trade t WHERE t.customer.id = :customerId")
+    Double totalSumByCustomer(@Param("customerId") UUID customerId);
+
+    @Query(value = "SELECT SUM(t.totalProfit) FROM Trade t WHERE t.customer.id = :customerId")
+    Double totalProfitByCustomer(@Param("customerId") UUID customerId);
+
 
     List<Trade> findAllByCustomer_Id(UUID customer_id);
 

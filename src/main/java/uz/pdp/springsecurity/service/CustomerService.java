@@ -54,6 +54,7 @@ public class CustomerService {
         customer.setDebt(customerDto.getDebt());
         customer.setPayDate(customerDto.getPayDate());
         customer.setLidCustomer(customerDto.getLidCustomer());
+        customer.setDescription(customerDto.getDescription());
 
         customer.setBusiness(branches.get(0).getBusiness()); // TODO: 6/6/2023  delete
         customer.setBranch(branches.get(0)); // TODO: 6/6/2023  delete
@@ -221,5 +222,24 @@ public class CustomerService {
             responses.add(response);
         }
         return new ApiResponse("found", true, responses);
+    }
+
+    public ApiResponse getCustomerInfo(UUID customerId) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
+        if (optionalCustomer.isEmpty()) {
+            return new ApiResponse("not found customer", false);
+        }
+
+        CustomerInfoDto customerInfoDto = new CustomerInfoDto();
+        Customer customer = optionalCustomer.get();
+        CustomerDto customerDto = mapper.toDto(customer);
+        customerInfoDto.setCustomerDto(customerDto);
+
+        Double totalSumByCustomer = tradeRepository.totalSumByCustomer(customerId);
+        Double totalProfitByCustomer = tradeRepository.totalProfitByCustomer(customerId);
+        customerInfoDto.setTotalTradeSum(totalSumByCustomer != null ? totalSumByCustomer : 0);
+        customerInfoDto.setTotalProfitSum(totalProfitByCustomer != null ? totalProfitByCustomer : 0);
+
+        return new ApiResponse("data", true, customerInfoDto);
     }
 }
