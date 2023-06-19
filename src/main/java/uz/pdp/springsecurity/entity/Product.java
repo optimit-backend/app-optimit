@@ -30,13 +30,13 @@ public class Product extends AbsEntity {
     private double salePrice;
     private double grossPrice;
     private double grossPriceDollar;
-    private double buyPriceDollar = 1;
-    private boolean buyDollar = false;
-    private double salePriceDollar = 1;
-    private boolean saleDollar = false;
+    private double buyPriceDollar;
+    private boolean buyDollar;
+    private double salePriceDollar;
+    private boolean saleDollar;
 
     private Boolean kpiPercent = true;
-    private Double kpi = 0d;
+    private Double kpi;
     private Date expireDate;
 
     @Column(nullable = false)
