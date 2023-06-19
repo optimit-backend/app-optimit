@@ -286,4 +286,47 @@ public class CustomerService {
         }
         return new ApiResponse("all", true, customerTradeInfo);
     }
+
+    public ApiResponse getCustomerPreventedInfo(UUID customerId) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
+        if (optionalCustomer.isEmpty()) {
+            return new ApiResponse("not found customer", false);
+        }
+
+        List<Trade> all = tradeRepository.findAllByCustomer_Id(customerId);
+        List<CustomerPreventedInfoDto> customerPreventedInfoDtoList = new ArrayList<>();
+
+        for (Trade trade : all) {
+            CustomerPreventedInfoDto customerPreventedInfoDto = new CustomerPreventedInfoDto();
+            Double paidSum = tradeRepository.totalPaidSum(trade.getId());
+            TotalPaidSumDto totalPaidSumDto = new TotalPaidSumDto();
+            totalPaidSumDto.setCreateAt(trade.getCreatedAt());
+            totalPaidSumDto.setPaidSum(paidSum != null ? paidSum : 0);
+            totalPaidSumDto.setPayMethodName(trade.getPayMethod().getType());
+            customerPreventedInfoDto.setTotalPaidSumDto(totalPaidSumDto);
+
+            if (trade.getDebtSum() != 0) {
+                customerPreventedInfoDto.setDebtSum(trade.getDebtSum());
+            }
+
+            List<TradeProduct> allByTradeId = tradeProductRepository.findAllByTradeId(trade.getId());
+            for (TradeProduct tradeProduct : allByTradeId) {
+                if (tradeProduct.getBacking() != null) {
+                    BackingProductDto backingProductDto = new BackingProductDto();
+                    backingProductDto.setCreateAt(tradeProduct.getCreatedAt());
+                    backingProductDto.setPaidSum(tradeProduct.getBacking());
+                    backingProductDto.setPayMethodName(tradeProduct.getTrade().getPayMethod().getType());
+                    customerPreventedInfoDto.setBackingProductDto(backingProductDto);
+                }
+            }
+            customerPreventedInfoDtoList.add(customerPreventedInfoDto);
+        }
+
+
+        if (customerPreventedInfoDtoList.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+
+        return new ApiResponse("found", true, customerPreventedInfoDtoList);
+    }
 }
