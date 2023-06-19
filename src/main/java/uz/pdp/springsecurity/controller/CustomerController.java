@@ -114,4 +114,11 @@ public class CustomerController {
         ApiResponse apiResponse = customerService.getCustomerTradeInfo(customerId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("VIEW_CUSTOMER")
+    @GetMapping("/get-customer-prevented-info/{customerId}")
+    public HttpEntity<?> getCustomerPreventedInfo(@PathVariable UUID customerId) {
+        ApiResponse apiResponse = customerService.getCustomerPreventedInfo(customerId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }
