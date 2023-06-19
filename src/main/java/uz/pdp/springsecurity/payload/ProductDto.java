@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDto {
-    @NotNull(message = "required line")
+    @NotNull
     private String name;
 
     private Double minQuantity;
@@ -26,12 +26,12 @@ public class ProductDto {
 
     private UUID childCategoryId;
 
-    @NotNull(message = "required line")
+    @NotNull
     private UUID measurementId;
 
     private UUID photoId;
 
-    @NotNull(message = "required line")
+    @NotNull
     private double buyPrice;
 
     private double salePrice;
@@ -47,19 +47,19 @@ public class ProductDto {
 
     private double tax;
 
-    @NotNull(message = "required line")
+    @NotNull
     private List<UUID> branchId;
 
     private Date expireDate;
 
     private Date dueDate;
 
-    @NotNull(message = "required line")
+    @NotNull
     private UUID businessId;
 
     // types { SINGLE, MANY, COMBO }
 
-    @NotNull(message = "required line")
+    @NotNull
     private String type;
 
     //  fields for MANY types

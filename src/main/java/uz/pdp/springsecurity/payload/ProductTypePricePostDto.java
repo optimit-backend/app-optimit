@@ -14,6 +14,7 @@ public class ProductTypePricePostDto {
 
     private UUID productTypePriceId;
 
+    @NotNull
     private UUID productTypeValueId;
 
     private UUID subProductTypeValueId;
@@ -24,7 +25,10 @@ public class ProductTypePricePostDto {
 
     @NotNull(message = "required line")
     private double buyPrice;
+    @NotNull
     private double salePrice;
+    @NotNull
     private double grossPrice;
+    @NotNull
     private double profitPercent;
 }
