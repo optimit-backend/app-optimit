@@ -311,15 +311,19 @@ public class CustomerService {
 
             List<TradeProduct> allByTradeId = tradeProductRepository.findAllByTradeId(trade.getId());
             for (TradeProduct tradeProduct : allByTradeId) {
+                BackingProductDto backingProductDto = new BackingProductDto();
                 if (tradeProduct.getBacking() != null) {
-                    BackingProductDto backingProductDto = new BackingProductDto();
                     backingProductDto.setCreateAt(tradeProduct.getCreatedAt());
                     backingProductDto.setPaidSum(tradeProduct.getBacking());
                     backingProductDto.setPayMethodName(tradeProduct.getTrade().getPayMethod().getType());
-                    customerPreventedInfoDto.setBackingProductDto(backingProductDto);
+                } else {
+                    backingProductDto.setPaidSum(0.0);
                 }
+                customerPreventedInfoDto.setBackingProductDto(backingProductDto);
             }
             customerPreventedInfoDtoList.add(customerPreventedInfoDto);
+            Customer customer = optionalCustomer.get();
+            customerPreventedInfoDto.setBalance(customer.getDebt());
         }
 
 
