@@ -132,10 +132,11 @@ public class TaskServise {
 
         saveFileData(taskDto, save);
 
-        List<User> users = new ArrayList<>();
+        Set<User> users = new HashSet<>();
         for (TaskPrice taskPrice : taskPriceList) {
             users.addAll(taskPrice.getUserList());
         }
+
         for (User user : users) {
             Notification notification = new Notification();
             SmsDto smsDto = new SmsDto();

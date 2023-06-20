@@ -1,22 +1,20 @@
 package uz.pdp.springsecurity.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.entity.Address;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.SmsDto;
-import uz.pdp.springsecurity.repository.CustomerRepository;
-import uz.pdp.springsecurity.repository.ShablonRepository;
-import uz.pdp.springsecurity.repository.TokenRepository;
-import uz.pdp.springsecurity.repository.UserRepository;
+import uz.pdp.springsecurity.repository.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.*;
 
 
 @Service
@@ -33,6 +31,7 @@ public class SmsService {
     private final TokenRepository tokenRepository;
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
+    private final BranchRepository branchRepository;
 
 
     public ApiResponse add(SmsDto smsDto) {
@@ -149,7 +148,6 @@ public class SmsService {
         return new ApiResponse("successfully send", true);
     }
 
-
     public String getGetToken() {
         ObjectMapper objectMapper = new ObjectMapper();
         OkHttpClient client = new OkHttpClient().newBuilder()
@@ -184,5 +182,64 @@ public class SmsService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void createBusiness(Business business) throws IOException {
+
+        String smsToken = null;
+        List<Token> all1 = tokenRepository.findAll();
+        for (Token token : all1) {
+            smsToken = token.getToken();
+            break;
+        }
+
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
+
+        String name = business.getName();
+        Timestamp data = business.getCreatedAt();
+        String description = business.getDescription();
+        List<Branch> all = branchRepository.findAllByBusiness_Id(business.getId());
+        List<User> allUsers = userRepository.findAllByBusiness_Id(business.getId());
+
+        Address address = new Address();
+        String name1 = "";
+        for (Branch branch : all) {
+            address = branch.getAddress();
+            name1 = branch.getName();
+            break;
+        }
+        String firstName = "";
+        String lastName = "";
+        String phoneNumber = "";
+
+        for (User allUser : allUsers) {
+            firstName = allUser.getFirstName();
+            lastName = allUser.getLastName();
+            phoneNumber = allUser.getPhoneNumber();
+            break;
+        }
+
+        String s = "Data:" + data + "\n" + "business name: " + name + "\n" + "address: " + address.getCity() + " "
+                + address.getDistrict() + " " + address.getStreet() + " " + address.getHome() + "\n" +
+                "fillial: " + name1 + "\n" + "admin : " + lastName + " " + firstName + "\n" + "Tel: " + phoneNumber;
+
+        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("mobile_phone", "998887970313")
+                .addFormDataPart("message", s)
+                .addFormDataPart("from", "4546")
+                .addFormDataPart("callback_url", "http://0000.uz/test.php")
+                .build();
+
+        if (smsToken == null) {
+            smsToken = getGetToken();
+        }
+
+        Request request = new Request.Builder()
+                .url("https://notify.eskiz.uz/api/message/sms/send")
+                .method("POST", body)
+                .header("Authorization", "Bearer " + smsToken)
+                .build();
+
+        Response response = client.newCall(request).execute();
     }
 }
