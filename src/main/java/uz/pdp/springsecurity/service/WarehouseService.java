@@ -48,7 +48,7 @@ public class WarehouseService {
             if (optionalWarehouse.isPresent()) {
                 warehouse = optionalWarehouse.get();
                 if (warehouse.getAmount() < 0) {
-                    amount = -warehouse.getAmount();
+                    amount = - warehouse.getAmount();
                 }
                 warehouse.setAmount(warehouse.getAmount() + quantity);
             } else {

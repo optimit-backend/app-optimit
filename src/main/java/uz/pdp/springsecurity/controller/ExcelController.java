@@ -67,4 +67,14 @@ public class ExcelController {
             return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse).getBody();
 
         }
+
+    @CheckPermission("POST_EXCEL")
+    @PostMapping("/uploadExcel")
+    public ApiResponse uploadFileExcel(@RequestParam MultipartFile file,
+                                       @RequestParam UUID branchId) {
+        ApiResponse apiResponse = excelService.saveExcel(file,branchId);
+        ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse).getBody();
+
+    }
 }
