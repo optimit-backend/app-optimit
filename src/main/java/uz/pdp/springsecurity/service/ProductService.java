@@ -255,7 +255,6 @@ public class ProductService {
         product.setType(Type.MANY);
 
         Product saveProduct = productRepository.save(product);
-//        List<ProductTypePrice> productTypePriceList = new ArrayList<>();
 
         for (ProductTypePricePostDto typePricePostDto : productDto.getProductTypePricePostDtoList()) {
             Optional<ProductTypeValue> optionalProductTypeValue = productTypeValueRepository.findById(typePricePostDto.getProductTypeValueId());
@@ -344,7 +343,7 @@ public class ProductService {
         return new ApiResponse("successfully saved", true);
     }
 
-    private String generateBarcode(UUID businessId, String productName, UUID productId, boolean isUpdate) {
+    private  String generateBarcode(UUID businessId, String productName, UUID productId, boolean isUpdate) {
         String name = productName.toLowerCase();
         StringBuilder str = new StringBuilder(String.valueOf(System.currentTimeMillis()));
         str.append(name.charAt(0));
