@@ -100,4 +100,25 @@ public class CustomerController {
         ApiResponse apiResponse = customerService.getAllByLidCustomer(branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("VIEW_CUSTOMER")
+    @GetMapping("/get-customer-info/{customerId}")
+    public HttpEntity<?> getCustomerInfo(@PathVariable UUID customerId) {
+        ApiResponse apiResponse = customerService.getCustomerInfo(customerId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_CUSTOMER")
+    @GetMapping("/get-customer-trade-info/{customerId}")
+    public HttpEntity<?> getCustomerTradeInfo(@PathVariable UUID customerId) {
+        ApiResponse apiResponse = customerService.getCustomerTradeInfo(customerId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_CUSTOMER")
+    @GetMapping("/get-customer-prevented-info/{customerId}")
+    public HttpEntity<?> getCustomerPreventedInfo(@PathVariable UUID customerId) {
+        ApiResponse apiResponse = customerService.getCustomerPreventedInfo(customerId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 }

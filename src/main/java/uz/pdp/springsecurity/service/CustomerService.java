@@ -24,6 +24,7 @@ public class CustomerService {
     private final RepaymentDebtRepository repaymentDebtRepository;
     private final CustomerDebtRepository customerDebtRepository;
     private final PayMethodRepository payMethodRepository;
+    private final TradeProductRepository tradeProductRepository;
 
     public ApiResponse add(CustomerDto customerDto) {
         return createEdit(new Customer(), customerDto);
@@ -54,6 +55,7 @@ public class CustomerService {
         customer.setDebt(customerDto.getDebt());
         customer.setPayDate(customerDto.getPayDate());
         customer.setLidCustomer(customerDto.getLidCustomer());
+        customer.setDescription(customerDto.getDescription());
 
         customer.setBusiness(branches.get(0).getBusiness()); // TODO: 6/6/2023  delete
         customer.setBranch(branches.get(0)); // TODO: 6/6/2023  delete
@@ -221,5 +223,110 @@ public class CustomerService {
             responses.add(response);
         }
         return new ApiResponse("found", true, responses);
+    }
+
+    public ApiResponse getCustomerInfo(UUID customerId) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
+        if (optionalCustomer.isEmpty()) {
+            return new ApiResponse("not found customer", false);
+        }
+
+        CustomerInfoDto customerInfoDto = new CustomerInfoDto();
+        Customer customer = optionalCustomer.get();
+        CustomerDto customerDto = mapper.toDto(customer);
+        customerInfoDto.setCustomerDto(customerDto);
+
+        Double totalSumByCustomer = tradeRepository.totalSumByCustomer(customerId);
+        Double totalProfitByCustomer = tradeRepository.totalProfitByCustomer(customerId);
+        customerInfoDto.setTotalTradeSum(totalSumByCustomer != null ? totalSumByCustomer : 0);
+        customerInfoDto.setTotalProfitSum(totalProfitByCustomer != null ? totalProfitByCustomer : 0);
+
+        return new ApiResponse("data", true, customerInfoDto);
+    }
+
+    public ApiResponse getCustomerTradeInfo(UUID customerId) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
+        if (optionalCustomer.isEmpty()) {
+            return new ApiResponse("not found customer", false);
+        }
+
+        List<CustomerTradeInfo> customerTradeInfo = new ArrayList<>();
+        List<Trade> all = tradeRepository.findAllByCustomer_Id(customerId);
+        for (Trade trade : all) {
+            CustomerTradeInfo customerTradeInfo1 = new CustomerTradeInfo();
+            List<TradeProductCustomerDto> tradeProductCustomerDtoList = new ArrayList<>();
+
+            List<TradeProduct> allByTradeId = tradeProductRepository.findAllByTradeId(trade.getId());
+
+            for (TradeProduct tradeProduct : allByTradeId) {
+                TradeProductCustomerDto productCustomerDto = new TradeProductCustomerDto();
+                if (tradeProduct.getBacking() != null) {
+                    customerTradeInfo1.setTrade(false);
+                    customerTradeInfo1.setTotalSumma(tradeProduct.getBacking());
+                } else {
+                    customerTradeInfo1.setTrade(true);
+                    customerTradeInfo1.setTotalSumma(tradeProduct.getTrade().getTotalSum());
+                }
+                if (tradeProduct.getProduct().getPhoto() != null) {
+                    productCustomerDto.setAttachmentId(tradeProduct.getProduct().getPhoto().getId());
+                }
+                productCustomerDto.setProductName(tradeProduct.getProductTypePrice() != null ?
+                        tradeProduct.getProductTypePrice().getName() : tradeProduct.getProduct().getName());
+
+                tradeProductCustomerDtoList.add(productCustomerDto);
+            }
+
+            customerTradeInfo1.setCreateAt(trade.getCreatedAt());
+            customerTradeInfo1.setProductCutomerDtoList(tradeProductCustomerDtoList);
+            customerTradeInfo.add(customerTradeInfo1);
+        }
+
+        if (customerTradeInfo.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+        return new ApiResponse("all", true, customerTradeInfo);
+    }
+
+    public ApiResponse getCustomerPreventedInfo(UUID customerId) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
+        if (optionalCustomer.isEmpty()) {
+            return new ApiResponse("not found customer", false);
+        }
+
+        List<Trade> all = tradeRepository.findAllByCustomer_Id(customerId);
+        List<CustomerPreventedInfoDto> customerPreventedInfoDtoList = new ArrayList<>();
+
+        for (Trade trade : all) {
+            CustomerPreventedInfoDto customerPreventedInfoDto = new CustomerPreventedInfoDto();
+            Double paidSum = tradeRepository.totalPaidSum(trade.getId());
+            TotalPaidSumDto totalPaidSumDto = new TotalPaidSumDto();
+            totalPaidSumDto.setCreateAt(trade.getCreatedAt());
+            totalPaidSumDto.setPaidSum(paidSum != null ? paidSum : 0);
+            totalPaidSumDto.setPayMethodName(trade.getPayMethod().getType());
+            customerPreventedInfoDto.setTotalPaidSumDto(totalPaidSumDto);
+
+            if (trade.getDebtSum() != 0) {
+                customerPreventedInfoDto.setDebtSum(trade.getDebtSum());
+            }
+
+            List<TradeProduct> allByTradeId = tradeProductRepository.findAllByTradeId(trade.getId());
+            for (TradeProduct tradeProduct : allByTradeId) {
+                if (tradeProduct.getBacking() != null) {
+                    BackingProductDto backingProductDto = new BackingProductDto();
+                    backingProductDto.setCreateAt(tradeProduct.getCreatedAt());
+                    backingProductDto.setPaidSum(tradeProduct.getBacking());
+                    backingProductDto.setPayMethodName(tradeProduct.getTrade().getPayMethod().getType());
+                    customerPreventedInfoDto.setBackingProductDto(backingProductDto);
+                }
+            }
+            customerPreventedInfoDtoList.add(customerPreventedInfoDto);
+        }
+
+
+        if (customerPreventedInfoDtoList.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+
+        return new ApiResponse("found", true, customerPreventedInfoDtoList);
     }
 }

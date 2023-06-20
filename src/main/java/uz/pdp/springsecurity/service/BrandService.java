@@ -40,7 +40,7 @@ public class BrandService {
         }
         Business business = optionalBusiness.get();
         brand.setBusiness(business);
-        List<Branch> branchList = branchRepository.findAllByBusiness_Id(business.getId());
+        List<Brand> branchList = brandRepository.findAllByBusiness_Id(business.getId());
         int size = branchList.size();
 
 

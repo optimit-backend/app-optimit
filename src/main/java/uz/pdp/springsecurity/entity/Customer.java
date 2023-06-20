@@ -28,6 +28,7 @@ public class Customer extends AbsEntity {
     private String name;
     private String phoneNumber;
     private String telegram;
+    private String description;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -54,7 +55,7 @@ public class Customer extends AbsEntity {
 
     private Boolean lidCustomer;
 
-    public Customer( String name, String phoneNumber, String telegram, Business business) {
+    public Customer(String name, String phoneNumber, String telegram, Business business) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.telegram = telegram;
@@ -77,7 +78,7 @@ public class Customer extends AbsEntity {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.telegram = telegram;
-        this.customerGroup=customerGroup;
+        this.customerGroup = customerGroup;
         this.business = business;
     }
 
@@ -97,6 +98,6 @@ public class Customer extends AbsEntity {
         this.telegram = telegram;
         this.business = business;
         this.branch = branch;
-        this.customerGroup=customerGroup;
+        this.customerGroup = customerGroup;
     }
 }

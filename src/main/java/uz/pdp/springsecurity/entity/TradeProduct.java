@@ -45,6 +45,7 @@ public class TradeProduct extends AbsEntity {
 
     //TOTAL PROFIT OF PRODUCT
     private double profit;
+
     private Boolean subMeasurement;
 
     @Transient
