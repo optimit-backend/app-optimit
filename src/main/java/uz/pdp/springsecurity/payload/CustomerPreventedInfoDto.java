@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class CustomerPreventedInfoDto {
     private TotalPaidSumDto totalPaidSumDto;
     private BackingProductDto backingProductDto;
-    private Double debtSum;
+    private double debtSum = 0;
+    private double balance;
 }
