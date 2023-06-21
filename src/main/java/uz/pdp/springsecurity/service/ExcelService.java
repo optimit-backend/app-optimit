@@ -222,6 +222,7 @@ public class ExcelService {
             int count = 0;
 
             for (ExcelDto excelDto : exportExcelDtoList) {
+
                 if (checkProduct(branchId, optionalBranch, fifoCalculationList, excelDto.getBarcode(), excelDto.getAmount(), excelDto.getBuyPrice())) {
                     continue;
                 }
@@ -274,15 +275,29 @@ public class ExcelService {
                         new Date(),
                         product
                 ));
-                if (excelDto.getTypeSize() != null || excelDto.getTypeColor() != null){
-                    product.setType(Type.MANY);
-                    productRepository.save(product);
+                boolean checkingSize = false;
+                boolean checkingColor = false;
+                if (excelDto.getTypeSize() != null){
+                    checkingSize = true;
+                }
+                if (excelDto.getTypeColor() != null){
+                    checkingColor = true;
+                }
+                if (checkingSize && checkingColor){
+
+                    boolean exists = productTypePriceRepository.existsByProduct_ActiveAndBarcodeAndProduct_BusinessId(true, excelDto.getBarcode(),business.getId());
+                    if (exists){
+                        Warehouse warehouseProductTypePrice = warehouseRepository.findAllByProductTypePrice_BarcodeAndBranch_BusinessId(excelDto.getBarcode(),business.getId());
+                        warehouseProductTypePrice.setAmount(warehouseProductTypePrice.getAmount()+excelDto.getAmount());
+                        warehouseRepository.save(warehouseProductTypePrice);
+                        continue;
+                    }
+
                     String typeSizes = excelDto.getTypeColor();
                     String typeColor = excelDto.getTypeSize();
 
                     double parseDouble = Double.parseDouble(typeSizes);
                     int typeSize = (int) parseDouble;
-
                     ProductTypeValue productTypeValueColor = productTypeValueRepository
                             .findAllByProductType_BusinessIdAndName(business.getId(), String.valueOf(typeSize))
                             .orElse(null);
@@ -290,10 +305,14 @@ public class ExcelService {
                     ProductTypeValue productTypeValueSize = productTypeValueRepository
                             .findAllByProductType_BusinessIdAndName(business.getId(), typeColor)
                             .orElse(null);
-
                     assert productTypeValueColor != null;
-                    ProductType productType = productTypeValueColor.getProductType();
-
+                    if (productTypeValueSize!=null){
+                        product.setName(product.getName() + " ( " +productTypeValueColor.getName() + " " + productTypeValueSize.getName() + " )");
+                    }else {
+                        product.setName(product.getName() + "( " + productTypeValueColor.getProductType().getName() + " - " + productTypeValueColor.getName() + " )");
+                    }
+                    product.setType(Type.MANY);
+                    productRepository.save(product);
 
                     ProductTypePrice productTypePrice = new ProductTypePrice();
                     productTypePrice.setProduct(product);
@@ -304,13 +323,31 @@ public class ExcelService {
                         productTypePrice.setName(product.getName() + "( " + productTypeValueColor.getProductType().getName() + " - " + productTypeValueColor.getName() + " )");
                     }
 
+
                     productTypePrice.setProductTypeValue(productTypeValueColor);
-                    productTypePrice.setBuyPrice(excelDto.getBuyPrice());
-                    productTypePrice.setBuyPriceDollar(Math.round(excelDto.getBuyPrice() / currency.getCourse() * 100) / 100.);
-                    productTypePrice.setSalePrice(excelDto.getSalePrice());
-                    productTypePrice.setSalePriceDollar(Math.round(excelDto.getSalePrice() / currency.getCourse() * 100) / 100.);
-                    productTypePrice.setGrossPrice(excelDto.getSalePrice());
-                    productTypePrice.setGrossPriceDollar(Math.round(excelDto.getWholeSale() / currency.getCourse() * 100) / 100.);
+
+                    if (excelDto.getDollarBuy().equals("true")){
+                        assert currency != null;
+                        productTypePrice.setBuyPrice(currency.getCourse()* excelDto.getBuyPrice());
+                        productTypePrice.setBuyPriceDollar(excelDto.getBuyPrice());
+                    }else {
+                        productTypePrice.setBuyPrice(excelDto.getBuyPrice());
+                        productTypePrice.setBuyPriceDollar(Math.round(excelDto.getBuyPrice() / currency.getCourse() * 100) / 100.);
+
+                    }
+                    if (excelDto.getDollarSale().equals("true")){
+                        productTypePrice.setSalePrice(currency.getCourse()*excelDto.getSalePrice());
+                        productTypePrice.setSalePriceDollar(excelDto.getSalePrice());
+                        productTypePrice.setGrossPrice(currency.getCourse()* excelDto.getWholeSale());
+                        productTypePrice.setGrossPriceDollar(excelDto.getWholeSale());
+                    }else {
+                        productTypePrice.setSalePrice(excelDto.getSalePrice());
+                        productTypePrice.setSalePriceDollar(Math.round(excelDto.getSalePrice() / currency.getCourse() * 100) / 100.);
+                        productTypePrice.setGrossPrice(excelDto.getWholeSale());
+                        productTypePrice.setGrossPriceDollar(Math.round(excelDto.getWholeSale() / currency.getCourse() * 100) / 100.);
+                    }
+
+
                     productTypePrice.setProfitPercent(10);
                     productTypePrice.setPhoto(null);
                     productTypePrice.setBarcode(excelDto.getBarcode());

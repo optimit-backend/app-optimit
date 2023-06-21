@@ -20,6 +20,8 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 
     List<Warehouse> findAllByBranch_Business_Id(UUID branch_business_id);
 
+    Warehouse findAllByProductTypePrice_BarcodeAndBranch_BusinessId(String productTypePrice_barcode, UUID branch_business_id);
+
     Page<Warehouse> findAllByBranch_BusinessIdAndAmountNotOrderByAmountAsc(UUID product_business_id, double amount, Pageable pageable);
 
     Page<Warehouse> findAllByBranchIdAndAmountNotOrderByAmountAsc(UUID branch_id, double amount, Pageable pageable);

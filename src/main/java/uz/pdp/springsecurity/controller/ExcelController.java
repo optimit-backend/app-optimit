@@ -55,21 +55,21 @@ public class ExcelController {
         return ResponseEntity.ok(response);
     }
 
+//    @CheckPermission("POST_EXCEL")
+//    @PostMapping("/upload")
+//    public ApiResponse uploadFile(@RequestParam MultipartFile file,
+//                                     @RequestParam UUID branchId,
+//                                     @RequestParam UUID measurementId,
+//                                     @RequestParam(required = false) UUID categoryId,
+//                                     @RequestParam(required = false) UUID brandId) {
+//            ApiResponse apiResponse = excelService.save(file, categoryId, measurementId, branchId, brandId);
+//            ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+//            return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse).getBody();
+//
+//        }
+
     @CheckPermission("POST_EXCEL")
     @PostMapping("/upload")
-    public ApiResponse uploadFile(@RequestParam MultipartFile file,
-                                     @RequestParam UUID branchId,
-                                     @RequestParam UUID measurementId,
-                                     @RequestParam(required = false) UUID categoryId,
-                                     @RequestParam(required = false) UUID brandId) {
-            ApiResponse apiResponse = excelService.save(file, categoryId, measurementId, branchId, brandId);
-            ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-            return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse).getBody();
-
-        }
-
-    @CheckPermission("POST_EXCEL")
-    @PostMapping("/uploadExcel")
     public ApiResponse uploadFileExcel(@RequestParam MultipartFile file,
                                        @RequestParam UUID branchId) {
         ApiResponse apiResponse = excelService.saveExcel(file,branchId);

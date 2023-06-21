@@ -734,18 +734,21 @@ public class ProductService {
         if (checkingBranch) {
             checkingBusiness = false;
         }
-
-        assert search != null;
-        String[] words = search.split("\\s+");
-        if (!search.equals("null")) {
-            for (String word : words) {
-                if (branch_id != null) {
-                    productList = productRepository.findAllByBranchIdAndNameContainingIgnoreCaseOrBarcodeContainingIgnoreCase(branch_id, word, word, pageable);
-                } else {
-                    productList = productRepository.findAllByBranch_BusinessIdAndNameContainingIgnoreCaseOrBarcodeContainingIgnoreCase(businessId, word, word, pageable);
+        if (search.isBlank()){
+            search = null;
+        }if (search!=null){
+            String[] words = search.split("\\s+");
+            if (!search.equals("null")) {
+                for (String word : words) {
+                    if (branch_id != null) {
+                        productList = productRepository.findAllByBranchIdAndNameContainingIgnoreCase(branch_id, word, pageable);
+                    } else {
+                        productList = productRepository.findAllByBranch_BusinessIdAndNameContainingIgnoreCase(businessId, word, pageable);
+                    }
                 }
             }
-        }else {
+        }
+        else {
             if (checkingCategory && checkingBrand && checkingBranch) {
                 productList = productRepository.findAllByBrand_IdAndCategoryIdAndBranchIdAndActiveTrue(brand_id, categoryId, branch_id, pageable);
             } else if (checkingBrand && checkingBranch) {
@@ -764,9 +767,15 @@ public class ProductService {
                 productList = productRepository.findAllByBranch_IdAndActiveTrue(branch_id, pageable);
             }
         }
+        int totalPages = 0;
+        long totalElements = 0;
+        int currentPage = 0;
 
         if (productList != null && !productList.isEmpty()) {
             products = productList.getContent();
+             totalPages = productList.getTotalPages();
+             currentPage = productList.getNumber();
+             totalElements = productList.getTotalElements();
             if (checkingBranch) {
                 getProductMethod(productViewDtoList, products, branch_id);
             } else {
@@ -777,8 +786,14 @@ public class ProductService {
         if (productViewDtoList.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         }
+        Map<String, Object> response = new HashMap<>();
+        response.put("product_list",productViewDtoList);
+        response.put("currentPage", currentPage);
+        response.put("totalPages",totalPages);
+        response.put("totalItems",totalElements);
 
-        return new ApiResponse("FOUND", true, productViewDtoList);
+
+        return new ApiResponse("FOUND", true, response);
     }
 
 
