@@ -233,11 +233,11 @@ public class ProductService {
         if (productDto.getBarcode() != null && !productDto.getBarcode().isBlank()) {
             if (isUpdate) {
                 if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId(), product.getId())
-                        || productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(productDto.getBarcode(), product.getBusiness().getId()))
+                        || productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId()))
                     return new ApiResponse("product with the barcode is already exist");
             } else {
                 if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId())
-                        || productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(productDto.getBarcode(), product.getBusiness().getId()))
+                        || productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndActiveTrue(productDto.getBarcode(), product.getBusiness().getId()))
                     return new ApiResponse("product with the barcode is already exist");
             }
             product.setBarcode(productDto.getBarcode());
@@ -311,14 +311,14 @@ public class ProductService {
         }
         if (dto.getBarcode() != null && !dto.getBarcode().isBlank()) {
             if (edit) {
-                if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndIdIsNot(dto.getBarcode(), product.getBusiness().getId(), productTypePrice.getId())
+                if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndIdIsNotAndActiveTrue(dto.getBarcode(), product.getBusiness().getId(), productTypePrice.getId())
                         || productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(dto.getBarcode(), product.getBusiness().getId(), productTypePrice.getId())) {
                     productTypePrice.setBarcode(generateBarcode(product.getBusiness().getId(), product.getName(), productTypePrice.getId(), false));
                 } else {
                     productTypePrice.setBarcode(dto.getBarcode());
                 }
             }else {
-                if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(dto.getBarcode(), product.getBusiness().getId())
+                if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndActiveTrue(dto.getBarcode(), product.getBusiness().getId())
                         || productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(dto.getBarcode(), product.getBusiness().getId())) {
                     productTypePrice.setBarcode(generateBarcode(product.getBusiness().getId(), product.getName(), productTypePrice.getId(), edit));
                 } else {
@@ -338,10 +338,10 @@ public class ProductService {
         str.reverse();
         String barcode = str.substring(0, 9);
         if (edit) {
-            if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(barcode, businessId, productId) || productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndIdIsNot(barcode, businessId, productId))
+            if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(barcode, businessId, productId) || productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndIdIsNotAndActiveTrue(barcode, businessId, productId))
                 return generateBarcode(businessId, productName, productId, true);
         } else {
-            if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(barcode, businessId) || productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(barcode, businessId))
+            if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(barcode, businessId) || productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndActiveTrue(barcode, businessId))
                 return generateBarcode(businessId, productName, productId, false);
         }
         return barcode;
@@ -381,7 +381,7 @@ public class ProductService {
             return new ApiResponse("productGetDto", true, productGetDto);
         } else if (product.getType().name().equals(Type.MANY.name())) {
             List<ProductTypePriceGetDto> productTypePriceGetDtoList = new ArrayList<>();
-            List<ProductTypePrice> allByProductId = productTypePriceRepository.findAllByProductId(product.getId());
+            List<ProductTypePrice> allByProductId = productTypePriceRepository.findAllByProductIdAndActiveTrue(product.getId());
             for (ProductTypePrice productTypePrice : allByProductId) {
                 ProductTypePriceGetDto productTypePriceGetDto = new ProductTypePriceGetDto();
                 productTypePriceGetDto.setProductTypePriceId(productTypePrice.getId());
@@ -435,6 +435,13 @@ public class ProductService {
             if (optionalProduct.isPresent()) {
                 Product product = optionalProduct.get();
                 product.setActive(false);
+                if (product.getType().name().equals(Type.MANY.name())){
+                    List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductIdAndActiveTrue(product.getId());
+                    for (ProductTypePrice productTypePrice : productTypePriceList) {
+                        productTypePrice.setActive(false);
+                    }
+                    productTypePriceRepository.saveAll(productTypePriceList);
+                }
                 productRepository.save(product);
                 return new ApiResponse("DELETED", true);
             }
@@ -569,7 +576,7 @@ public class ProductService {
     private void toViewDtoMto(UUID branch_id, List<ProductGetForPurchaseDto> getForPurchaseDtoList, List<Product> productList) {
         for (Product product : productList) {
             if (product.getType().equals(Type.MANY)) {
-                List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductId(product.getId());
+                List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductIdAndActiveTrue(product.getId());
                 for (ProductTypePrice productTypePrice : productTypePriceList) {
                     ProductGetForPurchaseDto getForPurchaseDto = new ProductGetForPurchaseDto();
                     getForPurchaseDto.setProductTypePriceId(productTypePrice.getId());
@@ -793,6 +800,13 @@ public class ProductService {
             if (optional.isPresent()) {
                 Product product = optional.get();
                 product.setActive(false);
+                if (product.getType().name().equals(Type.MANY.name())){
+                    List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductIdAndActiveTrue(product.getId());
+                    for (ProductTypePrice productTypePrice : productTypePriceList) {
+                        productTypePrice.setActive(false);
+                    }
+                    productTypePriceRepository.saveAll(productTypePriceList);
+                }
                 productRepository.save(product);
             }
         }
@@ -838,7 +852,7 @@ public class ProductService {
 
             if (product.getType().equals(Type.MANY)) {
                 double total = 0;
-                List<ProductTypePrice> typePriceRepositoryAllByProductId = productTypePriceRepository.findAllByProductId(product.getId());
+                List<ProductTypePrice> typePriceRepositoryAllByProductId = productTypePriceRepository.findAllByProductIdAndActiveTrue(product.getId());
                 for (ProductTypePrice productTypePrice : typePriceRepositoryAllByProductId) {
                     List<Warehouse> allByByProductId;
                     if (branchId != null) {
@@ -1042,7 +1056,7 @@ public class ProductService {
     private void editPriceHelper(List<Product> productList, double course) {
         for (Product product : productList) {
             if (product.getType().equals(Type.MANY)) {
-                editSalePriceManyHelper(productTypePriceRepository.findAllByProductId(product.getId()), course);
+                editSalePriceManyHelper(productTypePriceRepository.findAllByProductIdAndActiveTrue(product.getId()), course);
             } else {
                 product.setSalePrice(course * product.getSalePriceDollar());
             }

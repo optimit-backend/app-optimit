@@ -70,7 +70,7 @@ public class ProductTypeService {
 //    public ApiResponse getProductTypeByProductId(UUID productId){
 //        List<ProductTypeViewDto> productTypeViewDtoList=new ArrayList<>();
 //        Optional<Product> optionalProduct = productRepository.findById(productId);
-//        List<ProductTypePrice> priceList = productTypePriceRepository.findAllByProductId(productId);
+//        List<ProductTypePrice> priceList = productTypePriceRepository.findAllByProductIdAndActiveTrue(productId);
 //        if (optionalProduct.isEmpty()){
 //            return new ApiResponse("NOT FOUND", false);
 //        }
