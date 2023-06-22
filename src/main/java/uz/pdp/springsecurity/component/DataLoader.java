@@ -66,7 +66,7 @@ public class DataLoader implements CommandLineRunner {
                         "test tariff",
                         "test uchun",
                         List.of(permissions),
-                        0,
+                        10,
                         0,
                         0,
                         0,
