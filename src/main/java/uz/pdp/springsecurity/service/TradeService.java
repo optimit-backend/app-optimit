@@ -140,11 +140,9 @@ public class TradeService {
                     }
                     if (dto.getType().equalsIgnoreCase("single")) {
                         UUID productId = dto.getProductId();
-//                    if (!productRepository.existsById(productId)) return new ApiResponse("PRODUCT NOT FOUND", false);
                         map.put(productId, map.getOrDefault(productId, 0d) + tradedQuantity);
                     } else if (dto.getType().equalsIgnoreCase("many")) {
                         UUID productId = dto.getProductTypePriceId();
-//                    if (!productTypePriceRepository.existsById(productId)) return new ApiResponse("PRODUCT NOT FOUND", false);
                         map.put(productId, map.getOrDefault(productId, 0d) + tradedQuantity);
                     } else if (dto.getType().equalsIgnoreCase("combo")) {
                         UUID productId = dto.getProductId();
@@ -459,15 +457,15 @@ public class TradeService {
         Page<Trade> tradePage;
         if (businessRepository.existsById(id)) {
             if (invoice != null) {
-                tradePage = tradeRepository.findAllByBranch_BusinessIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(id, invoice, invoice, pageable);
+                tradePage = tradeRepository.findAllByBranch_BusinessIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByPayDateDesc(id, invoice, invoice, pageable);
             } else {
-                tradePage = tradeRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(id, pageable);
+                tradePage = tradeRepository.findAllByBranch_BusinessIdOrderByPayDateDesc(id, pageable);
             }
         } else if (branchRepository.existsById(id)) {
             if (invoice != null) {
-                tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(id, invoice, invoice, pageable);
+                tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByPayDateDesc(id, invoice, invoice, pageable);
             } else {
-                tradePage = tradeRepository.findAllByBranchIdOrderByCreatedAtDesc(id, pageable);
+                tradePage = tradeRepository.findAllByBranchIdOrderByPayDateDesc(id, pageable);
             }
         } else {
             return new ApiResponse("ID ERROR", false);
