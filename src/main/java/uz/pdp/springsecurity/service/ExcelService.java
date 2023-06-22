@@ -243,7 +243,7 @@ public class ExcelService {
                 product.setBusiness(business);
                 product.setName(excelDto.getName());
                 product.setExpireDate(excelDto.getExpiredDate());
-                product.setBarcode(generateBarcode(business.getId(),product.getName(),product.getId(),false));
+                product.setBarcode(excelDto.getBarcode());
 
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 Date dueDate = (excelDto.getExpiredDate() != null)
