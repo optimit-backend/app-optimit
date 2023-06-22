@@ -56,12 +56,6 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
     Page<Warehouse> findAllByBranch_Id(UUID branchId, Pageable pageable);
     Page<Warehouse> findAllByBranch_IdAndProduct_ActiveTrue(UUID branchId, Pageable pageable);
 
-    /*@Query(value = "SELECT SUM(amount) from warehouse WHERE branch_id = ?1 ", nativeQuery = true)
-    Double amountByBranchId(UUID branchId);*/
-
-//    @Query(value = "SELECT SUM(t.debtSum) FROM Trade t WHERE t.branch.id = :branchId AND t.createdAt >= :startDate AND t.createdAt <= :endDate")
-//    Double totalDebtSum(@Param("branchId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
-
     @Query(value = "SELECT SUM(w.amount * w.product.buyPrice) FROM Warehouse w WHERE  w.product.id = :productId and w.createdAt >= :startDate AND w.createdAt <= :endDate")
     Double totalSumProduct(@Param("productId") UUID productId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
 
