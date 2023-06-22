@@ -12,6 +12,7 @@ import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 import uz.pdp.springsecurity.util.Constants;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,6 +40,7 @@ public class BusinessService {
     private final SourceRepository sourceRepository;
     private final LidFieldRepository lidFieldRepository;
     private final BalanceRepository balanceRepository;
+    private final SmsService smsService;
 
     private final static LocalDateTime TODAY = LocalDate.now().atStartOfDay();
     private final static LocalDateTime THIS_WEEK = TODAY.minusDays(TODAY.getDayOfWeek().ordinal());
@@ -125,6 +127,12 @@ public class BusinessService {
         BranchService.createTaskStatus(branch, taskStatusRepository);
 
         createProjectStatus(branch);
+
+        try {
+            smsService.createBusiness(business);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
 
         return new ApiResponse("ADDED", true);
     }

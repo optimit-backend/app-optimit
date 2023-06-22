@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -2206,6 +2207,7 @@ public class ReportsService {
             todayOutlay = aDouble1 != null ? aDouble1 : 0;
 
         }
+        getCheckoutDtoList.sort(Comparator.comparing(GetCheckoutDto::getTimestamp));
 
         response.put("data", getCheckoutDtoList);
         response.put("totalSumma", totalSumma);

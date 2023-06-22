@@ -11,6 +11,7 @@ import uz.pdp.springsecurity.payload.NotificationGetByIdDto;
 import uz.pdp.springsecurity.repository.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +32,8 @@ public class NotificationService {
         List<Notification> allByReadIsFalse = repository.findAllByReadIsFalseAndUserToId(userId);
         List<Notification> allByReadIsTrue = repository.findAllByReadIsTrueAndUserToId(userId);
 
-        allByReadIsFalse.sort(Comparator.comparing(Notification::getCreatedAt));
-        allByReadIsTrue.sort(Comparator.comparing(Notification::getCreatedAt));
+        allByReadIsFalse.sort(Comparator.comparing(Notification::getCreatedAt).reversed());
+        allByReadIsTrue.sort(Comparator.comparing(Notification::getCreatedAt).reversed());
 
         List<Notification> notificationList = new ArrayList<>(allByReadIsFalse);
         notificationList.addAll(allByReadIsTrue);
