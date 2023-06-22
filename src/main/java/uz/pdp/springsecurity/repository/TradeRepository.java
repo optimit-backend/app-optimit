@@ -81,10 +81,10 @@ public interface TradeRepository extends JpaRepository<Trade, UUID>, JpaSpecific
 
     Optional<Trade> findFirstByBranchIdOrderByCreatedAtDesc(UUID branchId);
 
-    Page<Trade> findAllByBranchIdOrderByCreatedAtDesc(UUID branchId, Pageable pageable);
+    Page<Trade> findAllByBranchIdOrderByPayDateDesc(UUID branchId, Pageable pageable);
 
-    Page<Trade> findAllByBranch_BusinessIdOrderByCreatedAtDesc(UUID businessId, Pageable pageable);
+    Page<Trade> findAllByBranch_BusinessIdOrderByPayDateDesc(UUID businessId, Pageable pageable);
 
-    Page<Trade> findAllByBranch_BusinessIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(UUID businessId, String invoice, String name, Pageable pageable);
-    Page<Trade> findAllByBranchIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(UUID branchId, String invoice, String name, Pageable pageable);
+    Page<Trade> findAllByBranch_BusinessIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByPayDateDesc(UUID businessId, String invoice, String name, Pageable pageable);
+    Page<Trade> findAllByBranchIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByPayDateDesc(UUID branchId, String invoice, String name, Pageable pageable);
 }

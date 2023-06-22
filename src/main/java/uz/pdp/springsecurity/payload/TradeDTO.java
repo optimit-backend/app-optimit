@@ -30,6 +30,7 @@ public class TradeDTO {
     @NotNull
     private List<PaymentDto> paymentDtoList;
 
+    @NotNull
     private Date payDate;
 
     @NotNull
