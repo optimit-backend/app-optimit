@@ -58,6 +58,7 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 
     List<Warehouse> findAllByBranchId(UUID branchId);
     Page<Warehouse> findAllByBranch_Id(UUID branchId, Pageable pageable);
+    Page<Warehouse> findAllByBranch_IdAndProduct_ActiveTrue(UUID branchId, Pageable pageable);
 
     /*@Query(value = "SELECT SUM(amount) from warehouse WHERE branch_id = ?1 ", nativeQuery = true)
     Double amountByBranchId(UUID branchId);*/

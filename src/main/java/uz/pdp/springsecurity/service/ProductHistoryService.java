@@ -120,7 +120,7 @@ public class ProductHistoryService {
 
     public ApiResponse amount(UUID branchId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Warehouse> warehousePage = warehouseRepository.findAllByBranch_Id(branchId, pageable);
+        Page<Warehouse> warehousePage = warehouseRepository.findAllByBranch_IdAndProduct_ActiveTrue(branchId, pageable);
         List<ProductAmountDto> productAmountDtoList = new ArrayList<>();
         for (Warehouse warehouse : warehousePage.getContent()) {
             LocalDateTime createdAtLocal = warehouse.getCreatedAt().toLocalDateTime();
