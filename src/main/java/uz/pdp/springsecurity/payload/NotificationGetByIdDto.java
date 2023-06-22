@@ -17,4 +17,5 @@ public class NotificationGetByIdDto {
     private String type;
     private UUID objectId;
     private UUID attachmentId;
+    private UUID branchId;
 }

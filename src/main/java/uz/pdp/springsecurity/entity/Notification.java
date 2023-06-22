@@ -36,6 +36,8 @@ public class Notification extends AbsEntity {
     @ManyToOne
     private Attachment attachment;
 
+    private UUID branchId;
+
     private boolean delivery;
 
     private boolean read;
