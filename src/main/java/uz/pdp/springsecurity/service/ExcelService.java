@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -140,7 +139,7 @@ public class ExcelService {
                 product.setName(excelDto.getProductName());
                 product.setExpireDate(excelDto.getExpiredDate());
                 boolean exists = productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(excelDto.getBarcode(), optionalBranch.get().getBusiness().getId());
-                boolean exists1 = productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(excelDto.getBarcode(), optionalBranch.get().getBusiness().getId());
+                boolean exists1 = productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndActiveTrue(excelDto.getBarcode(), optionalBranch.get().getBusiness().getId());
                 if (exists && exists1) {
                     continue;
                 }
@@ -307,7 +306,7 @@ public class ExcelService {
                 }
                 if (checkingSize && checkingColor){
 
-                    boolean exists = productTypePriceRepository.existsByProduct_ActiveAndBarcodeAndProduct_BusinessId(true, excelDto.getBarcode(),business.getId());
+                    boolean exists = productTypePriceRepository.existsByProduct_ActiveAndBarcodeAndProduct_BusinessIdAndActiveTrue(true, excelDto.getBarcode(),business.getId());
                     if (exists){
                         Warehouse warehouseProductTypePrice = warehouseRepository.findAllByProductTypePrice_BarcodeAndBranch_BusinessId(excelDto.getBarcode(),business.getId());
                         warehouseProductTypePrice.setAmount(warehouseProductTypePrice.getAmount()+excelDto.getAmount());
@@ -412,10 +411,10 @@ public class ExcelService {
         str.reverse();
         String barcode = str.substring(0, 9);
         if (isUpdate) {
-            if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(barcode, businessId, productId) || productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndIdIsNot(barcode, businessId, productId))
+            if (productRepository.existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(barcode, businessId, productId) || productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndIdIsNotAndActiveTrue(barcode, businessId, productId))
                 return generateBarcode(businessId, productName, productId, isUpdate);
         } else {
-            if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(barcode, businessId) || productTypePriceRepository.existsByBarcodeAndProduct_BusinessId(barcode, businessId))
+            if (productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(barcode, businessId) || productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndActiveTrue(barcode, businessId))
                 return generateBarcode(businessId, productName, productId, isUpdate);
         }
         return barcode;

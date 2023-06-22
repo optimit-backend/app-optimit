@@ -15,7 +15,6 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -404,7 +403,7 @@ public class ReportsService {
         }
         UUID businessId = optionalBranch.get().getBusiness().getId();
         List<Product> productList = productRepository.findAllByBrandIdAndBusinessIdAndActiveTrue(brandId, businessId);
-        List<ProductTypePrice> productTypePrices = productTypePriceRepository.findAllByProduct_BranchIdAndProduct_BrandId(branchId, brandId);
+        List<ProductTypePrice> productTypePrices = productTypePriceRepository.findAllByProduct_BranchIdAndProduct_BrandIdAndActiveTrue(branchId, brandId);
         if (productList.isEmpty() && productTypePrices.isEmpty()) {
             return new ApiResponse("No Found Products", false);
         }
@@ -597,10 +596,10 @@ public class ReportsService {
         List<ProductTypePrice> productTypePriceList = null;
         if (checkingBranch) {
             productList = productRepository.findAllByBranchIdAndActiveTrue(branchId);
-            productTypePriceList = productTypePriceRepository.findAllByProduct_BranchId(branchId);
+            productTypePriceList = productTypePriceRepository.findAllByProduct_BranchIdAndActiveTrue(branchId);
         } else {
             productList = productRepository.findAllByBranch_BusinessIdAndActiveTrue(businessId);
-            productTypePriceList = productTypePriceRepository.findAllByProduct_BusinessId(businessId);
+            productTypePriceList = productTypePriceRepository.findAllByProduct_BusinessIdAndActiveTrue(businessId);
         }
 
 

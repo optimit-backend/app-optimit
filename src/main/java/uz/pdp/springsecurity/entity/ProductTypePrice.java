@@ -2,6 +2,7 @@ package uz.pdp.springsecurity.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
@@ -11,6 +12,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@EqualsAndHashCode(callSuper = true)
 public class ProductTypePrice extends AbsEntity {
     @Column(nullable = false)
     private String name;
@@ -36,6 +38,6 @@ public class ProductTypePrice extends AbsEntity {
     private double salePriceDollar = 1;
     private double grossPrice;
     private double grossPriceDollar;
-
     private double profitPercent;
+    private Boolean active;
 }
