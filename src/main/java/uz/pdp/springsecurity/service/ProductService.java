@@ -726,9 +726,9 @@ public class ProductService {
             if (!search.equals("null")) {
                 for (String word : words) {
                     if (branch_id != null) {
-                        productList = productRepository.findAllByBranchIdAndNameContainingIgnoreCase(branch_id, word, pageable);
+                        productList = productRepository.findAllByBranchIdAndNameContainingIgnoreCaseAndActiveTrue(branch_id, word, pageable);
                     } else {
-                        productList = productRepository.findAllByBranch_BusinessIdAndNameContainingIgnoreCase(businessId, word, pageable);
+                        productList = productRepository.findAllByBranch_BusinessIdAndNameContainingIgnoreCaseAndActiveTrue(businessId, word, pageable);
                     }
                 }
             }

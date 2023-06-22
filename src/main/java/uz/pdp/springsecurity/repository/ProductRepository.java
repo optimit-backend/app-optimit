@@ -16,8 +16,8 @@ import java.util.UUID;
 public interface ProductRepository extends JpaRepository<Product, UUID> {
     boolean existsByBarcodeAndBusinessIdAndActiveTrue(String barcode, UUID businessId);
     boolean existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(String barcode, UUID businessId, UUID productId);
-    Page<Product> findAllByBranchIdAndNameContainingIgnoreCase(UUID branch_id, String name, Pageable pageable);
-    Page<Product> findAllByBranch_BusinessIdAndNameContainingIgnoreCase(UUID branch_id, String name, Pageable pageable);
+    Page<Product> findAllByBranchIdAndNameContainingIgnoreCaseAndActiveTrue(UUID branch_id, String name, Pageable pageable);
+    Page<Product> findAllByBranch_BusinessIdAndNameContainingIgnoreCaseAndActiveTrue(UUID branch_id, String name, Pageable pageable);
     List<Product> findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(UUID brand_id, UUID category_id, UUID branchId);
     Page<Product> findAllByBrand_IdAndCategoryIdAndBranchIdAndActiveTrue(UUID brand_id, UUID category_id, UUID branchId,Pageable pageable);
     List<Product> findAllByBrandIdAndActiveIsTrue(UUID brand_id);

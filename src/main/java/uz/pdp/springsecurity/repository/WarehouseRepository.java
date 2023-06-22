@@ -52,10 +52,6 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 
     List<Warehouse> findAllByProductTypePrice_IdAndBranch_Id(UUID productTypePrice_id, UUID product_branch_id);
 
-    boolean existsByBranchIdAndProductId(UUID branchId, UUID productId);
-
-    boolean existsByBranchIdAndProductTypePriceId(UUID branchId, UUID productTypePriceId);
-
     List<Warehouse> findAllByBranchId(UUID branchId);
     Page<Warehouse> findAllByBranch_Id(UUID branchId, Pageable pageable);
     Page<Warehouse> findAllByBranch_IdAndProduct_ActiveTrue(UUID branchId, Pageable pageable);
