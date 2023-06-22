@@ -16,4 +16,5 @@ public class NotificationGetAllDto {
     private boolean read;
     private Timestamp createdAt;
     private UUID objectId;
+    private UUID branchId;
 }

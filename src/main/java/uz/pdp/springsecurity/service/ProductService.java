@@ -305,6 +305,7 @@ public class ProductService {
         productTypePrice.setGrossPrice(dto.getGrossPrice());
         productTypePrice.setGrossPriceDollar(Math.round(dto.getGrossPrice() / currency.getCourse() * 100) / 100.);
         productTypePrice.setProfitPercent(dto.getProfitPercent());
+        productTypePrice.setActive(true);
         if (dto.getPhotoId() != null) {
             Optional<Attachment> optionalAttachment = attachmentRepository.findById(dto.getPhotoId());
             optionalAttachment.ifPresent(productTypePrice::setPhoto);
@@ -317,7 +318,7 @@ public class ProductService {
                 } else {
                     productTypePrice.setBarcode(dto.getBarcode());
                 }
-            }else {
+            } else {
                 if (productTypePriceRepository.existsByBarcodeAndProduct_BusinessIdAndActiveTrue(dto.getBarcode(), product.getBusiness().getId())
                         || productRepository.existsByBarcodeAndBusinessIdAndActiveTrue(dto.getBarcode(), product.getBusiness().getId())) {
                     productTypePrice.setBarcode(generateBarcode(product.getBusiness().getId(), product.getName(), productTypePrice.getId(), edit));
@@ -331,7 +332,7 @@ public class ProductService {
         return new ApiResponse("SUCCESS", true);
     }
 
-    private  String generateBarcode(UUID businessId, String productName, UUID productId, boolean edit) {
+    private String generateBarcode(UUID businessId, String productName, UUID productId, boolean edit) {
         String name = productName.toLowerCase();
         StringBuilder str = new StringBuilder(String.valueOf(System.currentTimeMillis()));
         str.append(name.charAt(0));
@@ -435,7 +436,7 @@ public class ProductService {
             if (optionalProduct.isPresent()) {
                 Product product = optionalProduct.get();
                 product.setActive(false);
-                if (product.getType().name().equals(Type.MANY.name())){
+                if (product.getType().name().equals(Type.MANY.name())) {
                     List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductIdAndActiveTrue(product.getId());
                     for (ProductTypePrice productTypePrice : productTypePriceList) {
                         productTypePrice.setActive(false);
@@ -697,7 +698,7 @@ public class ProductService {
         return new ApiResponse("FOUND", true, productViewDtoList);
     }
 
-    public ApiResponse getByBusinessPageable(UUID businessId, UUID branch_id, UUID brand_id, UUID categoryId, String search, int page,int size) {
+    public ApiResponse getByBusinessPageable(UUID businessId, UUID branch_id, UUID brand_id, UUID categoryId, String search, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -726,9 +727,10 @@ public class ProductService {
         if (checkingBranch) {
             checkingBusiness = false;
         }
-        if (search.isBlank()){
+        if (search.isBlank()) {
             search = null;
-        }if (search!=null){
+        }
+        if (search != null) {
             String[] words = search.split("\\s+");
             if (!search.equals("null")) {
                 for (String word : words) {
@@ -739,8 +741,7 @@ public class ProductService {
                     }
                 }
             }
-        }
-        else {
+        } else {
             if (checkingCategory && checkingBrand && checkingBranch) {
                 productList = productRepository.findAllByBrand_IdAndCategoryIdAndBranchIdAndActiveTrue(brand_id, categoryId, branch_id, pageable);
             } else if (checkingBrand && checkingBranch) {
@@ -765,9 +766,9 @@ public class ProductService {
 
         if (productList != null && !productList.isEmpty()) {
             products = productList.getContent();
-             totalPages = productList.getTotalPages();
-             currentPage = productList.getNumber();
-             totalElements = productList.getTotalElements();
+            totalPages = productList.getTotalPages();
+            currentPage = productList.getNumber();
+            totalElements = productList.getTotalElements();
             if (checkingBranch) {
                 getProductMethod(productViewDtoList, products, branch_id);
             } else {
@@ -779,10 +780,10 @@ public class ProductService {
             return new ApiResponse("NOT FOUND", false);
         }
         Map<String, Object> response = new HashMap<>();
-        response.put("product_list",productViewDtoList);
+        response.put("product_list", productViewDtoList);
         response.put("currentPage", currentPage);
-        response.put("totalPages",totalPages);
-        response.put("totalItems",totalElements);
+        response.put("totalPages", totalPages);
+        response.put("totalItems", totalElements);
 
 
         return new ApiResponse("FOUND", true, response);
@@ -800,7 +801,7 @@ public class ProductService {
             if (optional.isPresent()) {
                 Product product = optional.get();
                 product.setActive(false);
-                if (product.getType().name().equals(Type.MANY.name())){
+                if (product.getType().name().equals(Type.MANY.name())) {
                     List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductIdAndActiveTrue(product.getId());
                     for (ProductTypePrice productTypePrice : productTypePriceList) {
                         productTypePrice.setActive(false);

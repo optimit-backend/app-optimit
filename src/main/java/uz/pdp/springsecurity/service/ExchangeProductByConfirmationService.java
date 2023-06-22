@@ -30,6 +30,7 @@ public class ExchangeProductByConfirmationService {
     private final NotificationRepository notificationRepository;
     private final ProductRepository productRepository;
     private final ProductTypePriceRepository productTypePriceRepository;
+    private final BranchRepository branchRepository;
 
     public ApiResponse add(ExchangeProductByConfirmationDto byConfirmationDto) {
 
@@ -67,15 +68,23 @@ public class ExchangeProductByConfirmationService {
                 getShippedBranchId());
 
         List<User> all = getUsers(allUsers);
+        UUID receivedBranchId = byConfirmationDto.getExchangeProductBranchDTO().getReceivedBranchId();
+        UUID shippedBranchId = byConfirmationDto.getExchangeProductBranchDTO().getShippedBranchId();
+        Optional<Branch> optionalReceivedBranch = branchRepository.findById(receivedBranchId);
+        String branchName = " ";
+        if (optionalReceivedBranch.isPresent()) {
+            branchName = optionalReceivedBranch.get().getName();
+        }
 
         for (User user : all) {
             Notification notification = new Notification();
             notification.setRead(false);
             notification.setName("Mahsulotlar o'tqazmasi so'ralyapdi!");
-            notification.setMessage(byConfirmation.getExchangeProductBranch().getReceivedBranch().getName() + " fillialidan maxsulotlat so'ralmoqda!");
+            notification.setMessage(branchName + " fillialdan maxsulotlar so'ralmoqda!");
             notification.setUserTo(user);
             notification.setType(NotificationType.NEW_EXCHANGE_PRODUCT);
             notification.setObjectId(byConfirmation.getId());
+            notification.setBranchId(shippedBranchId);
             notificationRepository.save(notification);
         }
 
