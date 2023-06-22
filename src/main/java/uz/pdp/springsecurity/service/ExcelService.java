@@ -254,10 +254,32 @@ public class ExcelService {
                 product.setMeasurement(measurement);
                 product.setBrand(brand);
                 product.setCategory(category);
-                product.setBuyPrice(excelDto.getBuyPrice());
-                product.setSalePrice(excelDto.getSalePrice());
+
+                if (excelDto.getDollarBuy().equals("true")){
+                    assert currency != null;
+                    product.setBuyPrice(currency.getCourse()* excelDto.getBuyPrice());
+                    product.setBuyPriceDollar(excelDto.getBuyPrice());
+                }else {
+                    product.setBuyPrice(excelDto.getBuyPrice());
+                    product.setBuyPriceDollar(Math.round(excelDto.getBuyPrice() / currency.getCourse() * 100) / 100.);
+
+                }
+
+                if (excelDto.getDollarSale().equals("true")){
+                    product.setSalePrice(currency.getCourse()*excelDto.getSalePrice());
+                    product.setSalePriceDollar(excelDto.getSalePrice());
+                    product.setGrossPrice(currency.getCourse()* excelDto.getWholeSale());
+                    product.setGrossPriceDollar(excelDto.getWholeSale());
+                }else {
+                    product.setSalePrice(excelDto.getSalePrice());
+                    product.setSalePriceDollar(Math.round(excelDto.getSalePrice() / currency.getCourse() * 100) / 100.);
+                    product.setGrossPrice(excelDto.getWholeSale());
+                    product.setGrossPriceDollar(Math.round(excelDto.getWholeSale() / currency.getCourse() * 100) / 100.);
+                }
+
                 product.setMinQuantity(excelDto.getAlertQuantity());
                 product.setBranch(branchList);
+                product.setGrossPrice(excelDto.getWholeSale());
                 product.setTax(0);
                 product.setActive(true);
                 product.setPhoto(null);
@@ -275,13 +297,13 @@ public class ExcelService {
                         new Date(),
                         product
                 ));
-                boolean checkingSize = false;
-                boolean checkingColor = false;
+                boolean checkingSize = true;
+                boolean checkingColor = true;
                 if (excelDto.getTypeSize() != null){
-                    checkingSize = true;
+                    checkingSize = false;
                 }
                 if (excelDto.getTypeColor() != null){
-                    checkingColor = true;
+                    checkingColor = false;
                 }
                 if (checkingSize && checkingColor){
 
