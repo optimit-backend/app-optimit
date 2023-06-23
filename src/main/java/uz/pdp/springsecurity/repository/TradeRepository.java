@@ -28,9 +28,11 @@ public interface TradeRepository extends JpaRepository<Trade, UUID>, JpaSpecific
 
     List<Trade> findAllByBranch_Business_IdOrderByCreatedAtDesc(UUID businessId);
 
-    double countAllByBranch_BusinessIdAndCreatedAtBetween(UUID branch_business_id, Timestamp createdAt, Timestamp createdAt2);
+    double countAllByBranch_BusinessIdAndCreatedAtBetween(UUID branch_business_id, Timestamp startDate, Timestamp endDate);
 
-    double countAllByBranchIdAndCreatedAtBetween(UUID branch_id, Timestamp createdAt, Timestamp createdAt2);
+    double countAllByBranchIdAndCreatedAtBetween(UUID branch_id, Timestamp startDate, Timestamp endDate);
+
+    double countAllByTraderIdAndCreatedAtBetween(UUID trader_id, Timestamp startDate, Timestamp endDate);
 
     @Query(value = "select sum (t.totalSum) from Trade t where t.branch.id = :branchId AND t.createdAt >= :startDate AND t.createdAt <= :endDate")
     Double totalSum(@Param("branchId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
