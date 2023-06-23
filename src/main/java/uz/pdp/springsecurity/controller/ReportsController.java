@@ -243,4 +243,13 @@ public class ReportsController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+
+    @CheckPermission("VIEW_REPORT")
+    @GetMapping("/get-seller-for-chart/{businessId}")
+    public HttpEntity<?> getSellerForChart(@PathVariable UUID businessId,
+                                  @RequestParam(required = false) UUID branchId) {
+        ApiResponse apiResponse = reportsService.getSellerForChart(branchId, businessId);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
 }

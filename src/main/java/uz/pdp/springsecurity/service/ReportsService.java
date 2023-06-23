@@ -2217,7 +2217,6 @@ public class ReportsService {
 
     }
 
-
     public ApiResponse getIncrease(UUID businessId, UUID branchId, String date, Date startDate, Date endDate) {
 
         Timestamp startTimestamp = null;
@@ -2493,5 +2492,35 @@ public class ReportsService {
         response.put("totalDebt", totalDebtSum2);
 
         return new ApiResponse("kassadagi pul", true, response);
+    }
+
+    public ApiResponse getSellerForChart(UUID branchId, UUID businessId) {
+
+        List<SellerForChartDto> dtoList = new ArrayList<>();
+
+        for (int i = 0; i <= 7; i++) {
+            Timestamp from = Timestamp.valueOf(TODAY_END.minusDays(i + 1));
+            Timestamp to = Timestamp.valueOf(TODAY_END.minusDays(i));
+
+            if (branchId != null) {
+                SellerForChartDto sellerForChartDto = new SellerForChartDto();
+                double tradeAmountByBranchId = tradeRepository.countAllByBranchIdAndCreatedAtBetween(branchId, from, to);
+                sellerForChartDto.setCreateAt(from);
+                sellerForChartDto.setTradeAmount(tradeAmountByBranchId);
+                dtoList.add(sellerForChartDto);
+            } else {
+                SellerForChartDto sellerForChartDto = new SellerForChartDto();
+                double tradeAmountByBusinessId = tradeRepository.countAllByBranch_BusinessIdAndCreatedAtBetween(businessId, from, to);
+                sellerForChartDto.setCreateAt(from);
+                sellerForChartDto.setTradeAmount(tradeAmountByBusinessId);
+                dtoList.add(sellerForChartDto);
+            }
+        }
+
+        if (dtoList.isEmpty()) {
+            return new ApiResponse("list empty", false);
+        }
+
+        return new ApiResponse("all", true, dtoList);
     }
 }
