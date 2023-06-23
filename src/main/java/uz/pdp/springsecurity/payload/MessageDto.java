@@ -14,6 +14,7 @@ import java.util.UUID;
 public class MessageDto {
     private UUID senderId;
     private UUID receiverId;
+    private UUID attachmentId;
     private String receiverName;
     private String senderName;
     private String message;

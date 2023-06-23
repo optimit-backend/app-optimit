@@ -4,6 +4,7 @@ import lombok.*;
 import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -17,6 +18,8 @@ public class Message extends AbsEntity {
     private String receiverName;
     private String senderName;
     private String message;
+    @ManyToOne
+    private Attachment attachment;
     private String date;
     private Status status;
 
