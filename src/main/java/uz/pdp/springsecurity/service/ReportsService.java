@@ -2376,7 +2376,7 @@ public class ReportsService {
         TotalCustomerDto totalCustomerDto = new TotalCustomerDto();
         if (nowTotalCustomerInt != 0 || lastTotalCustomerInt != 0) {
             totalCustomerDto.setAmount(nowTotalCustomerInt - lastTotalCustomerInt);
-            totalCustomerDto.setPercentage((double) ((nowTotalCustomerInt - lastTotalCustomerInt) * 100) / lastTotalCustomerInt);
+            totalCustomerDto.setPercentage(lastTotalCustomerInt == 0 ? 0 : (double) ((nowTotalCustomerInt - lastTotalCustomerInt) * 100) / lastTotalCustomerInt);
             totalCustomerDto.setSuccess(true);
         } else {
             totalCustomerDto.setMessage("O'tgan yoki hozirgi davr mobaynida yangi mijozlar mavjud emas");
@@ -2386,7 +2386,7 @@ public class ReportsService {
         TotalSumDto totalSumDto = new TotalSumDto();
         if (nowTotalSumDouble != 0 || lastTotalSumDouble != 0) {
             totalSumDto.setSumma(nowTotalSumDouble - lastTotalSumDouble);
-            totalSumDto.setPercentage(((nowTotalSumDouble - lastTotalSumDouble) * 100) / lastTotalSumDouble);
+            totalSumDto.setPercentage(lastTotalSumDouble == 0 ? 0 : ((nowTotalSumDouble - lastTotalSumDouble) * 100) / lastTotalSumDouble);
             totalSumDto.setSuccess(true);
         } else {
             totalSumDto.setSuccess(false);
@@ -2396,7 +2396,7 @@ public class ReportsService {
         TotalProfitSumDto totalProfitSumDto = new TotalProfitSumDto();
         if (nowTotalProfitDouble != 0 || lastTotalProfitDouble != 0) {
             totalProfitSumDto.setSumma(nowTotalProfitDouble - lastTotalProfitDouble);
-            totalProfitSumDto.setPercentage(((nowTotalProfitDouble - lastTotalProfitDouble) * 100) / lastTotalProfitDouble);
+            totalProfitSumDto.setPercentage(lastTotalProfitDouble == 0 ? 0 : ((nowTotalProfitDouble - lastTotalProfitDouble) * 100) / lastTotalProfitDouble);
             totalProfitSumDto.setSuccess(true);
         } else {
             totalProfitSumDto.setMessage("O'tgan yoki hozirgi davr mobaynida yangi savdolar mavjud emas!");
@@ -2406,7 +2406,7 @@ public class ReportsService {
         TotalProductSumDto totalProductSumDto = new TotalProductSumDto();
         if (nowTotalProductSum != 0 || lastTotalProductSum != 0) {
             totalProductSumDto.setSumma(nowTotalProductSum - lastTotalProductSum);
-            totalProductSumDto.setPercentage(((nowTotalProductSum - lastTotalProductSum) * 100) / lastTotalProductSum);
+            totalProductSumDto.setPercentage(lastTotalProductSum == 0 ? 0 : ((nowTotalProductSum - lastTotalProductSum) * 100) / lastTotalProductSum);
             totalProductSumDto.setSuccess(true);
         } else {
             totalProductSumDto.setMessage("O'tgan yoki hozirgi davr mobaynida yangi mahsulotlar mavjud emas!");
