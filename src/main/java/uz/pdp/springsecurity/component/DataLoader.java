@@ -138,13 +138,23 @@ public class DataLoader implements CommandLineRunner {
             progressStatus.setBusiness(business);
             lidStatusRepository.save(progressStatus);
 
+            LidStatus rejectionStatus = new LidStatus();
+            rejectionStatus.setName("Rejection");
+            rejectionStatus.setIncrease(true);
+            rejectionStatus.setOrginalName("Rejection");
+            rejectionStatus.setColor("rang");
+            rejectionStatus.setSort(3);
+            rejectionStatus.setBusiness(business);
+            lidStatusRepository.save(rejectionStatus);
+
+
             LidStatus doneStatus = new LidStatus();
             doneStatus.setName("Done");
             doneStatus.setIncrease(true);
             doneStatus.setOrginalName("Done");
             doneStatus.setColor("rang");
             doneStatus.setSaleStatus(true);
-            doneStatus.setSort(3);
+            doneStatus.setSort(4);
             doneStatus.setBusiness(business);
             lidStatusRepository.save(doneStatus);
 
@@ -914,14 +924,29 @@ public class DataLoader implements CommandLineRunner {
                     shablon3.setBusiness(business2);
                     shablonRepository.save(shablon3);
                 }
+                List<LidStatus> rejection = lidStatusRepository.
+                        findAllByBusinessIdAndOrginalName(business2.getId(), "Rejection");
+
+                if (rejection.isEmpty()) {
+                    LidStatus rejectionStatus = new LidStatus();
+                    rejectionStatus.setName("Rejection");
+                    rejectionStatus.setIncrease(true);
+                    rejectionStatus.setOrginalName("Rejection");
+                    rejectionStatus.setColor("rang");
+                    Integer maxSort = lidStatusRepository.getMaxSort(business2.getId());
+                    rejectionStatus.setSort(maxSort+1);
+                    rejectionStatus.setBusiness(business2);
+                    lidStatusRepository.save(rejectionStatus);
+                }
             }
 //            updatePermission(); // TODO: 5/29/2023 if you add new permission
         }
+
     }
 
     private void updatePermission() {
         List<Permissions> newPermissionList = Arrays.asList(// TODO: 5/29/2023 write new permissions here
-                );
+        );
         Optional<Role> superAdmin = roleRepository.findByName(Constants.SUPERADMIN);
         List<Role> adminList = roleRepository.findAllByName(Constants.ADMIN);
         superAdmin.ifPresent(adminList::add);
