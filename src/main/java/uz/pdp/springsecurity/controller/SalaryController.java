@@ -39,14 +39,14 @@ public class SalaryController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_SALARY")
+//    @CheckPermission("GET_SALARY")
     @GetMapping("/by-user/{userId}")
     public HttpEntity<?> getAllByUser(@PathVariable UUID userId, @RequestParam() UUID branchId) {
         ApiResponse apiResponse = salaryService.getAllByUser(userId, branchId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("GET_SALARY")
+//    @CheckPermission("GET_SALARY")
     @GetMapping("/by-user-last-month/{userId}")
     public HttpEntity<?> getByUserLast(@PathVariable UUID userId, @RequestParam() UUID branchId) {
         ApiResponse apiResponse = salaryService.getByUserLast(userId, branchId);
