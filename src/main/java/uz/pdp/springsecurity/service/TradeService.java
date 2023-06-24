@@ -305,7 +305,6 @@ public class TradeService {
             }
             trade.setTotalProfit(profit);
         } catch (Exception e) {
-//            throw e;
             return new ApiResponse("TRADE PRODUCT ERROR", false);
         }
 
