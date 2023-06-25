@@ -173,20 +173,35 @@ public class ProductionService {
         }
 
         for (ContentProduct contentProduct : contentProductList) {
-            if (contentProduct.isByProduct()){
+            if (contentProduct.isByProduct()) {
                 double minusAmount = warehouseService.createOrEditWareHouseHelper(branch, contentProduct.getProduct(), contentProduct.getProductTypePrice(), contentProduct.getQuantity());
                 fifoCalculationService.createByProduct(production, contentProduct, minusAmount);
             }
         }
-        productionRepository.save(production);
-        double minusAmount = warehouseService.createOrEditWareHouse(production);
-        fifoCalculationService.createProduction(production, minusAmount);
+        try {
+            productionRepository.save(production);
+            double minusAmount = warehouseService.createOrEditWareHouse(production);
+            fifoCalculationService.createProduction(production, minusAmount);
+        } catch (Exception e) {
+            return new ApiResponse("SAVE ERROR", false);
+        }
 
         task.setTaskStatus(taskStatus);
         task.setProduction(production);
         taskRepository.save(task);
-        salaryCountService.addForTask(task);
-        prizeService.addForTask(task);
+
+        try {
+            salaryCountService.addForTask(task);
+        } catch (Exception e) {
+            return new ApiResponse("SAVE ERROR", false);
+        }
+
+        try {
+            prizeService.addForTask(task);
+        } catch (Exception e) {
+            return new ApiResponse("PRIZE ERROR", false);
+        }
+
         return new ApiResponse("SUCCESS", true);
     }
 

@@ -96,10 +96,12 @@ public class ProjectService {
         List<FileData> fileDataList = new ArrayList<>();
         if (projectDto.getFileDateList() != null) {
             for (UUID uuid : projectDto.getFileDateList()) {
-                Optional<FileData> optionalFileData = fileDateRepository.findById(uuid);
-                if (optionalFileData.isPresent()) {
-                    FileData fileData = optionalFileData.get();
-                    fileDataList.add(fileData);
+                if (uuid != null) {
+                    Optional<FileData> optionalFileData = fileDateRepository.findById(uuid);
+                    if (optionalFileData.isPresent()) {
+                        FileData fileData = optionalFileData.get();
+                        fileDataList.add(fileData);
+                    }
                 }
             }
         }
@@ -387,7 +389,7 @@ public class ProjectService {
             project.setEndDate(endDate);
         } else if (projectStatus.getName().equals("Uncompleted")) {
             project.setEndDate(null);
-        }else if (projectStatus.getName().equals("process")){
+        } else if (projectStatus.getName().equals("process")) {
             project.setEndDate(null);
         }
         project.setProjectStatus(projectStatus);
