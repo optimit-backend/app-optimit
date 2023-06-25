@@ -179,11 +179,17 @@ public class ProductionService {
             }
         }
         productionRepository.save(production);
-        double minusAmount = warehouseService.createOrEditWareHouse(production);
+        double minusAmount;
+        try {
+            minusAmount = warehouseService.createOrEditWareHouse(production);
+        } catch (Exception e) {
+            return new ApiResponse("WAREHOUSE ERROR", false);
+        }
+
         try {
             fifoCalculationService.createProduction(production, minusAmount);
         } catch (Exception e) {
-            return new ApiResponse("SAVE ERROR", false);
+            return new ApiResponse("FIFO ERROR", false);
         }
 
         task.setTaskStatus(taskStatus);
