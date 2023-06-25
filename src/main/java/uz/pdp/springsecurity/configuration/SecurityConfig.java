@@ -78,7 +78,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/app/topic/public",
                         "/app/chat.send",
                         "/app/message",
-                        "/app/chatroom/public"
+                        "/app/chatroom/public",
+                        "/ws"
                 )
                 .permitAll()
                 .anyRequest()
