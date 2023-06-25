@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
+import uz.pdp.springsecurity.payload.ConfirmationDto;
 import uz.pdp.springsecurity.payload.ExchangeProductByConfirmationDto;
 import uz.pdp.springsecurity.service.ExchangeProductByConfirmationService;
 
@@ -39,10 +40,17 @@ public class ExchangeProductByConfirmationController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("ADD_EXCHANGE")
+    @CheckPermission("EDIT_EXCHANGE")
     @PutMapping("/{id}")
     public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody ExchangeProductByConfirmationDto byConfirmationDto) {
         ApiResponse apiResponse = service.edit(id, byConfirmationDto);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("ADD_EXCHANGE")
+    @PutMapping("/confirmation/{id}")
+    public HttpEntity<?> edit(@PathVariable UUID id, @RequestBody ConfirmationDto confirmationDto) {
+        ApiResponse apiResponse = service.editConfirmation(id, confirmationDto);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

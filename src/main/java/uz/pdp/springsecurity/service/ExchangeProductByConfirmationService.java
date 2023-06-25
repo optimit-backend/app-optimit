@@ -8,10 +8,7 @@ import uz.pdp.springsecurity.enums.NotificationType;
 import uz.pdp.springsecurity.enums.Permissions;
 import uz.pdp.springsecurity.mapper.ExchangeProductBranchMapper;
 import uz.pdp.springsecurity.mapper.ExchangeProductMapper;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.ExchangeProductBranchDTO;
-import uz.pdp.springsecurity.payload.ExchangeProductByConfirmationDto;
-import uz.pdp.springsecurity.payload.ExchangeProductDTO;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
 import java.util.*;
@@ -68,7 +65,7 @@ public class ExchangeProductByConfirmationService {
                 getShippedBranchId());
 
 
-        Set<User> all = getUsers(allUsers);
+        Set<User> all = getUsers(allUsers, true);
         UUID receivedBranchId = byConfirmationDto.getExchangeProductBranchDTO().getReceivedBranchId();
         UUID shippedBranchId = byConfirmationDto.getExchangeProductBranchDTO().getShippedBranchId();
         Optional<Branch> optionalReceivedBranch = branchRepository.findById(receivedBranchId);
@@ -132,77 +129,90 @@ public class ExchangeProductByConfirmationService {
         exchangeProductRepository.saveAll(confirmation.getExchangeProductBranch().getExchangeProductList());
         repository.save(confirmation);
 
+        List<User> allUsers = userRepository.findAllByBranches_Id(confirmation.
+                getExchangeProductBranch().getReceivedBranch().getId());
 
-        UUID userBranchId = byConfirmationDto.getUserBranchId();
-        if (confirmation.getExchangeProductBranch().getShippedBranch().getId().equals(userBranchId)) {
-            List<User> allUsers = userRepository.findAllByBranches_Id(confirmation.
-                    getExchangeProductBranch().getReceivedBranch().getId());
-            Set<User> all = getUsers(allUsers);
-            if (confirmation.getConfirmation() != null && (Boolean.FALSE.equals(confirmation.getConfirmation()))) {
-                for (User user : all) {
+        Set<User> all = getUsers(allUsers, true);
+        for (User user : all) {
+            Notification notification = new Notification();
+            notification.setRead(false);
+            notification.setName("Mahsulotlar o'tqazmasi tasdiqlandi!");
+            notification.setMessage(confirmation.getExchangeProductBranch().getShippedBranch().getName() + " filliali so'ralgan maxsulotlarni tasdiqlandi! " +
+                    confirmation.getMessage());
+            notification.setUserTo(user);
+            notification.setType(NotificationType.CONFIRMED);
+            notification.setObjectId(confirmation.getId());
+            notificationRepository.save(notification);
+        }
+
+        return new ApiResponse("Saqlandi!", true);
+    }
+
+    public ApiResponse editConfirmation(UUID id, ConfirmationDto confirmationDto) {
+        Optional<ExchangeProductByConfirmation> optional = repository.findById(id);
+        if (optional.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+        ExchangeProductByConfirmation confirmation = optional.get();
+        List<User> all = userRepository.findAllByBranches_Id(confirmation.getExchangeProductBranch().getShippedBranch().getId());
+        Set<User> users = getUsers(all, false);
+
+        if (confirmationDto.isConfirmation()) {
+            confirmation.setConfirmation(true);
+            repository.save(confirmation);
+
+            for (User user : users) {
+                if (!confirmationDto.getUserId().equals(user.getId())) {
                     Notification notification = new Notification();
                     notification.setRead(false);
-                    notification.setName("Mahsulotlar o'tqazmasi bekor qilindi!");
-                    notification.setMessage(confirmation.getExchangeProductBranch().getShippedBranch().getName() + " filliali so'ralgan maxsulotlarni rad etdi! " +
+                    notification.setName("Mahsulotlar o'tqazmasi saqlandi!");
+                    notification.setMessage(confirmation.getExchangeProductBranch().getReceivedBranch().getName() + " fillial maxsulotlarni tasdiqladi! " +
                             confirmation.getMessage());
                     notification.setUserTo(user);
-                    notification.setType(NotificationType.REJECTION);
-                    notification.setObjectId(confirmation.getId());
-                    notificationRepository.save(notification);
-                }
-            } else {
-                for (User user : all) {
-                    Notification notification = new Notification();
-                    notification.setRead(false);
-                    notification.setName("Mahsulotlar o'tqazmasi tasdiqlandi!");
-                    notification.setMessage(confirmation.getExchangeProductBranch().getShippedBranch().getName() + " filliali so'ralgan maxsulotlarni tasdiqlandi! " +
-                            confirmation.getMessage());
-                    notification.setUserTo(user);
+                    notification.setObjectId(id);
                     notification.setType(NotificationType.CONFIRMED);
-                    notification.setObjectId(confirmation.getId());
                     notificationRepository.save(notification);
                 }
+                return new ApiResponse("Saqlandi!", true);
             }
         } else {
-            List<User> allUsers = userRepository.findAllByBranches_Id(confirmation.
-                    getExchangeProductBranch().getShippedBranch().getId());
-            Set<User> all = getUsers(allUsers);
-            if (confirmation.getConfirmation() != null && (Boolean.FALSE.equals(confirmation.getConfirmation()))) {
-                for (User user : all) {
+            confirmation.setConfirmation(false);
+            confirmation.setMessage(confirmationDto.getMessage());
+            repository.save(confirmation);
+
+            for (User user : users) {
+                if (!confirmationDto.getUserId().equals(user.getId())) {
                     Notification notification = new Notification();
                     notification.setRead(false);
                     notification.setName("Mahsulotlar o'tqazmasi bekor qilindi!");
-                    notification.setMessage(confirmation.getExchangeProductBranch().getReceivedBranch().getName() + " filliali maxsulotlarni rad etdi! " +
+                    notification.setMessage(confirmation.getExchangeProductBranch().getReceivedBranch().getName() + " fillial maxsulotlarni rad etdi! " +
                             confirmation.getMessage());
                     notification.setUserTo(user);
+                    notification.setObjectId(id);
                     notification.setType(NotificationType.REJECTION);
-                    notificationRepository.save(notification);
-                }
-            } else {
-                for (User user : all) {
-                    Notification notification = new Notification();
-                    notification.setRead(false);
-                    notification.setName("Mahsulotlar o'tqazmasi tasdiqlandi!");
-                    notification.setMessage(confirmation.getExchangeProductBranch().getReceivedBranch().getName() + " filliali maxsulotlarni tasdiqladi! " +
-                            confirmation.getMessage());
-                    notification.setUserTo(user);
-                    notification.setType(NotificationType.CONFIRMED);
                     notificationRepository.save(notification);
                 }
             }
         }
-
-        return new ApiResponse("edited", true);
+        return new ApiResponse("O'tqazma bekor qilindi!", true);
     }
 
+
+
     @NotNull
-    private static Set<User> getUsers(List<User> allUsers) {
+    private static Set<User> getUsers(List<User> allUsers, boolean b) {
         Set<User> all = new HashSet<>();
         for (User allUser : allUsers) {
             List<Permissions> permissions = allUser.getRole().getPermissions();
             for (Permissions permission : permissions) {
-                if (permission.name().equals(Permissions.ADD_EXCHANGE.name()) || permission.name().equals(Permissions.VIEW_EXCHANGE.name())) {
-                    all.add(allUser);
+                if (b) {
+                    if (permission.name().equals(Permissions.ADD_EXCHANGE.name())) {
+                        all.add(allUser);
+                    }
+                } else {
+                    if (permission.name().equals(Permissions.EDIT_EXCHANGE.name())) {
+                        all.add(allUser);
+                    }
                 }
             }
         }
