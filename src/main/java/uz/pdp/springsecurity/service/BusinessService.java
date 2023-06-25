@@ -41,6 +41,7 @@ public class BusinessService {
     private final LidFieldRepository lidFieldRepository;
     private final BalanceRepository balanceRepository;
     private final SmsService smsService;
+    private  final ShablonRepository shablonRepository;
 
     private final static LocalDateTime TODAY = LocalDate.now().atStartOfDay();
     private final static LocalDateTime THIS_WEEK = TODAY.minusDays(TODAY.getDayOfWeek().ordinal());
@@ -232,6 +233,28 @@ public class BusinessService {
         doneStatus.setSort(4);
         doneStatus.setBusiness(business);
         lidStatusRepository.save(doneStatus);
+
+
+        Shablon shablon = new Shablon();
+        shablon.setName("Tug'ilgan kun uchun");
+        shablon.setOriginalName("bithday");
+        shablon.setMessage("Hurmatli {ism} tugilgan kuningiz bilan");
+        shablon.setBusiness(business);
+        shablonRepository.save(shablon);
+
+        Shablon shablon2 = new Shablon();
+        shablon2.setName("Mijozlar qarzi");
+        shablon2.setOriginalName("debtCustomer");
+        shablon2.setMessage("Hurmatli mijoz qarzingiz bor");
+        shablon2.setBusiness(business);
+        shablonRepository.save(shablon2);
+
+        Shablon shablon3 = new Shablon();
+        shablon3.setName("Task qo'shilganda");
+        shablon3.setOriginalName("newTask");
+        shablon3.setMessage("yangi task qoshildi");
+        shablon3.setBusiness(business);
+        shablonRepository.save(shablon3);
 
     }
 
