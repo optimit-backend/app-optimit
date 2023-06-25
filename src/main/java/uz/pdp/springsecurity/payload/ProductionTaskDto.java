@@ -21,17 +21,8 @@ public class ProductionTaskDto {
     @NotNull
     private Date date;
 
-    /*@NotNull
-    private double totalQuantity;*/
-
     @NotNull
     private double invalid = 0;
 
-    /*@NotNull
-    private double contentPrice;*/
-
-    /*@NotNull
-    @NotEmpty
-    List<ContentProductDto> contentProductDtoList;*/
     List<ContentProductDto> lossContentProductDtoList;
 }
