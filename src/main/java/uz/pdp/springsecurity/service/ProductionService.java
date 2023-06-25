@@ -178,9 +178,9 @@ public class ProductionService {
                 fifoCalculationService.createByProduct(production, contentProduct, minusAmount);
             }
         }
+        productionRepository.save(production);
+        double minusAmount = warehouseService.createOrEditWareHouse(production);
         try {
-            productionRepository.save(production);
-            double minusAmount = warehouseService.createOrEditWareHouse(production);
             fifoCalculationService.createProduction(production, minusAmount);
         } catch (Exception e) {
             return new ApiResponse("SAVE ERROR", false);
