@@ -67,25 +67,29 @@ public class ExchangeProductByConfirmationService {
                 getExchangeProductBranchDTO().
                 getShippedBranchId());
 
-        List<User> all = getUsers(allUsers);
+
+        Set<User> all = getUsers(allUsers);
         UUID receivedBranchId = byConfirmationDto.getExchangeProductBranchDTO().getReceivedBranchId();
         UUID shippedBranchId = byConfirmationDto.getExchangeProductBranchDTO().getShippedBranchId();
         Optional<Branch> optionalReceivedBranch = branchRepository.findById(receivedBranchId);
+
         String branchName = " ";
         if (optionalReceivedBranch.isPresent()) {
             branchName = optionalReceivedBranch.get().getName();
         }
 
         for (User user : all) {
-            Notification notification = new Notification();
-            notification.setRead(false);
-            notification.setName("Mahsulotlar o'tqazmasi so'ralyapdi!");
-            notification.setMessage(branchName + " fillialdan maxsulotlar so'ralmoqda!");
-            notification.setUserTo(user);
-            notification.setType(NotificationType.NEW_EXCHANGE_PRODUCT);
-            notification.setObjectId(byConfirmation.getId());
-            notification.setBranchId(shippedBranchId);
-            notificationRepository.save(notification);
+            if (!byConfirmationDto.getExchangeProductBranchDTO().getUserId().equals(user.getId())) {
+                Notification notification = new Notification();
+                notification.setRead(false);
+                notification.setName("Mahsulotlar o'tqazmasi so'ralyapdi!");
+                notification.setMessage(branchName + " fillialdan maxsulotlar so'ralmoqda!");
+                notification.setUserTo(user);
+                notification.setType(NotificationType.NEW_EXCHANGE_PRODUCT);
+                notification.setObjectId(byConfirmation.getId());
+                notification.setBranchId(shippedBranchId);
+                notificationRepository.save(notification);
+            }
         }
 
         return new ApiResponse("saved", true);
@@ -133,7 +137,7 @@ public class ExchangeProductByConfirmationService {
         if (confirmation.getExchangeProductBranch().getShippedBranch().getId().equals(userBranchId)) {
             List<User> allUsers = userRepository.findAllByBranches_Id(confirmation.
                     getExchangeProductBranch().getReceivedBranch().getId());
-            List<User> all = getUsers(allUsers);
+            Set<User> all = getUsers(allUsers);
             if (confirmation.getConfirmation() != null && (Boolean.FALSE.equals(confirmation.getConfirmation()))) {
                 for (User user : all) {
                     Notification notification = new Notification();
@@ -162,7 +166,7 @@ public class ExchangeProductByConfirmationService {
         } else {
             List<User> allUsers = userRepository.findAllByBranches_Id(confirmation.
                     getExchangeProductBranch().getShippedBranch().getId());
-            List<User> all = getUsers(allUsers);
+            Set<User> all = getUsers(allUsers);
             if (confirmation.getConfirmation() != null && (Boolean.FALSE.equals(confirmation.getConfirmation()))) {
                 for (User user : all) {
                     Notification notification = new Notification();
@@ -192,12 +196,12 @@ public class ExchangeProductByConfirmationService {
     }
 
     @NotNull
-    private static List<User> getUsers(List<User> allUsers) {
-        List<User> all = new ArrayList<>();
+    private static Set<User> getUsers(List<User> allUsers) {
+        Set<User> all = new HashSet<>();
         for (User allUser : allUsers) {
             List<Permissions> permissions = allUser.getRole().getPermissions();
             for (Permissions permission : permissions) {
-                if (permission.name().equals(Permissions.ADD_EXCHANGE.name())) {
+                if (permission.name().equals(Permissions.ADD_EXCHANGE.name()) || permission.name().equals(Permissions.VIEW_EXCHANGE.name())) {
                     all.add(allUser);
                 }
             }

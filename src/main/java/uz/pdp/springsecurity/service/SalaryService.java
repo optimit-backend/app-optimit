@@ -85,7 +85,6 @@ public class SalaryService {
             salaryRepository.save(salary);
             salaryRepository.save(newSalary);
 
-
             balanceService.edit(salary.getBranch().getId(), salaryDto.getSalary(), false, salaryDto.getPaymentMethodId());
 
             return new ApiResponse("SUCCESS", true);

@@ -27,4 +27,6 @@ ExchangeProductBranchDTO {
     private List<ExchangeProductDTO> exchangeProductDTOS;
 
     private UUID businessId;
+
+    private UUID userId;
 }
