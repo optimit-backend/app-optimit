@@ -37,8 +37,10 @@ public class BranchService {
             Subscription subscription = optionalSubscription.get();
             int branchAmount = subscription.getTariff().getBranchAmount();
             int count = branchRepository.countAllByBusiness_Id(businessId);
-            if (branchAmount <= count) {
-                return new ApiResponse("Tarif bo'yicha fillial qo'shish limiti cheklangan!", false);
+            if (branchAmount != 0) {
+                if (branchAmount <= count) {
+                    return new ApiResponse("Tarif bo'yicha fillial qo'shish limiti cheklangan!", false);
+                }
             }
         }
 
