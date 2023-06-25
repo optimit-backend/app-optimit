@@ -3,7 +3,6 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.Tariff;
-import uz.pdp.springsecurity.enums.Permissions;
 import uz.pdp.springsecurity.mapper.TariffMapper;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.TariffDto;
@@ -57,7 +56,7 @@ public class TariffService {
         Tariff tariff = mapper.toEntity(tariffDto);
         tariff.setPermissions(tariffDto.getPermissionsList());
         repository.save(tariff);
-        return new ApiResponse("successfully saved tariff", true);
+        return new ApiResponse("SUCCESS", true);
     }
 
 
