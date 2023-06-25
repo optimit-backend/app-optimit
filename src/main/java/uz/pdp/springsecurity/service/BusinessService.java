@@ -234,6 +234,7 @@ public class BusinessService {
         doneStatus.setBusiness(business);
         lidStatusRepository.save(doneStatus);
 
+
         Shablon shablon = new Shablon();
         shablon.setName("Tug'ilgan kun uchun");
         shablon.setOriginalName("bithday");
@@ -254,7 +255,8 @@ public class BusinessService {
         shablon3.setMessage("yangi task qoshildi");
         shablon3.setBusiness(business);
         shablonRepository.save(shablon3);
-
+=========
+>>>>>>>>> Temporary merge branch 2
     }
 
     public ApiResponse edit(UUID id, BusinessEditDto businessEditDto) {
