@@ -3,7 +3,6 @@ package uz.pdp.springsecurity.controller;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,7 +13,6 @@ import uz.pdp.springsecurity.entity.User;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LoginDto;
 import uz.pdp.springsecurity.security.JwtProvider;
-import uz.pdp.springsecurity.service.AuthService;
 
 import javax.validation.Valid;
 import java.util.Date;
@@ -24,21 +22,10 @@ import java.util.Date;
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/auth")
 public class AuthController {
-    @Autowired
-    AuthService authService;
+    private final AuthenticationManager authenticationManager;
 
-    final
-    AuthenticationManager authenticationManager;
+    private final JwtProvider jwtProvider;
 
-    @Autowired
-    JwtProvider jwtProvider;
-
-    /**
-     * LOGIN YO'LI
-     *
-     * @param loginDto
-     * @return
-     */
     @PostMapping("/login")
     public HttpEntity<?> loginUser(@Valid @RequestBody LoginDto loginDto) {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));

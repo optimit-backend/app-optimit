@@ -901,8 +901,7 @@ public class DataLoader implements CommandLineRunner {
             List<Business> businessRepositoryAll1 = businessRepository.findAll();
             for (Business business2 : businessRepositoryAll1) {
                 List<Shablon> all1 = shablonRepository.findAllByBusiness_Id(business2.getId());
-                if (!all1.isEmpty()) {
-                    shablonRepository.deleteAll(all1);
+                if (all1.isEmpty()) {
                     Shablon shablon = new Shablon();
                     shablon.setName("Tug'ilgan kun uchun");
                     shablon.setOriginalName("bithday");
