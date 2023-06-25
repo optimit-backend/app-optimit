@@ -193,7 +193,7 @@ public class ProductionService {
         try {
             salaryCountService.addForTask(task);
         } catch (Exception e) {
-            return new ApiResponse("SAVE ERROR", false);
+            return new ApiResponse("SALARY ERROR", false);
         }
 
         try {
