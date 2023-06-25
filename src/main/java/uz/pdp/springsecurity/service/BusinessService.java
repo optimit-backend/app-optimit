@@ -195,6 +195,10 @@ public class BusinessService {
         source3.setName("HandleWrite");
         sourceRepository.save(source3);
 
+        addLidStatus(business);
+    }
+
+    private void addLidStatus(Business business) {
         LidStatus newStatus = new LidStatus();
         newStatus.setName("New");
         newStatus.setIncrease(true);
@@ -211,15 +215,25 @@ public class BusinessService {
         progressStatus.setBusiness(business);
         lidStatusRepository.save(progressStatus);
 
+        LidStatus rejectionStatus = new LidStatus();dd
+        rejectionStatus.setName("Rejection");
+        rejectionStatus.setIncrease(true);
+        rejectionStatus.setOrginalName("Rejection");
+        rejectionStatus.setColor("rang");
+        rejectionStatus.setSort(3);
+        rejectionStatus.setBusiness(business);
+        lidStatusRepository.save(rejectionStatus);
+
         LidStatus doneStatus = new LidStatus();
         doneStatus.setName("Done");
         doneStatus.setIncrease(true);
         doneStatus.setOrginalName("Done");
         doneStatus.setColor("rang");
         doneStatus.setSaleStatus(true);
-        doneStatus.setSort(3);
-        progressStatus.setBusiness(business);
+        doneStatus.setSort(4);
+        doneStatus.setBusiness(business);
         lidStatusRepository.save(doneStatus);
+
 
         Shablon shablon = new Shablon();
         shablon.setName("Tug'ilgan kun uchun");
@@ -241,6 +255,7 @@ public class BusinessService {
         shablon3.setMessage("yangi task qoshildi");
         shablon3.setBusiness(business);
         shablonRepository.save(shablon3);
+
     }
 
     public ApiResponse edit(UUID id, BusinessEditDto businessEditDto) {
