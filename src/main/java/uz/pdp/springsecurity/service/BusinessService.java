@@ -215,7 +215,7 @@ public class BusinessService {
         progressStatus.setBusiness(business);
         lidStatusRepository.save(progressStatus);
 
-        LidStatus rejectionStatus = new LidStatus();dd
+        LidStatus rejectionStatus = new LidStatus();
         rejectionStatus.setName("Rejection");
         rejectionStatus.setIncrease(true);
         rejectionStatus.setOrginalName("Rejection");
