@@ -267,8 +267,10 @@ public class CustomerService {
                     customerTradeInfo1.setTrade(true);
                     customerTradeInfo1.setTotalSumma(tradeProduct.getTrade().getTotalSum());
                 }
-                if (tradeProduct.getProduct().getPhoto() != null) {
-                    productCustomerDto.setAttachmentId(tradeProduct.getProduct().getPhoto().getId());
+                if (tradeProduct.getProduct() != null) {
+                    if (tradeProduct.getProduct().getPhoto() != null) {
+                        productCustomerDto.setAttachmentId(tradeProduct.getProduct().getPhoto().getId());
+                    }
                 }
                 productCustomerDto.setProductName(tradeProduct.getProductTypePrice() != null ?
                         tradeProduct.getProductTypePrice().getName() : tradeProduct.getProduct().getName());
