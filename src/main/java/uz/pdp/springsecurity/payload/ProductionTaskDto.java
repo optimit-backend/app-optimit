@@ -22,7 +22,7 @@ public class ProductionTaskDto {
     private Date date;
 
     @NotNull
-    private double invalid = 0;
+    private double invalid;
 
     List<ContentProductDto> lossContentProductDtoList;
 }

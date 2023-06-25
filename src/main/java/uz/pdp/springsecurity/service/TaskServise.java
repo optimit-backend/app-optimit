@@ -162,11 +162,13 @@ public class TaskServise {
         List<UUID> fileDataIdList = taskDto.getFileDataList();
         if (!fileDataIdList.isEmpty()) {
             for (UUID uuid : fileDataIdList) {
-                Optional<FileData> optionalFileData = fileDateRepository.findById(uuid);
-                if (optionalFileData.isPresent()) {
-                    FileData fileData = optionalFileData.get();
-                    fileData.setTask(save);
-                    fileDateRepository.save(fileData);
+                if (uuid != null) {
+                    Optional<FileData> optionalFileData = fileDateRepository.findById(uuid);
+                    if (optionalFileData.isPresent()) {
+                        FileData fileData = optionalFileData.get();
+                        fileData.setTask(save);
+                        fileDateRepository.save(fileData);
+                    }
                 }
             }
         }
