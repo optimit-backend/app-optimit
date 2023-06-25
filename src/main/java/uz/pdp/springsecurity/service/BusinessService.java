@@ -215,7 +215,7 @@ public class BusinessService {
         progressStatus.setBusiness(business);
         lidStatusRepository.save(progressStatus);
 
-        LidStatus rejectionStatus = new LidStatus();dd
+        LidStatus rejectionStatus = new LidStatus();
         rejectionStatus.setName("Rejection");
         rejectionStatus.setIncrease(true);
         rejectionStatus.setOrginalName("Rejection");
@@ -255,8 +255,7 @@ public class BusinessService {
         shablon3.setMessage("yangi task qoshildi");
         shablon3.setBusiness(business);
         shablonRepository.save(shablon3);
-=========
->>>>>>>>> Temporary merge branch 2
+
     }
 
     public ApiResponse edit(UUID id, BusinessEditDto businessEditDto) {
