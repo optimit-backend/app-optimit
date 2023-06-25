@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
 import uz.pdp.springsecurity.payload.ApiResponse;
@@ -25,7 +26,7 @@ public class ProductionController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-    @CheckPermission("CREATE_PRODUCTION")
+    @PreAuthorize("hasAnyAuthority('GET_TASK', 'GET_OWN_TASK')")
     @PostMapping("/task-production")
     public HttpEntity<?> addProductionForTask(@Valid @RequestBody ProductionTaskDto productionTaskDto) {
         ApiResponse apiResponse = productionService.addProductionForTask(productionTaskDto);

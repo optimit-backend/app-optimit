@@ -122,14 +122,13 @@ public class TaskServise {
             project.setBudget(budget);
             projectRepository.save(project);
         }
-        Task save = taskRepository.save(task);
-
         if (task.isProductions()) {
-            ApiResponse apiResponse = productionService.addContentForTask(save, taskDto.getContentProductDtoList());
+            ApiResponse apiResponse = productionService.addContentForTask(task, taskDto.getContentProductDtoList());
             if (!apiResponse.isSuccess())
                 return apiResponse;
         }
 
+        Task save = taskRepository.save(task);
         saveFileData(taskDto, save);
 
         Set<User> users = new HashSet<>();
