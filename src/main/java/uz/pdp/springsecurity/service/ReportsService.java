@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.mapper.TradeLidMapper;
 import uz.pdp.springsecurity.payload.*;
@@ -121,6 +122,8 @@ public class ReportsService {
 
     @Autowired
     private RepaymentDebtRepository repaymentDebtRepository;
+    @Autowired
+    private FifoCalculationRepository fifoCalculationRepository;
 
     public ApiResponse allProductAmount(UUID branchId, UUID brandId, UUID categoryId, String production) {
 
@@ -570,6 +573,8 @@ public class ReportsService {
         return new ApiResponse("Business Products Amount", true, productReportDtoList);
     }
 
+
+    @Transactional
     public ApiResponse allProductAmountByBranch(UUID branchId, UUID businessId) {
 
         Optional<Branch> optionalBranch = Optional.empty();
@@ -585,6 +590,12 @@ public class ReportsService {
 
         if (optionalBranch.isEmpty() && optionalBusiness.isEmpty()) {
             return new ApiResponse("Not Found", false);
+        }
+
+        if (checkingBranch){
+            cleanWarehouseByDeletedProduct(optionalBranch.get().getBusiness().getId());
+        } else {
+            cleanWarehouseByDeletedProduct(businessId);
         }
 
         double totalSumBySalePrice = 0;
@@ -606,65 +617,17 @@ public class ReportsService {
         }
         amounts.setTotalSumBySalePrice(totalSumBySalePrice);
         return new ApiResponse("Business Products Amount", true, amounts);
+    }
 
-        /*List<Product> productList = null;
-        List<ProductTypePrice> productTypePriceList = null;
-        if (checkingBranch) {
-            productList = productRepository.findAllByBranchIdAndActiveTrue(branchId);
-            productTypePriceList = productTypePriceRepository.findAllByProduct_BranchIdAndActiveTrue(branchId);
-        } else {
-            productList = productRepository.findAllByBranch_BusinessIdAndActiveTrue(businessId);
-            productTypePriceList = productTypePriceRepository.findAllByProduct_BusinessIdAndActiveTrue(businessId);
+    @Transactional
+    public void cleanWarehouseByDeletedProduct(UUID businessId) {
+        List<Product> productList = productRepository.findAllByBusinessIdAndActiveFalse(businessId);
+        for (Product product : productList) {
+            warehouseRepository.deleteAllByProductId(product.getId());
+            warehouseRepository.deleteAllByProductTypePrice_ProductId(product.getId());
+            fifoCalculationRepository.deleteAllByProductId(product.getId());
+            fifoCalculationRepository.deleteAllByProductTypePrice_ProductId(product.getId());
         }
-
-
-        if (productList.isEmpty() && productTypePriceList.isEmpty()) {
-            return new ApiResponse("No Found Products", false);
-        }*/
-
-        /*for (Product product : productList) {
-            List<Warehouse> warehouseList = null;
-            if (businessId != null) {
-                warehouseList = warehouseRepository.findByProductIdAndProduct_BusinessId(product.getId(), businessId);
-            } else {
-                warehouseList = warehouseRepository.findByProductIdAndBranch_Id(product.getId(), branchId);
-            }
-            double amount = 0;
-            for (Warehouse warehouse : warehouseList) {
-                amount += warehouse.getAmount();
-            }
-            double salePrice = product.getSalePrice();
-            double buyPrice = product.getBuyPrice();
-
-            totalSumBySalePrice += amount * salePrice;
-            totalSumByBuyPrice += amount * buyPrice;
-            amounts.setTotalSumBySalePrice(totalSumBySalePrice);
-            amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
-
-        }
-        for (ProductTypePrice product : productTypePriceList) {
-            List<Warehouse> warehouseList = null;
-            if (businessId != null) {
-                warehouseList = warehouseRepository.findByBranch_BusinessIdAndProductTypePriceId(businessId, product.getId());
-            } else {
-                warehouseList = warehouseRepository.findByBranch_IdAndProductTypePriceId(branchId, product.getId());
-            }
-            double amount = 0;
-            for (Warehouse warehouse : warehouseList) {
-                amount += warehouse.getAmount();
-            }
-            double salePrice = product.getSalePrice();
-
-            totalSumBySalePrice += amount * salePrice;
-            double price = 0;
-            if (branchId != null) {
-                price = fifoCalculationService.productBuyPriceByBranch(branchId);
-            } else {
-                price = fifoCalculationService.productBuyPriceByBusiness(businessId);
-            }
-            amounts.setTotalSumBySalePrice(price);
-            amounts.setTotalSumByBuyPrice(totalSumByBuyPrice);
-        }*/
     }
 
     public ApiResponse mostUnSaleProducts(UUID branchId) {

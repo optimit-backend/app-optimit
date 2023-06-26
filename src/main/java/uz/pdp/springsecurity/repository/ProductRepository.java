@@ -33,7 +33,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     Page<Product> findAllByBusinessIdAndActiveTrue(UUID businessId,Pageable pageable);
     List<Product> findAllByBranchIdAndActiveTrue(UUID branch_id);
     Page<Product> findAllByBranch_IdAndActiveTrue(UUID branch_id,Pageable pageable);
-    List<Product> findAllByBranch_BusinessIdAndActiveTrue(UUID branch_business_id);
+    List<Product> findAllByBusinessIdAndActiveFalse(UUID businessId);
     List<Product> findAllByCategoryIdAndBusinessIdAndActiveTrue(UUID categoryId, UUID businessId);
     Page<Product> findAllByCategoryIdAndBusiness_IdAndActiveTrue(UUID categoryId, UUID businessId,Pageable pageable);
     List<Product> findAllByBrandIdAndBranchIdAndActiveTrue(UUID brandId, UUID branchId);

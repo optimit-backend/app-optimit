@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.enums.Type;
@@ -429,6 +430,7 @@ public class ProductService {
         }
     }
 
+    @Transactional
     public ApiResponse deleteProduct(UUID id, User user) {
         Set<Branch> branches = user.getBranches();
         for (Branch branch : branches) {
@@ -436,6 +438,10 @@ public class ProductService {
             if (optionalProduct.isPresent()) {
                 Product product = optionalProduct.get();
                 product.setActive(false);
+                warehouseRepository.deleteAllByProductId(product.getId());
+                warehouseRepository.deleteAllByProductTypePrice_ProductId(product.getId());
+                fifoCalculationRepository.deleteAllByProductId(product.getId());
+                fifoCalculationRepository.deleteAllByProductTypePrice_ProductId(product.getId());
                 if (product.getType().name().equals(Type.MANY.name())) {
                     List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductIdAndActiveTrue(product.getId());
                     for (ProductTypePrice productTypePrice : productTypePriceList) {
@@ -789,11 +795,11 @@ public class ProductService {
         return new ApiResponse("FOUND", true, response);
     }
 
-
     public ApiResponse getByBranchProduct(UUID branchId) {
         return getProductByBranch(branchId);
     }
 
+    @Transactional
     public ApiResponse deleteProducts(ProductIdsDto productIdsDto) {
         List<UUID> ids = productIdsDto.getIds();
         for (UUID id : ids) {
@@ -801,6 +807,10 @@ public class ProductService {
             if (optional.isPresent()) {
                 Product product = optional.get();
                 product.setActive(false);
+                warehouseRepository.deleteAllByProductId(product.getId());
+                warehouseRepository.deleteAllByProductTypePrice_ProductId(product.getId());
+                fifoCalculationRepository.deleteAllByProductId(product.getId());
+                fifoCalculationRepository.deleteAllByProductTypePrice_ProductId(product.getId());
                 if (product.getType().name().equals(Type.MANY.name())) {
                     List<ProductTypePrice> productTypePriceList = productTypePriceRepository.findAllByProductIdAndActiveTrue(product.getId());
                     for (ProductTypePrice productTypePrice : productTypePriceList) {

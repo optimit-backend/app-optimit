@@ -30,4 +30,7 @@ public interface FifoCalculationRepository extends JpaRepository<FifoCalculation
 
     @Query(value = "SELECT remain_amount FROM fifo_calculation WHERE purchase_product_id = ?1", nativeQuery = true)
     Double remainQuantityByPurchaseProductId(UUID purchaseProductId);
+
+    void deleteAllByProductId(UUID productId);
+    void deleteAllByProductTypePrice_ProductId(UUID productId);
 }

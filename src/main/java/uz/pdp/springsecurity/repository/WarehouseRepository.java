@@ -28,17 +28,9 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 
     Page<Warehouse> findAllByBranchIdAndAmountIsNotOrderByLastSoldDate(UUID branch_id, double amount, Pageable pageable);
 
-    List<Warehouse> findByBranch_BusinessIdAndProductTypePriceId(UUID business_id, UUID productTypePriceId);
-
-    List<Warehouse> findByBranch_IdAndProductTypePriceId(UUID business_id, UUID productTypePriceId);
-
     Optional<Warehouse> findByBranchIdAndProductTypePriceId(UUID branchId, UUID productTypePriceId);
 
     Optional<Warehouse> findByProductIdAndBranchId(UUID product_id, UUID branch_id);
-
-    List<Warehouse> findByProductIdAndBranch_Id(UUID product_id, UUID branch_id);
-
-    List<Warehouse> findByProductIdAndProduct_BusinessId(UUID product_id, UUID branch_id);
 
     Optional<Warehouse> findByProductTypePriceIdAndBranchId(UUID productTypePrice_id, UUID branch_id);
 
@@ -61,4 +53,7 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 
     @Query(value = "SELECT SUM(w.amount * w.productTypePrice.buyPrice) FROM Warehouse w WHERE  w.productTypePrice.id = :productTypePriceId and w.createdAt >= :startDate AND w.createdAt <= :endDate")
     Double totalSumProductTypePrice(@Param("productTypePriceId") UUID productTypePriceId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
+
+    void deleteAllByProductId(UUID productId);
+    void deleteAllByProductTypePrice_ProductId(UUID productId);
 }
