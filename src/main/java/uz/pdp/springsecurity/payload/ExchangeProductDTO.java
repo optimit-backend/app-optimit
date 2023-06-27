@@ -19,8 +19,6 @@ public class ExchangeProductDTO {
 
     private UUID productTypePriceId;
 
-
-
     private String productName;
 
     private String productTypePriceName;

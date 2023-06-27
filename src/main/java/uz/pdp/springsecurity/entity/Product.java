@@ -41,6 +41,7 @@ public class Product extends AbsEntity {
 
     @Column(nullable = false)
     private String barcode;
+
     private double minQuantity;
     //    @Column(unique = true, nullable = false)
     @Enumerated(EnumType.STRING)

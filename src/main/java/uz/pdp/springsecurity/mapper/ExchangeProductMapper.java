@@ -21,21 +21,21 @@ public interface ExchangeProductMapper {
 
     List<ExchangeProductDTO> toDtoList(List<ExchangeProduct> exchangeProducts);
 
-    @Mapping(target = "productTypePrice", ignore = true)
     @Mapping(target = "updateAt", ignore = true)
     @Mapping(target = "product", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "product.id", source = "productExchangeId")
+    @Mapping(target = "productTypePrice.id", source = "productTypePriceId")
     ExchangeProduct toEntity(ExchangeProductDTO exchangeProductDTO);
 
     @InheritInverseConfiguration
-    @Mapping(target = "productTypePrice", ignore = true)
     @Mapping(target = "updateAt", ignore = true)
     @Mapping(target = "product", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "product.id", source = "productExchangeId")
+    @Mapping(target = "productTypePrice.id", source = "productTypePriceId")
     void update(ExchangeProductDTO exchangeProductDTO, @MappingTarget ExchangeProduct exchangeProduct);
 
     void update(List<ExchangeProductDTO> exchangeProductDTOList, @MappingTarget List<ExchangeProduct> exchangeProductList);

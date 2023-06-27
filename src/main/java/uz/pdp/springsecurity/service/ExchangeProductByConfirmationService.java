@@ -54,8 +54,19 @@ public class ExchangeProductByConfirmationService {
 
         ExchangeProductBranch save = exchangeProductBranchRepository.save(entity);
         for (ExchangeProductDTO exchangeProductDTO : byConfirmationDto.getExchangeProductBranchDTO().getExchangeProductDTOS()) {
-            exchangeProductRepository.save(exchangeProductMapper.toEntity(exchangeProductDTO));
+            ExchangeProduct exchangeProduct = new ExchangeProduct();
+            exchangeProduct.setExchangeProductQuantity(exchangeProductDTO.getExchangeProductQuantity());
+            if (exchangeProductDTO.getProductExchangeId() != null) {
+                Optional<Product> optionalProduct = productRepository.findById(exchangeProductDTO.getProductExchangeId());
+                optionalProduct.ifPresent(exchangeProduct::setProduct);
+            } else {
+                Optional<ProductTypePrice> optionalProductTypePrice = productTypePriceRepository
+                        .findById(exchangeProductDTO.getProductTypePriceId());
+                optionalProductTypePrice.ifPresent(exchangeProduct::setProductTypePrice);
+            }
+            exchangeProductRepository.save(exchangeProduct);
         }
+
         confirmation.setExchangeProductBranch(save);
         ExchangeProductByConfirmation byConfirmation = repository.save(confirmation);
 
@@ -196,7 +207,6 @@ public class ExchangeProductByConfirmationService {
         }
         return new ApiResponse("O'tqazma bekor qilindi!", true);
     }
-
 
 
     @NotNull
