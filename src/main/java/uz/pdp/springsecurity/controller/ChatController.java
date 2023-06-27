@@ -44,7 +44,7 @@ public class ChatController {
 
     @MessageMapping("/message")
     @SendTo("/chatroom/public")
-    public MessageDto receiveMessage(@Payload MessageDto messageDto) {
+    public MessageDto receiveMessage(@Payload MessageDto messageDto) throws InterruptedException {
         Message message = new Message();
         message.setMessage(messageDto.getMessage());
         message.setReceiverId(messageDto.getReceiverId());
@@ -54,7 +54,7 @@ public class ChatController {
         }
         message.setSenderId(messageDto.getSenderId());
         messageRepository.save(message);
-        System.out.println(messageDto);
+        Thread.sleep(1000);
         return messageDto;
     }
 
