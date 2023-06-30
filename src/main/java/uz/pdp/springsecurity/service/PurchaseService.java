@@ -125,7 +125,7 @@ public class PurchaseService {
 
         UUID businessId = branch.getBusiness().getId();
         Optional<Currency> optionalCurrency = currencyRepository.findByBusinessId(businessId);
-        double course = 11400;
+        double course = 11500;
         if (optionalCurrency.isPresent()){
             course = optionalCurrency.get().getCourse();
         }
@@ -153,17 +153,13 @@ public class PurchaseService {
                 if (optionalPurchaseProduct.isEmpty()) continue;
                 PurchaseProduct purchaseProduct = optionalPurchaseProduct.get();
                 double amount = purchaseProductDto.getPurchasedQuantity() - purchaseProduct.getPurchasedQuantity();
-
                 PurchaseProduct editPurchaseProduct = createOrEditPurchaseProduct(purchaseProduct, purchaseProductDto, course);
                 if (editPurchaseProduct == null) continue;
                 editPurchaseProduct.setPurchase(purchase);
                 purchaseProductList.add(editPurchaseProduct);
-
-                if (amount != 0) {
-                    purchaseProduct.setPurchasedQuantity(purchaseProductDto.getPurchasedQuantity());
-                    fifoCalculationService.editPurchaseProduct(purchaseProduct, amount);
-                    warehouseService.createOrEditWareHouse(purchaseProduct, amount);
-                }
+                purchaseProduct.setPurchasedQuantity(purchaseProductDto.getPurchasedQuantity());
+                fifoCalculationService.editPurchaseProduct(purchaseProduct, amount);
+                warehouseService.createOrEditWareHouse(purchaseProduct, amount);
             }
         }
         purchaseProductRepository.saveAll(purchaseProductList);
@@ -212,7 +208,6 @@ public class PurchaseService {
         purchaseProduct.setSalePrice(purchaseProductDto.getSalePrice());
         purchaseProduct.setBuyPrice(purchaseProductDto.getBuyPrice());
         purchaseProduct.setTotalSum(purchaseProductDto.getTotalSum());
-
         return purchaseProduct;
     }
 
