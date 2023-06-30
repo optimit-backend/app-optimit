@@ -26,15 +26,20 @@ public class ProductHistoryService {
     private final TradeProductRepository tradeProductRepository;
     private final ContentProductRepository contentProductRepository;
     LocalDateTime TODAY_START = LocalDate.now().atStartOfDay();
-    public void create(Branch branch, Product product, ProductTypePrice productTypePrice, boolean plus, double plusAmount, double amount) {
+
+    public void create(Branch branch, Product product, ProductTypePrice productTypePrice, boolean plus, double plusAmount, double amount, int count) {
         Optional<ProductHistory> optionalProductHistory;
         if (product != null)
             optionalProductHistory = productHistoryRepository.findByBranchIdAndProductIdAndCreatedAtBetween(branch.getId(), product.getId(), Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_START.plusDays(1)));
-        else
+        else if (productTypePrice != null)
             optionalProductHistory = productHistoryRepository.findByBranchIdAndProductTypePriceIdAndCreatedAtBetween(branch.getId(), productTypePrice.getId(), Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_START.plusDays(1)));
+        else
+            return;
+
         if (optionalProductHistory.isPresent()) {
             edit(optionalProductHistory.get(), plus, plusAmount, amount);
         } else {
+            if (count > 0) return;
             if (productHistoryRepository.existsAllByBranchIdAndCreatedAtBetween(branch.getId(), Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_START.plusDays(1)))) {
                 productHistoryRepository.save(new ProductHistory(
                         product,
@@ -48,7 +53,8 @@ public class ProductHistoryService {
                 boolean check = createAll(branch);
                 if (!check) return;
             }
-            create(branch, product, productTypePrice, plus, plusAmount, amount);
+
+            create(branch, product, productTypePrice, plus, plusAmount, amount, 1);
         }
     }
 
@@ -102,7 +108,7 @@ public class ProductHistoryService {
             dto.setMinusAmount(history.getMinusAmount());
             dtoList.add(dto);
         }
-        if (dtoList.isEmpty()){
+        if (historyPage.getTotalElements() == 0){
             if (localDate.getDayOfYear() == TODAY_START.getDayOfYear()) {
                 boolean check = createAll(optionalBranch.get());
                 if (check)
