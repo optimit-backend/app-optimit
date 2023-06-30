@@ -31,9 +31,9 @@ public class ProductHistory extends AbsEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;
 
-    private double amount = 0;
+    private double amount;
 
-    private double plusAmount = 0;
+    private double plusAmount;
 
-    private double minusAmount = 0;
+    private double minusAmount;
 }
