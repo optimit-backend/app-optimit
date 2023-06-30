@@ -272,6 +272,12 @@ public class CustomerService {
                         productCustomerDto.setAttachmentId(tradeProduct.getProduct().getPhoto().getId());
                     }
                 }
+                if (tradeProduct.getProductTypePrice() != null) {
+                    if (tradeProduct.getProductTypePrice().getPhoto() != null) {
+                        productCustomerDto.setAttachmentId(tradeProduct.getProductTypePrice().getPhoto().getId());
+                    }
+                }
+
                 productCustomerDto.setProductName(tradeProduct.getProductTypePrice() != null ?
                         tradeProduct.getProductTypePrice().getName() : tradeProduct.getProduct().getName());
 
