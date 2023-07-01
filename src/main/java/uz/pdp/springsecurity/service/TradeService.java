@@ -311,7 +311,7 @@ public class TradeService {
         try {
             countKPI(optionalAgreementKpi.get(), trade, tradeProductList);
         } catch (Exception e) {
-            return new ApiResponse("COUNT KPI ERROR", false);
+            return new ApiResponse("KPI ERROR", false);
         }
         tradeRepository.save(trade);
         tradeProductRepository.saveAll(tradeProductList);
