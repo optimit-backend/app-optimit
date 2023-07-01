@@ -73,12 +73,13 @@ public class WarehouseService {
             }
         }
         warehouseRepository.save(warehouse);
+        // TODO: 7/1/2023 create
         // DAILY PRODUCT HISTORY
-        if (quantity > 0){
-            productHistoryService.create(branch, product, productTypePrice, true, quantity, warehouse.getAmount(), 0);
-        } else {
-            productHistoryService.create(branch, product, productTypePrice, false, -quantity, warehouse.getAmount(), 0);
-        }
+//        if (quantity > 0){
+//            productHistoryService.create(branch, product, productTypePrice, true, quantity, warehouse.getAmount(), 0);
+//        } else {
+//            productHistoryService.create(branch, product, productTypePrice, false, -quantity, warehouse.getAmount(), 0);
+//        }
 
         return amount;
     }
@@ -125,7 +126,9 @@ public class WarehouseService {
                 notificationService.lessProduct(warehouse.getProduct().getId(), true, save.getAmount());
             }
             tradeProduct.setProduct(warehouse.getProduct());
-            productHistoryService.create(branch, warehouse.getProduct(), warehouse.getProductTypePrice(), false, -amount, warehouse.getAmount(), 0);
+
+            // TODO: 7/1/2023 create
+//            productHistoryService.create(branch, warehouse.getProduct(), warehouse.getProductTypePrice(), false, -amount, warehouse.getAmount(), 0);
         } else if (tradeProductDto.getType().equalsIgnoreCase("many")) {
             Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), tradeProductDto.getProductTypePriceId());
             Warehouse warehouse;
@@ -149,8 +152,9 @@ public class WarehouseService {
                 notificationService.lessProduct(warehouse.getProductTypePrice().getId(), false, save.getAmount());
             }
             tradeProduct.setProductTypePrice(warehouse.getProductTypePrice());
-            // DAILY PRODUCT HISTORY
-            productHistoryService.create(branch, warehouse.getProduct(), warehouse.getProductTypePrice(), false, -amount, warehouse.getAmount(), 0);
+
+            // TODO: 7/1/2023 create
+//            productHistoryService.create(branch, warehouse.getProduct(), warehouse.getProductTypePrice(), false, -amount, warehouse.getAmount(), 0);
         } else {
             Optional<Product> optionalProduct = productRepository.findById(tradeProductDto.getProductId());
             if (optionalProduct.isEmpty()) return null;
@@ -175,8 +179,9 @@ public class WarehouseService {
                     warehouse.setAmount(Math.round((warehouse.getAmount() + amount * combo.getAmount()) * 100) / 100.);
                     warehouse.setLastSoldDate(new Date());
                     warehouseRepository.save(warehouse);
-                    // DAILY PRODUCT HISTORY
-                    productHistoryService.create(branch, tradeProduct.getProduct(), tradeProduct.getProductTypePrice(), false, -amount, warehouse.getAmount(), 0);
+
+                    // TODO: 7/1/2023 create
+//                    productHistoryService.create(branch, tradeProduct.getProduct(), tradeProduct.getProductTypePrice(), false, -amount, warehouse.getAmount(), 0);
                 }else {
                     Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(branch.getId(), tradeProductDto.getProductTypePriceId());
                     Warehouse warehouse;
@@ -199,8 +204,9 @@ public class WarehouseService {
                     if (warehouse.getAmount() <= warehouse.getProductTypePrice().getProduct().getMinQuantity()) {
                         notificationService.lessProduct(warehouse.getProductTypePrice().getId(), false, save.getAmount());
                     }
-                    // DAILY PRODUCT HISTORY
-                    productHistoryService.create(branch, tradeProduct.getProduct(), tradeProduct.getProductTypePrice(), false, -amount, warehouse.getAmount(), 0);
+
+                    // TODO: 7/1/2023 create
+//                    productHistoryService.create(branch, tradeProduct.getProduct(), tradeProduct.getProductTypePrice(), false, -amount, warehouse.getAmount(), 0);
                 }
             }
             tradeProduct.setProduct(optionalProduct.get());
@@ -235,8 +241,9 @@ public class WarehouseService {
             }
             contentProduct.setProductTypePrice(warehouse.getProductTypePrice());
         }
-        // DAILY PRODUCT HISTORY
-        productHistoryService.create(warehouse.getBranch(), contentProduct.getProduct(), contentProduct.getProductTypePrice(), false, contentProductDto.getQuantity(), warehouse.getAmount(), 0);
+
+        // TODO: 7/1/2023 create
+//        productHistoryService.create(warehouse.getBranch(), contentProduct.getProduct(), contentProduct.getProductTypePrice(), false, contentProductDto.getQuantity(), warehouse.getAmount(), 0);
         return contentProduct;
     }
 

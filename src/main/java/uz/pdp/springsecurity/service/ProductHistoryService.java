@@ -27,7 +27,9 @@ public class ProductHistoryService {
     private final ContentProductRepository contentProductRepository;
     LocalDateTime TODAY_START = LocalDate.now().atStartOfDay();
 
-    public void create(Branch branch, Product product, ProductTypePrice productTypePrice, boolean plus, double plusAmount, double amount, int count) {
+
+    // TODO: 7/1/2023 create
+    /*public void create(Branch branch, Product product, ProductTypePrice productTypePrice, boolean plus, double plusAmount, double amount, int count) {
         Optional<ProductHistory> optionalProductHistory;
         if (product != null)
             optionalProductHistory = productHistoryRepository.findByBranchIdAndProductIdAndCreatedAtBetween(branch.getId(), product.getId(), Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_START.plusDays(1)));
@@ -53,10 +55,9 @@ public class ProductHistoryService {
                 boolean check = createAll(branch);
                 if (!check) return;
             }
-
             create(branch, product, productTypePrice, plus, plusAmount, amount, 1);
         }
-    }
+    }*/
 
     private void edit(ProductHistory history, boolean plus, double plusAmount, double amount) {
         if (plus)
@@ -83,7 +84,8 @@ public class ProductHistoryService {
     }
 
     public ApiResponse get(UUID branchId, Date date, int page, int size) {
-        Optional<Branch> optionalBranch = branchRepository.findById(branchId);
+        return new ApiResponse("MA'LUMOT TOPILMADI", false);
+        /*Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty())
             return new ApiResponse("BRANCH NOT FOUND", false);
         Pageable pageable = PageRequest.of(page, size);
@@ -121,7 +123,7 @@ public class ProductHistoryService {
         response.put("currentPage", historyPage.getNumber());
         response.put("totalItem", historyPage.getTotalElements());
         response.put("totalPage", historyPage.getTotalPages());
-        return new ApiResponse("SUCCESS", true, response);
+        return new ApiResponse("SUCCESS", true, response);*/
     }
 
     public ApiResponse amount(UUID branchId, int page, int size) {
