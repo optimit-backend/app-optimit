@@ -366,4 +366,15 @@ public class CustomerService {
 
         return new ApiResponse("found", true, customerPreventedInfoDtoList);
     }
+
+    public ApiResponse search(UUID branchId, String name) {
+        List<Customer> all = customerRepository.findAllByBranchIdAndNameContainingIgnoreCase(branchId, name);
+        Set<Customer> allCustomer = new HashSet<>(all);
+        all = new ArrayList<>(allCustomer);
+
+        if (all.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+        return new ApiResponse("all", true, toCustomerDtoList(all));
+    }
 }

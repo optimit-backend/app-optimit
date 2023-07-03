@@ -34,4 +34,6 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     Integer countAllByBranch_IdAndCreatedAtBetween(UUID branch_id, Timestamp createdAt, Timestamp createdAt2);
     Integer countAllByBusiness_IdAndCreatedAtBetween(UUID businessId, Timestamp createdAt, Timestamp createdAt2);
+
+    List<Customer> findAllByBranchIdAndNameContainingIgnoreCase(UUID branch_id, String name);
 }
