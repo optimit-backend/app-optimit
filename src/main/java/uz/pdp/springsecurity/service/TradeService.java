@@ -173,7 +173,7 @@ public class TradeService {
                 if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
                 double newDebt = tradeDTO.getDebtSum() - debtSum;
                 Customer customer = optionalCustomer.get();
-                double debt = -customer.getDebt();
+                double debt = -customer.getDebt() + trade.getPaidSum();
                 if (customer.getDebt() < 0 && newDebt > 0) {
                     unFrontPayment = Math.min(debt, newDebt);
                 }
