@@ -19,4 +19,7 @@ public class CustomerDebtRepayment extends AbsEntity {
     @ManyToOne
     private Customer customer;
 
+    @ManyToOne
+    private PaymentMethod paymentMethod;
+
 }
