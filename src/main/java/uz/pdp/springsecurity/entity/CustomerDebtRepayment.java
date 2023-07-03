@@ -12,13 +12,11 @@ import javax.persistence.ManyToOne;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class CustomerDebt extends AbsEntity {
+public class CustomerDebtRepayment extends AbsEntity {
+
+    private Double paidSum;
+
     @ManyToOne
     private Customer customer;
-    @ManyToOne
-    private Trade trade;
 
-    private Double debtSum;
-
-    private Boolean delete;
 }

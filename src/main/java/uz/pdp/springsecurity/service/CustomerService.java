@@ -25,6 +25,7 @@ public class CustomerService {
     private final CustomerDebtRepository customerDebtRepository;
     private final PayMethodRepository payMethodRepository;
     private final TradeProductRepository tradeProductRepository;
+    private final CustomerDebtRepaymentRepository customerDebtRepaymentRepository;
 
     public ApiResponse add(CustomerDto customerDto) {
         return createEdit(new Customer(), customerDto);
@@ -184,7 +185,14 @@ public class CustomerService {
                 paymentRepository.save(payment);
                 break;
             }
+
         }
+        CustomerDebtRepayment customerDebtRepayment = new CustomerDebtRepayment();
+        customerDebtRepayment.setCustomer(customer);
+        customerDebtRepayment.setPaidSum(paidSum);
+
+        customerDebtRepaymentRepository.save(customerDebtRepayment);
+
         tradeRepository.saveAll(tradeList);
     }
 
@@ -284,14 +292,31 @@ public class CustomerService {
                 tradeProductCustomerDtoList.add(productCustomerDto);
             }
 
-            customerTradeInfo1.setCreateAt(trade.getCreatedAt());
-            customerTradeInfo1.setProductCutomerDtoList(tradeProductCustomerDtoList);
-            customerTradeInfo.add(customerTradeInfo1);
+            if (customerTradeInfo1.getTotalSumma()!=null) {
+                customerTradeInfo1.setCreateAt(trade.getCreatedAt());
+                customerTradeInfo1.setProductCutomerDtoList(tradeProductCustomerDtoList);
+                customerTradeInfo.add(customerTradeInfo1);
+            }
+
+        }
+
+        List<CustomerDebtRepayment> customerDebtRepaymentList = customerDebtRepaymentRepository.findAllByCustomer_Id(customerId);
+
+        for (CustomerDebtRepayment customerDebtRepayment : customerDebtRepaymentList) {
+
+            CustomerTradeInfo customerTradeInfo2 = new CustomerTradeInfo();
+            customerTradeInfo2.setCreateAt(customerDebtRepayment.getCreatedAt());
+            customerTradeInfo2.setTotalSumma(customerDebtRepayment.getPaidSum());
+            customerTradeInfo2.setPaid(true);
+            customerTradeInfo.add(customerTradeInfo2);
         }
 
         if (customerTradeInfo.isEmpty()) {
             return new ApiResponse("not found", false);
         }
+
+        customerTradeInfo.sort(Comparator.comparing(CustomerTradeInfo::getCreateAt));
+
         return new ApiResponse("all", true, customerTradeInfo);
     }
 
