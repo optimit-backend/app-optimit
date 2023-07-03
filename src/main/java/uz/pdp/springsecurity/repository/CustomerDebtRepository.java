@@ -20,4 +20,6 @@ public interface CustomerDebtRepository extends JpaRepository<CustomerDebt, UUID
 
     Optional<CustomerDebt> findByTrade_Id(UUID trade_id);
     List<CustomerDebt> findByCustomer_Id(UUID customerId);
+
+    void deleteAllByTradeId(UUID tradeId);
 }

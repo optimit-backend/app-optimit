@@ -173,7 +173,7 @@ public class TradeService {
                 if (optionalCustomer.isEmpty()) return new ApiResponse("CUSTOMER NOT FOUND", false);
                 double newDebt = tradeDTO.getDebtSum() - debtSum;
                 Customer customer = optionalCustomer.get();
-                double debt = -customer.getDebt() + trade.getPaidSum();
+                double debt = -customer.getDebt();
                 if (customer.getDebt() < 0 && newDebt > 0) {
                     unFrontPayment = Math.min(debt, newDebt);
                 }
@@ -398,6 +398,7 @@ public class TradeService {
         return new ApiResponse(true, tradeGetOneDto);
     }
 
+    @Transactional
     public ApiResponse delete(UUID tradeId) {
         Optional<Trade> optionalTrade = tradeRepository.findById(tradeId);
         if (optionalTrade.isEmpty()) return new ApiResponse("NOT FOUND", false);
@@ -417,7 +418,8 @@ public class TradeService {
 
         if (trade.getCustomer() != null) {
             Customer customer = trade.getCustomer();
-            customer.setDebt(customer.getDebt() - (trade.getPaidSum() + trade.getDebtSum()));
+            customer.setDebt(customer.getDebt() - trade.getTotalSum());
+            customerRepository.save(customer);
         }
 
         if (trade.getKpi() != null) {
@@ -440,13 +442,9 @@ public class TradeService {
             balanceService.edit(trade.getBranch().getId(), payment.getPaidSum(), Boolean.FALSE, payment.getPayMethod().getId());
         }
 
+        customerDebtRepository.deleteAllByTradeId(tradeId);
+
         tradeRepository.deleteById(tradeId);
-        Optional<CustomerDebt> optionalCustomerDebt = customerDebtRepository.findByTrade_Id(tradeId);
-        if (optionalCustomerDebt.isPresent()) {
-            CustomerDebt customerDebt = optionalCustomerDebt.get();
-            customerDebt.setDelete(true);
-            customerDebtRepository.save(customerDebt);
-        }
 
         return new ApiResponse("DELETED", true);
     }
@@ -456,15 +454,15 @@ public class TradeService {
         Page<Trade> tradePage;
         if (businessRepository.existsById(id)) {
             if (invoice != null) {
-                tradePage = tradeRepository.findAllByBranch_BusinessIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByPayDateDesc(id, invoice, invoice, pageable);
+                tradePage = tradeRepository.findAllByBranch_BusinessIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(id, invoice, invoice, pageable);
             } else {
-                tradePage = tradeRepository.findAllByBranch_BusinessIdOrderByPayDateDesc(id, pageable);
+                tradePage = tradeRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(id, pageable);
             }
         } else if (branchRepository.existsById(id)) {
             if (invoice != null) {
-                tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByPayDateDesc(id, invoice, invoice, pageable);
+                tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(id, invoice, invoice, pageable);
             } else {
-                tradePage = tradeRepository.findAllByBranchIdOrderByPayDateDesc(id, pageable);
+                tradePage = tradeRepository.findAllByBranchIdOrderByCreatedAtDesc(id, pageable);
             }
         } else {
             return new ApiResponse("ID ERROR", false);
