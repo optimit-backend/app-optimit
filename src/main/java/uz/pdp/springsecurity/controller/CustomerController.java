@@ -121,4 +121,13 @@ public class CustomerController {
         ApiResponse apiResponse = customerService.getCustomerPreventedInfo(customerId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+    @CheckPermission("VIEW_CUSTOMER")
+    @GetMapping("/search/{branchId}")
+    public HttpEntity<?> search(@PathVariable UUID branchId,
+                                @RequestParam String name) {
+        ApiResponse apiResponse = customerService.search(branchId,name);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
 }
