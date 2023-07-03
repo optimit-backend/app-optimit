@@ -141,7 +141,7 @@ public class CustomerService {
             customer.setPayDate(repaymentDto.getPayDate());
             customerRepository.save(customer);
             try {
-                repaymentHelper(repaymentDto.getRepayment(), customer);
+                repaymentHelper(repaymentDto.getRepayment(), customer, repaymentDto.getPaymentMethodId());
                 balanceService.edit(customer.getBranch().getId(), repaymentDto.getRepayment(), true, repaymentDto.getPaymentMethodId());
                 UUID paymentMethodId = repaymentDto.getPaymentMethodId();
                 Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(paymentMethodId);
@@ -156,7 +156,7 @@ public class CustomerService {
         }
     }
 
-    private void repaymentHelper(double paidSum, Customer customer) {
+    private void repaymentHelper(double paidSum, Customer customer, UUID paymentMethodId) {
         PaymentStatus tolangan = paymentStatusRepository.findByStatus(StatusName.TOLANGAN.name());
         PaymentStatus qisman_tolangan = paymentStatusRepository.findByStatus(StatusName.QISMAN_TOLANGAN.name());
         List<Trade> tradeList = tradeRepository.findAllByCustomerIdAndDebtSumIsNotOrderByCreatedAtAsc(customer.getId(), 0d);
@@ -187,9 +187,11 @@ public class CustomerService {
             }
 
         }
+        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(paymentMethodId);
         CustomerDebtRepayment customerDebtRepayment = new CustomerDebtRepayment();
         customerDebtRepayment.setCustomer(customer);
         customerDebtRepayment.setPaidSum(paidSum);
+        optionalPaymentMethod.ifPresent(customerDebtRepayment::setPaymentMethod);
 
         customerDebtRepaymentRepository.save(customerDebtRepayment);
 
@@ -292,7 +294,7 @@ public class CustomerService {
                 tradeProductCustomerDtoList.add(productCustomerDto);
             }
 
-            if (customerTradeInfo1.getTotalSumma()!=null) {
+            if (customerTradeInfo1.getTotalSumma() != null) {
                 customerTradeInfo1.setCreateAt(trade.getCreatedAt());
                 customerTradeInfo1.setProductCutomerDtoList(tradeProductCustomerDtoList);
                 customerTradeInfo.add(customerTradeInfo1);
@@ -321,6 +323,7 @@ public class CustomerService {
     }
 
     public ApiResponse getCustomerPreventedInfo(UUID customerId) {
+
         Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
         if (optionalCustomer.isEmpty()) {
             return new ApiResponse("not found customer", false);
@@ -359,6 +362,18 @@ public class CustomerService {
             customerPreventedInfoDto.setBalance(customer.getDebt());
         }
 
+        List<CustomerDebtRepayment> customerDebtRepaymentList = customerDebtRepaymentRepository.findAllByCustomer_Id(customerId);
+        for (CustomerDebtRepayment customerDebtRepayment : customerDebtRepaymentList) {
+            CustomerPreventedInfoDto customerPreventedInfoDto = new CustomerPreventedInfoDto();
+            CustomerDebtRepaymentDto customerDebtRepaymentDto = new CustomerDebtRepaymentDto();
+
+            customerDebtRepaymentDto.setCreateAt(customerDebtRepayment.getCreatedAt());
+            customerDebtRepaymentDto.setPaidSum(customerDebtRepayment.getPaidSum());
+            customerDebtRepaymentDto.setPayMethodName(customerDebtRepayment.getPaymentMethod() != null ? customerDebtRepayment.getPaymentMethod().getType() : null);
+
+            customerPreventedInfoDto.setCustomerDebtRepaymentDto(customerDebtRepaymentDto);
+            customerPreventedInfoDtoList.add(customerPreventedInfoDto);
+        }
 
         if (customerPreventedInfoDtoList.isEmpty()) {
             return new ApiResponse("not found", false);
