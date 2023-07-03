@@ -15,4 +15,5 @@ public class CustomerTradeInfo {
     private List<TradeProductCustomerDto> productCutomerDtoList;
     private Double totalSumma;
     private boolean isTrade;
+    private boolean isPaid;
 }
