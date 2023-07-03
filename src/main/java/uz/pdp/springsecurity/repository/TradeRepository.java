@@ -32,7 +32,6 @@ public interface TradeRepository extends JpaRepository<Trade, UUID>, JpaSpecific
 
     double countAllByBranchIdAndCreatedAtBetween(UUID branch_id, Timestamp startDate, Timestamp endDate);
 
-    double countAllByTraderIdAndCreatedAtBetween(UUID trader_id, Timestamp startDate, Timestamp endDate);
 
     @Query(value = "select sum (t.totalSum) from Trade t where t.branch.id = :branchId AND t.createdAt >= :startDate AND t.createdAt <= :endDate")
     Double totalSum(@Param("branchId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
@@ -83,10 +82,10 @@ public interface TradeRepository extends JpaRepository<Trade, UUID>, JpaSpecific
 
     Optional<Trade> findFirstByBranchIdOrderByCreatedAtDesc(UUID branchId);
 
-    Page<Trade> findAllByBranchIdOrderByPayDateDesc(UUID branchId, Pageable pageable);
+    Page<Trade> findAllByBranchIdOrderByCreatedAtDesc(UUID branchId, Pageable pageable);
 
-    Page<Trade> findAllByBranch_BusinessIdOrderByPayDateDesc(UUID businessId, Pageable pageable);
+    Page<Trade> findAllByBranch_BusinessIdOrderByCreatedAtDesc(UUID businessId, Pageable pageable);
 
-    Page<Trade> findAllByBranch_BusinessIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByPayDateDesc(UUID businessId, String invoice, String name, Pageable pageable);
-    Page<Trade> findAllByBranchIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByPayDateDesc(UUID branchId, String invoice, String name, Pageable pageable);
+    Page<Trade> findAllByBranch_BusinessIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(UUID businessId, String invoice, String name, Pageable pageable);
+    Page<Trade> findAllByBranchIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(UUID branchId, String invoice, String name, Pageable pageable);
 }
