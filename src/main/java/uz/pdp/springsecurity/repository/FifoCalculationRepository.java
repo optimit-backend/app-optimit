@@ -33,4 +33,9 @@ public interface FifoCalculationRepository extends JpaRepository<FifoCalculation
 
     void deleteAllByProductId(UUID productId);
     void deleteAllByProductTypePrice_ProductId(UUID productId);
+
+    @Query(value = "SELECT SUM(remain_amount * buy_price) FROM fifo_calculation WHERE product_id = ?1", nativeQuery = true)
+    Double buyPriceByProductSingle(UUID productId);
+    @Query(value = "SELECT SUM(remain_amount * buy_price) FROM fifo_calculation WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1)", nativeQuery = true)
+    Double buyPriceByProductMany(UUID productId);
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.utils.ConstantProduct;
 
 import java.util.*;
 
@@ -22,6 +23,8 @@ public class LossService {
     private final LossProductRepository lossProductRepository;
     private final WarehouseService warehouseService;
     private final FifoCalculationService fifoCalculationService;
+    private final ProductAboutRepository productAboutRepository;
+
     public ApiResponse create(LossDTO lossDTO) {
         Optional<Branch> optionalBranch = branchRepository.findById(lossDTO.getBranchId());
         if (optionalBranch.isEmpty())
@@ -64,6 +67,14 @@ public class LossService {
             warehouseService.createOrEditWareHouseHelper(loss.getBranch(), lossProduct.getProduct(), lossProduct.getProductTypePrice(), -dto.getQuantity());
             fifoCalculationService.createLossProduct(loss.getBranch(), lossProduct);
             lossProductList.add(lossProduct);
+            // save product history
+            productAboutRepository.save(new ProductAbout(
+                    lossProduct.getProduct(),
+                    lossProduct.getProductTypePrice(),
+                    loss.getBranch(),
+                    ConstantProduct.LOSE,
+                    -lossProduct.getQuantity()
+            ));
         }
         return new ApiResponse("SUCCESS", true);
     }

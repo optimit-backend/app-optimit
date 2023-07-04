@@ -37,4 +37,6 @@ public class ProductHistoryController {
         ApiResponse apiResponse = productHistoryService.amount(branchId, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+
 }
