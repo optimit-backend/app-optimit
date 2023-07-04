@@ -18,4 +18,10 @@ public interface PurchaseProductRepository extends JpaRepository<PurchaseProduct
     List<PurchaseProduct> findAllByCreatedAtBetweenAndProduct_BranchIdAndPurchase_SupplierId(Timestamp start, Timestamp end, UUID branchId, UUID supplierId);
     Page<PurchaseProduct> findAllByPurchase_BranchIdAndProductIdOrderByCreatedAtDesc(UUID branch_id, UUID productId, Pageable pageable);
     Page<PurchaseProduct> findAllByPurchase_BranchIdAndProductTypePriceIdOrderByCreatedAtDesc(UUID branch_id, UUID productTypePriceId, Pageable pageable);
+
+
+    @Query(value = "SELECT SUM(purchased_quantity) FROM purchase_product WHERE product_id = ?1", nativeQuery = true)
+    Double quantityByProductSingle(UUID productId);
+    @Query(value = "SELECT SUM(purchased_quantity) FROM purchase_product WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1)", nativeQuery = true)
+    Double quantityByProductMany(UUID productId);
 }

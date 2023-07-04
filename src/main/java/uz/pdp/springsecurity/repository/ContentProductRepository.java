@@ -23,4 +23,9 @@ public interface ContentProductRepository extends JpaRepository<ContentProduct, 
 
     @Query(value = "SELECT SUM(quantity) FROM content_product WHERE loss_product = 'false' AND by_product = 'false' AND created_at BETWEEN ?1 AND ?2 AND product_type_price_id = ?3 AND production_id IN (SELECT id FROM production WHERE branch_id = ?4)", nativeQuery = true)
     Double quantityByBranchIdAndProductTypePriceIdAndCreatedAtBetween(Timestamp from, Timestamp to, UUID productTypePriceId, UUID branchId);
+
+    @Query(value = "SELECT SUM(quantity) FROM content_product WHERE product_id = ?1 AND by_product = TRUE OR loss_product = TRUE", nativeQuery = true)
+    Double byProductByProductSingle(UUID productId);
+    @Query(value = "SELECT SUM(quantity) FROM content_product WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1) AND by_product = TRUE OR loss_product = TRUE", nativeQuery = true)
+    Double byProductByProductMany(UUID productId);
 }

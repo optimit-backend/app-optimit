@@ -7,6 +7,7 @@ import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.Type;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.utils.ConstantProduct;
 
 import java.util.*;
 
@@ -22,12 +23,20 @@ public class WarehouseService {
     private final ExchangeProductBranchRepository exchangeProductBranchRepository;
     private final FifoCalculationService fifoCalculationService;
     private final NotificationService notificationService;
-    private final ProductHistoryService productHistoryService;
+    private final ProductAboutRepository productAboutRepository;
 
     public double createOrEditWareHouse(PurchaseProduct purchaseProduct, double quantity) {
         Branch branch = purchaseProduct.getPurchase().getBranch();
         Product product = purchaseProduct.getProduct();
         ProductTypePrice productTypePrice = purchaseProduct.getProductTypePrice();
+        // save product history
+        productAboutRepository.save(new ProductAbout(
+                product,
+                productTypePrice,
+                branch,
+                ConstantProduct.PURCHASE,
+                quantity
+        ));
         return createOrEditWareHouseHelper(branch, product, productTypePrice, quantity);
     }
 
@@ -35,10 +44,16 @@ public class WarehouseService {
         Branch branch = production.getBranch();
         Product product = production.getProduct();
         ProductTypePrice productTypePrice = production.getProductTypePrice();
+        // save product history
+        productAboutRepository.save(new ProductAbout(
+                product,
+                productTypePrice,
+                branch,
+                ConstantProduct.PRODUCTION,
+                production.getQuantity()
+        ));
         return createOrEditWareHouseHelper(branch, product, productTypePrice, production.getQuantity());
     }
-
-
 
     public double createOrEditWareHouseHelper(Branch branch, Product product, ProductTypePrice productTypePrice, Double quantity) {
         Warehouse warehouse;
@@ -83,7 +98,6 @@ public class WarehouseService {
 
         return amount;
     }
-
 
     public Boolean checkBeforeTrade(Branch branch, HashMap<UUID, Double> map) {
         for (Map.Entry<UUID, Double> entry : map.entrySet()) {
@@ -214,6 +228,15 @@ public class WarehouseService {
         tradeProduct.setTotalSalePrice(tradeProductDto.getTotalSalePrice());
         tradeProduct.setTradedQuantity(tradeProductDto.getTradedQuantity());
         tradeProduct.setSubMeasurement(tradeProductDto.isSubMeasurement());
+
+        // save product history
+        productAboutRepository.save(new ProductAbout(
+                tradeProduct.getProduct(),
+                tradeProduct.getProductTypePrice(),
+                branch,
+                ConstantProduct.TRADE,
+                -tradeProduct.getTradedQuantity()
+        ));
         return tradeProduct;
     }
 
@@ -242,6 +265,15 @@ public class WarehouseService {
             contentProduct.setProductTypePrice(warehouse.getProductTypePrice());
         }
 
+        // save product history
+        productAboutRepository.save(new ProductAbout(
+                contentProduct.getProduct(),
+                contentProduct.getProductTypePrice(),
+                contentProduct.getProduction().getBranch(),
+                ConstantProduct.CONTENT,
+                -contentProduct.getQuantity()
+        ));
+
         // TODO: 7/1/2023 create
 //        productHistoryService.create(warehouse.getBranch(), contentProduct.getProduct(), contentProduct.getProductTypePrice(), false, contentProductDto.getQuantity(), warehouse.getAmount(), 0);
         return contentProduct;
@@ -257,6 +289,15 @@ public class WarehouseService {
             if (optional.isEmpty()) return 0;
             contentProduct.setProductTypePrice(optional.get());
         }
+
+        // save product history
+        productAboutRepository.save(new ProductAbout(
+                contentProduct.getProduct(),
+                contentProduct.getProductTypePrice(),
+                contentProduct.getProduction().getBranch(),
+                ConstantProduct.PRODUCTION,
+                contentProduct.getQuantity()
+        ));
         return createOrEditWareHouseHelper(contentProduct.getProduction().getBranch(), contentProduct.getProduct(), contentProduct.getProductTypePrice(), contentProductDto.getQuantity());
     }
 

@@ -133,6 +133,7 @@ public class ProductHistoryService {
         for (Warehouse warehouse : warehousePage.getContent()) {
             LocalDateTime createdAtLocal = warehouse.getCreatedAt().toLocalDateTime();
             int days = TODAY_START.getDayOfYear() - createdAtLocal.getDayOfYear() + 1;
+            if (days < 0) days = 365 + days;
             if (days > 30) days = 30;
             Double quantityD;
             Double quantityD2;

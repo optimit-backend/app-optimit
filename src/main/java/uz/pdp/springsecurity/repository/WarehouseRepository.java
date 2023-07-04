@@ -56,4 +56,19 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 
     void deleteAllByProductId(UUID productId);
     void deleteAllByProductTypePrice_ProductId(UUID productId);
+
+    @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_type_price_id = ?1", nativeQuery = true)
+    Double amountByProductTypePrice(UUID productTypePriceId);
+
+    @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_id = ?1", nativeQuery = true)
+    Double amountByProductSingle(UUID productId);
+
+    @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1)", nativeQuery = true)
+    Double amountByProductMany(UUID productId);
+
+    @Query(value = "SELECT SUM(w.amount * w.product.salePrice) FROM Warehouse w WHERE w.product.id = ?1")
+    Double salePriceByProductSingle(UUID productId);
+
+    @Query(value = "SELECT SUM(w.amount * w.productTypePrice.salePrice) FROM Warehouse w WHERE w.productTypePrice.id IN (SELECT p.id FROM ProductTypePrice p WHERE p.product.id = ?1)")
+    Double salePriceByProductMany(UUID productId);
 }
