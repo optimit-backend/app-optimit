@@ -40,23 +40,15 @@ public class BrandService {
         }
         Business business = optionalBusiness.get();
         brand.setBusiness(business);
-        List<Brand> branchList = brandRepository.findAllByBusiness_Id(business.getId());
-        int size = branchList.size();
-
 
         Optional<Subscription> optionalSubscription = subscriptionRepository.findByBusinessIdAndActiveTrue(business.getId());
         if (optionalSubscription.isEmpty()) {
             return new ApiResponse("tariff aktiv emas", false);
         }
 
-        Subscription subscription = optionalSubscription.get();
-
-        if (subscription.getTariff().getBranchAmount() >= size || subscription.getTariff().getBranchAmount() == 0) {
-            brand.setName(brandDto.getName());
-            brandRepository.save(brand);
-            return new ApiResponse("ADDED", true);
-        }
-        return new ApiResponse("You have opened a sufficient branch according to the tariff", false);
+        brand.setName(brandDto.getName());
+        brandRepository.save(brand);
+        return new ApiResponse("ADDED", true);
     }
 
     public ApiResponse editBrand(UUID id, BrandDto brandDto) {
