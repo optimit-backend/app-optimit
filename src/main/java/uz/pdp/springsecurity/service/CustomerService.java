@@ -329,6 +329,7 @@ public class CustomerService {
             return new ApiResponse("not found customer", false);
         }
 
+        Customer customer = optionalCustomer.get();
         List<Trade> all = tradeRepository.findAllByCustomer_Id(customerId);
         List<CustomerPreventedInfoDto> customerPreventedInfoDtoList = new ArrayList<>();
 
@@ -358,7 +359,6 @@ public class CustomerService {
                 customerPreventedInfoDto.setBackingProductDto(backingProductDto);
             }
             customerPreventedInfoDtoList.add(customerPreventedInfoDto);
-            Customer customer = optionalCustomer.get();
             customerPreventedInfoDto.setBalance(customer.getDebt());
         }
 
@@ -373,6 +373,8 @@ public class CustomerService {
 
             customerPreventedInfoDto.setCustomerDebtRepaymentDto(customerDebtRepaymentDto);
             customerPreventedInfoDtoList.add(customerPreventedInfoDto);
+
+            customerPreventedInfoDto.setBalance(customer.getDebt());
         }
 
         if (customerPreventedInfoDtoList.isEmpty()) {
