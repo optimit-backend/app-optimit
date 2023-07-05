@@ -63,8 +63,8 @@ public class ProductAboutService {
             soldAmountD = tradeProductRepository.soldQuantityByProductMany(product.getId());
             returnAmountD = tradeProductRepository.backingByProductMany(product.getId());
             purchaseAmountD = purchaseProductRepository.quantityByProductMany(product.getId());
-            productionAmountD = productionRepository.quantityByProductMany(product.getId());
             byProductAmountD = contentProductRepository.byProductByProductMany(product.getId());
+            productionAmountD = productionRepository.quantityByProductMany(product.getId());
 
             soldPriceD = tradeProductRepository.soldPriceByProductMany(product.getId());
             profitD = tradeProductRepository.profitByProductMany(product.getId());
@@ -124,7 +124,7 @@ public class ProductAboutService {
                 dto.setPhoto(typePrice.getPhoto().getId());
             Double amountD = warehouseRepository.amountByProductTypePrice(typePrice.getId());
             Double soldAmountD = tradeProductRepository.quantityByProductTypePriceId(typePrice.getId());
-            Double profitD = tradeProductRepository.totalSumByProductTypePriceId(typePrice.getId());
+            Double profitD = tradeProductRepository.profitByProductTypePriceId(typePrice.getId());
             double amount = amountD == null ? 0 : amountD;
             double soldAmount = soldAmountD == null ? 0 : soldAmountD;
             double profit = profitD == null ? 0 : profitD;
