@@ -11,13 +11,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface FifoCalculationRepository extends JpaRepository<FifoCalculation, UUID> {
-    List<FifoCalculation> findAllByBranchIdAndProductIdAndActiveTrueOrderByDate(UUID branchId, UUID productId);
+    List<FifoCalculation> findAllByBranchIdAndProductIdAndActiveTrueOrderByCreatedAt(UUID branchId, UUID productId);
 
-    List<FifoCalculation> findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByDate(UUID branchId, UUID productTypePriceId);
+    List<FifoCalculation> findAllByBranchIdAndProductTypePriceIdAndActiveTrueOrderByCreatedAt(UUID branchId, UUID productTypePriceId);
 
-    List<FifoCalculation> findFirst20ByBranchIdAndProductIdOrderByDateDesc(UUID branchId, UUID productId);
+    List<FifoCalculation> findFirst20ByBranchIdAndProductIdOrderByCreatedAtDesc(UUID branchId, UUID productId);
 
-    List<FifoCalculation> findFirst20ByBranchIdAndProductTypePriceIdOrderByDateDesc(UUID branchId, UUID productId);
+    List<FifoCalculation> findFirst20ByBranchIdAndProductTypePriceIdOrderByCreatedAtDesc(UUID branchId, UUID productId);
 
     Optional<FifoCalculation> findByPurchaseProductId(UUID purchaseProductId);
 
