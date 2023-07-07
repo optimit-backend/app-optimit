@@ -215,7 +215,7 @@ public class ReportsService {
             productList = productRepository.findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(brandId, categoryId, branchId);
             productTypePriceList = productTypePriceRepository.findAllByProduct_BrandIdAndProduct_CategoryIdAndProduct_Branch_IdAndProduct_ActiveIsTrue(brandId, categoryId, branchId);
         } else if (production != null && categoryId == null && brandId == null) {
-            List<Production> productionList = productionRepository.findAllByBranchIdAndDoneIsTrue(branchId);
+            List<Production> productionList = productionRepository.findAllByBranchIdAndDoneIsTrueOrderByCreatedAtDesc(branchId);
             if (productionList.isEmpty()) {
                 return new ApiResponse("Production Not Found", false);
             }
@@ -1713,7 +1713,7 @@ public class ReportsService {
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found", false);
         }
-        List<Production> productionList = productionRepository.findAllByBranchIdAndDoneIsTrue(branchId);
+        List<Production> productionList = productionRepository.findAllByBranchIdAndDoneIsTrueOrderByCreatedAtDesc(branchId);
 
         return new ApiResponse("Found", true, productionList);
     }

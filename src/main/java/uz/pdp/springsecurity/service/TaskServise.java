@@ -123,7 +123,7 @@ public class TaskServise {
             projectRepository.save(project);
         }
         if (task.isProductions()) {
-            ApiResponse apiResponse = productionService.addContentForTask(task, taskDto.getContentProductDtoList());
+            ApiResponse apiResponse = productionService.addContentForTask(task, taskDto);
             if (!apiResponse.isSuccess())
                 return apiResponse;
         }
