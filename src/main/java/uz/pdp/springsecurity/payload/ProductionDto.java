@@ -32,17 +32,19 @@ public class ProductionDto{
     @NotNull
     private double totalQuantity;
 
-    private double invalid = 0;
+    private double invalid;
 
     @NotNull
     private double contentPrice;
-
-    private double cost;
 
     private boolean costEachOne = false;
 
     @NotNull
     private double totalPrice;
+
+    private double cost;
+
+    private List<CostDto> costDtoList;
 
     @NotNull
     @NotEmpty

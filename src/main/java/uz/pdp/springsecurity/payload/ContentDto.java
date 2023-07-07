@@ -16,14 +16,10 @@ public class ContentDto{
 
     private UUID productId;
 
-
     private UUID productTypePriceId;
 
     @NotNull
     private double quantity = 1;
-
-
-    private double cost;
 
     private boolean costEachOne;
 
@@ -33,6 +29,10 @@ public class ContentDto{
 
     @NotNull
     private double totalPrice;
+
+    private double cost;
+
+    private List<CostDto> costDtoList;
 
     @NotNull
     List<ContentProductDto> contentProductDtoList;

@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.mapper.CostMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
@@ -23,6 +24,9 @@ public class ProductionService {
     private final SalaryCountService salaryCountService;
     private final PrizeService prizeService;
     private final LostProductionRepository lostProductionRepository;
+    private final CostTypeRepository costTypeRepository;
+    private final CostRepository costRepository;
+    private final CostMapper costMapper;
 
     public ApiResponse add(ProductionDto productionDto) {
 
@@ -56,6 +60,9 @@ public class ProductionService {
             production.setProductTypePrice(optional.get());
         }
         productionRepository.save(production);
+
+        ApiResponse apiResponseCost = saveCostList(production, productionDto.getCostDtoList());
+        if (!apiResponseCost.isSuccess()) return apiResponseCost;
 
         List<ContentProduct>contentProductList = new ArrayList<>();
         double contentPrice = saveContentProductList(contentProductList, production, productionDto.getContentProductDtoList());
@@ -120,6 +127,22 @@ public class ProductionService {
             contentProductList.add(contentProduct);
         }
         return contentPrice;
+    }
+
+    private ApiResponse saveCostList(Production production, List<CostDto> costDtoList) {
+        List<Cost> list = new ArrayList<>();
+        for (CostDto dto : costDtoList) {
+            Optional<CostType> optionalCostType = costTypeRepository.findById(dto.getCostTypeId());
+            if (optionalCostType.isEmpty())
+                return new ApiResponse("NOT FOUND COST_TYPE", false);
+            list.add(new Cost(
+                    production,
+                    optionalCostType.get(),
+                    dto.getSum()
+            ));
+        }
+        costRepository.saveAll(list);
+        return new ApiResponse("SUCCESS", true);
     }
 
     public ApiResponse addContentForTask(Task task, TaskDto taskDto) {
@@ -308,6 +331,7 @@ public class ProductionService {
         if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
         GetOneContentProductionDto getOneContentProductionDto = new GetOneContentProductionDto(
                 production,
+                costMapper.toDtoList(costRepository.findAllByProductionId(productionId)),
                 contentProductList
         );
         return new ApiResponse(true, getOneContentProductionDto);
