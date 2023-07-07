@@ -808,6 +808,18 @@ public class DataLoader implements CommandLineRunner {
                     branches,
                     true
             );
+            User user = new User(
+                    "user",
+                    "user",
+                    "user",
+                    passwordEncoder.encode("123"),
+                    admin,
+                    true,
+                    business,
+                    branches,
+                    true
+            );
+            userRepository.save(user);
 
             userAdmin.setArrivalTime("08:00");
             userAdmin.setLeaveTime("16:00");
@@ -933,12 +945,40 @@ public class DataLoader implements CommandLineRunner {
                     rejectionStatus.setOrginalName("Rejection");
                     rejectionStatus.setColor("rang");
                     Integer maxSort = lidStatusRepository.getMaxSort(business2.getId());
-                    rejectionStatus.setSort(maxSort+1);
+                    rejectionStatus.setSort(maxSort + 1);
                     rejectionStatus.setBusiness(business2);
                     lidStatusRepository.save(rejectionStatus);
                 }
             }
 //            updatePermission(); // TODO: 5/29/2023 if you add new permission
+            List<User> allByRoleId = userRepository.findAllByRole_Id(roleRepository.findByName("Super Admin").get().getId());
+            boolean b = false;
+            Role role = null;
+            Business business = null;
+            Set<Branch> branch = new HashSet<>();
+            for (User user : allByRoleId) {
+                role = user.getRole();
+                business = user.getBusiness();
+                branch = user.getBranches();
+                if (user.getUsername().equals("user")) {
+                    b = true;
+                }
+            }
+
+            if (!b) {
+                User newUser = new User(
+                        "user",
+                        "user",
+                        "user",
+                        passwordEncoder.encode("123"),
+                        role,
+                        true,
+                        business,
+                        branch,
+                        true
+                );
+                userRepository.save(newUser);
+            }
         }
 
     }
