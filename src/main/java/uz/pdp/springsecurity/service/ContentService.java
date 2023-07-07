@@ -5,10 +5,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.*;
-import uz.pdp.springsecurity.payload.ApiResponse;
-import uz.pdp.springsecurity.payload.ContentDto;
-import uz.pdp.springsecurity.payload.ContentProductDto;
-import uz.pdp.springsecurity.payload.GetOneContentProductionDto;
+import uz.pdp.springsecurity.mapper.CostMapper;
+import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,8 +24,10 @@ public class ContentService {
     private final ProductRepository productRepository;
     private final ProductTypePriceRepository productTypePriceRepository;
     private final BranchRepository branchRepository;
-
     private final WarehouseRepository warehouseRepository;
+    private final CostRepository costRepository;
+    private final CostTypeRepository costTypeRepository;
+    private final CostMapper costMapper;
 
     @Transactional
     public ApiResponse add(ContentDto contentDto) {
@@ -62,8 +62,15 @@ public class ContentService {
         content.setTotalPrice(contentDto.getTotalPrice());
         contentRepository.save(content);
         contentProductRepository.deleteAllByContentId(content.getId());
+        costRepository.deleteAllByContentId(content.getId());
 
-        List<ContentProductDto> contentProductDtoList = contentDto.getContentProductDtoList();
+        ApiResponse apiResponse = saveCostList(content, contentDto.getCostDtoList());
+        if (!apiResponse.isSuccess())
+            return apiResponse;
+        return saveContentProductList(content, contentDto.getContentProductDtoList());
+    }
+
+    private ApiResponse saveContentProductList(Content content,  List<ContentProductDto> contentProductDtoList) {
         List<ContentProduct> contentProductList = new ArrayList<>();
         for (ContentProductDto contentProductDto : contentProductDtoList) {
             ContentProduct contentProduct = createOrEditContentProduct(new ContentProduct(), contentProductDto);
@@ -72,9 +79,8 @@ public class ContentService {
             contentProduct.setContent(content);
             contentProductList.add(contentProduct);
         }
-
         contentProductRepository.saveAll(contentProductList);
-        return new ApiResponse("successfully saved", true);
+        return new ApiResponse("SUCCESS", true);
     }
 
     private ContentProduct createOrEditContentProduct(ContentProduct contentProduct, ContentProductDto contentProductDto) {
@@ -91,6 +97,22 @@ public class ContentService {
         contentProduct.setTotalPrice(contentProductDto.getTotalPrice());
         contentProduct.setByProduct(contentProductDto.isByProduct());
         return contentProduct;
+    }
+
+    private ApiResponse saveCostList(Content content, List<CostDto> costDtoList) {
+        List<Cost> list = new ArrayList<>();
+        for (CostDto dto : costDtoList) {
+            Optional<CostType> optionalCostType = costTypeRepository.findById(dto.getCostTypeId());
+            if (optionalCostType.isEmpty())
+                return new ApiResponse("NOT FOUND COST_TYPE", false);
+            list.add(new Cost(
+                    content,
+                    optionalCostType.get(),
+                    dto.getSum()
+            ));
+        }
+        costRepository.saveAll(list);
+        return new ApiResponse("SUCCESS", true);
     }
 
     public ApiResponse getAll(UUID branchId) {
@@ -126,6 +148,7 @@ public class ContentService {
         if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
         GetOneContentProductionDto getOneContentProductionDto = new GetOneContentProductionDto(
                 content,
+                costMapper.toDtoList(costRepository.findAllByContentId(contentId)),
                 contentProductList
         );
         for (ContentProduct contentProduct : contentProductList) {

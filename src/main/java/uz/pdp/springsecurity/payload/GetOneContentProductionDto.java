@@ -17,15 +17,19 @@ public class GetOneContentProductionDto {
 
     private Production production;
 
+    private List<CostGetDto> costGetDtoList;
+
     private List<ContentProduct> contentProductList;
 
-    public GetOneContentProductionDto(Content content, List<ContentProduct> contentProductList) {
+    public GetOneContentProductionDto(Content content, List<CostGetDto> costGetDtoList, List<ContentProduct> contentProductList) {
         this.content = content;
+        this.costGetDtoList = costGetDtoList;
         this.contentProductList = contentProductList;
     }
 
-    public GetOneContentProductionDto(Production production, List<ContentProduct> contentProductList) {
+    public GetOneContentProductionDto(Production production, List<CostGetDto> costGetDtoList, List<ContentProduct> contentProductList) {
         this.production = production;
+        this.costGetDtoList = costGetDtoList;
         this.contentProductList = contentProductList;
     }
 }

@@ -4,13 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
 import java.util.UUID;
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class TaskTypeDto {
-    private String name;
 
-    private UUID branchId;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CostGetDto {
+    private UUID costTypeId;
+
+    private String costTypeName;
+
+    private double sum;
 }

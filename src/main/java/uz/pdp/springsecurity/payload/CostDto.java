@@ -7,10 +7,12 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class TaskTypeDto {
-    private String name;
+@AllArgsConstructor
+public class CostDto {
+    @NotNull
+    private UUID costTypeId;
 
-    private UUID branchId;
+    @NotNull
+    private double sum;
 }
