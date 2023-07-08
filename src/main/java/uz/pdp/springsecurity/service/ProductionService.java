@@ -39,6 +39,7 @@ public class ProductionService {
         ApiResponse apiResponse = checkBeforeProduction(branch, productionDto.getContentProductDtoList());
         if (!apiResponse.isSuccess()) return apiResponse;
 
+        double cost = productionDto.isCostEachOne()?productionDto.getTotalQuantity():1;
         Production production = new Production(
                 branch,
                 productionDto.getDate(),
@@ -47,7 +48,7 @@ public class ProductionService {
                 productionDto.getInvalid(),
                 productionDto.getTotalPrice(),
                 productionDto.getContentPrice(),
-                productionDto.getCost(),
+                productionDto.getCost() * cost,
                 productionDto.isCostEachOne()
         );
         if (productionDto.getProductId() != null) {
