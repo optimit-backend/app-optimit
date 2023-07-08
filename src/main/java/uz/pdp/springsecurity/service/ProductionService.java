@@ -71,8 +71,7 @@ public class ProductionService {
         if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
         contentProductRepository.saveAll(contentProductList);
         production.setContentPrice(contentPrice);
-        double cost = production.isCostEachOne()?production.getTotalQuantity():1;
-        production.setTotalPrice(cost * production.getCost() + contentPrice);
+        production.setTotalPrice(production.getCost() + contentPrice);
 
         if (production.getProduct() != null) {
             Product product = production.getProduct();
