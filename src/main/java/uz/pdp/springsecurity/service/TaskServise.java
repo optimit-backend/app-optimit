@@ -64,13 +64,13 @@ public class TaskServise {
         if (taskDto.getDeadLine() != null) {
             task.setDeadLine(taskDto.getDeadLine());
         }
-        if (taskDto.getContentId() != null) {
+        /*if (taskDto.getContentId() != null) {
             Optional<Content> optionalContent = contentRepository.findById(taskDto.getContentId());
             if (optionalContent.isPresent()) {
                 Content content = optionalContent.get();
                 task.setContent(content);
             }
-        }
+        }*/
         List<TaskPrice> taskPriceList = new ArrayList<>();
         for (TaskPriceDto taskPriceDto : taskDto.getTaskPriceDtos()) {
             TaskPrice taskPrice = new TaskPrice();
