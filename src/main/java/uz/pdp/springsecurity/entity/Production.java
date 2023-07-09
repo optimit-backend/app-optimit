@@ -54,6 +54,8 @@ public class Production extends AbsEntity {
     @Column(nullable = false)
     private double cost;
 
+    private Double taskPrice;
+
     @Column(nullable = false)
     private boolean costEachOne;
 

@@ -27,6 +27,12 @@ public class TaskDto {
     private UUID contentId;
     private boolean isProductions;
     private double goalAmount;
+
+    private boolean costEachOne;
+
+    private double cost;
+
+    private List<CostDto> costDtoList;
     List<ContentProductDto> contentProductDtoList;
     private double taskPrice;
     @NotNull

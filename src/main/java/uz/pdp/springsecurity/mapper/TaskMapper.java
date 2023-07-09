@@ -28,7 +28,8 @@ public interface TaskMapper {
     @Mapping(target = "taskStatusId", source = "taskStatus.id")
     @Mapping(target = "branchId", source = "branch.id")
     @Mapping(target = "dependTask", source = "dependTask.id")
-    @Mapping(target = "production", source = "production.id")
+    @Mapping(target = "contentProductList", ignore = true)
+    @Mapping(target = "costGetDtoList", ignore = true)
     @Mapping(target = "id", source = "task.id")
     TaskGetDto toDto(Task task);
 
