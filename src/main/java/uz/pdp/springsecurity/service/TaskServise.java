@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.Importance;
 import uz.pdp.springsecurity.enums.NotificationType;
+import uz.pdp.springsecurity.mapper.CostMapper;
 import uz.pdp.springsecurity.mapper.TaskMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
@@ -45,6 +46,8 @@ public class TaskServise {
     private final WarehouseService warehouseService;
     private final SmsService smsService;
     private final ShablonRepository shablonRepository;
+    private final CostRepository costRepository;
+    private final CostMapper costMapper;
 
     public ApiResponse add(TaskDto taskDto) {
         Optional<Branch> optionalBranch = branchRepository.findById(taskDto.getBranchId());
@@ -64,13 +67,13 @@ public class TaskServise {
         if (taskDto.getDeadLine() != null) {
             task.setDeadLine(taskDto.getDeadLine());
         }
-        /*if (taskDto.getContentId() != null) {
+        if (taskDto.getContentId() != null) {
             Optional<Content> optionalContent = contentRepository.findById(taskDto.getContentId());
             if (optionalContent.isPresent()) {
                 Content content = optionalContent.get();
                 task.setContent(content);
             }
-        }*/
+        }
         List<TaskPrice> taskPriceList = new ArrayList<>();
         for (TaskPriceDto taskPriceDto : taskDto.getTaskPriceDtos()) {
             TaskPrice taskPrice = new TaskPrice();
@@ -284,6 +287,10 @@ public class TaskServise {
         TaskGetDto getDto = taskMapper.toDto(optionalTask.get());
         List<FileData> allFileData = fileDateRepository.findAllByTask_Id(id);
         getDto.setFileDataIdList(allFileData);
+        if (getDto.getProduction() != null){
+            getDto.setContentProductList(contentProductRepository.findAllByProductionId(getDto.getProduction().getId()));
+            getDto.setCostGetDtoList(costMapper.toDtoList(costRepository.findAllByProductionId(getDto.getProduction().getId())));
+        }
         return new ApiResponse("found", true, getDto);
     }
 

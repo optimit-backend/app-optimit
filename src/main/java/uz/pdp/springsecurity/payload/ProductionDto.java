@@ -37,10 +37,10 @@ public class ProductionDto{
     @NotNull
     private double contentPrice;
 
-    private boolean costEachOne = false;
-
     @NotNull
     private double totalPrice;
+
+    private boolean costEachOne;
 
     private double cost;
 

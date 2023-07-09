@@ -146,16 +146,10 @@ public class ProductionService {
     }
 
     public ApiResponse addContentForTask(Task task, TaskDto taskDto) {
-
         ApiResponse apiResponse = checkBeforeProduction(task.getBranch(), taskDto.getContentProductDtoList());
         if (!apiResponse.isSuccess()) return apiResponse;
 
-        double cost = 0;
-        if (task.getContent() != null) {
-            cost = task.getContent().isCostEachOne() ? task.getGoalAmount() : 1;
-            cost *= task.getContent().getCost();
-        }
-
+        double cost = taskDto.isCostEachOne()?taskDto.getGoalAmount():1;
         Production production = new Production(
                 task.getBranch(),
                 task.getStartDate(),
@@ -164,9 +158,10 @@ public class ProductionService {
                 0,
                 0,
                 0,
-                cost,
-                false
+                taskDto.getCost() * cost,
+                taskDto.isCostEachOne()
         );
+
         production.setDone(false);
         if (task.getContent().getProduct() != null) {
             production.setProduct(task.getContent().getProduct());
@@ -180,9 +175,11 @@ public class ProductionService {
         double contentPrice = saveContentProductList(contentProductList, production, taskDto.getContentProductDtoList());
 
         if (contentProductList.isEmpty()) return new ApiResponse("NOT FOUND CONTENT PRODUCTS", false);
+        ApiResponse apiResponseCost = saveCostList(production, taskDto.getCostDtoList());
+        if (!apiResponseCost.isSuccess()) return apiResponseCost;
         contentProductRepository.saveAll(contentProductList);
         production.setContentPrice(contentPrice);
-        production.setTotalPrice(production.getCost() + contentPrice);
+        production.setTotalPrice(task.getTaskPrice() + production.getCost() + contentPrice);
         productionRepository.save(production);
 
         return new ApiResponse("SUCCESS", true);
@@ -218,9 +215,9 @@ public class ProductionService {
 
         production.setQuantity(production.getTotalQuantity() - productionTaskDto.getInvalid());
         production.setInvalid(productionTaskDto.getInvalid());
-        production.setCost(task.getTaskPrice() + production.getCost());
+        production.setTaskPrice(task.getTaskPrice());
         production.setContentPrice(production.getContentPrice() - lossContentPrice);
-        production.setTotalPrice(production.getCost() + production.getContentPrice());
+        production.setTotalPrice(production.getCost() + production.getContentPrice() + task.getTaskPrice());
         production.setDone(true);
 
         if (production.getProduct() != null) {

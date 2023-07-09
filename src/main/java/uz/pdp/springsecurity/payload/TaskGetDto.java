@@ -3,9 +3,7 @@ package uz.pdp.springsecurity.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uz.pdp.springsecurity.entity.Attachment;
-import uz.pdp.springsecurity.entity.FileData;
-import uz.pdp.springsecurity.entity.TaskPrice;
+import uz.pdp.springsecurity.entity.*;
 
 import java.util.Date;
 import java.util.List;
@@ -42,8 +40,6 @@ public class TaskGetDto {
 
     private boolean isProductions;
 
-    private UUID production;
-
     private double goalAmount;
 
     private double taskPrice;
@@ -57,4 +53,9 @@ public class TaskGetDto {
     private UUID projectId;
 
     private UUID stageId;
+
+    private Production production;
+    List<ContentProduct> contentProductList;
+    List<CostGetDto> costGetDtoList;
+
 }
