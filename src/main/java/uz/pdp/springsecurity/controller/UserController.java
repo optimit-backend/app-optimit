@@ -77,9 +77,10 @@ public class UserController {
 
     /**
      * OZINI PROFILINI TAXRIRLASH
+     *
+     * @return ApiResponse(success - > true, message - > UPDATED)
      * @CurrentUser user
      * @RequesBody profileDto
-     * @return ApiResponse(success - > true, message - > UPDATED)
      */
     @CheckPermission("EDIT_MY_PROFILE")
     @PutMapping()
@@ -90,8 +91,9 @@ public class UserController {
 
     /**
      * ROLE_ID ORQALI USERNI OLIB CHIQISH
-     * @Id role_id
+     *
      * @return ApiResponse(success - > true, message - > FOUND)
+     * @Id role_id
      */
 
     @CheckPermission("VIEW_USER")
@@ -104,8 +106,8 @@ public class UserController {
     /**
      * BUSINESS_ID ORQALI USERLARNI OLIB CHIQISH
      *
-     * @Id business_id
      * @return ApiResponse(success - > true, message - > FOUND)
+     * @Id business_id
      */
     @CheckPermission("VIEW_USER_ADMIN")
     @GetMapping("/get-by-business/{business_id}")
@@ -133,7 +135,7 @@ public class UserController {
                                           @RequestParam String name,
                                           @RequestParam(defaultValue = "0") int page,
                                           @RequestParam(defaultValue = "10") int size) {
-        ApiResponse apiResponse = userService.getAllByName(branch_id,name,page,size);
+        ApiResponse apiResponse = userService.getAllByName(branch_id, name, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -143,4 +145,13 @@ public class UserController {
         ApiResponse apiResponse = userService.getByPatron(user_id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+//    @CheckPermission("VIEW_USER")
+//    @GetMapping("/searche-by-username/{username}")
+//    public HttpEntity<?> getByPatron(@PathVariable String username) {
+//        ApiResponse apiResponse = userService.searche(username);
+//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+//    }
+
+
 }
