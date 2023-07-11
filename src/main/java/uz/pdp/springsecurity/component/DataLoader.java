@@ -950,7 +950,8 @@ public class DataLoader implements CommandLineRunner {
                     lidStatusRepository.save(rejectionStatus);
                 }
             }
-//            updatePermission(); // TODO: 5/29/2023 if you add new permission
+            updatePermission(); // TODO: 5/29/2023 if you add new permission
+
             List<User> allByRoleId = userRepository.findAllByRole_Id(roleRepository.findByName("Super Admin").get().getId());
             boolean b = false;
             Role role = null;
@@ -963,22 +964,30 @@ public class DataLoader implements CommandLineRunner {
                 if (user.getUsername().equals("user")) {
                     b = true;
                 }
+                if (user.getUsername().equals("superadmin")){
+                    user.setPassword(passwordEncoder.encode("dexqonchilik"));
+                    userRepository.save(user);
+                }
             }
 
-            if (!b) {
-                User newUser = new User(
-                        "user",
-                        "user",
-                        "user",
-                        passwordEncoder.encode("123"),
-                        role,
-                        true,
-                        business,
-                        branch,
-                        true
-                );
-                userRepository.save(newUser);
-            }
+
+//
+//            if (!b) {
+//                User newUser = new User(
+//                        "user",
+//                        "user",
+//                        "user",
+//                        passwordEncoder.encode("123"),
+//                        role,
+//                        true,
+//                        business,
+//                        branch,
+//                        true
+//                );
+//                userRepository.save(newUser);
+//            }
+
+
         }
 
     }
