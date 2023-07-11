@@ -952,26 +952,24 @@ public class DataLoader implements CommandLineRunner {
             }
             updatePermission(); // TODO: 5/29/2023 if you add new permission
 
-            List<User> allByRoleId = userRepository.findAllByRole_Id(roleRepository.findByName("Super Admin").get().getId());
-            boolean b = false;
-            Role role = null;
-            Business business = null;
-            Set<Branch> branch = new HashSet<>();
-            for (User user : allByRoleId) {
-                role = user.getRole();
-                business = user.getBusiness();
-                branch = user.getBranches();
-                if (user.getUsername().equals("user")) {
-                    b = true;
-                }
-                if (user.getUsername().equals("superadmin")){
-                    user.setPassword(passwordEncoder.encode("dexqonchilik"));
-                    userRepository.save(user);
-                }
-            }
+//            List<User> allByRoleId = userRepository.findAllByRole_Id(roleRepository.findByName("Super Admin").get().getId());
+//            boolean b = false;
+//            Role role = null;
+//            Business business = null;
+//            Set<Branch> branch = new HashSet<>();
+//            for (User user : allByRoleId) {
+//                role = user.getRole();
+//                business = user.getBusiness();
+//                branch = user.getBranches();
+//                if (user.getUsername().equals("user")) {
+//                    b = true;
+//                }
+//                if (user.getUsername().equals("superadmin")){
+//                    user.setPassword(passwordEncoder.encode("dexqonchilik"));
+//                    userRepository.save(user);
+//                }
+//            }
 
-
-//
 //            if (!b) {
 //                User newUser = new User(
 //                        "user",
@@ -989,7 +987,6 @@ public class DataLoader implements CommandLineRunner {
 
 
         }
-
     }
 
     private void updatePermission() {
