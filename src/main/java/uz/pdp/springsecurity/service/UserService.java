@@ -376,11 +376,12 @@ public class UserService {
         if (password.isEmpty()) {
             return new ApiResponse("parol kiriting!", false);
         }
+
         User user = optionalUser.get();
         user.setPassword(passwordEncoder.encode(password));
 
         userRepository.save(user);
 
-        return new ApiResponse("parol saqlandi!");
+        return new ApiResponse("parol saqlandi!", true);
     }
 }

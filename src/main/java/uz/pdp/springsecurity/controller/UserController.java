@@ -154,12 +154,11 @@ public class UserController {
     }
 
     @CheckPermission("VIEW_USER")
-    @GetMapping("/edit-password/{id}")
+    @PutMapping("/edit-password/{id}")
     public HttpEntity<?> editPassword(@PathVariable UUID id,
                                       @RequestBody String password) {
         ApiResponse apiResponse = userService.editPassword(id,password);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
 
 }
