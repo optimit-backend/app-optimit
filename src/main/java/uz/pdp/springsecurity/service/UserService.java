@@ -116,7 +116,7 @@ public class UserService {
         User user = optionalUser.get();
         userMapper.update(userDto, user);
         assert userDto.getPassword() != null;
-        if (!userDto.getPassword().isEmpty()){
+        if (!userDto.getPassword().isEmpty()) {
             if (userDto.getPassword().length() > 2) {
                 user.setPassword(passwordEncoder.encode(userDto.getPassword()));
             }
@@ -203,7 +203,7 @@ public class UserService {
             Optional<User> optional = userRepository.findByUsername(profileDto.getUsername());
             if (optional.isPresent()) {
                 if (!optional.get().getId().equals(optionalUser.get().getId())) {
-                     return new ApiResponse("USERNAME ALREADY EXISTS", false);
+                    return new ApiResponse("USERNAME ALREADY EXISTS", false);
                 }
             }
         }
@@ -221,7 +221,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(profileDto.getPassword()));
         }
 
-        if (profileDto.getPhotoId()!=null){
+        if (profileDto.getPhotoId() != null) {
             Optional<Attachment> optionalPhoto = attachmentRepository.findById(profileDto.getPhotoId());
             if (optionalPhoto.isEmpty()) return new ApiResponse("PHOTO NOT FOUND", false);
             user.setPhoto(optionalPhoto.get());
@@ -300,7 +300,7 @@ public class UserService {
         Set<Task> taskSet = new HashSet<>(taskList);
         taskAmount = taskSet.size();
 
-        int completed = taskRepository.countTasksByTaskStatusOriginalNameAndUserId( "Completed",userId);
+        int completed = taskRepository.countTasksByTaskStatusOriginalNameAndUserId("Completed", userId);
         int expiredIsTrue = taskRepository.countExpiredTasksByUserId(userId);
         TaskInfoGetDto taskInfoGetDto = new TaskInfoGetDto();
         taskInfoGetDto.setTaskAmount(taskAmount);
@@ -342,14 +342,45 @@ public class UserService {
         String[] words = name.split("\\s+");
         Page<User> users = null;
         for (String word : words) {
-            users = userRepository.findAllByFirstNameContainingIgnoreCaseAndBranchesIdAndUsernameNot(word,branchId,"superadmin",pageable);
+            users = userRepository.findAllByFirstNameContainingIgnoreCaseAndBranchesIdAndUsernameNot(word, branchId, "superadmin", pageable);
         }
-        if (users==null){
-            return new ApiResponse("Not found",false);
+        if (users == null) {
+            return new ApiResponse("Not found", false);
         }
         List<User> userList = users.getContent();
         List<UserDto> userDtoList = userMapper.toDto(userList);
         Page<UserDto> pages = new PageImpl<>(userDtoList, pageable, userDtoList.size());
-        return new ApiResponse("Found",true,pages);
+        return new ApiResponse("Found", true, pages);
+    }
+
+    public ApiResponse search(String username) {
+        List<User> all = userRepository.findAllByUsernameContainingIgnoreCase(username);
+        Set<User> userSet = new HashSet<>(all);
+
+        List<UserDto> dtoList = new ArrayList<>();
+        for (User user : userSet) {
+            UserDto userDto = userMapper.toDto(user);
+            dtoList.add(userDto);
+        }
+        return new ApiResponse("found", true, dtoList);
+    }
+
+
+    public ApiResponse editPassword(UUID id, String password) {
+        Optional<User> optionalUser = userRepository.findById(id);
+
+        if (optionalUser.isEmpty()) {
+            return new ApiResponse("not found", false);
+        }
+
+        if (password.isEmpty()) {
+            return new ApiResponse("parol kiriting!", false);
+        }
+        User user = optionalUser.get();
+        user.setPassword(passwordEncoder.encode(password));
+
+        userRepository.save(user);
+
+        return new ApiResponse("parol saqlandi!");
     }
 }

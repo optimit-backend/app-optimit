@@ -146,12 +146,20 @@ public class UserController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-//    @CheckPermission("VIEW_USER")
-//    @GetMapping("/searche-by-username/{username}")
-//    public HttpEntity<?> getByPatron(@PathVariable String username) {
-//        ApiResponse apiResponse = userService.searche(username);
-//        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-//    }
+    @CheckPermission("VIEW_USER")
+    @GetMapping("/search-by-username/{username}")
+    public HttpEntity<?> search(@PathVariable String username) {
+        ApiResponse apiResponse = userService.search(username);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_USER")
+    @GetMapping("/edit-password/{id}")
+    public HttpEntity<?> editPassword(@PathVariable UUID id,
+                                      @RequestBody String password) {
+        ApiResponse apiResponse = userService.editPassword(id,password);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
 
 
 }
