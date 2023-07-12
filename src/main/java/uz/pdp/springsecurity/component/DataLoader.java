@@ -950,7 +950,7 @@ public class DataLoader implements CommandLineRunner {
                     lidStatusRepository.save(rejectionStatus);
                 }
             }
-            updatePermission(); // TODO: 5/29/2023 if you add new permission
+//            updatePermission(); // TODO: 5/29/2023 if you add new permission
 
             List<User> allByRoleId = userRepository.findAllByRole_Id(roleRepository.findByName("Super Admin").get().getId());
             for (User user : allByRoleId) {

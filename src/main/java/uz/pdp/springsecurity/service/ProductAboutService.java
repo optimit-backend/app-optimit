@@ -47,6 +47,7 @@ public class ProductAboutService {
     private void setProductPageDto(ProductPageDto dto, Product product) {
         Double amountD;
         Double soldAmountD;
+        Double contentAmountD;
         Double purchaseAmountD;
         Double productionAmountD;
         Double byProductAmountD;
@@ -61,6 +62,7 @@ public class ProductAboutService {
         if (product.getType().equals(Type.MANY)) {
             amountD = warehouseRepository.amountByProductMany(product.getId());
             soldAmountD = tradeProductRepository.soldQuantityByProductMany(product.getId());
+            contentAmountD = contentProductRepository.contentAmountByProductMany(product.getId());
             returnAmountD = tradeProductRepository.backingByProductMany(product.getId());
             purchaseAmountD = purchaseProductRepository.quantityByProductMany(product.getId());
             byProductAmountD = contentProductRepository.byProductByProductMany(product.getId());
@@ -73,6 +75,7 @@ public class ProductAboutService {
         } else {
             amountD = warehouseRepository.amountByProductSingle(product.getId());
             soldAmountD = tradeProductRepository.soldQuantityByProductSingle(product.getId());
+            contentAmountD = contentProductRepository.contentAmountByProductSingle(product.getId());
             returnAmountD = tradeProductRepository.backingByProductSingle(product.getId());
             purchaseAmountD = purchaseProductRepository.quantityByProductSingle(product.getId());
             byProductAmountD = contentProductRepository.byProductByProductSingle(product.getId());
@@ -86,6 +89,7 @@ public class ProductAboutService {
 
         double amount = amountD == null? 0: amountD;
         double soldAmount = soldAmountD == null? 0: soldAmountD;
+        soldAmount += contentAmountD == null? 0: contentAmountD;
         double purchaseAmount = purchaseAmountD == null? 0: purchaseAmountD;
         double productionAmount = productionAmountD == null? 0: productionAmountD;
         double byProductAmount = byProductAmountD == null? 0: byProductAmountD;
