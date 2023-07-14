@@ -162,6 +162,8 @@ public class ProductionService {
                 taskDto.isCostEachOne()
         );
 
+        // commit
+
         production.setDone(false);
         if (task.getContent().getProduct() != null) {
             production.setProduct(task.getContent().getProduct());

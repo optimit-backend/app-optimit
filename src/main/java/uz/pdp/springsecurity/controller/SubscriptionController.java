@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +15,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/subscription")
 public class SubscriptionController {
-
     private final SubscriptionService subscriptionService;
 
     @CheckPermission("CREATE_SUBSCRIPTION")
@@ -60,6 +58,4 @@ public class SubscriptionController {
         ApiResponse apiResponse = subscriptionService.getByBusinessId(id);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
-
-
 }
