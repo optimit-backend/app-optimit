@@ -38,4 +38,8 @@ public interface FifoCalculationRepository extends JpaRepository<FifoCalculation
     Double buyPriceByProductSingle(UUID productId);
     @Query(value = "SELECT SUM(remain_amount * buy_price) FROM fifo_calculation WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1)", nativeQuery = true)
     Double buyPriceByProductMany(UUID productId);
+    @Query(value = "SELECT SUM(remain_amount * buy_price) FROM fifo_calculation WHERE product_id = ?1 AND branch_id = ?2", nativeQuery = true)
+    Double buyPriceByProductSingleAndBranchId(UUID productId, UUID branchId);
+    @Query(value = "SELECT SUM(remain_amount * buy_price) FROM fifo_calculation WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1) AND branch_id = ?2", nativeQuery = true)
+    Double buyPriceByProductManyAndBranchId(UUID productId, UUID branchId);
 }

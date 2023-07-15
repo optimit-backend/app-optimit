@@ -59,16 +59,26 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 
     @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_type_price_id = ?1", nativeQuery = true)
     Double amountByProductTypePrice(UUID productTypePriceId);
+    @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_type_price_id = ?1 AND branch_id = ?2", nativeQuery = true)
+    Double amountByProductTypePriceAndBranchId(UUID productTypePriceId, UUID branchId);
 
     @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_id = ?1", nativeQuery = true)
     Double amountByProductSingle(UUID productId);
-
     @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1)", nativeQuery = true)
     Double amountByProductMany(UUID productId);
 
+    @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_id = ?1 AND branch_id = ?2", nativeQuery = true)
+    Double amountByProductSingleAndBranchId(UUID productId, UUID branchId);
+    @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1) AND branch_id = ?2", nativeQuery = true)
+    Double amountByProductManyAndBranchId(UUID productId, UUID branchId);
+
     @Query(value = "SELECT SUM(w.amount * w.product.salePrice) FROM Warehouse w WHERE w.product.id = ?1")
     Double salePriceByProductSingle(UUID productId);
-
     @Query(value = "SELECT SUM(w.amount * w.productTypePrice.salePrice) FROM Warehouse w WHERE w.productTypePrice.id IN (SELECT p.id FROM ProductTypePrice p WHERE p.product.id = ?1)")
     Double salePriceByProductMany(UUID productId);
+
+    @Query(value = "SELECT SUM(w.amount * w.product.salePrice) FROM Warehouse w WHERE w.product.id = ?1 AND w.branch.id = ?2")
+    Double salePriceByProductSingleAndBranchId(UUID productId, UUID branchId);
+    @Query(value = "SELECT SUM(w.amount * w.productTypePrice.salePrice) FROM Warehouse w WHERE w.productTypePrice.id IN (SELECT p.id FROM ProductTypePrice p WHERE p.product.id = ?1) AND w.branch.id = ?2")
+    Double salePriceByProductManyAndBranchId(UUID productId, UUID branchId);
 }

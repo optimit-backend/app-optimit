@@ -24,4 +24,8 @@ public interface ProductionRepository extends JpaRepository<Production, UUID> {
     Double quantityByProductSingle(UUID productId);
     @Query(value = "SELECT SUM(quantity) FROM production WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1)", nativeQuery = true)
     Double quantityByProductMany(UUID productId);
+    @Query(value = "SELECT SUM(quantity) FROM production WHERE product_id = ?1 AND branch_id = ?2", nativeQuery = true)
+    Double quantityByProductSingleAndBranchId(UUID productId, UUID branchId);
+    @Query(value = "SELECT SUM(quantity) FROM production WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1) AND branch_id = ?2", nativeQuery = true)
+    Double quantityByProductManyAndBranchId(UUID productId, UUID branchId);
 }
