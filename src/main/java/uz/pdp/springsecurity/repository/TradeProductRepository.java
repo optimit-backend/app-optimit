@@ -102,30 +102,52 @@ public interface TradeProductRepository extends JpaRepository<TradeProduct, UUID
 
   @Query(value = "SELECT SUM(traded_quantity) FROM trade_product WHERE created_at BETWEEN ?1 AND ?2 AND product_type_price_id = ?3 AND trade_id IN (SELECT id FROM trade WHERE branch_id = ?4)", nativeQuery = true)
   Double quantityByBranchIdAndProductTypePriceIdAndCreatedAtBetween(Date from, Date to, UUID productTypePriceId, UUID branchId);
+
   @Query(value = "SELECT SUM(traded_quantity) FROM trade_product WHERE product_type_price_id = ?1", nativeQuery = true)
   Double quantityByProductTypePriceId(UUID productTypePriceId);
+  @Query(value = "SELECT SUM(traded_quantity) FROM trade_product WHERE product_type_price_id = ?1 AND trade_id IN (SELECT id FROM trade WHERE branch_id = ?2)", nativeQuery = true)
+  Double quantityByProductTypePriceIdAndBranchId(UUID productTypePriceId, UUID branchId);
+
   @Query(value = "SELECT SUM(profit) FROM trade_product WHERE product_type_price_id = ?1", nativeQuery = true)
   Double profitByProductTypePriceId(UUID productTypePriceId);
+  @Query(value = "SELECT SUM(profit) FROM trade_product WHERE product_type_price_id = ?1 AND trade_id IN (SELECT id FROM trade WHERE branch_id = ?2)", nativeQuery = true)
+  Double profitByProductTypePriceIdAndBranchId(UUID productTypePriceId, UUID branchId);
 
   @Query(value = "SELECT SUM(traded_quantity) FROM trade_product WHERE product_id = ?1", nativeQuery = true)
   Double soldQuantityByProductSingle(UUID productId);
   @Query(value = "SELECT SUM(traded_quantity) FROM trade_product WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1)", nativeQuery = true)
   Double soldQuantityByProductMany(UUID productId);
+  @Query(value = "SELECT SUM(traded_quantity) FROM trade_product WHERE product_id = ?1 AND trade_id IN (SELECT id FROM trade WHERE branch_id = ?2)", nativeQuery = true)
+  Double soldQuantityByProductSingleAndBranchId(UUID productId, UUID branchId);
+  @Query(value = "SELECT SUM(traded_quantity) FROM trade_product WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1) AND trade_id IN (SELECT id FROM trade WHERE branch_id = ?2)", nativeQuery = true)
+  Double soldQuantityByProductManyAndBranchId(UUID productId, UUID branchId);
 
   @Query(value = "SELECT SUM(backing) FROM trade_product WHERE product_id = ?1", nativeQuery = true)
   Double backingByProductSingle(UUID productId);
   @Query(value = "SELECT SUM(backing) FROM trade_product WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1)", nativeQuery = true)
   Double backingByProductMany(UUID productId);
+  @Query(value = "SELECT SUM(backing) FROM trade_product WHERE product_id = ?1 AND trade_id IN (SELECT id FROM trade WHERE branch_id = ?2)", nativeQuery = true)
+  Double backingByProductSingleAndBranchId(UUID productId, UUID branchId);
+  @Query(value = "SELECT SUM(backing) FROM trade_product WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1) AND trade_id IN (SELECT id FROM trade WHERE branch_id = ?2)", nativeQuery = true)
+  Double backingByProductManyAndBranchId(UUID productId, UUID branchId);
 
   @Query(value = "SELECT SUM(total_sale_price) FROM trade_product WHERE product_id = ?1", nativeQuery = true)
   Double soldPriceByProductSingle(UUID productId);
   @Query(value = "SELECT SUM(total_sale_price) FROM trade_product WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1)", nativeQuery = true)
   Double soldPriceByProductMany(UUID productId);
+  @Query(value = "SELECT SUM(total_sale_price) FROM trade_product WHERE product_id = ?1 AND trade_id IN (SELECT id FROM trade WHERE branch_id = ?2)", nativeQuery = true)
+  Double soldPriceByProductSingleAndBranchId(UUID productId, UUID branchId);
+  @Query(value = "SELECT SUM(total_sale_price) FROM trade_product WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1) AND trade_id IN (SELECT id FROM trade WHERE branch_id = ?2)", nativeQuery = true)
+  Double soldPriceByProductManyAndBranchId(UUID productId, UUID branchId);
 
   @Query(value = "SELECT SUM(profit) FROM trade_product WHERE product_id = ?1", nativeQuery = true)
   Double profitByProductSingle(UUID productId);
   @Query(value = "SELECT SUM(profit) FROM trade_product WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1)", nativeQuery = true)
   Double profitByProductMany(UUID productId);
+  @Query(value = "SELECT SUM(profit) FROM trade_product WHERE product_id = ?1 AND trade_id IN (SELECT id FROM trade WHERE branch_id = ?2)", nativeQuery = true)
+  Double profitByProductSingleAndBranchId(UUID productId, UUID branchId);
+  @Query(value = "SELECT SUM(profit) FROM trade_product WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1) AND trade_id IN (SELECT id FROM trade WHERE branch_id = ?2)", nativeQuery = true)
+  Double profitByProductManyAndBranchId(UUID productId, UUID branchId);
 
   List<TradeProduct> findAllByTrade_BranchIdAndBackingIsNotNull(UUID branchId);
 

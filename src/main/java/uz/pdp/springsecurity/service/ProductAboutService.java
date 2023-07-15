@@ -27,16 +27,16 @@ public class ProductAboutService {
     private final FifoCalculationRepository fifoCalculationRepository;
     private final ContentProductRepository contentProductRepository;
 
-    public ApiResponse getOne(UUID productId) {
+    public ApiResponse getOne(UUID productId, UUID branchId) {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         if (optionalProduct.isEmpty())
             return new ApiResponse("PRODUCT NOT FOUND", false);
         Product product = optionalProduct.get();
         ProductPageDto dto = new ProductPageDto();
-        setProductPageDto(dto, product);
+        setProductPageDto(branchId, dto, product);
         List<ProductPageDtoMany> productPageDtoManyList = new ArrayList<>();
         if (product.getType().equals(Type.MANY)){
-            setProductPageDtoManyList(productPageDtoManyList, productTypePriceRepository.findAllByProductIdAndActiveTrue(productId));
+            setProductPageDtoManyList(branchId, productPageDtoManyList, productTypePriceRepository.findAllByProductIdAndActiveTrue(productId));
         }
         Map<String, Object> response = new HashMap<>();
         response.put("productPageDto", dto);
@@ -44,62 +44,104 @@ public class ProductAboutService {
         return new ApiResponse(true, response);
     }
 
-    private void setProductPageDto(ProductPageDto dto, Product product) {
+    private void setProductPageDto(UUID branchId, ProductPageDto dto, Product product) {
         Double amountD;
+        Double returnAmountD;
+
         Double soldAmountD;
         Double contentAmountD;
+
         Double purchaseAmountD;
         Double productionAmountD;
         Double byProductAmountD;
-        Double returnAmountD;
 
         Double buyPriceD;
         Double salePriceD;
         Double soldPriceD;
         Double profitD;
 
-        int days = (int) (System.currentTimeMillis() - product.getCreatedAt().getTime()) / (1000 * 60 * 60 * 24) + 1;
-        if (product.getType().equals(Type.MANY)) {
-            amountD = warehouseRepository.amountByProductMany(product.getId());
-            soldAmountD = tradeProductRepository.soldQuantityByProductMany(product.getId());
-            contentAmountD = contentProductRepository.contentAmountByProductMany(product.getId());
-            returnAmountD = tradeProductRepository.backingByProductMany(product.getId());
-            purchaseAmountD = purchaseProductRepository.quantityByProductMany(product.getId());
-            byProductAmountD = contentProductRepository.byProductByProductMany(product.getId());
-            productionAmountD = productionRepository.quantityByProductMany(product.getId());
+        if (branchId != null){
+            if (product.getType().equals(Type.MANY)) {
+                amountD = warehouseRepository.amountByProductManyAndBranchId(product.getId(), branchId);
+                returnAmountD = tradeProductRepository.backingByProductManyAndBranchId(product.getId(), branchId);
 
-            soldPriceD = tradeProductRepository.soldPriceByProductMany(product.getId());
-            profitD = tradeProductRepository.profitByProductMany(product.getId());
-            buyPriceD = fifoCalculationRepository.buyPriceByProductMany(product.getId());
-            salePriceD = warehouseRepository.salePriceByProductMany(product.getId());
+                soldAmountD = tradeProductRepository.soldQuantityByProductManyAndBranchId(product.getId(), branchId);
+                contentAmountD = contentProductRepository.contentAmountByProductManyAndBranchId(product.getId(), branchId);
+
+                purchaseAmountD = purchaseProductRepository.quantityByProductManyAndBranchId(product.getId(), branchId);
+                byProductAmountD = contentProductRepository.byProductByProductManyAndBranchId(product.getId(), branchId);
+                productionAmountD = productionRepository.quantityByProductManyAndBranchId(product.getId(), branchId);
+
+                soldPriceD = tradeProductRepository.soldPriceByProductManyAndBranchId(product.getId(), branchId);
+                profitD = tradeProductRepository.profitByProductManyAndBranchId(product.getId(), branchId);
+                buyPriceD = fifoCalculationRepository.buyPriceByProductManyAndBranchId(product.getId(), branchId);
+                salePriceD = warehouseRepository.salePriceByProductManyAndBranchId(product.getId(), branchId);
+            } else {
+                amountD = warehouseRepository.amountByProductSingleAndBranchId(product.getId(), branchId);
+                returnAmountD = tradeProductRepository.backingByProductSingleAndBranchId(product.getId(), branchId);
+
+                soldAmountD = tradeProductRepository.soldQuantityByProductSingleAndBranchId(product.getId(), branchId);
+                contentAmountD = contentProductRepository.contentAmountByProductSingleAndBranchId(product.getId(), branchId);
+
+                purchaseAmountD = purchaseProductRepository.quantityByProductSingleAndBranchId(product.getId(), branchId);
+                byProductAmountD = contentProductRepository.byProductByProductSingleAndBranchId(product.getId(), branchId);
+                productionAmountD = productionRepository.quantityByProductSingleAndBranchId(product.getId(), branchId);
+
+                soldPriceD = tradeProductRepository.soldPriceByProductSingleAndBranchId(product.getId(), branchId);
+                profitD = tradeProductRepository.profitByProductSingleAndBranchId(product.getId(), branchId);
+                buyPriceD = fifoCalculationRepository.buyPriceByProductSingleAndBranchId(product.getId(), branchId);
+                salePriceD = warehouseRepository.salePriceByProductSingleAndBranchId(product.getId(), branchId);
+            }
         } else {
-            amountD = warehouseRepository.amountByProductSingle(product.getId());
-            soldAmountD = tradeProductRepository.soldQuantityByProductSingle(product.getId());
-            contentAmountD = contentProductRepository.contentAmountByProductSingle(product.getId());
-            returnAmountD = tradeProductRepository.backingByProductSingle(product.getId());
-            purchaseAmountD = purchaseProductRepository.quantityByProductSingle(product.getId());
-            byProductAmountD = contentProductRepository.byProductByProductSingle(product.getId());
-            productionAmountD = productionRepository.quantityByProductSingle(product.getId());
+            if (product.getType().equals(Type.MANY)) {
+                amountD = warehouseRepository.amountByProductMany(product.getId());
+                returnAmountD = tradeProductRepository.backingByProductMany(product.getId());
 
-            soldPriceD = tradeProductRepository.soldPriceByProductSingle(product.getId());
-            profitD = tradeProductRepository.profitByProductSingle(product.getId());
-            buyPriceD = fifoCalculationRepository.buyPriceByProductSingle(product.getId());
-            salePriceD = warehouseRepository.salePriceByProductSingle(product.getId());
+                soldAmountD = tradeProductRepository.soldQuantityByProductMany(product.getId());
+                contentAmountD = contentProductRepository.contentAmountByProductMany(product.getId());
+
+                purchaseAmountD = purchaseProductRepository.quantityByProductMany(product.getId());
+                byProductAmountD = contentProductRepository.byProductByProductMany(product.getId());
+                productionAmountD = productionRepository.quantityByProductMany(product.getId());
+
+                soldPriceD = tradeProductRepository.soldPriceByProductMany(product.getId());
+                profitD = tradeProductRepository.profitByProductMany(product.getId());
+                buyPriceD = fifoCalculationRepository.buyPriceByProductMany(product.getId());
+                salePriceD = warehouseRepository.salePriceByProductMany(product.getId());
+            } else {
+                amountD = warehouseRepository.amountByProductSingle(product.getId());
+                returnAmountD = tradeProductRepository.backingByProductSingle(product.getId());
+
+                soldAmountD = tradeProductRepository.soldQuantityByProductSingle(product.getId());
+                contentAmountD = contentProductRepository.contentAmountByProductSingle(product.getId());
+
+                purchaseAmountD = purchaseProductRepository.quantityByProductSingle(product.getId());
+                byProductAmountD = contentProductRepository.byProductByProductSingle(product.getId());
+                productionAmountD = productionRepository.quantityByProductSingle(product.getId());
+
+                soldPriceD = tradeProductRepository.soldPriceByProductSingle(product.getId());
+                profitD = tradeProductRepository.profitByProductSingle(product.getId());
+                buyPriceD = fifoCalculationRepository.buyPriceByProductSingle(product.getId());
+                salePriceD = warehouseRepository.salePriceByProductSingle(product.getId());
+            }
         }
 
         double amount = amountD == null? 0: amountD;
+        double returnAmount = returnAmountD == null? 0: returnAmountD;
+
         double soldAmount = soldAmountD == null? 0: soldAmountD;
         soldAmount += contentAmountD == null? 0: contentAmountD;
+
         double purchaseAmount = purchaseAmountD == null? 0: purchaseAmountD;
         double productionAmount = productionAmountD == null? 0: productionAmountD;
         double byProductAmount = byProductAmountD == null? 0: byProductAmountD;
-        double returnAmount = returnAmountD == null? 0: returnAmountD;
 
         double salePrice = salePriceD == null? 0: salePriceD;
         double buyPrice = buyPriceD == null? 0: buyPriceD;
         double soldPrice = soldPriceD == null? 0: soldPriceD;
         double profit = profitD == null? 0: profitD;
 
+        int days = (int) (System.currentTimeMillis() - product.getCreatedAt().getTime()) / (1000 * 60 * 60 * 24) + 1;
         double average = soldAmount / days;
 
         dto.setAverage(average);
@@ -118,7 +160,7 @@ public class ProductAboutService {
         dto.setSoldPrice(soldPrice);
     }
 
-    private void setProductPageDtoManyList(List<ProductPageDtoMany> list, List<ProductTypePrice> typePriceList) {
+    private void setProductPageDtoManyList(UUID branchId, List<ProductPageDtoMany> list, List<ProductTypePrice> typePriceList) {
         for (ProductTypePrice typePrice : typePriceList) {
             ProductPageDtoMany dto = new ProductPageDtoMany();
             dto.setName(typePrice.getName());
@@ -126,9 +168,19 @@ public class ProductAboutService {
             dto.setMeasurement(typePrice.getProduct().getMeasurement().getName());
             if (typePrice.getPhoto() != null)
                 dto.setPhoto(typePrice.getPhoto().getId());
-            Double amountD = warehouseRepository.amountByProductTypePrice(typePrice.getId());
-            Double soldAmountD = tradeProductRepository.quantityByProductTypePriceId(typePrice.getId());
-            Double profitD = tradeProductRepository.profitByProductTypePriceId(typePrice.getId());
+            Double amountD;
+            Double soldAmountD;
+            Double profitD;
+            if (branchId != null){
+                amountD = warehouseRepository.amountByProductTypePriceAndBranchId(typePrice.getId(), branchId);
+                soldAmountD = tradeProductRepository.quantityByProductTypePriceIdAndBranchId(typePrice.getId(), branchId);
+                profitD = tradeProductRepository.profitByProductTypePriceIdAndBranchId(typePrice.getId(), branchId);
+            } else {
+                amountD = warehouseRepository.amountByProductTypePrice(typePrice.getId());
+                soldAmountD = tradeProductRepository.quantityByProductTypePriceId(typePrice.getId());
+                profitD = tradeProductRepository.profitByProductTypePriceId(typePrice.getId());
+            }
+
             double amount = amountD == null ? 0 : amountD;
             double soldAmount = soldAmountD == null ? 0 : soldAmountD;
             double profit = profitD == null ? 0 : profitD;
@@ -139,21 +191,31 @@ public class ProductAboutService {
         }
     }
 
-    public ApiResponse getOneAmount(UUID productId, int page, int size) {
+    public ApiResponse getOneAmount(UUID productId, UUID branchId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductAbout> aboutPage;
         if (productTypePriceRepository.existsById(productId)){
-            aboutPage = productAboutRepository.findAllByProductTypePriceIdOrderByCreatedAtDesc(productId, pageable);
+            if(branchId != null)
+                aboutPage = productAboutRepository.findAllByProductTypePriceIdAndBranchIdOrderByCreatedAtDesc(productId, branchId, pageable);
+            else
+                aboutPage = productAboutRepository.findAllByProductTypePriceIdOrderByCreatedAtDesc(productId, pageable);
         } else {
             Optional<Product> optionalProduct = productRepository.findById(productId);
             if (optionalProduct.isEmpty()) {
                 return new ApiResponse("PRODUCT NOT FOUND", false);
             }
             Product product = optionalProduct.get();
-            if (product.getType().equals(Type.SINGLE))
-                aboutPage = productAboutRepository.findAllByProductIdOrderByCreatedAtDesc(productId, pageable);
-            else
-                aboutPage = productAboutRepository.findAllByProductTypePrice_ProductIdOrderByCreatedAtDesc(productId, pageable);
+            if (branchId != null) {
+                if (product.getType().equals(Type.SINGLE))
+                    aboutPage = productAboutRepository.findAllByProductIdAndBranchIdOrderByCreatedAtDesc(productId, branchId, pageable);
+                else
+                    aboutPage = productAboutRepository.findAllByProductTypePrice_ProductIdAndBranchIdOrderByCreatedAtDesc(productId, branchId, pageable);
+            } else {
+                if (product.getType().equals(Type.SINGLE))
+                    aboutPage = productAboutRepository.findAllByProductIdOrderByCreatedAtDesc(productId, pageable);
+                else
+                    aboutPage = productAboutRepository.findAllByProductTypePrice_ProductIdOrderByCreatedAtDesc(productId, pageable);
+            }
         }
         List<ProductAboutDto> aboutDtoList = new ArrayList<>();
         setProductAboutDtoList(aboutDtoList, aboutPage.getContent());

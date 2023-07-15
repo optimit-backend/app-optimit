@@ -952,13 +952,13 @@ public class DataLoader implements CommandLineRunner {
             }
 //            updatePermission(); // TODO: 5/29/2023 if you add new permission
 
-            List<User> allByRoleId = userRepository.findAllByRole_Id(roleRepository.findByName("Super Admin").get().getId());
+            /*List<User> allByRoleId = userRepository.findAllByRole_Id(roleRepository.findByName("Super Admin").get().getId());
             for (User user : allByRoleId) {
                 if (user.getUsername().equals("superadmin")) {
                     user.setPassword(passwordEncoder.encode("dexqonchilik"));
                     userRepository.save(user);
                 }
-            }
+            }*/
         }
     }
 
