@@ -415,6 +415,25 @@ public class WarehouseService {
                     warehouseRepository.save(warehouse);
                 }
             }
+
+            // save product history
+            productAboutRepository.save(new ProductAbout(
+                    exchangeProduct.getProduct(),
+                    exchangeProduct.getProductTypePrice(),
+                    shippedBranch,
+                    ConstantProduct.TO_BRANCH,
+                    -exchangeProduct.getExchangeProductQuantity()
+            ));
+
+            // save product history
+            productAboutRepository.save(new ProductAbout(
+                    exchangeProduct.getProduct(),
+                    exchangeProduct.getProductTypePrice(),
+                    receivedBranch,
+                    ConstantProduct.FROM_BRANCH,
+                    exchangeProduct.getExchangeProductQuantity()
+            ));
+
         }
         List<ExchangeProduct> exchangeProducts = exchangeProductRepository.saveAll(exchangeProductList);
         exchangeProductBranch.setExchangeProductList(exchangeProducts);

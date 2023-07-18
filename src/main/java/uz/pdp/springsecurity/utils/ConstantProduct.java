@@ -6,4 +6,6 @@ public interface ConstantProduct {
     String TRADE = "SOTILDI";
     String CONTENT = "XOMASHYO";
     String LOSE = "YO'QOTILDI";
+    String FROM_BRANCH = "FILIALDAN QABUL QILINDI";
+    String TO_BRANCH = "FILIALGA YUBORILDI";
 }
