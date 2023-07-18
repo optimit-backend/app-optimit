@@ -1,11 +1,14 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.entity.Currency;
+import uz.pdp.springsecurity.enums.HistoryName;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.utils.AppConstant;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -41,6 +44,7 @@ public class PurchaseService {
 
     private final PayMethodRepository payMethodRepository;
     private final FifoCalculationRepository fifoCalculationRepository;
+    private final HistoryRepository historyRepository;
 
 
     public ApiResponse add(PurchaseDto purchaseDto) {
@@ -53,12 +57,12 @@ public class PurchaseService {
         if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         Purchase purchase = optionalPurchase.get();
-        if (!purchase.isEditable()) return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
+        if (!purchase.isEditable()) return new ApiResponse("YOU CAN NOT EDIT AFTER 26 DAY", false);
         LocalDateTime createdAt = purchase.getCreatedAt().toLocalDateTime();
         int day = LocalDateTime.now().getDayOfYear() - createdAt.getDayOfYear();
-        if (day > 1) {
+        if (day > 7) {
             purchase.setEditable(false);
-            return new ApiResponse("YOU CAN NOT EDIT AFTER 24 HOUR", false);
+            return new ApiResponse("YOU CAN NOT EDIT AFTER 26 DAY", false);
         }
         return createOrEditPurchase(true, purchase, purchaseDto);
     }
@@ -122,6 +126,24 @@ public class PurchaseService {
 
 
         purchaseRepository.save(purchase);
+//        HISTORY
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (isEdit){
+            historyRepository.save(new History(
+                    HistoryName.XARID,
+                    user,
+                    branch,
+                    AppConstant.EDIT_PURCHASE
+            ));
+        } else {
+            historyRepository.save(new History(
+                    HistoryName.XARID,
+                    user,
+                    branch,
+                    AppConstant.ADD_PURCHASE
+            ));
+        }
+
 
         UUID businessId = branch.getBusiness().getId();
         Optional<Currency> optionalCurrency = currencyRepository.findByBusinessId(businessId);
@@ -269,7 +291,16 @@ public class PurchaseService {
     }
 
     public ApiResponse delete(UUID id) {
-        if (!purchaseRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
+        Optional<Purchase> optionalPurchase = purchaseRepository.findById(id);
+        if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND", false);
+//        HISTORY
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        historyRepository.save(new History(
+                HistoryName.XARID,
+                user,
+                optionalPurchase.get().getBranch(),
+                AppConstant.DELETE_PURCHASE
+        ));
         purchaseRepository.deleteById(id);
         return new ApiResponse("DELETED", true);
     }

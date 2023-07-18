@@ -1,11 +1,14 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.HistoryName;
 import uz.pdp.springsecurity.mapper.CostMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.utils.AppConstant;
 
 import java.util.*;
 
@@ -27,6 +30,7 @@ public class ProductionService {
     private final CostTypeRepository costTypeRepository;
     private final CostRepository costRepository;
     private final CostMapper costMapper;
+    private final HistoryRepository historyRepository;
 
     public ApiResponse add(ProductionDto productionDto) {
 
@@ -94,6 +98,15 @@ public class ProductionService {
         double minusAmount = warehouseService.createOrEditWareHouse(production);
         fifoCalculationService.createProduction(production, minusAmount);
 
+//        HISTORY
+        String name = production.getProduct() != null ? production.getProduct().getName() : production.getProductTypePrice().getName();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        historyRepository.save(new History(
+                HistoryName.ISHLAB_CHIQARISH,
+                user,
+                branch,
+                production.getQuantity() + " " + name +AppConstant.ADD_PRODUCTION
+        ));
         return new ApiResponse("SUCCESS", true);
     }
 
@@ -239,6 +252,15 @@ public class ProductionService {
             }
         }
         productionRepository.save(production);
+        //        HISTORY
+        String name = production.getProduct() != null ? production.getProduct().getName() : production.getProductTypePrice().getName();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        historyRepository.save(new History(
+                HistoryName.ISHLAB_CHIQARISH,
+                user,
+                branch,
+                production.getQuantity() + " " + name +AppConstant.ADD_PRODUCTION
+        ));
         double minusAmount;
         try {
             minusAmount = warehouseService.createOrEditWareHouse(production);
