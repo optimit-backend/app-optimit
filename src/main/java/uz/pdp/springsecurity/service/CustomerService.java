@@ -157,6 +157,14 @@ public class CustomerService {
     }
 
     private void repaymentHelper(double paidSum, Customer customer, UUID paymentMethodId) {
+        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(paymentMethodId);
+        CustomerDebtRepayment customerDebtRepayment = new CustomerDebtRepayment();
+        customerDebtRepayment.setCustomer(customer);
+        customerDebtRepayment.setPaidSum(paidSum);
+        optionalPaymentMethod.ifPresent(customerDebtRepayment::setPaymentMethod);
+        customerDebtRepaymentRepository.save(customerDebtRepayment);
+
+
         PaymentStatus tolangan = paymentStatusRepository.findByStatus(StatusName.TOLANGAN.name());
         PaymentStatus qisman_tolangan = paymentStatusRepository.findByStatus(StatusName.QISMAN_TOLANGAN.name());
         List<Trade> tradeList = tradeRepository.findAllByCustomerIdAndDebtSumIsNotOrderByCreatedAtAsc(customer.getId(), 0d);
@@ -187,13 +195,6 @@ public class CustomerService {
             }
 
         }
-        Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(paymentMethodId);
-        CustomerDebtRepayment customerDebtRepayment = new CustomerDebtRepayment();
-        customerDebtRepayment.setCustomer(customer);
-        customerDebtRepayment.setPaidSum(paidSum);
-        optionalPaymentMethod.ifPresent(customerDebtRepayment::setPaymentMethod);
-
-        customerDebtRepaymentRepository.save(customerDebtRepayment);
 
         tradeRepository.saveAll(tradeList);
     }
