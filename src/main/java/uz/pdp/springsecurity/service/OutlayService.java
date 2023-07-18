@@ -1,11 +1,14 @@
 package uz.pdp.springsecurity.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.HistoryName;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.OutlayDto;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.utils.AppConstant;
 
 import java.sql.Date;
 import java.util.*;
@@ -29,6 +32,8 @@ public class OutlayService {
     BalanceService balanceService;
     @Autowired
     private BalanceRepository balanceRepository;
+    @Autowired
+    private HistoryRepository historyRepository;
 
     public ApiResponse add(OutlayDto outlayDto) {
         Outlay outlay = new Outlay();
@@ -64,6 +69,14 @@ public class OutlayService {
         balanceService.edit(optionalBranch.get().getId(), outlayDto.getTotalSum(), false, outlayDto.getPaymentMethodId());
 
         outlayRepository.save(outlay);
+//        HISTORY
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        historyRepository.save(new History(
+                HistoryName.XARAJAT,
+                user,
+                outlay.getBranch(),
+                outlay.getTotalSum()+AppConstant.ADD_OUTLAY
+        ));
         return new ApiResponse("ADDED", true);
     }
 
@@ -104,6 +117,15 @@ public class OutlayService {
         balanceService.edit(outlay.getBranch().getId(), outlayDto.getTotalSum(), false, outlayDto.getPaymentMethodId());
 
         outlayRepository.save(outlay);
+
+//        HISTORY
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        historyRepository.save(new History(
+                HistoryName.XARAJAT,
+                user,
+                outlay.getBranch(),
+                AppConstant.EDIT_OUTLAY
+        ));
         return new ApiResponse("EDITED", true);
     }
 
@@ -113,7 +135,17 @@ public class OutlayService {
     }
 
     public ApiResponse delete(UUID id) {
-        if (!outlayRepository.existsById(id)) return new ApiResponse("NOT FOUND", false);
+        Optional<Outlay> optionalOutlay = outlayRepository.findById(id);
+        if (optionalOutlay.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        Outlay outlay = optionalOutlay.get();
+//        HISTORY
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        historyRepository.save(new History(
+                HistoryName.XARAJAT,
+                user,
+                outlay.getBranch(),
+                outlay.getTotalSum()+AppConstant.DELETE_OUTLAY
+        ));
         outlayRepository.deleteById(id);
         return new ApiResponse("DELETED", true);
     }

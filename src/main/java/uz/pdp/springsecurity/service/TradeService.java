@@ -5,15 +5,18 @@ import lombok.SneakyThrows;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.Currency;
 import uz.pdp.springsecurity.entity.Customer;
 import uz.pdp.springsecurity.entity.*;
+import uz.pdp.springsecurity.enums.HistoryName;
 import uz.pdp.springsecurity.enums.SalaryStatus;
 import uz.pdp.springsecurity.mapper.PaymentMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
+import uz.pdp.springsecurity.utils.AppConstant;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -54,6 +57,7 @@ public class TradeService {
     private final BalanceService balanceService;
     private final BusinessRepository businessRepository;
     private final ProductRepository productRepository;
+    private final HistoryRepository historyRepository;
 
     @SneakyThrows
     public ApiResponse create(TradeDTO tradeDTO) {
@@ -216,6 +220,33 @@ public class TradeService {
             trade.setTotalSumDollar(Math.round(trade.getTotalSum() / optionalCurrency.get().getCourse() * 100) / 100.);
         }
         tradeRepository.save(trade);
+
+//        HISTORY
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!isEdit){
+            historyRepository.save(new History(
+                    HistoryName.SAVDO,
+                    user,
+                    branch,
+                    trade.getInvoice()+AppConstant.ADD_TRADE
+            ));
+        } else {
+            if (tradeDTO.isBacking()){
+                historyRepository.save(new History(
+                        HistoryName.SAVDO,
+                        user,
+                        branch,
+                        trade.getInvoice()+AppConstant.BACKING_TRADE
+                ));
+            } else {
+                historyRepository.save(new History(
+                        HistoryName.SAVDO,
+                        user,
+                        branch,
+                        trade.getInvoice()+AppConstant.EDIT_TRADE
+                ));
+            }
+        }
 
         if (paymentRepository.existsByTradeId(trade.getId())) {
             List<Payment> paymentList = paymentRepository.findAllByTradeId(trade.getId());
@@ -437,6 +468,13 @@ public class TradeService {
             }
         }
 
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        historyRepository.save(new History(
+                HistoryName.SAVDO,
+                user,
+                trade.getBranch(),
+                trade.getInvoice()+AppConstant.DELETE_TRADE
+        ));
 
         for (Payment payment : paymentRepository.findAllByTradeId(tradeId)) {
             balanceService.edit(trade.getBranch().getId(), payment.getPaidSum(), Boolean.FALSE, payment.getPayMethod().getId());
@@ -446,7 +484,7 @@ public class TradeService {
 
         tradeRepository.deleteById(tradeId);
 
-        return new ApiResponse("DELETED", true);
+        return new ApiResponse("SUCCESS", true);
     }
 
     public ApiResponse getAllByFilter(UUID id, String invoice, int page, int size) {

@@ -42,6 +42,4 @@ public class Outlay extends AbsEntity {
     private String description;
 
     private Date date;
-
-
 }
