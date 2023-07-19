@@ -5,10 +5,10 @@ public interface AppConstant {
 
     String DEFAULT_SIZE = "5";
 
-    String ADD_TRADE = " chekli savdo qilindi";
-    String EDIT_TRADE = " chekli savdo tahrirlandi";
-    String DELETE_TRADE = " chekli savdo o'chirildi";
-    String BACKING_TRADE = " chekli savdo qaytarildi";
+    String ADD_TRADE = " - chekli savdo qilindi";
+    String EDIT_TRADE = " - chekli savdo tahrirlandi";
+    String DELETE_TRADE = " - chekli savdo o'chirildi";
+    String BACKING_TRADE = " - chekli savdo qaytarildi";
 
     String ADD_PURCHASE = " xarid qilindi";
     String EDIT_PURCHASE = " xarid tahrirlandi";
