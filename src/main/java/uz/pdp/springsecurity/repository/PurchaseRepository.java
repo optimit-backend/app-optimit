@@ -15,7 +15,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, UUID> {
 
     List<Purchase> findAllByPaymentStatus_Id(UUID paymentStatus_id);
 
-    List<Purchase> findAllByBranch_Id(UUID branch_id);
+    List<Purchase> findAllByBranch_IdOrderByCreatedAtDesc(UUID branch_id);
 
     @Query("SELECT s.name, s.phoneNumber, SUM(p.totalSum) FROM Purchase p JOIN p.supplier s WHERE p.branch.id = :branchId GROUP BY s.name, s.phoneNumber ORDER BY SUM(p.totalSum) DESC")
     List<Object[]> findTop10SuppliersByPurchase(@Param("branchId") UUID branchId);
@@ -29,7 +29,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, UUID> {
 
     List<Purchase> findAllBySupplierId(UUID dealer_id);
 
-    List<Purchase> findAllByBranch_BusinessId(UUID businessId);
+    List<Purchase> findAllByBranch_BusinessIdOrderByCreatedAtDesc(UUID businessId);
 
     @Query(value = "select sum (p.totalSum) from Purchase p where p.branch.id = :branchId and p.date >= :startDate and p.date <= :endDate")
     Double totalPurchase(@Param("branchId") UUID branchId, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);

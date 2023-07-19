@@ -234,7 +234,7 @@ public class PurchaseService {
     }
 
     public ApiResponse getAllByBusiness(UUID businessId) {
-        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_BusinessId(businessId);
+        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(businessId);
         if (purchaseList.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         return new ApiResponse("FOUND", true, purchaseList);
@@ -324,7 +324,7 @@ public class PurchaseService {
     }
 
     public ApiResponse getByBranchId(UUID branch_id) {
-        List<Purchase> allByBranch_id = purchaseRepository.findAllByBranch_Id(branch_id);
+        List<Purchase> allByBranch_id = purchaseRepository.findAllByBranch_IdOrderByCreatedAtDesc(branch_id);
         if (allByBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, allByBranch_id);
     }

@@ -66,7 +66,7 @@ public class InfoService {
 
         List<Outlay> outlayList = new ArrayList<>();
         return getInfoHelper(businessId,
-                purchaseRepository.findAllByBranch_BusinessId(businessId),
+                purchaseRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(businessId),
                 tradeRepository.findAllByBranch_Business_IdOrderByCreatedAtDesc(businessId),
                 outlayRepository.findAllByBusinessId(businessId),
                 paymentRepository.findAllByPayMethod_BusinessId(businessId),
@@ -123,7 +123,7 @@ public class InfoService {
         if (Objects.equals(date, "ALL") && startDate == null && endDate == null) {
             return getInfoHelper(
                     businessId,
-                    purchaseRepository.findAllByBranch_Id(branchId),
+                    purchaseRepository.findAllByBranch_IdOrderByCreatedAtDesc(branchId),
                     tradeRepository.findAllByBranch_IdOrderByCreatedAtDesc(branchId),
                     outlayRepository.findAllByBranch_Id(branchId),
                     paymentRepository.findAllByTrade_BranchId(branchId),
@@ -191,7 +191,7 @@ public class InfoService {
         if (Objects.equals(date, "ALL") && startDate == null && endDate == null) {
             return getInfoHelper(
                     businessId,
-                    purchaseRepository.findAllByBranch_BusinessId(businessId),
+                    purchaseRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(businessId),
                     tradeRepository.findAllByBranch_Business_IdOrderByCreatedAtDesc(businessId),
                     outlayRepository.findAllByBusinessId(businessId),
                     paymentRepository.findAllByTrade_Branch_BusinessId(businessId),
