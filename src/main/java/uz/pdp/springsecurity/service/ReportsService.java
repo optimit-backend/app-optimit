@@ -767,7 +767,7 @@ public class ReportsService {
             return new ApiResponse("Not Found");
         }
 
-        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_Id(branchId);
+        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_IdOrderByCreatedAtDesc(branchId);
 
         if (purchaseList.isEmpty()) {
             return new ApiResponse("Not Found Purchase", false);
