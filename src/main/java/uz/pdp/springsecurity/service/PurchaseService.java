@@ -57,12 +57,13 @@ public class PurchaseService {
         if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND", false);
 
         Purchase purchase = optionalPurchase.get();
-        if (!purchase.isEditable()) return new ApiResponse("YOU CAN NOT EDIT AFTER 26 DAY", false);
+        if (!purchase.isEditable()) return new ApiResponse("7 KUNDAN KEYIN TAHRIRLASH MUMKIN EMAS", false);
         LocalDateTime createdAt = purchase.getCreatedAt().toLocalDateTime();
         int day = LocalDateTime.now().getDayOfYear() - createdAt.getDayOfYear();
         if (day > 7) {
             purchase.setEditable(false);
-            return new ApiResponse("YOU CAN NOT EDIT AFTER 26 DAY", false);
+            purchaseRepository.save(purchase);
+            return new ApiResponse("7 KUNDAN KEYIN TAHRIRLASH MUMKIN EMAS", false);
         }
         return createOrEditPurchase(true, purchase, purchaseDto);
     }
