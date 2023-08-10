@@ -146,35 +146,7 @@ public class WorkTimeService {
             }
         }
 
-        addSalaryMonth(optionalBranch.get());
         return new ApiResponse(true, workTimeGetDtoList);
-    }
-
-    private void addSalaryMonth(Branch branch) {
-        LocalDateTime todayEnd = LocalDate.now().atStartOfDay().plusDays(1);
-        List<Agreement> agreementList = agreementRepository.findAllByUser_BusinessIdAndSalaryStatusAndEndDateBeforeAndActiveTrue(branch.getBusiness().getId(), SalaryStatus.MONTH, Timestamp.valueOf(todayEnd));
-        for (Agreement agreement : agreementList) {
-            Date endDate = agreement.getEndDate();
-            LocalDateTime endDateLocal = LocalDateTime.ofInstant(endDate.toInstant(), ZoneId.systemDefault());
-            LocalDateTime startDateLocal = LocalDateTime.ofInstant(agreement.getStartDate().toInstant(), ZoneId.systemDefault());
-            int days = endDateLocal.getDayOfYear() - startDateLocal.getDayOfYear();
-            double salary = agreement.getPrice() * days / 30;
-            if (agreement.getPrice() > 0) {
-                ApiResponse apiResponse = salaryCountService.add(new SalaryCountDto(
-                        1,
-                        days >= 28 ? agreement.getPrice() : salary,
-                        agreement.getId(),
-                        branch.getId(),
-                        new Date(),
-                        days >= 28 ? "1 month " + new Date() : days + " kun " + new Date()
-                ));
-                if (apiResponse.isSuccess()) {
-                    agreement.setStartDate(endDate);
-                    agreement.setEndDate(Timestamp.valueOf(endDateLocal.plusMonths(1)));
-                    agreementRepository.save(agreement);
-                }
-            }
-        }
     }
 
     public ApiResponse getComeWork(UUID branchId) {

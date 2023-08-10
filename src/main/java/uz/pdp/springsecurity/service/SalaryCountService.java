@@ -9,6 +9,10 @@ import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.SalaryCountDto;
 import uz.pdp.springsecurity.repository.*;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -97,5 +101,35 @@ public class SalaryCountService {
             }
         }
         taskRepository.save(task);
+    }
+
+    public void addSalaryMonth(Branch branch) {
+        LocalDateTime todayEnd = LocalDate.now().atStartOfDay().plusDays(1);
+        List<Agreement> agreementList = agreementRepository.findAllByUser_BusinessIdAndSalaryStatusAndEndDateBeforeAndActiveTrue(branch.getBusiness().getId(), SalaryStatus.MONTH, Timestamp.valueOf(todayEnd));
+        for (Agreement agreement : agreementList) {
+            LocalDateTime startDateLocal = LocalDateTime.ofInstant(agreement.getStartDate().toInstant(), ZoneId.systemDefault());
+            LocalDateTime endDateLocal = LocalDateTime.ofInstant(agreement.getEndDate().toInstant(), ZoneId.systemDefault());
+            int days = endDateLocal.getDayOfYear() - startDateLocal.getDayOfYear();
+            if (days < 0)
+                days = -days;
+            if (days > 90)
+                days = 360 - days;
+            double salary = agreement.getPrice() * days / 30;
+            if (agreement.getPrice() > 0 && days > 1) {
+                ApiResponse apiResponse = add(new SalaryCountDto(
+                        1,
+                        days >= 24 ? agreement.getPrice() : salary,
+                        agreement.getId(),
+                        branch.getId(),
+                        new Date(),
+                        days >= 24 ? "1 month " + new Date() : days + " kun " + new Date()
+                ));
+                if (apiResponse.isSuccess()) {
+                    agreement.setStartDate(Timestamp.valueOf(endDateLocal));
+                    agreement.setEndDate(Timestamp.valueOf(endDateLocal.plusMonths(1)));
+                    agreementRepository.save(agreement);
+                }
+            }
+        }
     }
 }

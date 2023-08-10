@@ -19,7 +19,6 @@ import java.util.Date;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 public class SalaryCount extends AbsEntity {
-
     @ManyToOne(optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Branch branch;

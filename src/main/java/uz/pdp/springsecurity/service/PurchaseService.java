@@ -113,7 +113,7 @@ public class PurchaseService {
         purchase.setPaymentMethod(paymentMethod);
 
         double debtSum = purchase.getDebtSum();
-        if (purchaseDto.getDebtSum() > 0 || debtSum != purchase.getDebtSum()) {
+        if (purchaseDto.getDebtSum() > 0 || debtSum != purchaseDto.getDebtSum()) {
             supplier.setDebt(supplier.getDebt() - debtSum + purchaseDto.getDebtSum());
             supplierRepository.save(supplier);
         }
