@@ -49,7 +49,7 @@ public class ContentService {
             Optional<Product> optional = productRepository.findById(contentDto.getProductId());
             if (optional.isEmpty()) return new ApiResponse("NOT FOUND PRODUCT", false);
             content.setProduct(optional.get());
-        } else if(contentDto.getProductTypePriceId() != null){
+        } else if (contentDto.getProductTypePriceId() != null) {
             Optional<ProductTypePrice> optional = productTypePriceRepository.findById(contentDto.getProductTypePriceId());
             if (optional.isEmpty()) return new ApiResponse("NOT FOUND PRODUCT TYPE PRICE", false);
             content.setProductTypePrice(optional.get());
@@ -70,7 +70,7 @@ public class ContentService {
         return saveContentProductList(content, contentDto.getContentProductDtoList());
     }
 
-    private ApiResponse saveContentProductList(Content content,  List<ContentProductDto> contentProductDtoList) {
+    private ApiResponse saveContentProductList(Content content, List<ContentProductDto> contentProductDtoList) {
         List<ContentProduct> contentProductList = new ArrayList<>();
         for (ContentProductDto contentProductDto : contentProductDtoList) {
             ContentProduct contentProduct = createOrEditContentProduct(new ContentProduct(), contentProductDto);
@@ -123,20 +123,17 @@ public class ContentService {
         return new ApiResponse(true, contentList);
     }
 
-    public ApiResponse getAllPageable(UUID branchId,String name, int page , int size) {
+    public ApiResponse getAllPageable(UUID branchId, String name, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
         Page<Content> contents = null;
         if (name != null) {
-            String[] words = name.split("\\s+");
-            for (String word : words) {
-                contents = contentRepository.findAllByProduct_NameContainingIgnoreCaseAndBranchId(word,branchId,pageable);
-            }
-        }else {
-            contents = contentRepository.findAllByBranch_Id(branchId,pageable);
+            contents = contentRepository.findAllByProduct_NameContainingIgnoreCaseAndBranchId(name, branchId, pageable);
+        } else {
+            contents = contentRepository.findAllByBranch_Id(branchId, pageable);
         }
-        if (contents==null) return new ApiResponse("NOT FOUND", false);
+        if (contents == null) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse(true, contents);
     }
 
@@ -160,7 +157,7 @@ public class ContentService {
                     double amount = warehouse.getAmount();
                     contentProduct.setProductWarehouseAmount(amount);
                 }
-            }else if (contentProduct.getProductTypePrice() != null) {
+            } else if (contentProduct.getProductTypePrice() != null) {
                 UUID productId = contentProduct.getProductTypePrice().getId();
                 Optional<Warehouse> optionalWarehouse = warehouseRepository.findByBranchIdAndProductTypePriceId(content.getBranch().getId(), productId);
                 if (optionalWarehouse.isPresent()) {
