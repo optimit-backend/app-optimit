@@ -76,7 +76,7 @@ public class CustomerExcelService {
     }
 
     public byte[] exportCustomersToExcel(UUID branchId) throws IOException {
-        List<Customer> customers = customerRepository.findAllByBranchesId(branchId);
+        List<Customer> customers = customerRepository.findAllByBranchesIdAndActiveIsTrueOrActiveIsNull(branchId);
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Customers");

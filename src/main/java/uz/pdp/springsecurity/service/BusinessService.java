@@ -129,11 +129,11 @@ public class BusinessService {
 
         createProjectStatus(branch);
 
-        try {
-            smsService.createBusiness(business);
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+//        try {
+//            smsService.createBusiness(business);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e.getMessage());
+//        }
 
         return new ApiResponse("ADDED", true);
     }

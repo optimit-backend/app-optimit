@@ -19,6 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductionController {
     private final ProductionService productionService;
+
     @CheckPermission("CREATE_PRODUCTION")
     @PostMapping
     public HttpEntity<?> add(@Valid @RequestBody ProductionDto productionDto) {
@@ -35,8 +36,11 @@ public class ProductionController {
 
     @CheckPermission("GET_PRODUCTION")
     @GetMapping("/by-branch/{branchId}")
-    public HttpEntity<?> getAll(@PathVariable UUID branchId) {
-        ApiResponse apiResponse = productionService.getAll(branchId);
+    public HttpEntity<?> getAll(@PathVariable UUID branchId,
+                                @RequestParam int page,
+                                @RequestParam int size,
+                                @RequestParam(required = false) String productionName) {
+        ApiResponse apiResponse = productionService.getAll(branchId, page, size, productionName);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

@@ -1605,7 +1605,7 @@ public class ReportsService {
             return new ApiResponse("Branch Not Found", false);
         }
         Map<UUID, Double> productAmount = new HashMap<>();
-        List<Customer> customerList = customerRepository.findAllByBranchesId(branchId);
+        List<Customer> customerList = customerRepository.findAllByBranchesIdAndActiveIsTrueOrActiveIsNull(branchId);
         for (Customer customer : customerList) {
             double amount = 0;
             if (Objects.equals(date, "LAST_DAY")) {

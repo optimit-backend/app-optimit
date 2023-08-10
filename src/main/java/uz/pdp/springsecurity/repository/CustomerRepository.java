@@ -10,25 +10,25 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
-    List<Customer> findAllByBusiness_Id(UUID business_id);
+    List<Customer> findAllByBusiness_IdAndActiveIsTrueOrActiveIsNull(UUID business_id);
 
-    List<Customer> findAllByCustomerGroupId(UUID customerGroup_id);
+    List<Customer> findAllByCustomerGroupIdAndActiveIsTrueOrActiveIsNull(UUID customerGroup_id);
 
-    List<Customer> findAllByBusiness_IdAndBirthdayBetween(UUID business_id, Date start, Date end);
+    List<Customer> findAllByBusiness_IdAndBirthdayBetweenAndActiveIsTrueOrActiveIsNull(UUID business_id, Date start, Date end);
 
     List<Customer> findAllByBusiness_IdAndDebtIsNotOrderByPayDateAsc(UUID business_id, Double debt);
 
-    List<Customer> findAllByBranchesId(UUID branchId);
+    List<Customer> findAllByBranchesIdAndActiveIsTrueOrActiveIsNull(UUID branchId);
 
     List<Customer> findAllByBranchesIdAndDebtIsNotOrderByPayDateAsc(UUID branchId, Double debt);
 
     List<Customer> findAllByBusinessIdAndDebtIsNotOrderByPayDateAsc(UUID businessId, Double debt);
 
-    Optional<Customer> findByPhoneNumber(String phoneNumber);
+    Optional<Customer> findByPhoneNumberAndActiveIsTrueOrActiveIsNull(String phoneNumber);
 
-    List<Customer> findAllByPayDateBetweenAndBusinessId(Date payDate, Date payDate2, UUID business_id);
+    List<Customer> findAllByPayDateBetweenAndBusinessIdAndActiveIsTrueOrActiveIsNull(Date payDate, Date payDate2, UUID business_id);
 
-    List<Customer> findAllByBranchesIdAndLidCustomerIsTrue(UUID branch_id);
+    List<Customer> findAllByBranchesIdAndLidCustomerIsTrueAndActiveIsTrueOrActiveIsNull(UUID branch_id);
 
     int countAllByBranchesId(UUID branchId);
 

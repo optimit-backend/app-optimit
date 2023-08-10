@@ -3,6 +3,7 @@ package uz.pdp.springsecurity.payload;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ public class RepaymentDto {
     @NotNull
     private Double repayment;
 
-    private Date payDate;
+    private Timestamp payDate;
 
     private UUID paymentMethodId;
 

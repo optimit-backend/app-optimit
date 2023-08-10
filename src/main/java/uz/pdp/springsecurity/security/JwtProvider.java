@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import uz.pdp.springsecurity.entity.Role;
 import uz.pdp.springsecurity.payload.ApiResponse;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 @Component
@@ -29,6 +30,7 @@ public class JwtProvider {
                 .claim("role", role.getName())
                 .compact();
     }
+
 
     public boolean validateToken(String token) {
         try {

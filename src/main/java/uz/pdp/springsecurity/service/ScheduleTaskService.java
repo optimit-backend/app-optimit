@@ -82,7 +82,7 @@ public class ScheduleTaskService {
                 Date today = Date.from(TODAY.atZone(ZoneId.systemDefault()).toInstant());
                 Date endToday = Date.from(END_TODAY.atZone(ZoneId.systemDefault()).toInstant());
                 List<User> allUser = userRepository.findAllByBusiness_IdAndBirthdayBetween(business.getId(), today, endToday);
-                List<Customer> allCustomer = customerRepository.findAllByBusiness_IdAndBirthdayBetween(business.getId(), today, endToday);
+                List<Customer> allCustomer = customerRepository.findAllByBusiness_IdAndBirthdayBetweenAndActiveIsTrueOrActiveIsNull(business.getId(), today, endToday);
                 for (User user : allUser) {
                     NotificationDto notificationDto = new NotificationDto();
                     notificationDto.setNotificationKay("select");
@@ -117,7 +117,7 @@ public class ScheduleTaskService {
                 Shablon shablon = debtShablon.get();
                 Date today = Date.from(TODAY.atZone(ZoneId.systemDefault()).toInstant());
                 Date endToday = Date.from(END_TODAY.atZone(ZoneId.systemDefault()).toInstant());
-                List<Customer> allCustomer = customerRepository.findAllByPayDateBetweenAndBusinessId(today, endToday, business.getId());
+                List<Customer> allCustomer = customerRepository.findAllByPayDateBetweenAndBusinessIdAndActiveIsTrueOrActiveIsNull(today, endToday, business.getId());
                 for (Customer customer : allCustomer) {
                     SmsDto smsDto = new SmsDto();
                     smsDto.setKey("CUSTOMERS");
@@ -138,7 +138,7 @@ public class ScheduleTaskService {
                 Shablon shablon = debtShablon.get();
                 Date today = Date.from(TODAY.atZone(ZoneId.systemDefault()).toInstant());
                 Date endToday = Date.from(END_TODAY.atZone(ZoneId.systemDefault()).toInstant());
-                List<Customer> allCustomer = customerRepository.findAllByPayDateBetweenAndBusinessId(today, endToday, business.getId());
+                List<Customer> allCustomer = customerRepository.findAllByPayDateBetweenAndBusinessIdAndActiveIsTrueOrActiveIsNull(today, endToday, business.getId());
                 for (Customer customer : allCustomer) {
                     SmsDto smsDto = new SmsDto();
                     smsDto.setKey("CUSTOMERS");

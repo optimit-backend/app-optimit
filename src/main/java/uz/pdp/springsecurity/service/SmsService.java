@@ -1,7 +1,6 @@
 package uz.pdp.springsecurity.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import uz.pdp.springsecurity.payload.SmsDto;
 import uz.pdp.springsecurity.repository.*;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -80,7 +78,7 @@ public class SmsService {
             String sendMessage = "";
             for (String phoneNumber : phoneNumberList) {
                 if (smsDto.getKey().equals("CUSTOMERS") && phoneNumber != null) {
-                    Optional<Customer> optionalCustomer = customerRepository.findByPhoneNumber(phoneNumber);
+                    Optional<Customer> optionalCustomer = customerRepository.findByPhoneNumberAndActiveIsTrueOrActiveIsNull(phoneNumber);
                     if (optionalCustomer.isPresent()) {
                         Customer customer = optionalCustomer.get();
                         int start = message.indexOf("{");
