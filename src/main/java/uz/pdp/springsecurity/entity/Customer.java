@@ -55,6 +55,8 @@ public class Customer extends AbsEntity {
 
     private Boolean lidCustomer;
 
+    private Boolean active = true;
+
     public Customer(String name, String phoneNumber, String telegram, Business business) {
         this.name = name;
         this.phoneNumber = phoneNumber;

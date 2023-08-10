@@ -7,6 +7,7 @@ import uz.pdp.springsecurity.entity.template.AbsEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import java.sql.Timestamp;
 
 @Data
 @AllArgsConstructor
@@ -23,4 +24,6 @@ public class RepaymentDebt extends AbsEntity {
     private PaymentMethod paymentMethod;
 
     private Boolean delete;
+
+    private Timestamp payDate;
 }

@@ -8,6 +8,7 @@ import uz.pdp.springsecurity.mapper.CustomerMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -89,16 +90,15 @@ public class CustomerService {
             List<CustomerDebt> all = customerDebtRepository.findByCustomer_Id(id);
             for (CustomerDebt customerDebt : all) {
                 customerDebt.setDelete(true);
-                customerDebt.setCustomer(new Customer());
                 customerDebtRepository.save(customerDebt);
             }
             List<RepaymentDebt> allByCustomerId = repaymentDebtRepository.findAllByCustomer_Id(id);
             for (RepaymentDebt repaymentDebt : allByCustomerId) {
                 repaymentDebt.setDelete(true);
-                repaymentDebt.setCustomer(new Customer());
                 repaymentDebtRepository.save(repaymentDebt);
             }
-            customerRepository.deleteById(id);
+            customer.setActive(false);
+            customerRepository.save(customer);
         } catch (Exception e) {
             return new ApiResponse("Qarzi bor yoki savdo qilgan mijozni o'chirib bo'lmaydi!", false);
         }
@@ -106,7 +106,7 @@ public class CustomerService {
     }
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Customer> customerList = customerRepository.findAllByBusiness_Id(businessId);
+        List<Customer> customerList = customerRepository.findAllByBusiness_IdAndActiveIsTrueOrActiveIsNull(businessId);
         if (customerList.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, toCustomerDtoList(customerList));
     }
@@ -126,7 +126,7 @@ public class CustomerService {
     }
 
     public ApiResponse getAllByBranchId(UUID branchId) {
-        List<Customer> customerList = customerRepository.findAllByBranchesId(branchId);
+        List<Customer> customerList = customerRepository.findAllByBranchesIdAndActiveIsTrueOrActiveIsNull(branchId);
         if (customerList.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, toCustomerDtoList(customerList));
     }
@@ -141,11 +141,12 @@ public class CustomerService {
             customer.setPayDate(repaymentDto.getPayDate());
             customerRepository.save(customer);
             try {
-                repaymentHelper(repaymentDto.getRepayment(), customer, repaymentDto.getPaymentMethodId());
+                repaymentHelper(repaymentDto.getRepayment(), customer, repaymentDto.getPaymentMethodId(), repaymentDto.getPayDate()
+                );
                 balanceService.edit(customer.getBranch().getId(), repaymentDto.getRepayment(), true, repaymentDto.getPaymentMethodId());
                 UUID paymentMethodId = repaymentDto.getPaymentMethodId();
                 Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(paymentMethodId);
-                optionalPaymentMethod.ifPresent(paymentMethod -> repaymentDebtRepository.save(new RepaymentDebt(customer, repaymentDto.getRepayment(), paymentMethod, false)));
+                optionalPaymentMethod.ifPresent(paymentMethod -> repaymentDebtRepository.save(new RepaymentDebt(customer, repaymentDto.getRepayment(), paymentMethod, false, repaymentDto.getPayDate())));
                 return new ApiResponse("Repayment Customer !", true);
             } catch (Exception e) {
                 return new ApiResponse("ERROR", false);
@@ -156,10 +157,11 @@ public class CustomerService {
         }
     }
 
-    private void repaymentHelper(double paidSum, Customer customer, UUID paymentMethodId) {
+    private void repaymentHelper(double paidSum, Customer customer, UUID paymentMethodId, Timestamp payDate) {
         Optional<PaymentMethod> optionalPaymentMethod = payMethodRepository.findById(paymentMethodId);
         CustomerDebtRepayment customerDebtRepayment = new CustomerDebtRepayment();
         customerDebtRepayment.setCustomer(customer);
+        customerDebtRepayment.setPayDate(payDate);
         customerDebtRepayment.setPaidSum(paidSum);
         optionalPaymentMethod.ifPresent(customerDebtRepayment::setPaymentMethod);
         customerDebtRepaymentRepository.save(customerDebtRepayment);
@@ -200,7 +202,7 @@ public class CustomerService {
     }
 
     public ApiResponse getAllByGroupId(UUID groupId) {
-        List<Customer> customerList = customerRepository.findAllByCustomerGroupId(groupId);
+        List<Customer> customerList = customerRepository.findAllByCustomerGroupIdAndActiveIsTrueOrActiveIsNull(groupId);
         if (customerList.isEmpty()) {
             return new ApiResponse("not found", false);
         }
@@ -208,7 +210,7 @@ public class CustomerService {
     }
 
     public ApiResponse getAllByLidCustomer(UUID branchId) {
-        List<Customer> customerList = customerRepository.findAllByBranchesIdAndLidCustomerIsTrue(branchId);
+        List<Customer> customerList = customerRepository.findAllByBranchesIdAndLidCustomerIsTrueAndActiveIsTrueOrActiveIsNull(branchId);
         if (customerList.isEmpty()) {
             return new ApiResponse("not found", false);
         }
@@ -308,7 +310,7 @@ public class CustomerService {
         for (CustomerDebtRepayment customerDebtRepayment : customerDebtRepaymentList) {
 
             CustomerTradeInfo customerTradeInfo2 = new CustomerTradeInfo();
-            customerTradeInfo2.setCreateAt(customerDebtRepayment.getCreatedAt());
+            customerTradeInfo2.setCreateAt(customerDebtRepayment.getPayDate() != null ? customerDebtRepayment.getPayDate() : customerDebtRepayment.getCreatedAt());
             customerTradeInfo2.setTotalSumma(customerDebtRepayment.getPaidSum());
             customerTradeInfo2.setPaid(true);
             customerTradeInfo.add(customerTradeInfo2);
