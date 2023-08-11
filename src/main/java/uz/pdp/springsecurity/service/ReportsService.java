@@ -592,7 +592,7 @@ public class ReportsService {
             return new ApiResponse("Not Found", false);
         }
 
-        if (checkingBranch){
+        if (checkingBranch) {
             cleanWarehouseByDeletedProduct(optionalBranch.get().getBusiness().getId());
         } else {
             cleanWarehouseByDeletedProduct(businessId);
@@ -604,8 +604,7 @@ public class ReportsService {
         if (checkingBranch) {
             warehouseList = warehouseRepository.findAllByBranchId(branchId);
             amounts.setTotalSumByBuyPrice(fifoCalculationService.productBuyPriceByBranch(branchId));
-        }
-        else {
+        } else {
             warehouseList = warehouseRepository.findAllByBranch_Business_Id(businessId);
             amounts.setTotalSumByBuyPrice(fifoCalculationService.productBuyPriceByBusiness(businessId));
         }
@@ -1605,7 +1604,7 @@ public class ReportsService {
             return new ApiResponse("Branch Not Found", false);
         }
         Map<UUID, Double> productAmount = new HashMap<>();
-        List<Customer> customerList = customerRepository.findAllByBranchesIdAndActiveIsTrueOrActiveIsNull(branchId);
+        List<Customer> customerList = customerRepository.findAllByBranchesIdAndActiveIsTrueOrBranchesIdAndActiveIsNull(branchId, branchId);
         for (Customer customer : customerList) {
             double amount = 0;
             if (Objects.equals(date, "LAST_DAY")) {

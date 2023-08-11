@@ -106,7 +106,7 @@ public class CustomerService {
     }
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Customer> customerList = customerRepository.findAllByBusiness_IdAndActiveIsTrueOrActiveIsNull(businessId);
+        List<Customer> customerList = customerRepository.findAllByBusiness_IdAndActiveIsTrueOrBusiness_IdAndActiveIsNull(businessId, businessId);
         if (customerList.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, toCustomerDtoList(customerList));
     }
@@ -126,7 +126,7 @@ public class CustomerService {
     }
 
     public ApiResponse getAllByBranchId(UUID branchId) {
-        List<Customer> customerList = customerRepository.findAllByBranchesIdAndActiveIsTrueOrActiveIsNull(branchId);
+        List<Customer> customerList = customerRepository.findAllByBranchesIdAndActiveIsTrueOrBranchesIdAndActiveIsNull(branchId, branchId);
         if (customerList.isEmpty()) return new ApiResponse("NOT FOUND", false);
         return new ApiResponse("FOUND", true, toCustomerDtoList(customerList));
     }
@@ -202,7 +202,7 @@ public class CustomerService {
     }
 
     public ApiResponse getAllByGroupId(UUID groupId) {
-        List<Customer> customerList = customerRepository.findAllByCustomerGroupIdAndActiveIsTrueOrActiveIsNull(groupId);
+        List<Customer> customerList = customerRepository.findAllByCustomerGroupIdAndActiveIsTrueOrCustomerGroupIdAndActiveIsNull(groupId, groupId);
         if (customerList.isEmpty()) {
             return new ApiResponse("not found", false);
         }
@@ -210,7 +210,7 @@ public class CustomerService {
     }
 
     public ApiResponse getAllByLidCustomer(UUID branchId) {
-        List<Customer> customerList = customerRepository.findAllByBranchesIdAndLidCustomerIsTrueAndActiveIsTrueOrActiveIsNull(branchId);
+        List<Customer> customerList = customerRepository.findAllByBranchesIdAndLidCustomerIsTrueAndActiveIsTrueOrBranchesIdAndLidCustomerIsTrueAndActiveIsNull(branchId, branchId);
         if (customerList.isEmpty()) {
             return new ApiResponse("not found", false);
         }
