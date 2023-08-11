@@ -30,7 +30,7 @@ public class CustomerExcelService {
     public ApiResponse importCustomersFromExcel(MultipartFile file, UUID branchId) throws IOException {
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
-        if (optionalBranch.isEmpty()){
+        if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch not found");
         }
 
@@ -68,15 +68,15 @@ public class CustomerExcelService {
                 customer.setBusiness(optionalBranch.get().getBusiness());
                 customer.setBranch(optionalBranch.get());
                 customerRepository.save(customer);
-            }catch (Exception e){
-                return new ApiResponse("Failed",false);
+            } catch (Exception e) {
+                return new ApiResponse("Failed", false);
             }
         }
-        return new ApiResponse("Saved",true);
+        return new ApiResponse("Saved", true);
     }
 
     public byte[] exportCustomersToExcel(UUID branchId) throws IOException {
-        List<Customer> customers = customerRepository.findAllByBranchesIdAndActiveIsTrueOrActiveIsNull(branchId);
+        List<Customer> customers = customerRepository.findAllByBranchesIdAndActiveIsTrueOrBranchesIdAndActiveIsNull(branchId, branchId);
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Customers");

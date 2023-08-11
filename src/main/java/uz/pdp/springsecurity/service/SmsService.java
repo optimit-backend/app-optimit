@@ -78,7 +78,7 @@ public class SmsService {
             String sendMessage = "";
             for (String phoneNumber : phoneNumberList) {
                 if (smsDto.getKey().equals("CUSTOMERS") && phoneNumber != null) {
-                    Optional<Customer> optionalCustomer = customerRepository.findByPhoneNumberAndActiveIsTrueOrActiveIsNull(phoneNumber);
+                    Optional<Customer> optionalCustomer = customerRepository.findByPhoneNumberAndActiveIsTrueOrPhoneNumberAndActiveIsNull(phoneNumber, phoneNumber);
                     if (optionalCustomer.isPresent()) {
                         Customer customer = optionalCustomer.get();
                         int start = message.indexOf("{");
