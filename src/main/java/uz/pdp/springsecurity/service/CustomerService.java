@@ -273,6 +273,7 @@ public class CustomerService {
 
             for (TradeProduct tradeProduct : allByTradeId) {
                 TradeProductCustomerDto productCustomerDto = new TradeProductCustomerDto();
+
                 if (tradeProduct.getBacking() != null) {
                     customerTradeInfo1.setTrade(false);
                     customerTradeInfo1.setTotalSumma(tradeProduct.getBacking());
@@ -280,6 +281,7 @@ public class CustomerService {
                     customerTradeInfo1.setTrade(true);
                     customerTradeInfo1.setTotalSumma(tradeProduct.getTrade().getTotalSum());
                 }
+
                 if (tradeProduct.getProduct() != null) {
                     if (tradeProduct.getProduct().getPhoto() != null) {
                         productCustomerDto.setAttachmentId(tradeProduct.getProduct().getPhoto().getId());
@@ -295,7 +297,11 @@ public class CustomerService {
                         tradeProduct.getProductTypePrice().getName() : tradeProduct.getProduct().getName());
 
                 productCustomerDto.setProductCount(tradeProduct.getTradedQuantity());
-                productCustomerDto.setMeasurementName(tradeProduct.getProduct().getMeasurement().getName());
+
+                //measurementni nameni olish uchun product type price ni null likga tekshirildi!
+                productCustomerDto.setMeasurementName(tradeProduct.getProductTypePrice() != null ?
+                        tradeProduct.getProductTypePrice().getProduct().getMeasurement().getName()
+                        : tradeProduct.getProduct().getMeasurement().getName());
 
                 tradeProductCustomerDtoList.add(productCustomerDto);
             }
@@ -323,7 +329,7 @@ public class CustomerService {
             return new ApiResponse("not found", false);
         }
 
-        customerTradeInfo.sort(Comparator.comparing(CustomerTradeInfo::getCreateAt));
+        customerTradeInfo.sort(Comparator.comparing(CustomerTradeInfo::getCreateAt).reversed());
 
         return new ApiResponse("all", true, customerTradeInfo);
     }
