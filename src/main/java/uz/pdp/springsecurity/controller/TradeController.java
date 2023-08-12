@@ -58,9 +58,10 @@ public class TradeController {
     @GetMapping("/get-by-filter/{id}")
     public HttpEntity<?> getAllByFilter(@PathVariable UUID id,
                                         @RequestParam(required = false) String invoice,
+                                        @RequestParam(required = false) Boolean backing,
                                         @RequestParam(defaultValue = AppConstant.DEFAULT_PAGE) int page,
                                         @RequestParam(defaultValue = AppConstant.DEFAULT_SIZE) int size) {
-        ApiResponse apiResponse = tradeService.getAllByFilter(id, invoice, page, size);
+        ApiResponse apiResponse = tradeService.getAllByFilter(id, invoice, backing, page, size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

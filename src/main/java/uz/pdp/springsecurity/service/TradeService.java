@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -207,6 +208,11 @@ public class TradeService {
             return new ApiResponse("CUSTOMER ERROR", false);
         }
 
+        if (tradeDTO.isBacking()){
+            trade.setBacking(true);
+        } else if (trade.getBacking() == null){
+            trade.setBacking(false);
+        }
         trade.setDollar(tradeDTO.getDollar());
         trade.setGross(tradeDTO.getGross());
         trade.setPayDate(tradeDTO.getPayDate());
@@ -487,20 +493,26 @@ public class TradeService {
         return new ApiResponse("SUCCESS", true);
     }
 
-    public ApiResponse getAllByFilter(UUID id, String invoice, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public ApiResponse getAllByFilter(UUID id, String invoice, Boolean backing, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Trade> tradePage;
         if (businessRepository.existsById(id)) {
-            if (invoice != null) {
-                tradePage = tradeRepository.findAllByBranch_BusinessIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(id, invoice, invoice, pageable);
+            if (invoice != null && backing != null) {
+                tradePage = tradeRepository.findAllByBranch_BusinessIdAndInvoiceContainingAndBackingOrBranch_BusinessIdAndCustomer_NameContainingIgnoreCaseAndBacking(id, invoice, backing, id, invoice, backing, pageable);
+            } else if (invoice != null) {
+                tradePage = tradeRepository.findAllByBranch_BusinessIdAndInvoiceContainingOrBranch_BusinessIdAndCustomer_NameContainingIgnoreCase(id, invoice, id, invoice, pageable);
+            } else if (backing != null) {
+                tradePage = tradeRepository.findAllByBranch_BusinessIdAndBacking(id, backing, pageable);
             } else {
-                tradePage = tradeRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(id, pageable);
+                tradePage = tradeRepository.findAllByBranch_BusinessId(id, pageable);
             }
         } else if (branchRepository.existsById(id)) {
-            if (invoice != null) {
-                tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(id, invoice, invoice, pageable);
-            } else {
-                tradePage = tradeRepository.findAllByBranchIdOrderByCreatedAtDesc(id, pageable);
+            if (invoice != null && backing != null) {
+                tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingAndBackingOrBranchIdAndCustomer_NameContainingIgnoreCaseAndBacking(id, invoice, backing, id, invoice, backing, pageable);
+            } else if (invoice != null) {
+                tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingOrBranchIdAndCustomer_NameContainingIgnoreCase(id, invoice, id, invoice, pageable);
+            }else {
+                tradePage = tradeRepository.findAllByBranchId(id, pageable);
             }
         } else {
             return new ApiResponse("ID ERROR", false);
