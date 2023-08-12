@@ -82,10 +82,15 @@ public interface TradeRepository extends JpaRepository<Trade, UUID>, JpaSpecific
 
     Optional<Trade> findFirstByBranchIdOrderByCreatedAtDesc(UUID branchId);
 
-    Page<Trade> findAllByBranchIdOrderByCreatedAtDesc(UUID branchId, Pageable pageable);
+    Page<Trade> findAllByBranchId(UUID branchId, Pageable pageable);
+    Page<Trade> findAllByBranch_BusinessId(UUID businessId, Pageable pageable);
 
-    Page<Trade> findAllByBranch_BusinessIdOrderByCreatedAtDesc(UUID businessId, Pageable pageable);
+    Page<Trade> findAllByBranchIdAndBacking(UUID branchId, boolean backing, Pageable pageable);
+    Page<Trade> findAllByBranch_BusinessIdAndBacking(UUID businessId, boolean backing, Pageable pageable);
 
-    Page<Trade> findAllByBranch_BusinessIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(UUID businessId, String invoice, String name, Pageable pageable);
-    Page<Trade> findAllByBranchIdAndInvoiceContainingOrCustomer_NameContainingIgnoreCaseOrderByCreatedAtDesc(UUID branchId, String invoice, String name, Pageable pageable);
+    Page<Trade> findAllByBranch_BusinessIdAndInvoiceContainingOrBranch_BusinessIdAndCustomer_NameContainingIgnoreCase(UUID businessId, String invoice, UUID businessId2, String name, Pageable pageable);
+    Page<Trade> findAllByBranchIdAndInvoiceContainingOrBranchIdAndCustomer_NameContainingIgnoreCase(UUID branchId, String invoice, UUID branchId2, String name, Pageable pageable);
+
+    Page<Trade> findAllByBranch_BusinessIdAndInvoiceContainingAndBackingOrBranch_BusinessIdAndCustomer_NameContainingIgnoreCaseAndBacking(UUID businessId, String invoice, boolean backing,  UUID businessId2, String name, boolean backing2, Pageable pageable);
+    Page<Trade> findAllByBranchIdAndInvoiceContainingAndBackingOrBranchIdAndCustomer_NameContainingIgnoreCaseAndBacking(UUID branchId, String invoice, boolean backing,  UUID branchId2, String name, boolean backing2, Pageable pageable);
 }

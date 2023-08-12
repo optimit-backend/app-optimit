@@ -69,4 +69,6 @@ public class Trade extends AbsEntity {
     private Double kpi;
 
     private String invoice;
+
+    private Boolean backing;
 }
