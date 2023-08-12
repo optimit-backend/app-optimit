@@ -12,4 +12,6 @@ import java.util.UUID;
 public class TradeProductCustomerDto {
     private String productName;
     private UUID attachmentId;
+    private Double productCount;
+    private String measurementName;
 }

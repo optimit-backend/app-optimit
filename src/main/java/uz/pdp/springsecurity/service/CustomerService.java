@@ -294,6 +294,9 @@ public class CustomerService {
                 productCustomerDto.setProductName(tradeProduct.getProductTypePrice() != null ?
                         tradeProduct.getProductTypePrice().getName() : tradeProduct.getProduct().getName());
 
+                productCustomerDto.setProductCount(tradeProduct.getTradedQuantity());
+                productCustomerDto.setMeasurementName(tradeProduct.getProduct().getMeasurement().getName());
+
                 tradeProductCustomerDtoList.add(productCustomerDto);
             }
 
@@ -370,7 +373,7 @@ public class CustomerService {
             CustomerPreventedInfoDto customerPreventedInfoDto = new CustomerPreventedInfoDto();
             CustomerDebtRepaymentDto customerDebtRepaymentDto = new CustomerDebtRepaymentDto();
 
-            customerDebtRepaymentDto.setCreateAt(customerDebtRepayment.getCreatedAt());
+            customerDebtRepaymentDto.setCreateAt(customerDebtRepayment.getPayDate() != null ? customerDebtRepayment.getPayDate() : customerDebtRepayment.getCreatedAt());
             customerDebtRepaymentDto.setPaidSum(customerDebtRepayment.getPaidSum());
             customerDebtRepaymentDto.setPayMethodName(customerDebtRepayment.getPaymentMethod() != null ? customerDebtRepayment.getPaymentMethod().getType() : null);
 
