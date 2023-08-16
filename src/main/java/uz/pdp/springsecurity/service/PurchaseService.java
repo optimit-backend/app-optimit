@@ -1,6 +1,10 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
@@ -10,6 +14,7 @@ import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 import uz.pdp.springsecurity.utils.AppConstant;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -234,13 +239,6 @@ public class PurchaseService {
         return purchaseProduct;
     }
 
-    public ApiResponse getAllByBusiness(UUID businessId) {
-        List<Purchase> purchaseList = purchaseRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(businessId);
-        if (purchaseList.isEmpty()) return new ApiResponse("NOT FOUND", false);
-
-        return new ApiResponse("FOUND", true, purchaseList);
-    }
-
     public ApiResponse getOne(UUID id) {
         Optional<Purchase> optionalPurchase = purchaseRepository.findById(id);
         if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND PURCHASE", false);
@@ -306,27 +304,59 @@ public class PurchaseService {
         return new ApiResponse("DELETED", true);
     }
 
-    public ApiResponse getByDealerId(UUID dealer_id) {
-        List<Purchase> allByDealer_id = purchaseRepository.findAllBySupplierId(dealer_id);
-        if (allByDealer_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, allByDealer_id);
+    public ApiResponse getByBranch(UUID brId, UUID userId, UUID supId, Date date, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
+        Page<Purchase> purchasePage;
+        if (userId != null && supId != null && date != null)
+            purchasePage = purchaseRepository.findAllByBranchIdAndSellerIdAndSupplierIdAndDate(brId, userId, supId, date, pageable);
+        else if (userId != null && supId != null)
+            purchasePage = purchaseRepository.findAllByBranchIdAndSellerIdAndSupplierId(brId, userId, supId, pageable);
+        else if (userId != null && date != null)
+            purchasePage = purchaseRepository.findAllByBranchIdAndSellerIdAndDate(brId, userId, date, pageable);
+        else if (supId != null && date != null)
+            purchasePage = purchaseRepository.findAllByBranchIdAndSupplierIdAndDate(brId, supId,date, pageable);
+        else if (userId != null)
+            purchasePage = purchaseRepository.findAllByBranchIdAndSellerId(brId, userId, pageable);
+        else if (supId != null)
+            purchasePage = purchaseRepository.findAllByBranchIdAndSupplierId(brId, supId, pageable);
+        else if (date != null)
+            purchasePage = purchaseRepository.findAllByBranchIdAndDate(brId, date, pageable);
+        else
+            purchasePage = purchaseRepository.findAllByBranchId(brId, pageable);
+        return getAllHelper(purchasePage);
     }
 
-    public ApiResponse getByPurchaseStatusId(UUID purchaseStatus_id) {
-        List<Purchase> allByPurchaseStatus_id = purchaseRepository.findAllByPurchaseStatus_Id(purchaseStatus_id);
-        if (allByPurchaseStatus_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, allByPurchaseStatus_id);
+    public ApiResponse getByBusiness(UUID busId, UUID userId, UUID supId, Date date, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
+        Page<Purchase> purchasePage;
+        if (userId != null && supId != null && date != null)
+            purchasePage = purchaseRepository.findAllByBranch_BusinessIdAndSellerIdAndSupplierIdAndDate(busId, userId, supId, date, pageable);
+        else if (userId != null && supId != null)
+            purchasePage = purchaseRepository.findAllByBranch_BusinessIdAndSellerIdAndSupplierId(busId, userId, supId, pageable);
+        else if (userId != null && date != null)
+            purchasePage = purchaseRepository.findAllByBranch_BusinessIdAndSellerIdAndDate(busId, userId, date, pageable);
+        else if (supId != null && date != null)
+            purchasePage = purchaseRepository.findAllByBranch_BusinessIdAndSupplierIdAndDate(busId, supId,date, pageable);
+        else if (userId != null)
+            purchasePage = purchaseRepository.findAllByBranch_BusinessIdAndSellerId(busId, userId, pageable);
+        else if (supId != null)
+            purchasePage = purchaseRepository.findAllByBranch_BusinessIdAndSupplierId(busId, supId, pageable);
+        else if (date != null)
+            purchasePage = purchaseRepository.findAllByBranch_BusinessIdAndDate(busId, date, pageable);
+        else
+            purchasePage = purchaseRepository.findAllByBranch_BusinessId(busId, pageable);
+        return getAllHelper(purchasePage);
     }
 
-    public ApiResponse getByPaymentStatusId(UUID paymentStatus_id) {
-        List<Purchase> allByPaymentStatus_id = purchaseRepository.findAllByPaymentStatus_Id(paymentStatus_id);
-        if (allByPaymentStatus_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, allByPaymentStatus_id);
-    }
-
-    public ApiResponse getByBranchId(UUID branch_id) {
-        List<Purchase> allByBranch_id = purchaseRepository.findAllByBranch_IdOrderByCreatedAtDesc(branch_id);
-        if (allByBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        return new ApiResponse("FOUND", true, allByBranch_id);
+    private ApiResponse getAllHelper(Page<Purchase> purchasePage) {
+        if (purchasePage.isEmpty()) {
+            return new ApiResponse("MA'LUMOT TOPILMADI", false);
+        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("list", purchasePage.getContent());
+        response.put("currentPage", purchasePage.getNumber());
+        response.put("totalPage", purchasePage.getTotalPages());
+        response.put("totalItem", purchasePage.getTotalElements());
+        return new ApiResponse( true, response);
     }
 }
