@@ -12,17 +12,12 @@ import java.util.UUID;
 public interface ProductRepository extends JpaRepository<Product, UUID> {
     boolean existsByBarcodeAndBusinessIdAndActiveTrue(String barcode, UUID businessId);
     boolean existsByBarcodeAndBusinessIdAndIdIsNotAndActiveTrue(String barcode, UUID businessId, UUID productId);
-    Page<Product> findAllByBranchIdAndNameContainingIgnoreCaseAndActiveTrue(UUID branch_id, String name, Pageable pageable);
-    Page<Product> findAllByBranch_BusinessIdAndNameContainingIgnoreCaseAndActiveTrue(UUID branch_id, String name, Pageable pageable);
     List<Product> findAllByBrandIdAndCategoryIdAndBranchIdAndActiveTrue(UUID brand_id, UUID category_id, UUID branchId);
-    Page<Product> findAllByBrand_IdAndCategoryIdAndBranchIdAndActiveTrue(UUID brand_id, UUID category_id, UUID branchId,Pageable pageable);
     List<Product> findAllByBrandIdAndActiveIsTrue(UUID brand_id);
     Optional<Product> findByIdAndBranchIdAndActiveTrue(UUID id, UUID branchId);
     Optional<Product> findAllByBarcodeAndBranchIdAndActiveTrue(String barcode, UUID branch_id);
     List<Product> findAllByCategoryIdAndBranchIdAndActiveTrue(UUID category_id, UUID branch_id);
-    Page<Product> findAllByCategoryIdAndBranch_IdAndActiveTrue(UUID category_id, UUID branch_id,Pageable pageable);
     List<Product> findAllByBrandIdAndBusinessIdAndActiveTrue(UUID brand_id, UUID businessId);
-    Page<Product> findAllByBrand_IdAndBusinessIdAndActiveTrue(UUID brand_id, UUID businessId,Pageable pageable);
     List<Product> findAllByBranchIdAndActiveIsTrue(UUID branch_id);
     List<Product> findAllByBranchIdAndActiveIsTrueAndNameContainingIgnoreCase(UUID branch_id, String name);
     List<Product> findAllByBranchIdAndActiveIsTrueAndBarcodeContainingIgnoreCase(UUID branch_id, String name);
@@ -30,16 +25,28 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findAllByBranchIdAndBarcodeOrNameAndActiveTrue(UUID branch_id, String barcode, String name);
     Optional<Product> findByBarcodeAndBranch_IdAndActiveTrue(String barcode, UUID receivedBranch);
     List<Product> findAllByBusiness_IdAndActiveTrue(UUID businessId);
-    Page<Product> findAllByBusinessIdAndActiveTrue(UUID businessId,Pageable pageable);
     List<Product> findAllByBranchIdAndActiveTrue(UUID branch_id);
-    Page<Product> findAllByBranch_IdAndActiveTrue(UUID branch_id,Pageable pageable);
     List<Product> findAllByBusinessIdAndActiveFalse(UUID businessId);
     List<Product> findAllByCategoryIdAndBusinessIdAndActiveTrue(UUID categoryId, UUID businessId);
-    Page<Product> findAllByCategoryIdAndBusiness_IdAndActiveTrue(UUID categoryId, UUID businessId,Pageable pageable);
     List<Product> findAllByBrandIdAndBranchIdAndActiveTrue(UUID brandId, UUID branchId);
-    Page<Product> findAllByBrand_IdAndBranchIdAndActiveTrue(UUID brandId, UUID branchId,Pageable pageable);
     List<Product> findAllByBrandIdAndCategoryIdAndBusinessIdAndActiveTrue(UUID brandId, UUID categoryId, UUID businessId);
-    Page<Product> findAllByBrandIdAndCategoryIdAndBusiness_IdAndActiveTrue(UUID brandId, UUID categoryId, UUID businessId,Pageable pageable);
     List<Product> findAllByBusinessIdAndActiveTrueAndBuyDollarTrueOrSaleDollarTrue(UUID businessId);
     int countAllByBranchId(UUID branchId);
+
+
+
+    Page<Product> findAllByBusinessIdAndNameContainingIgnoreCaseAndActiveTrueOrBusinessIdAndBarcodeContainingIgnoreCaseAndActiveTrue(UUID busId1, String name, UUID busId2, String barcode, Pageable pageable);
+    Page<Product> findAllByBranch_IdAndNameContainingIgnoreCaseAndActiveTrueOrBusinessIdAndBarcodeContainingIgnoreCaseAndActiveTrue(UUID branchId1, String name, UUID branchId2, String barcode, Pageable pageable);
+
+    Page<Product> findAllByBusinessIdAndCategoryIdAndBrandIdAndActiveTrue(UUID businessId, UUID categoryId, UUID brandId, Pageable pageable);
+    Page<Product> findAllByBranch_IdAndCategoryIdAndBrandIdAndActiveTrue(UUID branchId, UUID categoryId, UUID brandId, Pageable pageable);
+
+    Page<Product> findAllByBusinessIdAndCategoryIdAndActiveTrue(UUID businessId, UUID categoryId, Pageable pageable);
+    Page<Product> findAllByBranch_IdAndCategoryIdAndActiveTrue(UUID branchId, UUID categoryId, Pageable pageable);
+
+    Page<Product> findAllByBusinessIdAndBrandIdAndActiveTrue(UUID businessId, UUID brandId, Pageable pageable);
+    Page<Product> findAllByBranch_IdAndBrandIdAndActiveTrue(UUID branchId, UUID brandId, Pageable pageable);
+
+    Page<Product> findAllByBusinessIdAndActiveTrue(UUID businessId, Pageable pageable);
+    Page<Product> findAllByBranch_IdAndActiveTrue(UUID branchId, Pageable pageable);
 }
