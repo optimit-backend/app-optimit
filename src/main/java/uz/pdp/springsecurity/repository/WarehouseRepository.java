@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
-
     Optional<Warehouse> findByBranchIdAndProductId(UUID branchId, UUID productId);
 
     List<Warehouse> findAllByBranch_BusinessIdAndProductId(UUID branchId, UUID productId);
@@ -40,10 +39,6 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 
     List<Warehouse> findAllByProduct_IdAndBranch_Id(UUID product_id, UUID branch_id);
 
-    List<Warehouse> findAllByProductTypePrice_Id(UUID productTypePrice_id);
-
-    List<Warehouse> findAllByProductTypePrice_IdAndBranch_Id(UUID productTypePrice_id, UUID product_branch_id);
-
     List<Warehouse> findAllByBranchId(UUID branchId);
     Page<Warehouse> findAllByBranch_Id(UUID branchId, Pageable pageable);
     Page<Warehouse> findAllByBranch_IdAndProduct_ActiveTrue(UUID branchId, Pageable pageable);
@@ -62,14 +57,14 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
     @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_type_price_id = ?1 AND branch_id = ?2", nativeQuery = true)
     Double amountByProductTypePriceAndBranchId(UUID productTypePriceId, UUID branchId);
 
-    @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_id = ?1", nativeQuery = true)
+    @Query(value = "SELECT SUM(w.amount) FROM Warehouse w WHERE w.product.id = ?1")
     Double amountByProductSingle(UUID productId);
-    @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1)", nativeQuery = true)
+    @Query(value = "SELECT SUM(w.amount) FROM Warehouse w WHERE w.productTypePrice.product.id = ?1")
     Double amountByProductMany(UUID productId);
 
-    @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_id = ?1 AND branch_id = ?2", nativeQuery = true)
+    @Query(value = "SELECT w.amount FROM Warehouse w WHERE w.product.id = ?1 AND w.branch.id = ?2")
     Double amountByProductSingleAndBranchId(UUID productId, UUID branchId);
-    @Query(value = "SELECT SUM(amount) FROM warehouse WHERE product_type_price_id IN (SELECT id FROM product_type_price WHERE product_id = ?1) AND branch_id = ?2", nativeQuery = true)
+    @Query(value = "SELECT SUM(w.amount) FROM Warehouse w WHERE w.productTypePrice.product.id = ?1 AND w.branch.id = ?2")
     Double amountByProductManyAndBranchId(UUID productId, UUID branchId);
 
     @Query(value = "SELECT SUM(w.amount * w.product.salePrice) FROM Warehouse w WHERE w.product.id = ?1")

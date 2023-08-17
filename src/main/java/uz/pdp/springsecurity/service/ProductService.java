@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.springsecurity.entity.*;
@@ -704,95 +705,50 @@ public class ProductService {
         return new ApiResponse("FOUND", true, productViewDtoList);
     }
 
-    public ApiResponse getByBusinessPageable(UUID businessId, UUID branch_id, UUID brand_id, UUID categoryId, String search, int page, int size) {
+    public ApiResponse getByBusinessPageable(UUID businessId, UUID branchId, UUID brandId, UUID catId, String search, int page, int size) {
+        if (search.isBlank()) search = null;
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.ASC, "name");
 
-        List<ProductViewDto> productViewDtoList = new ArrayList<>();
-        Page<Product> productList = null;
-        List<Product> products;
+        Page<Product> productPage;
 
-
-        boolean checkingBranch = false;
-        boolean checkingBrand = false;
-        boolean checkingCategory = false;
-        boolean checkingBusiness = false;
-
-        if (categoryId != null) {
-            checkingCategory = true;
-        }
-        if (brand_id != null) {
-            checkingBrand = true;
-        }
-        if (branch_id != null) {
-            checkingBranch = true;
-        }
-        if (businessId != null) {
-            checkingBusiness = true;
-        }
-        if (checkingBranch) {
-            checkingBusiness = false;
-        }
-        if (search.isBlank()) {
-            search = null;
-        }
-        if (search != null) {
-            String[] words = search.split("\\s+");
-            if (!search.equals("null")) {
-                for (String word : words) {
-                    if (branch_id != null) {
-                        productList = productRepository.findAllByBranchIdAndNameContainingIgnoreCaseAndActiveTrue(branch_id, word, pageable);
-                    } else {
-                        productList = productRepository.findAllByBranch_BusinessIdAndNameContainingIgnoreCaseAndActiveTrue(businessId, word, pageable);
-                    }
-                }
+        if (branchId != null) {
+            if (search != null) {
+                productPage = productRepository.findAllByBranch_IdAndNameContainingIgnoreCaseAndActiveTrueOrBusinessIdAndBarcodeContainingIgnoreCaseAndActiveTrue(branchId, search, branchId, search, pageable);
+            } else if (catId != null && brandId != null) {
+                productPage = productRepository.findAllByBranch_IdAndCategoryIdAndBrandIdAndActiveTrue(branchId, catId, brandId, pageable);
+            } else if (catId != null) {
+                productPage = productRepository.findAllByBranch_IdAndCategoryIdAndActiveTrue(branchId, catId, pageable);
+            } else if (brandId != null) {
+                productPage = productRepository.findAllByBranch_IdAndBrandIdAndActiveTrue(branchId, brandId, pageable);
+            } else {
+                productPage = productRepository.findAllByBranch_IdAndActiveTrue(branchId, pageable);
             }
         } else {
-            if (checkingCategory && checkingBrand && checkingBranch) {
-                productList = productRepository.findAllByBrand_IdAndCategoryIdAndBranchIdAndActiveTrue(brand_id, categoryId, branch_id, pageable);
-            } else if (checkingBrand && checkingBranch) {
-                productList = productRepository.findAllByBrand_IdAndBranchIdAndActiveTrue(brand_id, branch_id, pageable);
-            } else if (checkingCategory && checkingBranch) {
-                productList = productRepository.findAllByCategoryIdAndBranch_IdAndActiveTrue(categoryId, branch_id, pageable);
-            } else if (checkingCategory && checkingBrand && checkingBusiness) {
-                productList = productRepository.findAllByBrandIdAndCategoryIdAndBusiness_IdAndActiveTrue(brand_id, categoryId, businessId, pageable);
-            } else if (checkingBrand && checkingBusiness) {
-                productList = productRepository.findAllByBrand_IdAndBusinessIdAndActiveTrue(brand_id, businessId, pageable);
-            } else if (checkingCategory && checkingBusiness) {
-                productList = productRepository.findAllByCategoryIdAndBusiness_IdAndActiveTrue(categoryId, businessId, pageable);
-            } else if (checkingBusiness) {
-                productList = productRepository.findAllByBusinessIdAndActiveTrue(businessId, pageable);
-            } else if (checkingBranch) {
-                productList = productRepository.findAllByBranch_IdAndActiveTrue(branch_id, pageable);
-            }
-        }
-        int totalPages = 0;
-        long totalElements = 0;
-        int currentPage = 0;
-
-        if (productList != null && !productList.isEmpty()) {
-            products = productList.getContent();
-            totalPages = productList.getTotalPages();
-            currentPage = productList.getNumber();
-            totalElements = productList.getTotalElements();
-            if (checkingBranch) {
-                getProductMethod(productViewDtoList, products, branch_id);
+            if (search != null) {
+                productPage = productRepository.findAllByBusinessIdAndNameContainingIgnoreCaseAndActiveTrueOrBusinessIdAndBarcodeContainingIgnoreCaseAndActiveTrue(businessId, search, businessId, search, pageable);
+            } else if (catId != null && brandId != null) {
+                productPage = productRepository.findAllByBusinessIdAndCategoryIdAndBrandIdAndActiveTrue(businessId, catId, brandId, pageable);
+            } else if (catId != null) {
+                productPage = productRepository.findAllByBusinessIdAndCategoryIdAndActiveTrue(businessId, catId, pageable);
+            } else if (brandId != null) {
+                productPage = productRepository.findAllByBusinessIdAndBrandIdAndActiveTrue(businessId, brandId, pageable);
             } else {
-                getProductMethod(productViewDtoList, products, null);
+                productPage = productRepository.findAllByBusinessIdAndActiveTrue(businessId, pageable);
             }
         }
-
+        List<ProductViewDto> productViewDtoList = new ArrayList<>();
+        getProductMethod(productViewDtoList, productPage.getContent(), branchId);
         if (productViewDtoList.isEmpty()) {
-            return new ApiResponse("NOT FOUND", false);
+            return new ApiResponse("MA'LUMOT TOPILMADI", false);
         }
+
         Map<String, Object> response = new HashMap<>();
         response.put("product_list", productViewDtoList);
-        response.put("currentPage", currentPage);
-        response.put("totalPages", totalPages);
-        response.put("totalItems", totalElements);
-
-
-        return new ApiResponse("FOUND", true, response);
+        response.put("currentPage", productPage.getNumber());
+        response.put("totalPages", productPage.getTotalPages());
+        response.put("totalItems", productPage.getTotalElements());
+        return new ApiResponse( true, response);
     }
 
     public ApiResponse getByBranchProduct(UUID branchId) {
@@ -837,12 +793,12 @@ public class ProductService {
     }
 
     private void getProductMethod(List<ProductViewDto> productViewDtoList, List<Product> productList, UUID branchId) {
+        Double amountD;
+        double amount;
         for (Product product : productList) {
             ProductViewDto productViewDto = new ProductViewDto();
             productViewDto.setProductId(product.getId());
             productViewDto.setProductName(product.getName());
-            if (product.getBrand() != null)
-                productViewDto.setBrandName(product.getBrand().getName());
             productViewDto.setBarcode(product.getBarcode());
 
             productViewDto.setMinQuantity(product.getMinQuantity());
@@ -850,6 +806,10 @@ public class ProductService {
             productViewDto.setSaleDollar(product.isSaleDollar());
             productViewDto.setBranch(product.getBranch());
             productViewDto.setExpiredDate(product.getExpireDate());
+            if (product.getBrand() != null)
+                productViewDto.setBrandName(product.getBrand().getName());
+            if (product.getCategory() != null)
+                productViewDto.setCategory(product.getCategory().getName());
             if (product.getPhoto() != null) {
                 productViewDto.setPhotoId(product.getPhoto().getId());
             }
@@ -862,24 +822,8 @@ public class ProductService {
             }
 
             if (product.getType().equals(Type.MANY)) {
-                double total = 0;
                 List<ProductTypePrice> typePriceRepositoryAllByProductId = productTypePriceRepository.findAllByProductIdAndActiveTrue(product.getId());
                 for (ProductTypePrice productTypePrice : typePriceRepositoryAllByProductId) {
-                    List<Warehouse> allByByProductId;
-                    if (branchId != null) {
-                        allByByProductId = warehouseRepository.findAllByProductTypePrice_IdAndBranch_Id(productTypePrice.getId(), branchId);
-                    } else {
-                        allByByProductId = warehouseRepository.findAllByProductTypePrice_Id(productTypePrice.getId());
-                    }
-
-                    if (allByByProductId.isEmpty()) {
-                        productViewDto.setAmount(0);
-                    }
-                    double totalAmount = 0;
-                    for (Warehouse warehouse : allByByProductId) {
-                        totalAmount += warehouse.getAmount();
-                    }
-                    total += totalAmount;
                     productViewDto.setBuyPrice(productTypePrice.getBuyPrice());
                     productViewDto.setSalePrice(productTypePrice.getSalePrice());
                     productViewDto.setBuyPriceDollar(productTypePrice.getBuyPriceDollar());
@@ -887,32 +831,25 @@ public class ProductService {
                     productViewDto.setGrossPrice(productTypePrice.getGrossPrice());
                     productViewDto.setGrossPriceDollar(productTypePrice.getGrossPriceDollar());
                 }
-                productViewDto.setAmount(total);
+                if (branchId != null)
+                    amountD = warehouseRepository.amountByProductManyAndBranchId(product.getId(), branchId);
+                else
+                    amountD = warehouseRepository.amountByProductMany(product.getId());
+                amount = amountD == null ? 0 : amountD;
+                productViewDto.setAmount(amount);
             } else {
-                List<Warehouse> allByByProductId;
-                if (branchId != null) {
-                    allByByProductId = warehouseRepository.findAllByProduct_IdAndBranch_Id(product.getId(), branchId);
-                } else {
-                    allByByProductId = warehouseRepository.findAllByProduct_Id(product.getId());
-                }
-                if (allByByProductId.isEmpty()) {
-                    productViewDto.setAmount(0);
-                } else {
-                    double totalAmount = 0;
-                    for (Warehouse warehouse : allByByProductId) {
-                        totalAmount += warehouse.getAmount();
-                    }
-                    productViewDto.setAmount(totalAmount);
-                }
                 productViewDto.setBuyPrice(product.getBuyPrice());
                 productViewDto.setSalePrice(product.getSalePrice());
                 productViewDto.setBuyPriceDollar(product.getBuyPriceDollar());
                 productViewDto.setSalePriceDollar(product.getSalePriceDollar());
                 productViewDto.setGrossPrice(product.getGrossPrice());
                 productViewDto.setGrossPriceDollar(product.getGrossPriceDollar());
-                if (product.getCategory() != null) {
-                    productViewDto.setCategory(product.getCategory().getName());
-                }
+                if (branchId != null)
+                    amountD = warehouseRepository.amountByProductSingleAndBranchId(product.getId(), branchId);
+                else
+                    amountD = warehouseRepository.amountByProductSingle(product.getId());
+                amount = amountD == null ? 0 : amountD;
+                productViewDto.setAmount(amount);
             }
 
             productViewDtoList.add(productViewDto);
