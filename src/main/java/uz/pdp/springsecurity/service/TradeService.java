@@ -288,10 +288,19 @@ public class TradeService {
                 if (tradeProductDto.isDelete() && tradeProductDto.getTradeProductId() != null) {
                     Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
                     if (optionalTradeProduct.isPresent()) {
-                        TradeProduct tradeProduct = optionalTradeProduct.get();
+                        TradeProduct tp = optionalTradeProduct.get();
+
+                        if (tradeDTO.isBacking()) {
+                            if (tp.getBacking() != null) {
+                                tp.setBacking(tp.getBacking() + tp.getTradedQuantity());
+                            } else {
+                                tp.setBacking(tp.getTradedQuantity());
+                            }
+                        }
+
                         double tradedQuantity = tradeProductDto.getTradedQuantity(); // to send fifo calculation
                         tradeProductDto.setTradedQuantity(0);//  to make sold quantity 0
-                        TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(tradeProduct.getTrade().getBranch(), tradeProduct, tradeProductDto);
+                        TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(tp.getTrade().getBranch(), tp, tradeProductDto);
                         fifoCalculationService.returnedTrade(branch, savedTradeProduct, tradedQuantity);
                         tradeProductRepository.deleteById(tradeProductDto.getTradeProductId());
                     }
