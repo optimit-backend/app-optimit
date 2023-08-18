@@ -503,6 +503,8 @@ public class TradeService {
     }
 
     public ApiResponse getAllByFilter(UUID id, String invoice, Boolean backing, int page, int size) {
+        if (invoice != null && invoice.isBlank())
+            invoice = null;
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Trade> tradePage;
         if (businessRepository.existsById(id)) {
@@ -520,7 +522,9 @@ public class TradeService {
                 tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingAndBackingOrBranchIdAndCustomer_NameContainingIgnoreCaseAndBacking(id, invoice, backing, id, invoice, backing, pageable);
             } else if (invoice != null) {
                 tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingOrBranchIdAndCustomer_NameContainingIgnoreCase(id, invoice, id, invoice, pageable);
-            }else {
+            } else if (backing != null) {
+                tradePage = tradeRepository.findAllByBranchIdAndBacking(id, backing, pageable);
+            } else {
                 tradePage = tradeRepository.findAllByBranchId(id, pageable);
             }
         } else {
