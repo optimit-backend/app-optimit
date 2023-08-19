@@ -33,6 +33,7 @@ public class Purchase extends AbsEntity {
     private Branch branch;
     private Date date;
     private String description;
+    private String invoice;
     private double deliveryPrice;
     private double totalSum;
     private double paidSum;
