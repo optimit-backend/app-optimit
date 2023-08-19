@@ -25,7 +25,6 @@ public class InvoiceController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
-//    @CheckPermission("VIEW_INVOICE")
     @GetMapping("/{branchId}")
     public HttpEntity<?> getOne(@PathVariable UUID branchId) {
         ApiResponse apiResponse = invoiceService.getOne(branchId);

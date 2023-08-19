@@ -288,10 +288,19 @@ public class TradeService {
                 if (tradeProductDto.isDelete() && tradeProductDto.getTradeProductId() != null) {
                     Optional<TradeProduct> optionalTradeProduct = tradeProductRepository.findById(tradeProductDto.getTradeProductId());
                     if (optionalTradeProduct.isPresent()) {
-                        TradeProduct tradeProduct = optionalTradeProduct.get();
+                        TradeProduct tp = optionalTradeProduct.get();
+
+                        if (tradeDTO.isBacking()) {
+                            if (tp.getBacking() != null) {
+                                tp.setBacking(tp.getBacking() + tp.getTradedQuantity());
+                            } else {
+                                tp.setBacking(tp.getTradedQuantity());
+                            }
+                        }
+
                         double tradedQuantity = tradeProductDto.getTradedQuantity(); // to send fifo calculation
                         tradeProductDto.setTradedQuantity(0);//  to make sold quantity 0
-                        TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(tradeProduct.getTrade().getBranch(), tradeProduct, tradeProductDto);
+                        TradeProduct savedTradeProduct = warehouseService.createOrEditTrade(tp.getTrade().getBranch(), tp, tradeProductDto);
                         fifoCalculationService.returnedTrade(branch, savedTradeProduct, tradedQuantity);
                         tradeProductRepository.deleteById(tradeProductDto.getTradeProductId());
                     }
@@ -494,6 +503,8 @@ public class TradeService {
     }
 
     public ApiResponse getAllByFilter(UUID id, String invoice, Boolean backing, int page, int size) {
+        if (invoice != null && invoice.isBlank())
+            invoice = null;
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         Page<Trade> tradePage;
         if (businessRepository.existsById(id)) {
@@ -511,7 +522,9 @@ public class TradeService {
                 tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingAndBackingOrBranchIdAndCustomer_NameContainingIgnoreCaseAndBacking(id, invoice, backing, id, invoice, backing, pageable);
             } else if (invoice != null) {
                 tradePage = tradeRepository.findAllByBranchIdAndInvoiceContainingOrBranchIdAndCustomer_NameContainingIgnoreCase(id, invoice, id, invoice, pageable);
-            }else {
+            } else if (backing != null) {
+                tradePage = tradeRepository.findAllByBranchIdAndBacking(id, backing, pageable);
+            } else {
                 tradePage = tradeRepository.findAllByBranchId(id, pageable);
             }
         } else {

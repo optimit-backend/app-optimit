@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.springsecurity.annotations.CheckPermission;
-import uz.pdp.springsecurity.entity.LostProduction;
 import uz.pdp.springsecurity.payload.ApiResponse;
 import uz.pdp.springsecurity.payload.LostProductionDto;
 import uz.pdp.springsecurity.payload.TaskDto;

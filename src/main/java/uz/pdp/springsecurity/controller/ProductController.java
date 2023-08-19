@@ -40,13 +40,6 @@ public class ProductController {
     }
 
     @CheckPermission("VIEW_PRODUCT")
-    @GetMapping
-    public HttpEntity<?> get(@CurrentUser User user) {
-        ApiResponse apiResponse = productService.getAll(user);
-        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
-    }
-
-    @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/{id}")
     public HttpEntity<?> getOne(@PathVariable UUID id, @CurrentUser User user) {
         ApiResponse apiResponse = productService.getProduct(id, user);
@@ -72,6 +65,13 @@ public class ProductController {
     @GetMapping("/get-by-barcode/{barcode}")
     public HttpEntity<?> getByBarcode(@PathVariable String barcode, @CurrentUser User user) {
         ApiResponse apiResponse = productService.getByBarcode(barcode, user);
+        return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
+    }
+
+    @CheckPermission("VIEW_PRODUCT")
+    @GetMapping
+    public HttpEntity<?> get(@CurrentUser User user) {
+        ApiResponse apiResponse = productService.getAll(user);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
@@ -139,12 +139,12 @@ public class ProductController {
     @CheckPermission("VIEW_PRODUCT")
     @GetMapping("/get-by-business-pageable/{business_id}")
     public HttpEntity<?> getByBusinessPageable(@PathVariable UUID business_id,
-                                       @RequestParam(required = false) UUID branch_id,
-                                       @RequestParam(required = false) UUID brand_id,
-                                       @RequestParam(required = false) UUID categoryId,
-                                       @RequestParam(required = false) String search,
-                                       @RequestParam(defaultValue = "0", required = false) int page,
-                                       @RequestParam(defaultValue = "10", required = false) int size
+                                               @RequestParam(required = false) UUID branch_id,
+                                               @RequestParam(required = false) UUID brand_id,
+                                               @RequestParam(required = false) UUID categoryId,
+                                               @RequestParam(required = false) String search,
+                                               @RequestParam(defaultValue = "0", required = false) int page,
+                                               @RequestParam(defaultValue = "10", required = false) int size
     ) {
         ApiResponse apiResponse = productService.getByBusinessPageable(business_id, branch_id, brand_id, categoryId,search,page,size);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);

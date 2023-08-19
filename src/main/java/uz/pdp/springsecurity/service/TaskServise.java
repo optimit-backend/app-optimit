@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.geo.GeoPage;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
 import uz.pdp.springsecurity.enums.Importance;
@@ -16,7 +14,6 @@ import uz.pdp.springsecurity.mapper.TaskMapper;
 import uz.pdp.springsecurity.payload.*;
 import uz.pdp.springsecurity.repository.*;
 
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -343,11 +340,11 @@ public class TaskServise {
         }
         List<Map<String, Object>> responses = new ArrayList<>();
         for (TaskStatus status : taskStatusList) {
-            Integer integer = null;
+            Integer integer;
             integer = value.get(status.getId());
-            Page<Task> allTask = null;
+            Page<Task> allTask;
 
-            Pageable pageable = PageRequest.of(0, Objects.requireNonNullElse(integer, 5));
+            Pageable pageable = PageRequest.of(0, Objects.requireNonNullElse(integer, 5), Sort.Direction.DESC, "createdAt");
 
             if (userId == null) {
                 if (checkingProject && checkingType && checkingExpired) {
@@ -422,8 +419,8 @@ public class TaskServise {
 
     public ApiResponse getAllByBranchId(UUID branchId, UUID projectId, UUID statusId, UUID typeId, UUID userId, Date expired, int page, int size) {
 
-        Page<Task> tasks = null;
-        Pageable pageable = PageRequest.of(page, size);
+        Page<Task> tasks;
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         if (userId != null) {
             tasks = taskRepository.findAllByTaskPriceList_UserList_Id(userId, pageable);
         } else if (projectId != null && statusId != null && typeId != null) {
@@ -468,7 +465,7 @@ public class TaskServise {
     }
 
     public ApiResponse getAll(UUID branchId, UUID userId) {
-        List<Task> taskList = null;
+        List<Task> taskList;
         if (userId != null) {
             taskList = taskRepository.findTasksByUserId(userId);
         } else {
@@ -490,7 +487,7 @@ public class TaskServise {
     }
 
     public ApiResponse searchByName(UUID branchId,String name, int page, int size, UUID userId) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         String[] words = name.split("\\s+");
         Page<Task> taskPage = null;
         if (userId == null) {
@@ -510,14 +507,14 @@ public class TaskServise {
 
     public ApiResponse getOwnTask(UUID userId, UUID branchId, int page, int size) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
 
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()) {
             return new ApiResponse("Branch Not Found", false);
         }
 
-        Page<Task> tasks = null;
+        Page<Task> tasks;
 
         if (userId != null) {
             Optional<User> optionalUser = userRepository.findById(userId);
