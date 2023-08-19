@@ -745,10 +745,12 @@ public class ProductService {
 
         Map<String, Object> response = new HashMap<>();
         response.put("product_list", productViewDtoList);
+
         response.put("currentPage", productPage.getNumber());
         response.put("totalPages", productPage.getTotalPages());
         response.put("totalItems", productPage.getTotalElements());
         return new ApiResponse( true, response);
+
     }
 
     public ApiResponse getByBranchProduct(UUID branchId) {
