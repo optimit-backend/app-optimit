@@ -22,38 +22,31 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PurchaseService {
     private final PurchaseRepository purchaseRepository;
-
     private final PurchaseProductRepository purchaseProductRepository;
-
     private final ProductRepository productRepository;
-
     private final SupplierRepository supplierRepository;
-
     private final ExchangeStatusRepository exchangeStatusRepository;
-
     private final PaymentStatusRepository paymentStatusRepository;
-
     private final BranchRepository branchRepository;
-
     private final UserRepository userRepository;
-
     private final CurrencyRepository currencyRepository;
-
     private final FifoCalculationService fifoCalculationService;
-
     private final ProductTypePriceRepository productTypePriceRepository;
-
     private final WarehouseService warehouseService;
-
     private final BalanceService balanceService;
-
     private final PayMethodRepository payMethodRepository;
     private final FifoCalculationRepository fifoCalculationRepository;
     private final HistoryRepository historyRepository;
 
-
     public ApiResponse add(PurchaseDto purchaseDto) {
+        Optional<Purchase> optionalPurchase = purchaseRepository.findFirstByBranchIdOrderByCreatedAtDesc(purchaseDto.getBranchId());
+        int invoice = 0;
+        if (optionalPurchase.isPresent()) {
+            String invoiceStr = optionalPurchase.get().getInvoice();
+            invoice = invoiceStr != null ? Integer.parseInt(invoiceStr) : 0;
+        }
         Purchase purchase = new Purchase();
+        purchase.setInvoice(String.valueOf(++invoice));
         return createOrEditPurchase(false, purchase, purchaseDto);
     }
 
@@ -139,14 +132,14 @@ public class PurchaseService {
                     HistoryName.XARID,
                     user,
                     branch,
-                    AppConstant.EDIT_PURCHASE
+                    purchase.getInvoice() + AppConstant.EDIT_PURCHASE
             ));
         } else {
             historyRepository.save(new History(
                     HistoryName.XARID,
                     user,
                     branch,
-                    AppConstant.ADD_PURCHASE
+                    purchase.getInvoice() + AppConstant.ADD_PURCHASE
             ));
         }
 
@@ -291,14 +284,16 @@ public class PurchaseService {
 
     public ApiResponse delete(UUID id) {
         Optional<Purchase> optionalPurchase = purchaseRepository.findById(id);
-        if (optionalPurchase.isEmpty()) return new ApiResponse("NOT FOUND", false);
+        if (optionalPurchase.isEmpty())
+            return new ApiResponse("NOT FOUND", false);
+        String invoice = optionalPurchase.get().getInvoice();
 //        HISTORY
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         historyRepository.save(new History(
                 HistoryName.XARID,
                 user,
                 optionalPurchase.get().getBranch(),
-                AppConstant.DELETE_PURCHASE
+                invoice + AppConstant.DELETE_PURCHASE
         ));
         purchaseRepository.deleteById(id);
         return new ApiResponse("DELETED", true);

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.*;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, UUID> {
+    Optional<Purchase> findFirstByBranchIdOrderByCreatedAtDesc(UUID branchId);
 
     List<Purchase> findAllByBranch_IdOrderByCreatedAtDesc(UUID branch_id);
 
