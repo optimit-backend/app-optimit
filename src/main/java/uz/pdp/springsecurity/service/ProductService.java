@@ -785,12 +785,12 @@ public class ProductService {
         if (productViewDtoList.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         }
+
         Map<String, Object> response = new HashMap<>();
         response.put("product_list", productViewDtoList);
         response.put("currentPage", currentPage);
         response.put("totalPages", totalPages);
         response.put("totalItems", totalElements);
-
 
         return new ApiResponse("FOUND", true, response);
     }
