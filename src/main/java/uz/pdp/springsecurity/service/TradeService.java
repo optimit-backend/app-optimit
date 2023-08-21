@@ -92,11 +92,11 @@ public class TradeService {
             return new ApiResponse("NOT FOUND TRADE", false);
         }
         Trade trade = optionalTrade.get();
-        if (!trade.isEditable()) return new ApiResponse("YOU CAN NOT EDIT AFTER 7 DAYS", false);
+        if (!trade.isEditable()) return new ApiResponse("YOU CAN NOT EDIT AFTER 30 DAYS", false);
         int days = LocalDateTime.now().getDayOfYear() - trade.getCreatedAt().toLocalDateTime().getDayOfYear();
-        if (days > 6) {
+        if (days > 30) {
             trade.setEditable(false);
-            return new ApiResponse("YOU CAN NOT EDIT AFTER 7 DAYS", false);
+            return new ApiResponse("YOU CAN NOT EDIT AFTER 30 DAYS", false);
         }
         return createOrEditTrade(trade, tradeDTO, true);
     }
