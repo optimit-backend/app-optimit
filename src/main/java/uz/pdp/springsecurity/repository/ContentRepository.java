@@ -10,8 +10,11 @@ import java.util.UUID;
 
 public interface ContentRepository extends JpaRepository<Content, UUID> {
     Page<Content> findAllByBranch_Id(UUID branch_id, Pageable pageable);
+
     List<Content> findAllByBranchId(UUID branchId);
 
 
-    Page<Content> findAllByProduct_NameContainingIgnoreCaseAndBranchId(String product_name, UUID branch_id, Pageable pageable);
+    Page<Content> findAllByProduct_NameContainingIgnoreCaseAndBranchIdOrProductTypePrice_NameContainingIgnoreCaseAndBranchId(String product_name, UUID branch_id, String productTypePrice_name, UUID branch_id2, Pageable pageable);
+
+    Page<Content> findAllByProductTypePrice_NameContainingIgnoreCaseAndBranchId(String product_name, UUID branch_id, Pageable pageable);
 }
