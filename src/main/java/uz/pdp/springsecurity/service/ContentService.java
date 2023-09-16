@@ -129,7 +129,7 @@ public class ContentService {
         if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
         Page<Content> contents = null;
         if (name != null) {
-            contents = contentRepository.findAllByProduct_NameContainingIgnoreCaseAndBranchId(name, branchId, pageable);
+            contents = contentRepository.findAllByProduct_NameContainingIgnoreCaseAndBranchIdOrProductTypePrice_NameContainingIgnoreCaseAndBranchId(name, branchId, name, branchId, pageable);
         } else {
             contents = contentRepository.findAllByBranch_Id(branchId, pageable);
         }

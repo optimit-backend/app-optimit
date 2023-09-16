@@ -75,7 +75,7 @@ public class OutlayService {
                 HistoryName.XARAJAT,
                 user,
                 outlay.getBranch(),
-                outlay.getTotalSum()+AppConstant.ADD_OUTLAY
+                outlay.getTotalSum() + AppConstant.ADD_OUTLAY
         ));
         return new ApiResponse("ADDED", true);
     }
@@ -144,7 +144,7 @@ public class OutlayService {
                 HistoryName.XARAJAT,
                 user,
                 outlay.getBranch(),
-                outlay.getTotalSum()+AppConstant.DELETE_OUTLAY
+                outlay.getTotalSum() + AppConstant.DELETE_OUTLAY
         ));
         outlayRepository.deleteById(id);
         return new ApiResponse("DELETED", true);
@@ -159,7 +159,7 @@ public class OutlayService {
     public ApiResponse getAllByBranchId(UUID branch_id) {
         List<Outlay> allByBranch_id = outlayRepository.findAllByBranch_Id(branch_id);
         if (allByBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        allByBranch_id.sort(Comparator.comparing(Outlay::getTotalSum).reversed());
+        allByBranch_id.sort(Comparator.comparing(Outlay::getCreatedAt).reversed());
         return new ApiResponse("FOUND", true, allByBranch_id);
     }
 
@@ -168,6 +168,7 @@ public class OutlayService {
         if (allByBusinessId.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         }
+        allByBusinessId.sort(Comparator.comparing(Outlay::getCreatedAt).reversed());
         return new ApiResponse("FOUND", true, allByBusinessId);
     }
 

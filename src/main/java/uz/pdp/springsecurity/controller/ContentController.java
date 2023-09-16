@@ -49,6 +49,7 @@ public class ContentController {
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 
+
     @CheckPermission("GET_CONTENT")
     @GetMapping("/{contentId}")
     public HttpEntity<?> getOne(@PathVariable UUID contentId) {
@@ -62,4 +63,6 @@ public class ContentController {
         ApiResponse apiResponse = contentService.deleteOne(contentId);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
+
+
 }
