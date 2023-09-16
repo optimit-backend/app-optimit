@@ -796,7 +796,7 @@ public class ReportsService {
 
         if (categoryId == null && startDate == null && endDate == null) {
             outlayCategoryRepository.findAllByBranch_Id(branchId);
-            outlayList = outlayRepository.findAllByBranch_Id(branchId);
+            outlayList = outlayRepository.findAllByBranch_IdOrderByCreatedAtDesc(branchId);
             if (outlayList.isEmpty()) {
                 return new ApiResponse("Not Found Outlay", false);
             }

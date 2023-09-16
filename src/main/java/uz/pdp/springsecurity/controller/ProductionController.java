@@ -39,8 +39,8 @@ public class ProductionController {
     public HttpEntity<?> getAll(@PathVariable UUID branchId,
                                 @RequestParam int page,
                                 @RequestParam int size,
-                                @RequestParam(required = false) String productionName) {
-        ApiResponse apiResponse = productionService.getAll(branchId, page, size, productionName);
+                                @RequestParam(required = false) String name) {
+        ApiResponse apiResponse = productionService.getAll(branchId, page, size, name);
         return ResponseEntity.status(apiResponse.isSuccess() ? 200 : 409).body(apiResponse);
     }
 

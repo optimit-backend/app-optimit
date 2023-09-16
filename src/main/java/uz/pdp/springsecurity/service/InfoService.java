@@ -125,7 +125,7 @@ public class InfoService {
                     businessId,
                     purchaseRepository.findAllByBranch_IdOrderByCreatedAtDesc(branchId),
                     tradeRepository.findAllByBranch_IdOrderByCreatedAtDesc(branchId),
-                    outlayRepository.findAllByBranch_Id(branchId),
+                    outlayRepository.findAllByBranch_IdOrderByCreatedAtDesc(branchId),
                     paymentRepository.findAllByTrade_BranchId(branchId),
                     outlayRepository.findAllByCreatedAtBetweenAndBranchId(Timestamp.valueOf(TODAY_START), Timestamp.valueOf(TODAY_END), branchId),
                     customerRepository.findAllByBranchesIdAndDebtIsNotOrderByPayDateAsc(branchId, 0d)

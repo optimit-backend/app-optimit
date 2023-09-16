@@ -13,13 +13,14 @@ import java.util.UUID;
 public interface ProductionRepository extends JpaRepository<Production, UUID> {
     List<Production> findAllByBranchIdAndDoneIsTrueOrderByCreatedAtDesc(UUID branchId);
 
+    Page<Production> findAllByBranchIdAndDoneIsTrue(UUID branchId, Pageable pageable);
+
     List<Production> findAllByProduct_CategoryIdAndProduct_BrandIdAndProduct_BranchIdAndDoneIsTrue(UUID product_category_id, UUID product_brand_id, UUID product_branch_business_id);
 
     List<Production> findAllByProduct_CategoryIdAndProduct_BranchIdAndDoneIsTrue(UUID product_category_id, UUID product_branch_business_id);
 
     List<Production> findAllByProduct_BrandIdAndProduct_BranchIdAndDoneIsTrue(UUID product_category_id, UUID product_branch_business_id);
-    List<Production> findAllByBranchIdAndProduct_NameContainingIgnoreCaseAndDoneIsTrue(UUID branch_id, String product_name);
-    List<Production> findAllByBranchIdAndProductTypePrice_NameContainingIgnoreCaseAndDoneIsTrue(UUID branch_id, String product_name);
+    Page<Production> findAllByBranchIdAndDoneIsTrueAndProduct_NameContainingIgnoreCaseOrBranchIdAndDoneIsTrueAndProductTypePrice_NameContainingIgnoreCase(UUID branchId, String name, UUID branchId2, String name2, Pageable pageable);
 
     @Query(value = "SELECT SUM(quantity) FROM production WHERE created_at BETWEEN ?1 AND  ?2 AND branch_id = ?3", nativeQuery = true)
     Double amountByCreatedAtBetweenAndBranchId(Timestamp from, Timestamp to, UUID branch_id);

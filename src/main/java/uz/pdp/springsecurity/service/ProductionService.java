@@ -1,10 +1,7 @@
 package uz.pdp.springsecurity.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import uz.pdp.springsecurity.entity.*;
@@ -341,22 +338,17 @@ public class ProductionService {
         return lossContentPrice;
     }
 
-    public ApiResponse getAll(UUID branchId, int page, int size, String productionName) {
+    public ApiResponse getAll(UUID branchId, int page, int size, String name) {
         Optional<Branch> optionalBranch = branchRepository.findById(branchId);
         if (optionalBranch.isEmpty()) return new ApiResponse("NOT FOUND BRANCH", false);
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Production> all = null;
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
+        Page<Production> all;
 
-        if (productionName != null) {
-            List<Production> allProduct = productionRepository.findAllByBranchIdAndProduct_NameContainingIgnoreCaseAndDoneIsTrue(branchId, productionName);
-            allProduct.addAll(productionRepository.findAllByBranchIdAndProductTypePrice_NameContainingIgnoreCaseAndDoneIsTrue(branchId, productionName));
-            Set<Production> productionSet = new HashSet<>(allProduct);
-            allProduct = new ArrayList<>(productionSet);
-            all = new PageImpl<>(allProduct, pageable, allProduct.size());
+        if (name != null && !name.isBlank()) {
+            all = productionRepository.findAllByBranchIdAndDoneIsTrueAndProduct_NameContainingIgnoreCaseOrBranchIdAndDoneIsTrueAndProductTypePrice_NameContainingIgnoreCase(branchId, name, branchId, name, pageable);
         } else {
-            List<Production> allByBranchId = productionRepository.findAllByBranchIdAndDoneIsTrueOrderByCreatedAtDesc(branchId);
-            all = new PageImpl<>(allByBranchId, pageable, allByBranchId.size());
+            all = productionRepository.findAllByBranchIdAndDoneIsTrue(branchId, pageable);
         }
 
         if (all.isEmpty()) return new ApiResponse("NOT FOUND", false);

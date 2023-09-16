@@ -157,18 +157,16 @@ public class OutlayService {
     }
 
     public ApiResponse getAllByBranchId(UUID branch_id) {
-        List<Outlay> allByBranch_id = outlayRepository.findAllByBranch_Id(branch_id);
+        List<Outlay> allByBranch_id = outlayRepository.findAllByBranch_IdOrderByCreatedAtDesc(branch_id);
         if (allByBranch_id.isEmpty()) return new ApiResponse("NOT FOUND", false);
-        allByBranch_id.sort(Comparator.comparing(Outlay::getCreatedAt).reversed());
         return new ApiResponse("FOUND", true, allByBranch_id);
     }
 
     public ApiResponse getAllByBusinessId(UUID businessId) {
-        List<Outlay> allByBusinessId = outlayRepository.findAllByBranch_BusinessId(businessId);
+        List<Outlay> allByBusinessId = outlayRepository.findAllByBranch_BusinessIdOrderByCreatedAtDesc(businessId);
         if (allByBusinessId.isEmpty()) {
             return new ApiResponse("NOT FOUND", false);
         }
-        allByBusinessId.sort(Comparator.comparing(Outlay::getCreatedAt).reversed());
         return new ApiResponse("FOUND", true, allByBusinessId);
     }
 
