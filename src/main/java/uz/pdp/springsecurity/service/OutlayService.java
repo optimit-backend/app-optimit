@@ -26,12 +26,16 @@ public class OutlayService {
 
     @Autowired
     UserRepository userRepository;
+
     @Autowired
     PayMethodRepository payMethodRepository;
+
     @Autowired
     BalanceService balanceService;
+
     @Autowired
     private BalanceRepository balanceRepository;
+
     @Autowired
     private HistoryRepository historyRepository;
 
